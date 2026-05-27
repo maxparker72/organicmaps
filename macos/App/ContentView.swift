@@ -68,6 +68,11 @@ struct ContentView: View {
           onAddBookmark: {
             OMBookmarksHelper.addBookmarkForCurrentPlace()
             bookmarksModel.refresh()
+          },
+          onChanged: { bookmarksModel.refresh() },
+          onDeleted: {
+            placePageModel.clearSelection()
+            bookmarksModel.refresh()
           })
           .transition(.move(edge: .trailing))
       }

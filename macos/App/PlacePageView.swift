@@ -7,11 +7,32 @@ struct PlacePageView: View {
   let onClear: () -> Void
   let onHide: () -> Void
   let onAddBookmark: () -> Void
+  let onChanged: () -> Void
+  let onDeleted: () -> Void
+
+  @State private var editing = false
+
+  private var isEditable: Bool { info.isBookmark || info.isTrack }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       header
       Divider()
+      if editing {
+        EntityEditView(
+          info: info,
+          onSave: { editing = false; onChanged() },
+          onCancel: { editing = false },
+          onDelete: { editing = false; onDeleted() })
+      } else {
+        readContent
+      }
+    }
+    .frame(width: 340)
+    .background(.regularMaterial)
+  }
+
+  private var readContent: some View {
       ScrollView {
         VStack(alignment: .leading, spacing: 18) {
           if !info.subtitle.isEmpty || info.hasDistance {
@@ -34,9 +55,6 @@ struct PlacePageView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
       }
-    }
-    .frame(width: 340)
-    .background(.regularMaterial)
   }
 
   // MARK: - Header & summary
@@ -50,6 +68,10 @@ struct PlacePageView: View {
         }
       }
       Spacer()
+      if isEditable && !editing {
+        Button { editing = true } label: { Image(systemName: "pencil") }
+          .buttonStyle(.borderless).help("Edit")
+      }
       Button(action: onHide) { Image(systemName: "sidebar.right") }
         .buttonStyle(.borderless).help("Hide info pane")
       Button(action: onClear) { Image(systemName: "xmark.circle.fill") }

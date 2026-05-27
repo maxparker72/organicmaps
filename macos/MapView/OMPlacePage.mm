@@ -74,9 +74,13 @@ OMPlaceInfo * BuildPlaceInfo()
   place.longitude = ll.m_lon;
 
   place.isBookmark = info.IsBookmark();
+  place.isTrack = info.IsTrack();
   place.isMyPosition = info.IsMyPosition();
   place.canEdit = info.ShouldShowEditPlace();
   place.canAdd = info.ShouldShowAddPlace();
+  place.bookmarkId = info.IsBookmark() ? info.GetBookmarkId() : 0;
+  place.trackId = info.IsTrack() ? info.GetTrackId() : 0;
+  place.categoryId = info.GetBookmarkCategoryId();
 
   using MetadataID = osm::MapObject::MetadataID;
   info.ForEachMetadataReadable([&place](MetadataID metaID, std::string const & value)

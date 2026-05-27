@@ -56,6 +56,13 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
   func showAll() { manager.setUserCategoriesVisible(true); refresh() }
   func hideAll() { manager.setUserCategoriesVisible(false); refresh() }
 
+  func createList(_ name: String) {
+    let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return }
+    manager.createCategory(withName: trimmed)
+    refresh()
+  }
+
   // MARK: - Show on map
 
   func showBookmarkOnMap(_ id: MWMMarkID) { FrameworkHelper.showBookmark(id) }

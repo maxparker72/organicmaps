@@ -10,6 +10,8 @@ struct NavigatorView: View {
   let onHide: () -> Void
 
   @State private var expanded: Set<MWMMarkGroupID> = []
+  @State private var showNewList = false
+  @State private var newListName = ""
 
   var body: some View {
     VStack(spacing: 0) {
@@ -28,12 +30,19 @@ struct NavigatorView: View {
     }
     .frame(width: 300)
     .background(.regularMaterial)
+    .alert("New List", isPresented: $showNewList) {
+      TextField("Name", text: $newListName)
+      Button("Create") { model.createList(newListName); newListName = "" }
+      Button("Cancel", role: .cancel) { newListName = "" }
+    }
   }
 
   private var header: some View {
     HStack(spacing: 8) {
       Text("Bookmarks").font(.headline)
       Spacer()
+      Button { showNewList = true } label: { Image(systemName: "plus") }
+        .buttonStyle(.borderless).help("New list")
       Button { model.showAll() } label: { Image(systemName: "eye") }
         .buttonStyle(.borderless).help("Show all lists")
       Button { model.hideAll() } label: { Image(systemName: "eye.slash") }

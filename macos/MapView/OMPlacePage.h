@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 
+#import <CoreApi/MWMTypes.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 // A snapshot of the currently selected map object, for the info pane.
@@ -12,9 +14,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign) double latitude;
 @property(nonatomic, assign) double longitude;
 @property(nonatomic, assign) BOOL isBookmark;
+@property(nonatomic, assign) BOOL isTrack;
 @property(nonatomic, assign) BOOL isMyPosition;
 @property(nonatomic, assign) BOOL canEdit;
 @property(nonatomic, assign) BOOL canAdd;
+// Identity of the selected user object (0 when not applicable).
+@property(nonatomic, assign) MWMMarkID bookmarkId;
+@property(nonatomic, assign) MWMTrackID trackId;
+@property(nonatomic, assign) MWMMarkGroupID categoryId;
 
 // Distance / direction from the user's current position (if known).
 @property(nonatomic, assign) BOOL hasDistance;
