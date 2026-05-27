@@ -53,6 +53,40 @@ projectReferences:
   vulkan_wrapper: { path: ../xcode/vulkan_wrapper/vulkan_wrapper.xcodeproj }
 
 targets:
+  # Objective-C++ bridge to the C++ core, shared with the iOS app. Built as a
+  # static framework (matches iOS MACH_O_TYPE=staticlib); C++ symbols are
+  # resolved by the app, which links the engine libs.
+  CoreApi:
+    type: framework
+    platform: macOS
+    deploymentTarget: "14.0"
+    configFiles:
+      Debug: ../xcode/common-debug.xcconfig
+      Release: ../xcode/common-release.xcconfig
+    sources:
+      - path: ../iphone/CoreApi/CoreApi
+        headerVisibility: public
+    settings:
+      base:
+        PRODUCT_NAME: CoreApi
+        PRODUCT_BUNDLE_IDENTIFIER: app.organicmaps.desktop.CoreApi
+        MACH_O_TYPE: staticlib
+        DEFINES_MODULE: YES
+        MODULEMAP_FILE: ../iphone/CoreApi/CoreApi.modulemap
+        SDKROOT: macosx
+        SUPPORTED_PLATFORMS: macosx
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        CLANG_ENABLE_MODULES: YES
+        CLANG_ENABLE_OBJC_ARC: YES
+        CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES: YES
+        OMIM_ROOT: $(PROJECT_DIR)/..
+        HEADER_SEARCH_PATHS:
+          - $(inherited)
+          - $(OMIM_ROOT)
+          - $(OMIM_ROOT)/libs
+          - $(OMIM_ROOT)/3party/glm
+          - $(OMIM_ROOT)/3party/pugixml/pugixml/src
+
   OMapsDesktop:
     type: application
     platform: macOS
@@ -102,6 +136,8 @@ targets:
           cp -f "${BUILT_PRODUCTS_DIR}/shaders_metal.metallib" \
             "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources/shaders_metal.metallib"
     dependencies:
+      - target: CoreApi
+        embed: false
       - target: agg/agg
       - target: base/base
       - target: bsdiff/bsdiff

@@ -11,7 +11,7 @@
 @class MWMCarPlayBookmarkObject;
 @class MWMTrack;
 @class RecentlyDeletedCategory;
-@class UIColor;
+#import "TargetConditionalUI.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -3,7 +3,8 @@
 #import <Metal/Metal.h>
 #import <QuartzCore/CAMetalLayer.h>
 
-#include "Core/Framework.h"
+#include <CoreApi/Framework.h>
+
 #include "iphone/Maps/Core/MapRendering/MetalContextFactory.h"
 
 #include "map/framework.hpp"

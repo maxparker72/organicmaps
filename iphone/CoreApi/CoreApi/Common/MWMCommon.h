@@ -1,4 +1,4 @@
-#import <UIKit/UIKit.h>
+#import "TargetConditionalUI.h"
 
 #import "MWMTypes.h"
 
@@ -24,7 +24,11 @@ static inline BOOL firstVersionIsLessThanSecond(NSString * first, NSString * sec
 
 static inline BOOL isInterfaceRightToLeft(void) NS_EXTENSION_UNAVAILABLE_IOS("Not available in extensions")
 {
+#if TARGET_OS_IPHONE
   return UIApplication.sharedApplication.userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+#else
+  return NSApp.userInterfaceLayoutDirection == NSUserInterfaceLayoutDirectionRightToLeft;
+#endif
 }
 
 static inline NSString * formattedSize(uint64_t size)

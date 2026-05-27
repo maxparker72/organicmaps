@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import <UIKit/UIColor.h>
+#import "TargetConditionalUI.h"
 #import "MWMTypes.h"
 
 @class TrackInfo;
