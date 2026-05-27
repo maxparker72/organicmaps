@@ -47,6 +47,9 @@ struct PlacePageView: View {
             }
             .buttonStyle(.borderedProminent)
           }
+          if info.isTrack {
+            section("Elevation") { TrackElevationView(trackId: info.trackId) }
+          }
           hoursSection
           contactSection
           detailsSection

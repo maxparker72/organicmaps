@@ -16,10 +16,18 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)omLinkForLat:(double)lat lon:(double)lon name:(NSString *)name
     NS_SWIFT_NAME(omLink(lat:lon:name:));
 
+// Elevation profile of a track as points (x = cumulative distance m, y = altitude m).
++ (NSArray<NSValue *> *)elevationProfileForTrack:(MWMTrackID)trackId
+    NS_SWIFT_NAME(elevationProfile(forTrack:));
+
 + (NSString *)formatDistanceMeters:(double)meters NS_SWIFT_NAME(formatDistance(meters:));
 + (nullable NSString *)distanceFromCurrentPositionToLat:(double)lat
                                                     lon:(double)lon
     NS_SWIFT_NAME(distanceFromCurrentPosition(toLat:lon:));
+
+// Distance in metres from the user's position, or -1 if the position is unknown.
++ (double)metersFromCurrentPositionToLat:(double)lat lon:(double)lon
+    NS_SWIFT_NAME(metersFromCurrentPosition(toLat:lon:));
 
 @end
 

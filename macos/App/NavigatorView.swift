@@ -9,20 +9,52 @@ struct NavigatorView: View {
   let onSelectTrack: (MWMTrackID) -> Void
   let onHide: () -> Void
 
+  enum ListSort: String, CaseIterable, Identifiable {
+    case dateAdded = "Date Added", nameAsc = "Name A→Z", nameDesc = "Name Z→A"
+    var id: String { rawValue }
+  }
+  enum ItemSort: String, CaseIterable, Identifiable {
+    case nameAsc = "Name A→Z", nameDesc = "Name Z→A", distanceLength = "Distance / Length"
+    var id: String { rawValue }
+  }
+
+  private enum NavItem: Identifiable {
+    case bookmark(Bookmark)
+    case track(Track)
+    var id: String {
+      switch self {
+      case .bookmark(let b): return "b\(b.bookmarkId)"
+      case .track(let t): return "t\(t.trackId)"
+      }
+    }
+    var name: String {
+      switch self {
+      case .bookmark(let b): return b.bookmarkName
+      case .track(let t): return t.trackName
+      }
+    }
+  }
+
   @State private var expanded: Set<MWMMarkGroupID> = []
   @State private var showNewList = false
   @State private var newListName = ""
+  @State private var searchText = ""
+  @State private var listSort: ListSort = .dateAdded
+  @State private var itemSort: ItemSort = .nameAsc
+  @State private var groupByType = true
+
+  private var searching: Bool { !searchText.isEmpty }
 
   var body: some View {
     VStack(spacing: 0) {
       header
+      searchField
       Divider()
       List {
-        ForEach(model.lists, id: \.categoryId) { list in
+        ForEach(visibleLists, id: \.categoryId) { list in
           listRow(list)
-          if expanded.contains(list.categoryId) {
-            ForEach(list.bookmarks, id: \.bookmarkId) { bookmarkRow($0) }
-            ForEach(list.tracks, id: \.trackId) { trackRow($0) }
+          if isExpanded(list) {
+            listContent(list)
           }
         }
       }
@@ -37,10 +69,56 @@ struct NavigatorView: View {
     }
   }
 
+  @ViewBuilder private func listContent(_ list: BookmarkGroup) -> some View {
+    let bookmarks = bookmarksToShow(list)
+    let tracks = tracksToShow(list)
+    if groupByType {
+      if !bookmarks.isEmpty {
+        sectionLabel("Bookmarks")
+        ForEach(bookmarks, id: \.bookmarkId) { bookmarkRow($0) }
+      }
+      if !tracks.isEmpty {
+        sectionLabel("Tracks")
+        ForEach(tracks, id: \.trackId) { trackRow($0) }
+      }
+    } else {
+      ForEach(mixed(bookmarks, tracks)) { item in
+        switch item {
+        case .bookmark(let b): bookmarkRow(b)
+        case .track(let t): trackRow(t)
+        }
+      }
+    }
+  }
+
+  private func sectionLabel(_ text: String) -> some View {
+    Text(text.uppercased())
+      .font(.caption2).fontWeight(.semibold).foregroundStyle(.secondary)
+      .padding(.leading, 18).padding(.top, 4)
+  }
+
   private var header: some View {
     HStack(spacing: 8) {
       Text("Bookmarks").font(.headline)
       Spacer()
+      Menu {
+        Section("Sort Lists") {
+          Picker("Lists", selection: $listSort) {
+            ForEach(ListSort.allCases) { Text($0.rawValue).tag($0) }
+          }
+          .pickerStyle(.inline)
+        }
+        Section("Sort Items") {
+          Picker("Items", selection: $itemSort) {
+            ForEach(ItemSort.allCases) { Text($0.rawValue).tag($0) }
+          }
+          .pickerStyle(.inline)
+        }
+        Toggle("Group by type", isOn: $groupByType)
+      } label: {
+        Image(systemName: "arrow.up.arrow.down")
+      }
+      .menuStyle(.borderlessButton).fixedSize().help("Sort")
       Button { showNewList = true } label: { Image(systemName: "plus") }
         .buttonStyle(.borderless).help("New list")
       Button { model.showAll() } label: { Image(systemName: "eye") }
@@ -51,6 +129,90 @@ struct NavigatorView: View {
         .buttonStyle(.borderless).help("Hide navigator")
     }
     .padding(16)
+  }
+
+  private var searchField: some View {
+    HStack(spacing: 6) {
+      Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+      TextField("Search lists, bookmarks, tracks", text: $searchText)
+        .textFieldStyle(.plain)
+      if searching {
+        Button { searchText = "" } label: { Image(systemName: "xmark.circle.fill") }
+          .buttonStyle(.borderless).foregroundStyle(.secondary)
+      }
+    }
+    .padding(.horizontal, 16)
+    .padding(.bottom, 8)
+  }
+
+  // MARK: - Sorting & filtering
+
+  private func isExpanded(_ list: BookmarkGroup) -> Bool {
+    searching || expanded.contains(list.categoryId)
+  }
+
+  private func listMatches(_ list: BookmarkGroup) -> Bool {
+    list.title.localizedCaseInsensitiveContains(searchText)
+  }
+
+  private var visibleLists: [BookmarkGroup] {
+    var lists = model.lists
+    if searching {
+      lists = lists.filter { listMatches($0) || !matchingBookmarks($0).isEmpty || !matchingTracks($0).isEmpty }
+    }
+    switch listSort {
+    case .dateAdded: return lists
+    case .nameAsc: return lists.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+    case .nameDesc: return lists.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedDescending }
+    }
+  }
+
+  private func matchingBookmarks(_ list: BookmarkGroup) -> [Bookmark] {
+    list.bookmarks.filter { $0.bookmarkName.localizedCaseInsensitiveContains(searchText) }
+  }
+  private func matchingTracks(_ list: BookmarkGroup) -> [Track] {
+    list.tracks.filter { $0.trackName.localizedCaseInsensitiveContains(searchText) }
+  }
+
+  // When a list's own name matches, show all its items; otherwise only matches.
+  private func bookmarksToShow(_ list: BookmarkGroup) -> [Bookmark] {
+    let base = (searching && !listMatches(list)) ? matchingBookmarks(list) : list.bookmarks
+    return sortBookmarks(base)
+  }
+  private func tracksToShow(_ list: BookmarkGroup) -> [Track] {
+    let base = (searching && !listMatches(list)) ? matchingTracks(list) : list.tracks
+    return sortTracks(base)
+  }
+
+  private func sortBookmarks(_ bookmarks: [Bookmark]) -> [Bookmark] {
+    switch itemSort {
+    case .nameAsc: return bookmarks.sorted { $0.bookmarkName.localizedCaseInsensitiveCompare($1.bookmarkName) == .orderedAscending }
+    case .nameDesc: return bookmarks.sorted { $0.bookmarkName.localizedCaseInsensitiveCompare($1.bookmarkName) == .orderedDescending }
+    case .distanceLength: return bookmarks.sorted { distance($0) < distance($1) }
+    }
+  }
+  private func sortTracks(_ tracks: [Track]) -> [Track] {
+    switch itemSort {
+    case .nameAsc: return tracks.sorted { $0.trackName.localizedCaseInsensitiveCompare($1.trackName) == .orderedAscending }
+    case .nameDesc: return tracks.sorted { $0.trackName.localizedCaseInsensitiveCompare($1.trackName) == .orderedDescending }
+    case .distanceLength: return tracks.sorted { $0.trackLengthMeters < $1.trackLengthMeters }
+    }
+  }
+
+  private func distance(_ bm: Bookmark) -> Double {
+    let m = OMBookmarksHelper.metersFromCurrentPosition(toLat: bm.locationCoordinate.latitude,
+                                                        lon: bm.locationCoordinate.longitude)
+    return m < 0 ? .greatestFiniteMagnitude : m
+  }
+
+  // Undivided mixing sorts by name; distance/length aren't comparable across types.
+  private func mixed(_ bookmarks: [Bookmark], _ tracks: [Track]) -> [NavItem] {
+    let items = bookmarks.map { NavItem.bookmark($0) } + tracks.map { NavItem.track($0) }
+    let ascending = itemSort != .nameDesc
+    return items.sorted {
+      let cmp = $0.name.localizedCaseInsensitiveCompare($1.name)
+      return ascending ? cmp == .orderedAscending : cmp == .orderedDescending
+    }
   }
 
   private func listRow(_ list: BookmarkGroup) -> some View {
