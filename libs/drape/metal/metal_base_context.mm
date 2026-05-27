@@ -362,7 +362,14 @@ id<MTLSamplerState> MetalBaseContext::GetSamplerState(TextureFilter filter, Text
 bool MetalBaseContext::BeginRendering()
 {
   CHECK(m_currentCommandEncoder == nil, ("Current command encoder was not finished."));
-  return true;
+
+  // The default framebuffer renders into the layer's next drawable. A CAMetalLayer
+  // can transiently fail to vend a drawable (e.g. off-screen, mid-resize or occluded,
+  // which happens for a layer-backed NSView on macOS). Acquire it up front and skip
+  // the whole frame if it is unavailable, instead of encoding into a nil target and
+  // hitting the encoder assert. On iOS the layer always vends, so this is a no-op.
+  RequestFrameDrawable();
+  return m_frameDrawable != nil;
 }
 
 void MetalBaseContext::EndRendering()

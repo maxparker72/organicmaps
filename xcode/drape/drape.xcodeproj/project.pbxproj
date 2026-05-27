@@ -779,6 +779,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXCLUDED_SOURCE_FILE_NAMES = "";
+				"EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*]" = hw_texture_ios.mm;
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -788,6 +789,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXCLUDED_SOURCE_FILE_NAMES = "";
+				"EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*]" = hw_texture_ios.mm;
 				EXECUTABLE_PREFIX = lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

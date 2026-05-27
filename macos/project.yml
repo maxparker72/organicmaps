@@ -1,0 +1,168 @@
+name: OMapsDesktop
+
+options:
+  bundleIdPrefix: app.organicmaps.desktop
+  developmentLanguage: en
+  createIntermediateGroups: true
+  deploymentTarget:
+    macOS: "14.0"
+
+configs:
+  Debug: debug
+  Release: release
+
+configFiles:
+  Debug: ../xcode/common-debug.xcconfig
+  Release: ../xcode/common-release.xcconfig
+
+projectReferences:
+  agg: { path: ../xcode/agg/agg.xcodeproj }
+  base: { path: ../xcode/base/base.xcodeproj }
+  bsdiff: { path: ../xcode/bsdiff/bsdiff.xcodeproj }
+  coding: { path: ../xcode/coding/coding.xcodeproj }
+  descriptions: { path: ../xcode/descriptions/descriptions.xcodeproj }
+  drape: { path: ../xcode/drape/drape.xcodeproj }
+  drape_frontend: { path: ../xcode/drape_frontend/drape_frontend.xcodeproj }
+  editor: { path: ../xcode/editor/editor.xcodeproj }
+  expat: { path: ../xcode/expat/expat.xcodeproj }
+  freetype: { path: ../xcode/freetype/freetype.xcodeproj }
+  ge0: { path: ../xcode/ge0/ge0.xcodeproj }
+  geometry: { path: ../xcode/geometry/geometry.xcodeproj }
+  harfbuzz: { path: ../xcode/harfbuzz/harfbuzz.xcodeproj }
+  icu: { path: ../xcode/icu/icu.xcodeproj }
+  indexer: { path: ../xcode/indexer/indexer.xcodeproj }
+  kml: { path: ../xcode/kml/kml.xcodeproj }
+  map: { path: ../xcode/map/map.xcodeproj }
+  minizip: { path: ../xcode/minizip/minizip.xcodeproj }
+  mwm_diff: { path: ../xcode/mwm_diff/mwm_diff.xcodeproj }
+  open_location_code: { path: ../xcode/open_location_code/open_location_code.xcodeproj }
+  opening_hours: { path: ../xcode/opening_hours/opening_hours.xcodeproj }
+  platform: { path: ../xcode/platform/platform.xcodeproj }
+  protobuf: { path: ../xcode/protobuf/protobuf.xcodeproj }
+  pugixml: { path: ../xcode/pugixml/pugixml.xcodeproj }
+  routing: { path: ../xcode/routing/routing.xcodeproj }
+  routing_common: { path: ../xcode/routing_common/routing_common.xcodeproj }
+  search: { path: ../xcode/search/search.xcodeproj }
+  shaders: { path: ../xcode/shaders/shaders.xcodeproj }
+  stb_image: { path: ../xcode/stb_image/stb_image.xcodeproj }
+  storage: { path: ../xcode/storage/storage.xcodeproj }
+  succinct: { path: ../xcode/succinct/succinct.xcodeproj }
+  timezone: { path: ../xcode/timezone/timezone.xcodeproj }
+  traffic: { path: ../xcode/traffic/traffic.xcodeproj }
+  transit: { path: ../xcode/transit/transit.xcodeproj }
+  vulkan_wrapper: { path: ../xcode/vulkan_wrapper/vulkan_wrapper.xcodeproj }
+
+targets:
+  OMapsDesktop:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    configFiles:
+      Debug: ../xcode/common-debug.xcconfig
+      Release: ../xcode/common-release.xcconfig
+    sources:
+      - path: App
+      - path: MapView
+      - path: Core
+      # MetalContextFactory is shared with the iOS app target; compile it here.
+      - path: ../iphone/Maps/Core/MapRendering/MetalContextFactory.h
+      - path: ../iphone/Maps/Core/MapRendering/MetalContextFactory.mm
+    settings:
+      base:
+        PRODUCT_NAME: Organic Maps
+        PRODUCT_BUNDLE_IDENTIFIER: app.organicmaps.desktop
+        INFOPLIST_FILE: Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        SDKROOT: macosx
+        SUPPORTED_PLATFORMS: macosx
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        SWIFT_VERSION: "5.5"
+        SWIFT_OBJC_BRIDGING_HEADER: App/OMapsDesktop-Bridging-Header.h
+        CLANG_ENABLE_MODULES: YES
+        CLANG_ENABLE_OBJC_ARC: YES
+        CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES: YES
+        # common.xcconfig defines OMIM_ROOT = $(PROJECT_DIR)/../.. which assumes a
+        # project two levels under the repo (iphone/Maps, xcode/<lib>). This project
+        # is at macos/ (one level), so correct OMIM_ROOT to the repo root here.
+        OMIM_ROOT: $(PROJECT_DIR)/..
+        # Project includes resolve relative to repo root and libs/ (matches lib projects).
+        HEADER_SEARCH_PATHS:
+          - $(inherited)
+          - $(SRCROOT)
+          - $(OMIM_ROOT)
+          - $(OMIM_ROOT)/libs
+          - $(OMIM_ROOT)/3party/glm
+          - $(OMIM_ROOT)/3party/pugixml/pugixml/src
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    postBuildScripts:
+      - name: Copy Metal shader library
+        basedOnDependencyAnalysis: false
+        script: |
+          mkdir -p "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources"
+          cp -f "${BUILT_PRODUCTS_DIR}/shaders_metal.metallib" \
+            "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources/shaders_metal.metallib"
+    dependencies:
+      - target: agg/agg
+      - target: base/base
+      - target: bsdiff/bsdiff
+      - target: coding/coding
+      - target: descriptions/descriptions
+      - target: drape/drape
+      - target: drape_frontend/drape_frontend
+      - target: editor/editor
+      - target: expat/expat
+      - target: freetype/freetype
+      - target: ge0/ge0
+      - target: geometry/geometry
+      - target: harfbuzz/harfbuzz
+      - target: icu/icu
+      - target: indexer/indexer
+      - target: kml/kml
+      - target: map/map
+      - target: minizip/minizip
+        embed: true
+      - target: mwm_diff/mwm_diff
+      - target: open_location_code/open_location_code
+      - target: opening_hours/opening_hours
+      - target: platform/platform
+      - target: protobuf/protobuf
+      - target: pugixml/pugixml
+      - target: routing/routing
+      - target: routing_common/routing_common
+      - target: search/search
+      - target: shaders/shaders
+      - target: stb_image/stb_image
+      - target: storage/storage
+      - target: succinct/succinct
+      - target: timezone/timezone
+      - target: traffic/traffic
+      - target: transit/transit
+      - target: vulkan_wrapper/vulkan_wrapper
+      # Metal shader library: build it; a post-build script copies it into Resources.
+      - target: shaders/shaders_metal
+        link: false
+        embed: false
+      - sdk: Cocoa.framework
+      - sdk: Metal.framework
+      - sdk: MetalKit.framework
+      - sdk: QuartzCore.framework
+      - sdk: CoreLocation.framework
+      - sdk: SystemConfiguration.framework
+      - sdk: Security.framework
+      - sdk: CFNetwork.framework
+      - sdk: libz.tbd
+
+schemes:
+  OMapsDesktop:
+    build:
+      targets:
+        OMapsDesktop: all
+    run:
+      config: Debug
+      # Point the engine at the repo data dir (styles, fonts, World.mwm, classificator)
+      # instead of bundling hundreds of MB. Dev-only; refine before distribution.
+      environmentVariables:
+        MWM_RESOURCES_DIR: /Users/maxwellparker/Development/organicmaps/data
+        MWM_WRITABLE_DIR: /Users/maxwellparker/Library/Application Support/OMapsDesktop
+    profile:
+      config: Release
