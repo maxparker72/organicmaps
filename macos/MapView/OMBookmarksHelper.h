@@ -12,6 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 // Returns the target category id, or 0 if there is no current selection.
 + (MWMMarkGroupID)addBookmarkForCurrentPlace;
 
+// Shareable Organic Maps deep link (ge0/omaps) for a coordinate.
++ (NSString *)omLinkForLat:(double)lat lon:(double)lon name:(NSString *)name
+    NS_SWIFT_NAME(omLink(lat:lon:name:));
+
 + (NSString *)formatDistanceMeters:(double)meters NS_SWIFT_NAME(formatDistance(meters:));
 + (nullable NSString *)distanceFromCurrentPositionToLat:(double)lat
                                                     lon:(double)lon

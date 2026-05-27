@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
   @State private var showNavigator = false
@@ -16,6 +17,15 @@ struct ContentView: View {
     NavigationStack {
       MapView()
         .ignoresSafeArea()
+        .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+          for provider in providers {
+            _ = provider.loadObject(ofClass: URL.self) { url, _ in
+              guard let url else { return }
+              DispatchQueue.main.async { BookmarkFiles.load(url) }
+            }
+          }
+          return true
+        }
         .overlay(alignment: .bottom) {
           DownloadBanner(model: downloadModel).padding(.bottom, 16)
         }
@@ -28,6 +38,11 @@ struct ContentView: View {
         .onChange(of: placePageModel.openToken) { _, _ in
           selectedList = nil
           paneHidden = false
+        }
+        .onChange(of: bookmarksModel.lists.map(\.categoryId)) { _, ids in
+          if let sel = selectedList, !ids.contains(sel.categoryId) {
+            selectedList = nil
+          }
         }
         .onAppear {
           downloadModel.start()
@@ -57,7 +72,10 @@ struct ContentView: View {
 
   @ViewBuilder private var infoOverlay: some View {
     if !paneHidden {
-      if let list = selectedList {
+      // Only render a selected list that still exists; deleting it (from here or
+      // the navigator) removes the underlying category, and reading a stale group
+      // would assert in the engine.
+      if let list = selectedList, bookmarksModel.lists.contains(where: { $0.categoryId == list.categoryId }) {
         ListInfoView(
           list: list,
           onClear: { selectedList = nil },

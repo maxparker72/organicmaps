@@ -55,10 +55,25 @@ struct ListInfoView: View {
         if !list.author.isEmpty {
           detail("Author", list.author)
         }
+        Divider()
+        Menu {
+          Button("KMZ") { export(.kmz) }
+          Button("KML") { export(.kml) }
+          Button("GPX") { export(.gpx) }
+          Button("GeoJSON") { export(.geoJson) }
+        } label: {
+          Label("Export…", systemImage: "square.and.arrow.up")
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(16)
     }
+  }
+
+  private func export(_ fileType: FileType) {
+    BookmarkFiles.exportList(list.categoryId, fileType: fileType, suggestedName: list.title)
   }
 
   private var editForm: some View {

@@ -158,6 +158,15 @@ struct PlacePageView: View {
       } label: {
         Label("Open in Google Maps", systemImage: "arrow.up.forward.square")
       }
+      Button {
+        let link = OMBookmarksHelper.omLink(lat: info.latitude, lon: info.longitude,
+                                            name: info.title.isEmpty ? "" : info.title)
+        let pb = NSPasteboard.general
+        pb.clearContents()
+        pb.setString(link, forType: .string)
+      } label: {
+        Label("Copy Organic Maps Link", systemImage: "link")
+      }
     }
   }
 

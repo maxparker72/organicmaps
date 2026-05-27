@@ -16,6 +16,10 @@ struct OMapsDesktopApp: App {
           openWindow(id: "maps-manager")
         }
         .keyboardShortcut("d", modifiers: [.command, .shift])
+        Button("Import Bookmarks…") {
+          BookmarkFiles.runImportPanel()
+        }
+        .keyboardShortcut("i", modifiers: [.command, .shift])
       }
       // Map controls live in the menu bar / shortcuts to keep the map clean.
       CommandGroup(after: .sidebar) {

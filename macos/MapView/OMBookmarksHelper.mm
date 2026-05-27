@@ -44,6 +44,13 @@
   return categoryId;
 }
 
++ (NSString *)omLinkForLat:(double)lat lon:(double)lon name:(NSString *)name
+{
+  constexpr double kShareZoom = 17.0;
+  std::string const link = Framework::CodeGe0url(lat, lon, kShareZoom, name.UTF8String);
+  return @(link.c_str());
+}
+
 + (NSString *)formatDistanceMeters:(double)meters
 {
   return @(platform::Distance::CreateFormatted(meters).ToString().c_str());
