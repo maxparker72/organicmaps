@@ -27,6 +27,23 @@ struct ContentView: View {
             .padding(.bottom, 16)
         }
         .onAppear { downloadModel.start() }
+        .toolbar {
+          ToolbarItemGroup(placement: .automatic) {
+            Button {
+              OMLocationController.followMyPosition()
+            } label: {
+              Image(systemName: "location")
+            }
+            .help("Show my location")
+
+            Button {
+              OMMapControls.rotateToNorth()
+            } label: {
+              Image(systemName: "location.north.line")
+            }
+            .help("Orient north")
+          }
+        }
     }
   }
 }

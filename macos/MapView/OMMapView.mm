@@ -10,17 +10,23 @@
 #include "map/framework.hpp"
 
 #include "drape_frontend/user_event_stream.hpp"
+#include "drape_frontend/gui/skin.hpp"
 #include "drape/graphics_context_factory.hpp"
 #include "drape/pointers.hpp"
 
 #include "geometry/point2d.hpp"
+#include "geometry/screenbase.hpp"
 
+#include <atomic>
 #include <cmath>
+#include <memory>
 
 @implementation OMMapView
 {
   drape_ptr<dp::GraphicsContextFactory> m_contextFactory;
   BOOL m_engineCreated;
+  std::atomic<double> m_mapAngle;
+  std::unique_ptr<gui::Skin> m_guiSkin;
 }
 
 - (instancetype)initWithFrame:(NSRect)frameRect
@@ -106,8 +112,22 @@
   p.m_surfaceWidth = static_cast<int>(surfaceSize.x);
   p.m_surfaceHeight = static_cast<int>(surfaceSize.y);
 
+  // Position the engine's on-map widgets (scale ruler, compass, copyright).
+  m_guiSkin = std::make_unique<gui::Skin>(gui::ResolveGuiSkinFile("default"), static_cast<float>(scale));
+  m_guiSkin->Resize(static_cast<int>(surfaceSize.x), static_cast<int>(surfaceSize.y));
+  m_guiSkin->ForEach([&p](gui::EWidget widget, gui::Position const & pos) { p.m_widgetsInitInfo[widget] = pos; });
+
   GetFramework().CreateDrapeEngine(make_ref(m_contextFactory), std::move(p));
   GetFramework().SetRenderingEnabled(nullptr);
+
+  // Track the live map rotation so trackpad-twist deltas apply to the real angle.
+  __weak OMMapView * weakSelf = self;
+  GetFramework().SetViewportListener([weakSelf](ScreenBase const & screen)
+  {
+    OMMapView * strongSelf = weakSelf;
+    if (strongSelf)
+      strongSelf->m_mapAngle.store(screen.GetAngle());
+  });
 
   m_engineCreated = YES;
 }
@@ -137,6 +157,14 @@
     return;
   m2::PointU const size = [self surfaceSizePx];
   GetFramework().OnSize(static_cast<int>(size.x), static_cast<int>(size.y));
+
+  if (m_guiSkin)
+  {
+    m_guiSkin->Resize(static_cast<int>(size.x), static_cast<int>(size.y));
+    gui::TWidgetsLayoutInfo layout;
+    m_guiSkin->ForEach([&layout](gui::EWidget widget, gui::Position const & pos) { layout[widget] = pos.m_pixelPivot; });
+    GetFramework().SetWidgetLayout(std::move(layout));
+  }
 }
 
 #pragma mark - Input
@@ -182,6 +210,16 @@
     return;
   m2::PointD const pt = [self enginePointForEvent:event];
   GetFramework().Scale(1.0 + event.magnification, pt, false);
+}
+
+- (void)rotateWithEvent:(NSEvent *)event
+{
+  if (!m_engineCreated)
+    return;
+  // Two-finger trackpad twist. event.rotation is the per-event delta in degrees;
+  // negate so the map turns the same way the fingers twist.
+  double const deltaRadians = event.rotation * M_PI / 180.0;
+  GetFramework().Rotate(m_mapAngle.load() - deltaRadians, false /* isAnim */);
 }
 
 @end
