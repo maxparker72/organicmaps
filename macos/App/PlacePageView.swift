@@ -6,6 +6,7 @@ struct PlacePageView: View {
   let info: OMPlaceInfo
   let onClear: () -> Void
   let onHide: () -> Void
+  let onAddBookmark: () -> Void
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -15,6 +16,15 @@ struct PlacePageView: View {
         VStack(alignment: .leading, spacing: 18) {
           if !info.subtitle.isEmpty || info.hasDistance {
             summary
+          }
+          if info.isBookmark {
+            Label("Saved to bookmarks", systemImage: "bookmark.fill")
+              .font(.subheadline).foregroundStyle(.secondary)
+          } else {
+            Button(action: onAddBookmark) {
+              Label("Add to Bookmarks", systemImage: "bookmark")
+            }
+            .buttonStyle(.borderedProminent)
           }
           hoursSection
           contactSection

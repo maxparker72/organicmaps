@@ -1,86 +1,105 @@
 import SwiftUI
 
 struct ContentView: View {
-  // Placeholder sidebar sections; real bookmark/track organization comes later.
-  private enum SidebarItem: String, CaseIterable, Identifiable {
-    case map = "Map"
-    case bookmarks = "Bookmarks"
-    case tracks = "Tracks"
-    var id: String { rawValue }
-  }
-
-  @State private var selection: SidebarItem? = .map
+  @State private var showNavigator = false
   @State private var paneHidden = false
+  @State private var selectedList: BookmarkGroup?
+
   @StateObject private var downloadModel = MapDownloadModel()
   @StateObject private var layersModel = LayersModel()
   @StateObject private var placePageModel = PlacePageModel()
+  @StateObject private var bookmarksModel = BookmarksNavigatorModel()
+
+  private var hasInfo: Bool { selectedList != nil || placePageModel.info != nil }
 
   var body: some View {
-    NavigationSplitView {
-      List(SidebarItem.allCases, selection: $selection) { item in
-        Text(item.rawValue).tag(item)
-      }
-      .navigationTitle("Organic Maps")
-      .frame(minWidth: 200)
-    } detail: {
+    NavigationStack {
       MapView()
         .ignoresSafeArea()
         .overlay(alignment: .bottom) {
-          DownloadBanner(model: downloadModel)
-            .padding(.bottom, 16)
+          DownloadBanner(model: downloadModel).padding(.bottom, 16)
         }
-        .overlay(alignment: .trailing) {
-          if let info = placePageModel.info, !paneHidden {
-            PlacePageView(
-              info: info,
-              onClear: { placePageModel.clearSelection() },
-              onHide: { paneHidden = true })
-              .transition(.move(edge: .trailing))
-          }
-        }
-        .animation(.easeInOut(duration: 0.2), value: placePageModel.info == nil)
+        .overlay(alignment: .leading) { navigatorOverlay }
+        .overlay(alignment: .trailing) { infoOverlay }
+        .animation(.easeInOut(duration: 0.2), value: showNavigator)
         .animation(.easeInOut(duration: 0.2), value: paneHidden)
-        .onChange(of: placePageModel.openToken) { _, _ in paneHidden = false }
+        .animation(.easeInOut(duration: 0.2), value: selectedList?.categoryId)
+        .animation(.easeInOut(duration: 0.2), value: placePageModel.info == nil)
+        .onChange(of: placePageModel.openToken) { _, _ in
+          selectedList = nil
+          paneHidden = false
+        }
         .onAppear {
           downloadModel.start()
           placePageModel.start()
+          bookmarksModel.refresh()
         }
-        .toolbar {
-          ToolbarItemGroup(placement: .automatic) {
-            Button {
-              paneHidden.toggle()
-            } label: {
-              Image(systemName: "info.circle")
-            }
-            .help(paneHidden ? "Show info pane" : "Hide info pane")
-            .disabled(placePageModel.info == nil)
+        .toolbar { toolbarContent }
+    }
+  }
 
-            Menu {
-              Toggle("Subway", isOn: Binding(get: { layersModel.subway }, set: layersModel.setSubway))
-              Toggle("Isolines", isOn: Binding(get: { layersModel.isolines }, set: layersModel.setIsolines))
-              Toggle("Outdoor", isOn: Binding(get: { layersModel.outdoor }, set: layersModel.setOutdoor))
-              Toggle("Hiking", isOn: Binding(get: { layersModel.hiking }, set: layersModel.setHiking))
-              Toggle("Cycling", isOn: Binding(get: { layersModel.cycling }, set: layersModel.setCycling))
-            } label: {
-              Image(systemName: "square.3.layers.3d")
-            }
-            .help("Map layers")
+  // MARK: - Overlays
 
-            Button {
-              OMLocationController.followMyPosition()
-            } label: {
-              Image(systemName: "location")
-            }
-            .help("Show my location")
+  @ViewBuilder private var navigatorOverlay: some View {
+    if showNavigator {
+      NavigatorView(
+        model: bookmarksModel,
+        onSelectList: { list in
+          selectedList = list
+          paneHidden = false
+        },
+        onSelectBookmark: { bookmarksModel.showBookmarkOnMap($0) },
+        onSelectTrack: { bookmarksModel.showTrackOnMap($0) },
+        onHide: { showNavigator = false })
+        .transition(.move(edge: .leading))
+    }
+  }
 
-            Button {
-              OMMapControls.rotateToNorth()
-            } label: {
-              Image(systemName: "location.north.line")
-            }
-            .help("Orient north")
-          }
-        }
+  @ViewBuilder private var infoOverlay: some View {
+    if !paneHidden {
+      if let list = selectedList {
+        ListInfoView(list: list, onClear: { selectedList = nil }, onHide: { paneHidden = true })
+          .transition(.move(edge: .trailing))
+      } else if let info = placePageModel.info {
+        PlacePageView(
+          info: info,
+          onClear: { placePageModel.clearSelection() },
+          onHide: { paneHidden = true },
+          onAddBookmark: {
+            OMBookmarksHelper.addBookmarkForCurrentPlace()
+            bookmarksModel.refresh()
+          })
+          .transition(.move(edge: .trailing))
+      }
+    }
+  }
+
+  // MARK: - Toolbar
+
+  @ToolbarContentBuilder private var toolbarContent: some ToolbarContent {
+    ToolbarItemGroup(placement: .navigation) {
+      Button { showNavigator.toggle() } label: { Image(systemName: "bookmark") }
+        .help("Bookmarks")
+    }
+    ToolbarItemGroup(placement: .automatic) {
+      Menu {
+        Toggle("Subway", isOn: Binding(get: { layersModel.subway }, set: layersModel.setSubway))
+        Toggle("Isolines", isOn: Binding(get: { layersModel.isolines }, set: layersModel.setIsolines))
+        Toggle("Outdoor", isOn: Binding(get: { layersModel.outdoor }, set: layersModel.setOutdoor))
+        Toggle("Hiking", isOn: Binding(get: { layersModel.hiking }, set: layersModel.setHiking))
+        Toggle("Cycling", isOn: Binding(get: { layersModel.cycling }, set: layersModel.setCycling))
+      } label: {
+        Image(systemName: "square.3.layers.3d")
+      }
+      .help("Map layers")
+
+      Button { OMLocationController.followMyPosition() } label: { Image(systemName: "location") }
+        .help("Show my location")
+      Button { OMMapControls.rotateToNorth() } label: { Image(systemName: "location.north.line") }
+        .help("Orient north")
+      Button { paneHidden.toggle() } label: { Image(systemName: "info.circle") }
+        .help(paneHidden ? "Show info pane" : "Hide info pane")
+        .disabled(!hasInfo)
     }
   }
 }
@@ -94,13 +113,10 @@ private struct DownloadBanner: View {
     switch model.status {
     case .notDownloaded, .onDiskOutOfDate:
       banner {
-        Button {
-          model.download()
-        } label: {
+        Button { model.download() } label: {
           Label(actionTitle, systemImage: "arrow.down.circle.fill")
         }
         .buttonStyle(.borderedProminent)
-        // Download the highlighted area without reaching for the mouse.
         .keyboardShortcut(.return, modifiers: .shift)
       }
     case .downloading, .inQueue:
@@ -108,16 +124,14 @@ private struct DownloadBanner: View {
         VStack(alignment: .leading, spacing: 4) {
           Text(model.status == .inQueue ? "\(model.name) — queued" : "Downloading \(model.name)…")
             .font(.subheadline)
-          ProgressView(value: model.progressFraction)
-            .frame(width: 220)
+          ProgressView(value: model.progressFraction).frame(width: 220)
         }
         Button("Cancel", role: .cancel) { model.cancel() }
       }
     case .error:
       banner {
         Text("Couldn't download \(model.name)").font(.subheadline)
-        Button("Retry") { model.retry() }
-          .buttonStyle(.borderedProminent)
+        Button("Retry") { model.retry() }.buttonStyle(.borderedProminent)
       }
     case .none, .onDisk:
       EmptyView()
@@ -133,12 +147,10 @@ private struct DownloadBanner: View {
   }
 
   private func banner<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-    HStack(spacing: 12) {
-      content()
-    }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 10)
-    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-    .shadow(radius: 8)
+    HStack(spacing: 12) { content() }
+      .padding(.horizontal, 16)
+      .padding(.vertical, 10)
+      .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+      .shadow(radius: 8)
   }
 }

@@ -5,6 +5,14 @@
 #import "MapView/OMMapControls.h"
 #import "MapView/OMLocationController.h"
 #import "MapView/OMPlacePage.h"
+#import "MapView/OMBookmarksHelper.h"
 
 // Map layer toggles (subway, isolines, outdoor, hiking, cycling) from CoreApi.
 #import <CoreApi/MWMMapOverlayManager.h>
+
+// Bookmark lists / waypoints / tracks, driven directly from Swift.
+#import <CoreApi/MWMBookmarksManager.h>
+#import <CoreApi/MWMBookmarkGroup.h>
+#import <CoreApi/MWMBookmark.h>
+#import <CoreApi/MWMTrack.h>
+#import <CoreApi/MWMFrameworkHelper.h>
