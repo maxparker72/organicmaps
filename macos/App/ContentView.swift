@@ -10,7 +10,10 @@ struct ContentView: View {
   }
 
   @State private var selection: SidebarItem? = .map
+  @State private var paneHidden = false
   @StateObject private var downloadModel = MapDownloadModel()
+  @StateObject private var layersModel = LayersModel()
+  @StateObject private var placePageModel = PlacePageModel()
 
   var body: some View {
     NavigationSplitView {
@@ -26,9 +29,43 @@ struct ContentView: View {
           DownloadBanner(model: downloadModel)
             .padding(.bottom, 16)
         }
-        .onAppear { downloadModel.start() }
+        .overlay(alignment: .trailing) {
+          if let info = placePageModel.info, !paneHidden {
+            PlacePageView(
+              info: info,
+              onClear: { placePageModel.clearSelection() },
+              onHide: { paneHidden = true })
+              .transition(.move(edge: .trailing))
+          }
+        }
+        .animation(.easeInOut(duration: 0.2), value: placePageModel.info == nil)
+        .animation(.easeInOut(duration: 0.2), value: paneHidden)
+        .onChange(of: placePageModel.openToken) { _, _ in paneHidden = false }
+        .onAppear {
+          downloadModel.start()
+          placePageModel.start()
+        }
         .toolbar {
           ToolbarItemGroup(placement: .automatic) {
+            Button {
+              paneHidden.toggle()
+            } label: {
+              Image(systemName: "info.circle")
+            }
+            .help(paneHidden ? "Show info pane" : "Hide info pane")
+            .disabled(placePageModel.info == nil)
+
+            Menu {
+              Toggle("Subway", isOn: Binding(get: { layersModel.subway }, set: layersModel.setSubway))
+              Toggle("Isolines", isOn: Binding(get: { layersModel.isolines }, set: layersModel.setIsolines))
+              Toggle("Outdoor", isOn: Binding(get: { layersModel.outdoor }, set: layersModel.setOutdoor))
+              Toggle("Hiking", isOn: Binding(get: { layersModel.hiking }, set: layersModel.setHiking))
+              Toggle("Cycling", isOn: Binding(get: { layersModel.cycling }, set: layersModel.setCycling))
+            } label: {
+              Image(systemName: "square.3.layers.3d")
+            }
+            .help("Map layers")
+
             Button {
               OMLocationController.followMyPosition()
             } label: {
