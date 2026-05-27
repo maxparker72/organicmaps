@@ -58,7 +58,16 @@ struct ContentView: View {
   @ViewBuilder private var infoOverlay: some View {
     if !paneHidden {
       if let list = selectedList {
-        ListInfoView(list: list, onClear: { selectedList = nil }, onHide: { paneHidden = true })
+        ListInfoView(
+          list: list,
+          onClear: { selectedList = nil },
+          onHide: { paneHidden = true },
+          onChanged: {
+            let id = list.categoryId
+            bookmarksModel.refresh()
+            selectedList = bookmarksModel.lists.first { $0.categoryId == id }
+          },
+          onDeleted: { selectedList = nil; bookmarksModel.refresh() })
           .transition(.move(edge: .trailing))
       } else if let info = placePageModel.info {
         PlacePageView(

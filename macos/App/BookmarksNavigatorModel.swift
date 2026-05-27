@@ -68,6 +68,14 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
   func showBookmarkOnMap(_ id: MWMMarkID) { FrameworkHelper.showBookmark(id) }
   func showTrackOnMap(_ id: MWMTrackID) { FrameworkHelper.showTrack(id) }
 
+  // MARK: - Delete / move
+
+  func deleteBookmark(_ id: MWMMarkID) { manager.deleteBookmark(id); refresh() }
+  func deleteTrack(_ id: MWMTrackID) { manager.deleteTrack(id); refresh() }
+  func deleteList(_ id: MWMMarkGroupID) { manager.deleteCategory(id); refresh() }
+  func moveBookmark(_ id: MWMMarkID, to group: MWMMarkGroupID) { manager.moveBookmark(id, toGroupId: group); refresh() }
+  func moveTrack(_ id: MWMTrackID, to group: MWMMarkGroupID) { manager.moveTrack(id, toGroupId: group); refresh() }
+
   // MARK: - BookmarksObserver
 
   func onBookmarksLoadFinished() { refresh() }

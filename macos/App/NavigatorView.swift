@@ -76,6 +76,20 @@ struct NavigatorView: View {
       }
       .buttonStyle(.borderless)
     }
+    .contextMenu {
+      Button("Delete List", role: .destructive) { model.deleteList(list.categoryId) }
+    }
+    .swipeActions(edge: .trailing) {
+      Button(role: .destructive) { model.deleteList(list.categoryId) } label: { Label("Delete", systemImage: "trash") }
+    }
+  }
+
+  @ViewBuilder private func moveMenu(_ action: @escaping (MWMMarkGroupID) -> Void) -> some View {
+    Menu("Move to") {
+      ForEach(model.lists, id: \.categoryId) { list in
+        Button(list.title) { action(list.categoryId) }
+      }
+    }
   }
 
   private func bookmarkRow(_ bm: Bookmark) -> some View {
@@ -93,6 +107,13 @@ struct NavigatorView: View {
       .padding(.leading, 18)
     }
     .buttonStyle(.plain)
+    .contextMenu {
+      moveMenu { model.moveBookmark(bm.bookmarkId, to: $0) }
+      Button("Delete", role: .destructive) { model.deleteBookmark(bm.bookmarkId) }
+    }
+    .swipeActions(edge: .trailing) {
+      Button(role: .destructive) { model.deleteBookmark(bm.bookmarkId) } label: { Label("Delete", systemImage: "trash") }
+    }
   }
 
   private func trackRow(_ track: Track) -> some View {
@@ -110,6 +131,13 @@ struct NavigatorView: View {
       .padding(.leading, 18)
     }
     .buttonStyle(.plain)
+    .contextMenu {
+      moveMenu { model.moveTrack(track.trackId, to: $0) }
+      Button("Delete", role: .destructive) { model.deleteTrack(track.trackId) }
+    }
+    .swipeActions(edge: .trailing) {
+      Button(role: .destructive) { model.deleteTrack(track.trackId) } label: { Label("Delete", systemImage: "trash") }
+    }
   }
 
   private func bookmarkSubtitle(_ bm: Bookmark) -> String? {
