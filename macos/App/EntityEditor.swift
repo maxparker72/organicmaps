@@ -45,11 +45,9 @@ enum EntityEditor {
   static func listName(_ id: MWMMarkGroupID) -> String { manager.getCategoryName(id) }
   static func listDescription(_ id: MWMMarkGroupID) -> String { manager.getCategoryDescription(id) }
 
-  static func saveList(_ id: MWMMarkGroupID, name: String, description: String, color: BookmarkColor) {
+  static func saveList(_ id: MWMMarkGroupID, name: String, description: String) {
     manager.setCategory(id, name: name)
     manager.setCategory(id, description: description)
-    manager.setCategory(id, bookmarksColor: color)
-    manager.setCategory(id, tracksColor: color)
   }
 
   static func deleteList(_ id: MWMMarkGroupID) { manager.deleteCategory(id) }

@@ -1,5 +1,11 @@
 import SwiftUI
 
+extension Notification.Name {
+  /// Posted when item visibility changes from elsewhere (e.g. the filter window),
+  /// so the navigator's eye icons stay in sync.
+  static let omItemVisibilityChanged = Notification.Name("omItemVisibilityChanged")
+}
+
 extension BookmarkColor {
   var swiftUIColor: Color {
     switch self {
@@ -26,11 +32,17 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
 
   private var manager: BookmarksManager { BookmarksManager.shared() }
 
+  private var visibilityObserver: NSObjectProtocol?
+
   override init() {
     super.init()
     // Cast to the protocol so this resolves to BookmarksObservable.addObserver(_:)
     // rather than NSObject's KVO addObserver(_:forKeyPath:options:context:).
     (manager as any BookmarksObservable).add(self)
+    visibilityObserver = NotificationCenter.default.addObserver(
+      forName: .omItemVisibilityChanged, object: nil, queue: .main) { [weak self] _ in
+      self?.objectWillChange.send()
+    }
     if manager.areBookmarksLoaded() {
       refresh()
     } else {
@@ -40,6 +52,7 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
 
   deinit {
     (BookmarksManager.shared() as any BookmarksObservable).remove(self)
+    if let visibilityObserver { NotificationCenter.default.removeObserver(visibilityObserver) }
   }
 
   func refresh() {
@@ -53,8 +66,21 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
     refresh()
   }
 
-  func showAll() { manager.setUserCategoriesVisible(true); refresh() }
+  func showAll() {
+    OMBookmarksHelper.showAllItems()  // also clears any visual filter (bookmarks + tracks)
+    manager.setUserCategoriesVisible(true)
+    refresh()
+  }
   func hideAll() { manager.setUserCategoriesVisible(false); refresh() }
+
+  func setBookmarkVisible(_ id: MWMMarkID, _ visible: Bool) {
+    OMBookmarksHelper.setBookmarks([NSNumber(value: id)], visible: visible)
+    objectWillChange.send()
+  }
+  func setTrackVisible(_ id: MWMTrackID, _ visible: Bool) {
+    OMBookmarksHelper.setTracks([NSNumber(value: id)], visible: visible)
+    objectWillChange.send()
+  }
 
   func createList(_ name: String) {
     let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)

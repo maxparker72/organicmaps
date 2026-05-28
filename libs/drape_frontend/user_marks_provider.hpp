@@ -109,6 +109,7 @@ public:
 
   virtual kml::TrackId GetId() const { return m_id; }
   virtual kml::MarkGroupId GetGroupId() const = 0;
+  virtual bool IsVisible() const { return true; }
 
   virtual int GetMinZoom() const = 0;
   virtual DepthLayer GetDepthLayer() const = 0;

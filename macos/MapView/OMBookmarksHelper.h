@@ -29,6 +29,18 @@ NS_ASSUME_NONNULL_BEGIN
 + (double)metersFromCurrentPositionToLat:(double)lat lon:(double)lon
     NS_SWIFT_NAME(metersFromCurrentPosition(toLat:lon:));
 
+// Per-item visibility on the map (filter + manual eye toggles).
++ (void)setBookmarks:(NSArray<NSNumber *> *)bookmarkIds visible:(BOOL)visible;
++ (void)setTracks:(NSArray<NSNumber *> *)trackIds visible:(BOOL)visible;
++ (BOOL)isBookmarkVisible:(MWMMarkID)bookmarkId;
++ (BOOL)isTrackVisible:(MWMTrackID)trackId;
+// Reset every bookmark and track to visible (clears a visual filter).
++ (void)showAllItems;
+
+// Force the drape engine to re-flush user marks (use after edits when the
+// implicit dirty propagation hasn't yet refreshed the rendered tile).
++ (void)invalidateUserMarks;
+
 @end
 
 NS_ASSUME_NONNULL_END

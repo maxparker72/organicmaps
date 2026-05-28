@@ -65,6 +65,7 @@ struct EntityEditView: View {
       name = EntityEditor.trackName(info.trackId)
       details = EntityEditor.trackDescription(info.trackId)
       listId = EntityEditor.trackGroup(info.trackId)
+      color = BookmarkColor.closest(to: EntityEditor.trackColor(info.trackId))
     } else {
       name = EntityEditor.bookmarkName(info.bookmarkId)
       details = EntityEditor.bookmarkDescription(info.bookmarkId)
@@ -76,6 +77,9 @@ struct EntityEditView: View {
   private func save() {
     if info.isTrack {
       EntityEditor.saveTrack(info.trackId, group: listId, title: name, color: color.nsColor, description: details)
+      // Tracks render via a separate user-line cache; the implicit dirty path
+      // doesn't always re-flush the existing tile, so kick the engine.
+      OMBookmarksHelper.invalidateUserMarks()
     } else {
       EntityEditor.saveBookmark(info.bookmarkId, group: listId, title: name, color: color, description: details)
     }

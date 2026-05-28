@@ -24,6 +24,15 @@ public:
   bool IsDirty() const override { return m_isDirty; }
   void ResetChanges() const override { m_isDirty = false; }
 
+  bool IsVisible() const override { return m_data.m_visible; }
+  void SetIsVisible(bool visible)
+  {
+    if (m_data.m_visible == visible)
+      return;
+    m_data.m_visible = visible;
+    m_isDirty = true;
+  }
+
   kml::TrackData const & GetData() const { return m_data; }
   void SetData(kml::TrackData const & data);
 

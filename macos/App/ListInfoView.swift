@@ -101,9 +101,6 @@ private struct ListEditView: View {
 
   @State private var name = ""
   @State private var details = ""
-  @State private var color: BookmarkColor = .red
-
-  private let columns = Array(repeating: GridItem(.fixed(24), spacing: 8), count: 8)
 
   var body: some View {
     ScrollView {
@@ -112,15 +109,6 @@ private struct ListEditView: View {
         field("Description") {
           TextField("Description", text: $details, axis: .vertical)
             .textFieldStyle(.roundedBorder).lineLimit(3...6)
-        }
-        field("Color (all items)") {
-          LazyVGrid(columns: columns, spacing: 8) {
-            ForEach(BookmarkColor.palette, id: \.rawValue) { swatch in
-              Circle().fill(swatch.swiftUIColor).frame(width: 20, height: 20)
-                .overlay(Circle().stroke(Color.primary, lineWidth: swatch == color ? 2 : 0))
-                .onTapGesture { color = swatch }
-            }
-          }
         }
         Divider()
         HStack {
@@ -131,7 +119,7 @@ private struct ListEditView: View {
           Spacer()
           Button("Cancel", action: onCancel)
           Button("Save") {
-            EntityEditor.saveList(listId, name: name, description: details, color: color)
+            EntityEditor.saveList(listId, name: name, description: details)
             onSave()
           }
           .buttonStyle(.borderedProminent)

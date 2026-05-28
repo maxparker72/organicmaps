@@ -265,6 +265,11 @@ struct NavigatorView: View {
           }
         }
         Spacer()
+        let visible = OMBookmarksHelper.isBookmarkVisible(bm.bookmarkId)
+        Button { model.setBookmarkVisible(bm.bookmarkId, !visible) } label: {
+          Image(systemName: visible ? "eye" : "eye.slash").foregroundStyle(.secondary)
+        }
+        .buttonStyle(.borderless)
       }
       .padding(.leading, 18)
     }
@@ -289,6 +294,11 @@ struct NavigatorView: View {
             .font(.caption).foregroundStyle(.secondary)
         }
         Spacer()
+        let visible = OMBookmarksHelper.isTrackVisible(track.trackId)
+        Button { model.setTrackVisible(track.trackId, !visible) } label: {
+          Image(systemName: visible ? "eye" : "eye.slash").foregroundStyle(.secondary)
+        }
+        .buttonStyle(.borderless)
       }
       .padding(.leading, 18)
     }

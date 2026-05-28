@@ -487,6 +487,9 @@ void CacheUserLines(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKe
 
   source.ForEachUniqueTrack(tileKey.m_zoomLevel, renderParams, [&](UserLineRenderParams const & renderInfo)
   {
+    if (!renderInfo.m_isVisible)
+      return;
+
     // Spline is a shared_ptr here, can reassign later.
     for (auto spline : renderInfo.m_splines)
     {

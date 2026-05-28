@@ -4,10 +4,13 @@
 
 #include <CoreApi/Framework.h>
 
+#include "map/bookmark.hpp"
 #include "map/bookmark_manager.hpp"
 #include "map/elevation_info.hpp"
 #include "map/place_page_info.hpp"
 #include "map/track.hpp"
+
+#include "drape_frontend/drape_engine.hpp"
 
 #include "kml/types.hpp"
 
@@ -75,6 +78,61 @@
       cumulative += line.back().m_distance;
   }
   return result;
+}
+
++ (void)setBookmarks:(NSArray<NSNumber *> *)bookmarkIds visible:(BOOL)visible
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (NSNumber * identifier in bookmarkIds)
+  {
+    if (Bookmark * bookmark = session.GetBookmarkForEdit(static_cast<kml::MarkId>(identifier.unsignedLongLongValue)))
+      bookmark->SetIsVisible(visible);
+  }
+}
+
++ (void)setTracks:(NSArray<NSNumber *> *)trackIds visible:(BOOL)visible
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (NSNumber * identifier in trackIds)
+  {
+    if (Track * track = session.GetTrackForEdit(static_cast<kml::TrackId>(identifier.unsignedLongLongValue)))
+      track->SetIsVisible(visible);
+  }
+}
+
++ (BOOL)isBookmarkVisible:(MWMMarkID)bookmarkId
+{
+  Bookmark const * bookmark = GetFramework().GetBookmarkManager().GetBookmark(static_cast<kml::MarkId>(bookmarkId));
+  return bookmark != nullptr ? bookmark->IsVisible() : YES;
+}
+
++ (BOOL)isTrackVisible:(MWMTrackID)trackId
+{
+  Track const * track = GetFramework().GetBookmarkManager().GetTrack(static_cast<kml::TrackId>(trackId));
+  return track != nullptr ? track->IsVisible() : YES;
+}
+
++ (void)showAllItems
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (auto const groupId : bm.GetUnsortedBmGroupsIdList())
+  {
+    for (auto const markId : bm.GetUserMarkIds(groupId))
+      if (Bookmark * bookmark = session.GetBookmarkForEdit(markId))
+        bookmark->SetIsVisible(true);
+    for (auto const trackId : bm.GetTrackIds(groupId))
+      if (Track * track = session.GetTrackForEdit(trackId))
+        track->SetIsVisible(true);
+  }
+}
+
++ (void)invalidateUserMarks
+{
+  if (auto engine = GetFramework().GetDrapeEngine())
+    engine->InvalidateUserMarks();
 }
 
 + (NSString *)formatDistanceMeters:(double)meters

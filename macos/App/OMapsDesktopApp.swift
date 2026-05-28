@@ -21,6 +21,10 @@ struct OMapsDesktopApp: App {
         }
         .keyboardShortcut("i", modifiers: [.command, .shift])
       }
+      CommandMenu("Filter") {
+        Button("Filter Bookmarks…") { openWindow(id: "filter-builder") }
+          .keyboardShortcut("f", modifiers: [.command, .shift])
+      }
       // Map controls live in the menu bar / shortcuts to keep the map clean.
       CommandGroup(after: .sidebar) {
         Button("Zoom In") { OMMapControls.zoomIn() }
@@ -36,6 +40,10 @@ struct OMapsDesktopApp: App {
 
     Window("Download Maps", id: "maps-manager") {
       MapsManagerView()
+    }
+
+    Window("Filter Bookmarks", id: "filter-builder") {
+      FilterView()
     }
   }
 }

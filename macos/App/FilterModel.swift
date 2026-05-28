@@ -1,0 +1,185 @@
+import Foundation
+
+enum PropertyKind { case text, choice, number }
+
+enum FilterProperty: String, CaseIterable, Identifiable {
+  case name = "Name"
+  case type = "Type"
+  case description = "Description"
+  case color = "Color"
+  case list = "List"
+  case distance = "Distance (m)"
+  case length = "Length (m)"
+
+  var id: String { rawValue }
+  var isNumeric: Bool { kind == .number }
+
+  var kind: PropertyKind {
+    switch self {
+    case .name, .description: return .text
+    case .type, .color, .list: return .choice
+    case .distance, .length: return .number
+    }
+  }
+
+  // Some properties only make sense for one item type.
+  var appliesToBookmarks: Bool { self != .length }
+  var appliesToTracks: Bool {
+    switch self {
+    case .name, .description, .list, .length: return true
+    default: return false
+    }
+  }
+}
+
+enum StringOp: String, CaseIterable, Identifiable {
+  case isExactly = "is"
+  case isNot = "is not"
+  case contains = "contains"
+  case notContains = "does not contain"
+  case startsWith = "starts with"
+  case endsWith = "ends with"
+  var id: String { rawValue }
+}
+
+enum NumberOp: String, CaseIterable, Identifiable {
+  case eq = "="
+  case ne = "≠"
+  case gt = ">"
+  case lt = "<"
+  case ge = "≥"
+  case le = "≤"
+  var id: String { rawValue }
+}
+
+struct FilterCondition: Identifiable {
+  let id = UUID()
+  var property: FilterProperty = .name
+  var stringOp: StringOp = .contains
+  var numberOp: NumberOp = .gt
+  var value: String = ""
+}
+
+/// A visual filter over bookmarks (waypoints): a set of property conditions
+/// chained by AND/OR. Applying hides non-matching bookmarks on the map.
+/// (Tracks can't be hidden individually by the engine, so they're unaffected.)
+final class FilterModel: ObservableObject {
+  @Published var matchAll = true  // true = AND, false = OR
+  @Published var conditions: [FilterCondition] = [FilterCondition()]
+
+  func addCondition() { conditions.append(FilterCondition()) }
+  func removeCondition(_ condition: FilterCondition) { conditions.removeAll { $0.id == condition.id } }
+
+  /// Hide items that don't match; show those that do. An item is evaluated only
+  /// against the conditions that apply to its type; an item with no applicable
+  /// condition is hidden (the filter is clearly targeting the other type).
+  func apply() {
+    let lists = BookmarksManager.shared().sortedUserCategories()
+    var bmShow: [NSNumber] = [], bmHide: [NSNumber] = []
+    var trkShow: [NSNumber] = [], trkHide: [NSNumber] = []
+    for list in lists {
+      for bookmark in list.bookmarks {
+        let id = NSNumber(value: bookmark.bookmarkId)
+        if evaluateBookmark(bookmark, listName: list.title) { bmShow.append(id) } else { bmHide.append(id) }
+      }
+      for track in list.tracks {
+        let id = NSNumber(value: track.trackId)
+        if evaluateTrack(track, listName: list.title) { trkShow.append(id) } else { trkHide.append(id) }
+      }
+    }
+    OMBookmarksHelper.setBookmarks(bmShow, visible: true)
+    OMBookmarksHelper.setBookmarks(bmHide, visible: false)
+    OMBookmarksHelper.setTracks(trkShow, visible: true)
+    OMBookmarksHelper.setTracks(trkHide, visible: false)
+    NotificationCenter.default.post(name: .omItemVisibilityChanged, object: nil)
+  }
+
+  // MARK: - Evaluation
+
+  private func evaluateBookmark(_ bookmark: Bookmark, listName: String) -> Bool {
+    let applicable = conditions.filter { $0.property.appliesToBookmarks }
+    guard !applicable.isEmpty else { return false }
+    let results = applicable.map { matches($0, bookmark, listName) }
+    return matchAll ? results.allSatisfy { $0 } : results.contains(true)
+  }
+
+  private func evaluateTrack(_ track: Track, listName: String) -> Bool {
+    let applicable = conditions.filter { $0.property.appliesToTracks }
+    guard !applicable.isEmpty else { return false }
+    let results = applicable.map { matchesTrack($0, track, listName) }
+    return matchAll ? results.allSatisfy { $0 } : results.contains(true)
+  }
+
+  private func matchesTrack(_ condition: FilterCondition, _ track: Track, _ listName: String) -> Bool {
+    if condition.property == .length {
+      guard let rhs = Double(condition.value) else { return false }
+      let lhs = Double(track.trackLengthMeters)
+      switch condition.numberOp {
+      case .eq: return lhs == rhs
+      case .ne: return lhs != rhs
+      case .gt: return lhs > rhs
+      case .lt: return lhs < rhs
+      case .ge: return lhs >= rhs
+      case .le: return lhs <= rhs
+      }
+    }
+    let lhs: String
+    switch condition.property {
+    case .name: lhs = track.trackName
+    case .description: lhs = EntityEditor.trackDescription(track.trackId)
+    case .list: lhs = listName
+    default: return false
+    }
+    return compareString(lhs, condition)
+  }
+
+  private func compareString(_ lhs: String, _ condition: FilterCondition) -> Bool {
+    let rhs = condition.value
+    switch condition.stringOp {
+    case .isExactly: return lhs.caseInsensitiveCompare(rhs) == .orderedSame
+    case .isNot: return lhs.caseInsensitiveCompare(rhs) != .orderedSame
+    case .contains: return lhs.localizedCaseInsensitiveContains(rhs)
+    case .notContains: return !lhs.localizedCaseInsensitiveContains(rhs)
+    case .startsWith: return lhs.lowercased().hasPrefix(rhs.lowercased())
+    case .endsWith: return lhs.lowercased().hasSuffix(rhs.lowercased())
+    }
+  }
+
+  private func matches(_ condition: FilterCondition, _ bookmark: Bookmark, _ listName: String) -> Bool {
+    if condition.property.isNumeric {
+      guard let rhs = Double(condition.value) else { return false }
+      let lhs = numericValue(condition.property, bookmark)
+      guard lhs >= 0 else { return false }  // unknown (e.g. no location)
+      switch condition.numberOp {
+      case .eq: return lhs == rhs
+      case .ne: return lhs != rhs
+      case .gt: return lhs > rhs
+      case .lt: return lhs < rhs
+      case .ge: return lhs >= rhs
+      case .le: return lhs <= rhs
+      }
+    } else {
+      return compareString(stringValue(condition.property, bookmark, listName), condition)
+    }
+  }
+
+  private func stringValue(_ property: FilterProperty, _ bookmark: Bookmark, _ listName: String) -> String {
+    switch property {
+    case .name: return bookmark.bookmarkName
+    case .type: return bookmark.bookmarkType ?? ""
+    case .description: return EntityEditor.bookmarkDescription(bookmark.bookmarkId)
+    case .color: return bookmark.bookmarkColor.displayName
+    case .list: return listName
+    case .distance, .length: return ""
+    }
+  }
+
+  private func numericValue(_ property: FilterProperty, _ bookmark: Bookmark) -> Double {
+    switch property {
+    case .distance:
+      return OMBookmarksHelper.metersFromCurrentPosition(toLat: bookmark.locationCoordinate.latitude,
+                                                         lon: bookmark.locationCoordinate.longitude)
+    default: return -1
+    }
+  }
+}
