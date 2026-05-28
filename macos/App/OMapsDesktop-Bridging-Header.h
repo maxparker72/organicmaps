@@ -6,6 +6,7 @@
 #import "MapView/OMLocationController.h"
 #import "MapView/OMPlacePage.h"
 #import "MapView/OMBookmarksHelper.h"
+#import "MapView/OMRoutingHelper.h"
 
 // Map layer toggles (subway, isolines, outdoor, hiking, cycling) from CoreApi.
 #import <CoreApi/MWMMapOverlayManager.h>

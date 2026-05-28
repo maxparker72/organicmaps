@@ -9,8 +9,15 @@ struct PlacePageView: View {
   let onAddBookmark: () -> Void
   let onChanged: () -> Void
   let onDeleted: () -> Void
+  let onSetStart: () -> Void
+  let onPrepend: () -> Void
+  let onAddStopAtEnd: () -> Void
+  let onAddStopAtFront: () -> Void
+  let onSetFinish: () -> Void
+  let onAppend: () -> Void
 
   @State private var editing = false
+  @StateObject private var modifiers = ModifierKeyMonitor()
 
   private var isEditable: Bool { info.isBookmark || info.isTrack }
 
@@ -47,6 +54,32 @@ struct PlacePageView: View {
             }
             .buttonStyle(.borderedProminent)
           }
+          HStack(spacing: 8) {
+            Button {
+              if modifiers.isOptionPressed { onPrepend() } else { onSetStart() }
+            } label: {
+              Label(modifiers.isOptionPressed ? "Insert at front" : "From here",
+                    systemImage: "circle.fill")
+            }
+            .help("Set as start  ·  hold ⌥ to insert before the current start")
+
+            Button {
+              if modifiers.isOptionPressed { onAddStopAtFront() } else { onAddStopAtEnd() }
+            } label: {
+              Label(modifiers.isOptionPressed ? "Stop after start" : "Add stop",
+                    systemImage: "plus.circle")
+            }
+            .help("Add a stop before the finish  ·  hold ⌥ to add right after the start")
+
+            Button {
+              if modifiers.isOptionPressed { onAppend() } else { onSetFinish() }
+            } label: {
+              Label(modifiers.isOptionPressed ? "Insert at end" : "To here",
+                    systemImage: "flag.fill")
+            }
+            .help("Set as end  ·  hold ⌥ to insert after the current end")
+          }
+          .controlSize(.small)
           if info.isTrack {
             section("Elevation") { TrackElevationView(trackId: info.trackId) }
           }

@@ -10,6 +10,7 @@ struct ContentView: View {
   @StateObject private var layersModel = LayersModel()
   @StateObject private var placePageModel = PlacePageModel()
   @StateObject private var bookmarksModel = BookmarksNavigatorModel()
+  @StateObject private var routingModel = RoutingModel()
 
   private var hasInfo: Bool { selectedList != nil || placePageModel.info != nil }
 
@@ -31,6 +32,13 @@ struct ContentView: View {
         }
         .overlay(alignment: .leading) { navigatorOverlay }
         .overlay(alignment: .trailing) { infoOverlay }
+        .overlay(alignment: .top) {
+          if routingModel.hasPoints {
+            RoutePlannerView(model: routingModel, onSaved: { _ in bookmarksModel.refresh() })
+              .padding(.top, 16)
+              .transition(.move(edge: .top))
+          }
+        }
         .animation(.easeInOut(duration: 0.2), value: showNavigator)
         .animation(.easeInOut(duration: 0.2), value: paneHidden)
         .animation(.easeInOut(duration: 0.2), value: selectedList?.categoryId)
@@ -100,7 +108,13 @@ struct ContentView: View {
           onDeleted: {
             placePageModel.clearSelection()
             bookmarksModel.refresh()
-          })
+          },
+          onSetStart: { OMRoutingHelper.setStartForCurrentPlace() },
+          onPrepend: { OMRoutingHelper.prependForCurrentPlace() },
+          onAddStopAtEnd: { OMRoutingHelper.addStopBeforeFinishForCurrentPlace() },
+          onAddStopAtFront: { OMRoutingHelper.addStopAfterStartForCurrentPlace() },
+          onSetFinish: { OMRoutingHelper.setFinishForCurrentPlace() },
+          onAppend: { OMRoutingHelper.appendForCurrentPlace() })
           .transition(.move(edge: .trailing))
       }
     }
