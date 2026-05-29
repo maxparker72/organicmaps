@@ -1,5 +1,7 @@
 #import "OMBookmarksHelper.h"
 
+#import "OMTrackStats.h"
+
 #import <AppKit/AppKit.h>
 
 #include <CoreApi/Framework.h>
@@ -383,6 +385,145 @@ bool NormalizeTrack(Track * track)
       engine->InvalidateUserMarks();
   }
   return modified;
+}
+
+#pragma mark - Statistics
+
++ (nullable OMTrackStats *)trackStatsForTrack:(MWMTrackID)trackId
+{
+  return [OMTrackStats statsForTrackId:trackId];
+}
+
++ (NSInteger)bookmarkCountForList:(MWMMarkGroupID)groupId
+{
+  return static_cast<NSInteger>(
+      GetFramework().GetBookmarkManager().GetUserMarkIds(static_cast<kml::MarkGroupId>(groupId)).size());
+}
+
++ (NSInteger)trackCountForList:(MWMMarkGroupID)groupId
+{
+  return static_cast<NSInteger>(
+      GetFramework().GetBookmarkManager().GetTrackIds(static_cast<kml::MarkGroupId>(groupId)).size());
+}
+
+#pragma mark - Batched mutations
+
+namespace
+{
+// Mirror of MWMBookmarksManager.mm's private kmlColorFromBookmarkColor. Kept
+// local so the macOS bridge doesn't take a private dependency on the iOS file.
+kml::PredefinedColor KmlColorFromBookmarkColor(MWMBookmarkColor bookmarkColor)
+{
+  switch (bookmarkColor)
+  {
+  case MWMBookmarkColorNone: return kml::PredefinedColor::None;
+  case MWMBookmarkColorRed: return kml::PredefinedColor::Red;
+  case MWMBookmarkColorBlue: return kml::PredefinedColor::Blue;
+  case MWMBookmarkColorPurple: return kml::PredefinedColor::Purple;
+  case MWMBookmarkColorYellow: return kml::PredefinedColor::Yellow;
+  case MWMBookmarkColorPink: return kml::PredefinedColor::Pink;
+  case MWMBookmarkColorBrown: return kml::PredefinedColor::Brown;
+  case MWMBookmarkColorGreen: return kml::PredefinedColor::Green;
+  case MWMBookmarkColorOrange: return kml::PredefinedColor::Orange;
+  case MWMBookmarkColorDeepPurple: return kml::PredefinedColor::DeepPurple;
+  case MWMBookmarkColorLightBlue: return kml::PredefinedColor::LightBlue;
+  case MWMBookmarkColorCyan: return kml::PredefinedColor::Cyan;
+  case MWMBookmarkColorTeal: return kml::PredefinedColor::Teal;
+  case MWMBookmarkColorLime: return kml::PredefinedColor::Lime;
+  case MWMBookmarkColorDeepOrange: return kml::PredefinedColor::DeepOrange;
+  case MWMBookmarkColorGray: return kml::PredefinedColor::Gray;
+  case MWMBookmarkColorBlueGray: return kml::PredefinedColor::BlueGray;
+  case MWMBookmarkColorCount: return kml::PredefinedColor::Count;
+  }
+}
+}  // namespace
+
++ (void)deleteBookmarks:(NSArray<NSNumber *> *)bookmarkIds
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (NSNumber * identifier in bookmarkIds)
+  {
+    auto const markId = static_cast<kml::MarkId>(identifier.unsignedLongLongValue);
+    if (bm.GetBookmark(markId) != nullptr)
+      session.DeleteBookmark(markId);
+  }
+}
+
++ (void)deleteTracks:(NSArray<NSNumber *> *)trackIds
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (NSNumber * identifier in trackIds)
+  {
+    auto const trackId = static_cast<kml::TrackId>(identifier.unsignedLongLongValue);
+    if (bm.GetTrack(trackId) != nullptr)
+      session.DeleteTrack(trackId);
+  }
+}
+
++ (void)moveBookmarks:(NSArray<NSNumber *> *)bookmarkIds toList:(MWMMarkGroupID)groupId
+{
+  if (groupId == kml::kInvalidMarkGroupId)
+    return;
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (NSNumber * identifier in bookmarkIds)
+  {
+    auto const markId = static_cast<kml::MarkId>(identifier.unsignedLongLongValue);
+    Bookmark const * bookmark = bm.GetBookmark(markId);
+    if (bookmark == nullptr)
+      continue;
+    auto const currentGroupId = bookmark->GetGroupId();
+    if (currentGroupId != groupId)
+      session.MoveBookmark(markId, currentGroupId, groupId);
+  }
+}
+
++ (void)moveTracks:(NSArray<NSNumber *> *)trackIds toList:(MWMMarkGroupID)groupId
+{
+  if (groupId == kml::kInvalidMarkGroupId)
+    return;
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (NSNumber * identifier in trackIds)
+  {
+    auto const trackId = static_cast<kml::TrackId>(identifier.unsignedLongLongValue);
+    Track const * track = bm.GetTrack(trackId);
+    if (track == nullptr)
+      continue;
+    auto const currentGroupId = track->GetGroupId();
+    if (currentGroupId != groupId)
+      session.MoveTrack(trackId, currentGroupId, groupId);
+  }
+}
+
++ (void)setBookmarks:(NSArray<NSNumber *> *)bookmarkIds color:(MWMBookmarkColor)color
+{
+  auto const kmlColor = KmlColorFromBookmarkColor(color);
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (NSNumber * identifier in bookmarkIds)
+  {
+    if (Bookmark * bookmark = session.GetBookmarkForEdit(static_cast<kml::MarkId>(identifier.unsignedLongLongValue)))
+      bookmark->SetColor(kmlColor);
+  }
+  // Remember the last colour the user picked so single-bookmark creation in
+  // future inherits it, matching the single-item edit path.
+  bm.SetLastEditedBmColor(kmlColor);
+}
+
++ (void)setTracks:(NSArray<NSNumber *> *)trackIds color:(MWMBookmarkColor)color
+{
+  // Tracks store dp::Color directly; convert via the palette.
+  dp::Color const dpColor = kml::ColorFromPredefinedColor(KmlColorFromBookmarkColor(color));
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  for (NSNumber * identifier in trackIds)
+  {
+    if (Track * track = session.GetTrackForEdit(static_cast<kml::TrackId>(identifier.unsignedLongLongValue)))
+      track->SetColor(dpColor);
+  }
 }
 
 @end

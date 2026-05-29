@@ -1,6 +1,9 @@
 #import <Foundation/Foundation.h>
 
+#import <CoreApi/MWMBookmarkColor.h>
 #import <CoreApi/MWMTypes.h>
+
+@class OMTrackStats;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -75,6 +78,33 @@ NS_ASSUME_NONNULL_BEGIN
 // already-standard items are left untouched. Returns the count of items
 // whose data was actually rewritten.
 + (NSInteger)normalizeAllItems;
+
+// Per-track statistics snapshot (length, ascent/descent, duration, point
+// count, date range). Returns nil if the track no longer exists.
++ (nullable OMTrackStats *)trackStatsForTrack:(MWMTrackID)trackId
+    NS_SWIFT_NAME(trackStats(forTrack:));
+
+// Counts of items in a single list. Useful for the list inspector header.
++ (NSInteger)bookmarkCountForList:(MWMMarkGroupID)groupId
+    NS_SWIFT_NAME(bookmarkCount(forList:));
++ (NSInteger)trackCountForList:(MWMMarkGroupID)groupId
+    NS_SWIFT_NAME(trackCount(forList:));
+
+// Batched mutations. Each method opens a single edit session and processes
+// every item inside it, so one bulk action results in one KML write rather
+// than N. Unknown / already-removed ids are skipped silently.
++ (void)deleteBookmarks:(NSArray<NSNumber *> *)bookmarkIds
+    NS_SWIFT_NAME(deleteBookmarks(_:));
++ (void)deleteTracks:(NSArray<NSNumber *> *)trackIds
+    NS_SWIFT_NAME(deleteTracks(_:));
++ (void)moveBookmarks:(NSArray<NSNumber *> *)bookmarkIds toList:(MWMMarkGroupID)groupId
+    NS_SWIFT_NAME(moveBookmarks(_:to:));
++ (void)moveTracks:(NSArray<NSNumber *> *)trackIds toList:(MWMMarkGroupID)groupId
+    NS_SWIFT_NAME(moveTracks(_:to:));
++ (void)setBookmarks:(NSArray<NSNumber *> *)bookmarkIds color:(MWMBookmarkColor)color
+    NS_SWIFT_NAME(setBookmarks(_:color:));
++ (void)setTracks:(NSArray<NSNumber *> *)trackIds color:(MWMBookmarkColor)color
+    NS_SWIFT_NAME(setTracks(_:color:));
 
 @end
 
