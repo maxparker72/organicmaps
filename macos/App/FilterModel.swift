@@ -9,6 +9,7 @@ enum FilterProperty: String, CaseIterable, Identifiable {
   case color = "Color"
   case list = "List"
   case tag = "Tag"
+  case region = "Region"
   case distance = "Distance (m)"
   case length = "Length (m)"
 
@@ -18,7 +19,7 @@ enum FilterProperty: String, CaseIterable, Identifiable {
   var kind: PropertyKind {
     switch self {
     case .name, .description: return .text
-    case .type, .color, .list, .tag: return .choice
+    case .type, .color, .list, .tag, .region: return .choice
     case .distance, .length: return .number
     }
   }
@@ -27,7 +28,7 @@ enum FilterProperty: String, CaseIterable, Identifiable {
   var appliesToBookmarks: Bool { self != .length }
   var appliesToTracks: Bool {
     switch self {
-    case .name, .description, .list, .length, .tag: return true
+    case .name, .description, .list, .length, .tag, .region: return true
     default: return false
     }
   }
@@ -127,6 +128,9 @@ final class FilterModel: ObservableObject {
     if condition.property == .tag {
       return Self.evaluateTagMembership(OMBookmarksHelper.tags(forTrack: track.trackId), condition)
     }
+    if condition.property == .region {
+      return Self.evaluateTagMembership(OMBookmarksHelper.regions(forTrack: track.trackId), condition)
+    }
     let lhs: String
     switch condition.property {
     case .name: lhs = track.trackName
@@ -165,6 +169,9 @@ final class FilterModel: ObservableObject {
     if condition.property == .tag {
       return Self.evaluateTagMembership(OMBookmarksHelper.tags(forBookmark: bookmark.bookmarkId), condition)
     }
+    if condition.property == .region {
+      return Self.evaluateTagMembership(OMBookmarksHelper.regions(forBookmark: bookmark.bookmarkId), condition)
+    }
     if condition.property.isNumeric {
       guard let rhs = Double(condition.value) else { return false }
       let lhs = numericValue(condition.property, bookmark)
@@ -189,7 +196,7 @@ final class FilterModel: ObservableObject {
     case .description: return EntityEditor.bookmarkDescription(bookmark.bookmarkId)
     case .color: return bookmark.bookmarkColor.displayName
     case .list: return listName
-    case .tag, .distance, .length: return ""  // handled in matches() directly
+    case .tag, .region, .distance, .length: return ""  // handled in matches() directly
     }
   }
 

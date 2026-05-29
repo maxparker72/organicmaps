@@ -4,6 +4,12 @@ import SwiftUI
 struct OMapsDesktopApp: App {
   @Environment(\.openWindow) private var openWindow
 
+  init() {
+    // Set MWM_WRITABLE_DIR from user override before anything constructs the
+    // C++ Platform singleton (which reads it once and caches the path).
+    DataDirectoryManager.applyOverrideIfPresent()
+  }
+
   var body: some Scene {
     WindowGroup {
       ContentView()
@@ -20,6 +26,12 @@ struct OMapsDesktopApp: App {
           BookmarkFiles.runImportPanel()
         }
         .keyboardShortcut("i", modifiers: [.command, .shift])
+        Button("Normalize Bookmarks & Tracks") {
+          OMBookmarksHelper.normalizeAllItems()
+        }
+        Button("Back Up Bookmarks…") {
+          BookmarkFiles.runBackupPanel()
+        }
       }
       CommandMenu("Filter") {
         Button("Filter Bookmarks…") { openWindow(id: "filter-builder") }

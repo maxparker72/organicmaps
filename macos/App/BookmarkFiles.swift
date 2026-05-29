@@ -41,6 +41,30 @@ enum BookmarkFiles {
     }
   }
 
+  /// Bundle every category into one KMZ archive (engine API used by iOS's
+  /// "Share all") and save it to a user-chosen file. The resulting archive
+  /// can be reimported via the same Import flow to restore.
+  static func runBackupPanel() {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    let suggestedName = "OrganicMaps-Backup-\(dateFormatter.string(from: Date())).kmz"
+    let panel = NSSavePanel()
+    panel.nameFieldStringValue = suggestedName
+    if let kmz = UTType(filenameExtension: "kmz") {
+      panel.allowedContentTypes = [kmz]
+    }
+    guard panel.runModal() == .OK, let destination = panel.url else { return }
+    manager.shareAllCategories { status, url in
+      defer { manager.finishSharing() }
+      guard status == .success, let url else {
+        NSLog("[OMaps] Backup failed with status \(status.rawValue)")
+        return
+      }
+      try? FileManager.default.removeItem(at: destination)
+      try? FileManager.default.copyItem(at: url, to: destination)
+    }
+  }
+
   private static func save(temporaryURL: URL, suggestedName: String, ext: String) {
     let panel = NSSavePanel()
     panel.nameFieldStringValue = "\(suggestedName).\(ext)"

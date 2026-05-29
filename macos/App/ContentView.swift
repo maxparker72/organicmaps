@@ -15,6 +15,7 @@ struct ContentView: View {
   @StateObject private var projectsModel = ProjectModel()
   @StateObject private var routingModel = RoutingModel()
   @StateObject private var searchModel = SearchModel()
+  @StateObject private var importNormalizer = ImportNormalizer()
 
   @State private var buildings3D: Bool = OMPreferences.buildings3D()
 

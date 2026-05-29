@@ -6,6 +6,7 @@ import SwiftUI
 struct FilterView: View {
   @StateObject private var model = FilterModel()
   @StateObject private var tags = TagStore()
+  @StateObject private var regions = RegionStore()
 
   // Real values available to choose from, so a condition can't target something
   // that doesn't exist (which would hide everything).
@@ -73,6 +74,7 @@ struct FilterView: View {
     case .list: return listOptions
     case .type: return typeOptions
     case .tag: return tags.allTags
+    case .region: return regions.allRegions
     default: return []
     }
   }
@@ -85,16 +87,33 @@ private struct ConditionRow: View {
 
   private static let choiceOps: [StringOp] = [.isExactly, .isNot]
 
-  // .tag is a set-valued property; "is"/"is not" reads as "has"/"does not have".
+  // .tag and .region are set-valued; "is"/"is not" reads more naturally relabelled.
   static func opLabel(_ op: StringOp, property: FilterProperty) -> String {
-    if property == .tag {
+    switch property {
+    case .tag:
       switch op {
       case .isExactly: return "has"
       case .isNot: return "does not have"
       default: break
       }
+    case .region:
+      switch op {
+      case .isExactly: return "is in"
+      case .isNot: return "is not in"
+      default: break
+      }
+    default: break
     }
     return op.rawValue
+  }
+
+  // The .region picker stores raw CountryIds (e.g. "United States_California")
+  // but should display localized human names.
+  static func choiceLabel(_ value: String, property: FilterProperty) -> String {
+    if property == .region {
+      return OMBookmarksHelper.displayName(forRegion: value)
+    }
+    return value
   }
 
   var body: some View {
@@ -144,7 +163,9 @@ private struct ConditionRow: View {
         let choices = options(condition.property)
         Picker("", selection: $condition.value) {
           if choices.isEmpty { Text("—").tag("") }
-          ForEach(choices, id: \.self) { Text($0).tag($0) }
+          ForEach(choices, id: \.self) { value in
+            Text(Self.choiceLabel(value, property: condition.property)).tag(value)
+          }
         }
         .labelsHidden()
       case .number:

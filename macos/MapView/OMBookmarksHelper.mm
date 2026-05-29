@@ -14,6 +14,11 @@
 
 #include "kml/types.hpp"
 
+#include "storage/country_info_getter.hpp"
+#include "storage/storage.hpp"
+
+#include "kml/color_parser.hpp"
+
 #include "platform/distance.hpp"
 
 #include "geometry/distance_on_sphere.hpp"
@@ -252,6 +257,132 @@ std::string JoinTagsArray(NSArray<NSString *> * tags)
   else
     data.m_properties[kTagsKey] = joined;
   track->SetData(data);
+}
+
+#pragma mark - Regions
+
+namespace
+{
+// Returns the leaf CountryId followed by its ancestors (leaf-first, root excluded).
+NSArray<NSString *> * RegionChainForPoint(m2::PointD const & pt)
+{
+  auto & f = GetFramework();
+  storage::CountryId const leaf = f.GetCountryInfoGetter().GetRegionCountryId(pt);
+  if (leaf.empty())
+    return @[];
+
+  NSMutableArray<NSString *> * chain = [NSMutableArray arrayWithObject:@(leaf.c_str())];
+  f.GetStorage().ForEachAncestorExceptForTheRoot(
+      leaf, [&chain](storage::CountryId const & name, storage::CountryTree::Node const &)
+      { [chain addObject:@(name.c_str())]; });
+  return chain;
+}
+}  // namespace
+
++ (NSArray<NSString *> *)regionsForBookmark:(MWMMarkID)bookmarkId
+{
+  Bookmark const * bookmark = GetFramework().GetBookmarkManager().GetBookmark(static_cast<kml::MarkId>(bookmarkId));
+  if (!bookmark)
+    return @[];
+  return RegionChainForPoint(bookmark->GetPivot());
+}
+
++ (NSArray<NSString *> *)regionsForTrack:(MWMTrackID)trackId
+{
+  Track const * track = GetFramework().GetBookmarkManager().GetTrack(static_cast<kml::TrackId>(trackId));
+  if (!track)
+    return @[];
+  m2::RectD const rect = track->GetLimitRect();
+  if (!rect.IsValid())
+    return @[];
+  return RegionChainForPoint(rect.Center());
+}
+
++ (NSString *)displayNameForRegion:(NSString *)countryId
+{
+  if (countryId.length == 0)
+    return @"";
+  storage::NodeAttrs attrs;
+  GetFramework().GetStorage().GetNodeAttrs(std::string(countryId.UTF8String), attrs);
+  if (attrs.m_nodeLocalName.empty())
+    return countryId;
+  return @(attrs.m_nodeLocalName.c_str());
+}
+
+#pragma mark - Normalization
+
+namespace
+{
+// Imported GPX/KML files often carry tiny (or zero) line widths and arbitrary
+// RGBA colours; coerce both to a single in-app standard so every track looks
+// the same and every colour matches one of the 16 palette entries.
+constexpr double kStandardTrackLineWidth = 5.0;
+
+// Returns the canonical (snapped) ColorData for an arbitrary input, and sets
+// |changed| true if the result differs from the input.
+kml::ColorData SnapColor(kml::ColorData const & in, bool & changed)
+{
+  uint32_t const sourceRgba = in.m_rgba != 0
+      ? in.m_rgba
+      : kml::ColorFromPredefinedColor(in.m_predefinedColor).GetRGBA();
+  kml::PredefinedColor const snapped = kml::MapPredefinedColor(sourceRgba);
+  uint32_t const snappedRgba = kml::ColorFromPredefinedColor(snapped).GetRGBA();
+  if (in.m_predefinedColor != snapped || in.m_rgba != snappedRgba)
+    changed = true;
+  return {.m_predefinedColor = snapped, .m_rgba = snappedRgba};
+}
+
+bool NormalizeBookmark(Bookmark * bookmark)
+{
+  bool changed = false;
+  kml::BookmarkData data = bookmark->GetData();
+  data.m_color = SnapColor(data.m_color, changed);
+  if (changed)
+    bookmark->SetData(data);
+  return changed;
+}
+
+bool NormalizeTrack(Track * track)
+{
+  bool changed = false;
+  kml::TrackData data = track->GetData();
+  for (auto & layer : data.m_layers)
+  {
+    layer.m_color = SnapColor(layer.m_color, changed);
+    if (layer.m_lineWidth != kStandardTrackLineWidth)
+    {
+      layer.m_lineWidth = kStandardTrackLineWidth;
+      changed = true;
+    }
+  }
+  if (changed)
+    track->SetData(data);
+  return changed;
+}
+}  // namespace
+
++ (NSInteger)normalizeAllItems
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  NSInteger modified = 0;
+  for (auto const groupId : bm.GetUnsortedBmGroupsIdList())
+  {
+    for (auto const markId : bm.GetUserMarkIds(groupId))
+      if (Bookmark * bookmark = session.GetBookmarkForEdit(markId))
+        if (NormalizeBookmark(bookmark))
+          ++modified;
+    for (auto const trackId : bm.GetTrackIds(groupId))
+      if (Track * track = session.GetTrackForEdit(trackId))
+        if (NormalizeTrack(track))
+          ++modified;
+  }
+  if (modified > 0)
+  {
+    if (auto engine = GetFramework().GetDrapeEngine())
+      engine->InvalidateUserMarks();
+  }
+  return modified;
 }
 
 @end

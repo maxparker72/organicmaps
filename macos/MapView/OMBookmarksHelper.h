@@ -53,6 +53,29 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setTags:(NSArray<NSString *> *)tags forTrack:(MWMTrackID)trackId
     NS_SWIFT_NAME(setTags(_:forTrack:));
 
+// Storage-region ancestor chain for an item, leaf-first (e.g.
+// [@"United States_California", @"United States"]). For tracks the chain is
+// taken at the geometry bounding-box centre, so tracks that cross a border
+// are attributed to whichever region holds that centre. Empty if the point
+// is not in any known MWM region (e.g. mid-ocean).
++ (NSArray<NSString *> *)regionsForBookmark:(MWMMarkID)bookmarkId
+    NS_SWIFT_NAME(regions(forBookmark:));
++ (NSArray<NSString *> *)regionsForTrack:(MWMTrackID)trackId
+    NS_SWIFT_NAME(regions(forTrack:));
+
+// Localized human-readable name for a CountryId returned by the methods above
+// (e.g. "California" for "United States_California"). Falls back to the raw
+// id if the storage tree has no entry for it.
++ (NSString *)displayNameForRegion:(NSString *)countryId
+    NS_SWIFT_NAME(displayName(forRegion:));
+
+// Coerce every bookmark and track to a standard look: snap arbitrary RGBA
+// colors to the 16-color predefined palette (kml::MapPredefinedColor) and set
+// every track layer's line width to a single standard value. Idempotent;
+// already-standard items are left untouched. Returns the count of items
+// whose data was actually rewritten.
++ (NSInteger)normalizeAllItems;
+
 @end
 
 NS_ASSUME_NONNULL_END
