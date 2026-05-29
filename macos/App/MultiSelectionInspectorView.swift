@@ -53,7 +53,7 @@ struct MultiSelectionInspectorView: View {
       Button("Delete", role: .destructive) { performDelete() }
       Button("Cancel", role: .cancel) { }
     } message: {
-      Text("This removes the selected bookmarks and tracks from your library. The change cannot be undone.")
+      Text("This removes the selected bookmarks and tracks from your library. Cmd-Z can undo moves, tags, colors and visibility — but not deletions.")
     }
     .sheet(isPresented: $newTagSheet) {
       newTagDialog

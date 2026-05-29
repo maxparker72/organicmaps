@@ -2,6 +2,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ContentView: View {
+  @Environment(\.undoManager) private var envUndoManager
+
   @State private var showNavigator = false
   @State private var showProjects = false
   @State private var paneHidden = false
@@ -139,6 +141,7 @@ struct ContentView: View {
           downloadModel.start()
           placePageModel.start()
           bookmarksModel.refresh()
+          bookmarksModel.undoManager = envUndoManager
         }
         .toolbar { toolbarContent }
         .sheet(item: $importCoordinator.pendingSheet) { state in
