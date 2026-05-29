@@ -83,6 +83,11 @@ struct NavigatorView: View {
           }
         }
         .listStyle(.sidebar)
+        .onKeyPress(.space) {
+          if searchFieldFocused { return .ignored }
+          NotificationCenter.default.post(name: .omToggleQuickLook, object: nil)
+          return .handled
+        }
       case .table:
         NavigatorTableView(
           model: model,

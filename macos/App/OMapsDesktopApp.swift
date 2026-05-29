@@ -4,6 +4,9 @@ extension Notification.Name {
   /// Posted by the "Find in Library" command. ContentView listens, opens the
   /// navigator if hidden, and focuses its search field.
   static let omFindInLibrary = Notification.Name("omFindInLibrary")
+  /// Posted by Cmd-Y and the navigator's Space key. ContentView toggles the
+  /// Quick Look sheet, resolving the target item from the selection.
+  static let omToggleQuickLook = Notification.Name("omToggleQuickLook")
 }
 
 @main
@@ -65,6 +68,10 @@ struct OMapsDesktopApp: App {
           .keyboardShortcut("l", modifiers: .command)
         Button("Orient North") { OMMapControls.rotateToNorth() }
         Divider()
+        Button("Quick Look") {
+          NotificationCenter.default.post(name: .omToggleQuickLook, object: nil)
+        }
+        .keyboardShortcut("y", modifiers: .command)
       }
     }
 

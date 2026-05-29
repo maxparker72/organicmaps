@@ -106,6 +106,10 @@ struct NavigatorTableView: View {
         engineFocus(only)
       }
     }
+    .onKeyPress(.space) {
+      NotificationCenter.default.post(name: .omToggleQuickLook, object: nil)
+      return .handled
+    }
   }
 
   private func engineFocus(_ item: NavSelection) {

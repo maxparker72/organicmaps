@@ -2,9 +2,13 @@ import Foundation
 
 /// One selectable item in the navigator. Bookmark and track IDs are globally
 /// unique within `kml`, so cross-list multi-selection is well-defined.
-enum NavSelection: Hashable {
+enum NavSelection: Hashable, Identifiable {
   case bookmark(MWMMarkID)
   case track(MWMTrackID)
+
+  /// Identifiable conformance — used by SwiftUI's `.sheet(item:)` for the
+  /// Quick Look sheet (a NavSelection uniquely identifies itself).
+  var id: NavSelection { self }
 }
 
 /// Selection state for the bookmarks navigator. Lives alongside the engine's

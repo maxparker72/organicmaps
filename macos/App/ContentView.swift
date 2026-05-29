@@ -23,6 +23,7 @@ struct ContentView: View {
   @State private var buildings3D: Bool = OMPreferences.buildings3D()
   @State private var focusLibrarySearchRequest: Int = 0
   @State private var navigatorViewMode: NavigatorViewMode = NavigatorViewMode.loadPersisted()
+  @State private var quickLookItem: NavSelection?
 
   private var hasInfo: Bool {
     selectedList != nil || placePageModel.info != nil || navSelection.count >= 2
@@ -118,6 +119,22 @@ struct ContentView: View {
           showNavigator = true
           focusLibrarySearchRequest += 1
         }
+        .onReceive(NotificationCenter.default.publisher(for: .omToggleQuickLook)) { _ in
+          // Toggle: an open Quick Look closes; otherwise resolve a target from
+          // the navigator selection (single item) or, failing that, the
+          // engine's currently-open place page.
+          if quickLookItem != nil {
+            quickLookItem = nil
+            return
+          }
+          if navSelection.count == 1, let only = navSelection.selection.first {
+            quickLookItem = only
+          } else if let info = placePageModel.info, info.isBookmark {
+            quickLookItem = .bookmark(info.bookmarkId)
+          } else if let info = placePageModel.info, info.isTrack {
+            quickLookItem = .track(info.trackId)
+          }
+        }
         .onAppear {
           downloadModel.start()
           placePageModel.start()
@@ -133,6 +150,9 @@ struct ContentView: View {
             tagStore: tagStore,
             onConfirm: { importCoordinator.confirm($0) },
             onCancel: { importCoordinator.cancelSheet() })
+        }
+        .sheet(item: $quickLookItem) { item in
+          QuickLookView(item: item, onClose: { quickLookItem = nil })
         }
     }
   }
