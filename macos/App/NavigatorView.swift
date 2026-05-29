@@ -94,7 +94,7 @@ struct NavigatorView: View {
           selection: selection,
           tagStore: tagStore,
           projectsModel: projectsModel,
-          searchText: searchText)
+          searchText: $searchText)
       }
     }
     .frame(width: viewMode.paneWidth)
@@ -383,13 +383,17 @@ struct NavigatorView: View {
   private func bookmarkRow(_ bm: Bookmark, in list: BookmarkGroup) -> some View {
     let item = NavSelection.bookmark(bm.bookmarkId)
     let isSelected = selection.contains(item)
+    let tags = OMBookmarksHelper.tags(forBookmark: bm.bookmarkId)
     return Button { handleClick(item, in: list) } label: {
       HStack(spacing: 8) {
         Circle().fill(bm.bookmarkColor.swiftUIColor).frame(width: 10, height: 10)
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: 2) {
           Text(bm.bookmarkName)
           if let sub = bookmarkSubtitle(bm) {
             Text(sub).font(.caption).foregroundStyle(.secondary)
+          }
+          if !tags.isEmpty {
+            TagChipRow(tags: tags, limit: 3, onTap: { tag in searchText = tag })
           }
         }
         Spacer()
@@ -418,14 +422,18 @@ struct NavigatorView: View {
   private func trackRow(_ track: Track, in list: BookmarkGroup) -> some View {
     let item = NavSelection.track(track.trackId)
     let isSelected = selection.contains(item)
+    let tags = OMBookmarksHelper.tags(forTrack: track.trackId)
     return Button { handleClick(item, in: list) } label: {
       HStack(spacing: 8) {
         RoundedRectangle(cornerRadius: 1)
           .fill(Color(nsColor: track.trackColor)).frame(width: 12, height: 3)
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: 2) {
           Text(track.trackName)
           Text(OMBookmarksHelper.formatDistance(meters: Double(track.trackLengthMeters)))
             .font(.caption).foregroundStyle(.secondary)
+          if !tags.isEmpty {
+            TagChipRow(tags: tags, limit: 3, onTap: { tag in searchText = tag })
+          }
         }
         Spacer()
         let visible = OMBookmarksHelper.isTrackVisible(track.trackId)

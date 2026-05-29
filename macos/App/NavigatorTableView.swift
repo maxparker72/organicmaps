@@ -11,7 +11,7 @@ struct NavigatorTableView: View {
   @ObservedObject var selection: NavigatorSelectionModel
   @ObservedObject var tagStore: TagStore
   @ObservedObject var projectsModel: ProjectModel
-  let searchText: String
+  @Binding var searchText: String
 
   @State private var sortOrder: [KeyPathComparator<LibraryRow>] = [
     KeyPathComparator(\LibraryRow.name)
@@ -79,7 +79,7 @@ struct NavigatorTableView: View {
       .width(90)
 
       TableColumn("Tags", value: \.tagsJoined) { row in
-        Text(row.tagsJoined).lineLimit(1).truncationMode(.tail).foregroundStyle(.secondary)
+        TagChipRow(tags: row.tagArray, limit: 4, onTap: { tag in searchText = tag })
       }
 
       TableColumn("Region", value: \.regionName) { row in
@@ -180,14 +180,14 @@ struct LibraryRow: Identifiable {
     }
   }
 
-  var tagsJoined: String {
-    let tags: [String]
+  var tagArray: [String] {
     switch kind {
-    case .bookmark(let b): tags = OMBookmarksHelper.tags(forBookmark: b.bookmarkId)
-    case .track(let t): tags = OMBookmarksHelper.tags(forTrack: t.trackId)
+    case .bookmark(let b): return OMBookmarksHelper.tags(forBookmark: b.bookmarkId)
+    case .track(let t): return OMBookmarksHelper.tags(forTrack: t.trackId)
     }
-    return tags.joined(separator: ", ")
   }
+
+  var tagsJoined: String { tagArray.joined(separator: ", ") }
 
   var regionName: String {
     let chain: [String]
