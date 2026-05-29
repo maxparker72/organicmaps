@@ -34,7 +34,7 @@ enum FilterProperty: String, CaseIterable, Identifiable {
   }
 }
 
-enum StringOp: String, CaseIterable, Identifiable {
+enum StringOp: String, CaseIterable, Identifiable, Codable {
   case isExactly = "is"
   case isNot = "is not"
   case contains = "contains"
@@ -44,7 +44,7 @@ enum StringOp: String, CaseIterable, Identifiable {
   var id: String { rawValue }
 }
 
-enum NumberOp: String, CaseIterable, Identifiable {
+enum NumberOp: String, CaseIterable, Identifiable, Codable {
   case eq = "="
   case ne = "≠"
   case gt = ">"
@@ -54,12 +54,36 @@ enum NumberOp: String, CaseIterable, Identifiable {
   var id: String { rawValue }
 }
 
-struct FilterCondition: Identifiable {
+struct FilterCondition: Identifiable, Codable, Equatable {
+  // `id` is in-memory only — fresh UUID on decode so saved filters don't
+  // collide if duplicated in the UI.
   let id = UUID()
   var property: FilterProperty = .name
   var stringOp: StringOp = .contains
   var numberOp: NumberOp = .gt
   var value: String = ""
+
+  enum CodingKeys: String, CodingKey {
+    case property, stringOp, numberOp, value
+  }
+}
+
+extension FilterProperty: Codable {}
+
+/// Named, persisted FilterModel state. Restoring a SavedFilter into a
+/// FilterModel and calling apply() reproduces the saved view exactly.
+struct SavedFilter: Codable, Identifiable, Equatable {
+  let id: UUID
+  var name: String
+  var matchAll: Bool
+  var conditions: [FilterCondition]
+
+  init(id: UUID = UUID(), name: String, matchAll: Bool, conditions: [FilterCondition]) {
+    self.id = id
+    self.name = name
+    self.matchAll = matchAll
+    self.conditions = conditions
+  }
 }
 
 /// A visual filter over bookmarks (waypoints): a set of property conditions
@@ -71,6 +95,26 @@ final class FilterModel: ObservableObject {
 
   func addCondition() { conditions.append(FilterCondition()) }
   func removeCondition(_ condition: FilterCondition) { conditions.removeAll { $0.id == condition.id } }
+
+  /// Capture the current state into a named `SavedFilter` for persistence.
+  func snapshot(name: String, id: UUID = UUID()) -> SavedFilter {
+    SavedFilter(id: id, name: name, matchAll: matchAll, conditions: conditions)
+  }
+
+  /// Replace the current state with a saved filter, without applying.
+  func restore(_ saved: SavedFilter) {
+    matchAll = saved.matchAll
+    conditions = saved.conditions
+  }
+
+  /// One-shot apply: build a transient FilterModel from a saved filter and
+  /// run apply(). Used by NavigatorView and the Filter menu when the user
+  /// doesn't need to open the builder.
+  static func applyOneShot(_ saved: SavedFilter) {
+    let m = FilterModel()
+    m.restore(saved)
+    m.apply()
+  }
 
   /// Hide items that don't match; show those that do. An item is evaluated only
   /// against the conditions that apply to its type; an item with no applicable

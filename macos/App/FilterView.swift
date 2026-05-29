@@ -7,6 +7,14 @@ struct FilterView: View {
   @StateObject private var model = FilterModel()
   @StateObject private var tags = TagStore()
   @StateObject private var regions = RegionStore()
+  @ObservedObject private var saved = SavedFiltersStore.shared
+
+  // Track which saved filter is currently loaded in the builder, so a re-save
+  // updates that filter in place instead of creating a duplicate.
+  @State private var loadedSavedId: UUID?
+  @State private var saveSheet = false
+  @State private var saveName = ""
+  @State private var renameSheet: SavedFilter?
 
   // Real values available to choose from, so a condition can't target something
   // that doesn't exist (which would hide everything).
@@ -23,6 +31,84 @@ struct FilterView: View {
   private let colorOptions = BookmarkColor.palette.map(\.displayName)
 
   var body: some View {
+    HSplitView {
+      savedSidebar
+        .frame(minWidth: 180, idealWidth: 200)
+      builder
+        .frame(minWidth: 560)
+    }
+    .frame(minWidth: 760, minHeight: 360)
+    .sheet(isPresented: $saveSheet) { saveDialog }
+    .sheet(item: $renameSheet) { filter in renameDialog(filter) }
+  }
+
+  // MARK: - Sidebar
+
+  private var savedSidebar: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      HStack {
+        Text("Saved Filters").font(.headline)
+        Spacer()
+      }
+      .padding(.horizontal, 12).padding(.top, 12).padding(.bottom, 8)
+      Divider()
+      if saved.filters.isEmpty {
+        VStack(spacing: 6) {
+          Text("No saved filters yet")
+            .font(.subheadline).foregroundStyle(.secondary)
+          Text("Build a filter and click Save As… to keep it.")
+            .font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 18)
+        Spacer()
+      } else {
+        List {
+          ForEach(saved.filters) { filter in savedRow(filter) }
+        }
+        .listStyle(.sidebar)
+      }
+    }
+    .background(.regularMaterial)
+  }
+
+  private func savedRow(_ filter: SavedFilter) -> some View {
+    let isLoaded = loadedSavedId == filter.id
+    let isActive = saved.activeFilterId == filter.id
+    return HStack(spacing: 6) {
+      Image(systemName: isActive ? "line.3.horizontal.decrease.circle.fill"
+                                 : "line.3.horizontal.decrease.circle")
+        .foregroundStyle(isActive ? Color.accentColor : .secondary)
+      Text(filter.name).fontWeight(isLoaded ? .semibold : .regular)
+      Spacer()
+    }
+    .contentShape(Rectangle())
+    .onTapGesture {
+      model.restore(filter)
+      loadedSavedId = filter.id
+      model.apply()
+      saved.setActive(filter.id)
+    }
+    .contextMenu {
+      Button("Apply") {
+        model.restore(filter); loadedSavedId = filter.id
+        model.apply(); saved.setActive(filter.id)
+      }
+      Button("Load into Builder") {
+        model.restore(filter); loadedSavedId = filter.id
+      }
+      Button("Rename…") { renameSheet = filter }
+      Divider()
+      Button("Delete", role: .destructive) {
+        saved.delete(filter.id)
+        if loadedSavedId == filter.id { loadedSavedId = nil }
+      }
+    }
+  }
+
+  // MARK: - Builder
+
+  private var builder: some View {
     VStack(alignment: .leading, spacing: 12) {
       HStack(spacing: 6) {
         Text("Show bookmarks matching")
@@ -54,18 +140,65 @@ struct FilterView: View {
           BookmarksManager.shared().setUserCategoriesVisible(true)
           OMBookmarksHelper.showAllItems()
           NotificationCenter.default.post(name: .omItemVisibilityChanged, object: nil)
+          saved.setActive(nil)
         }
         Spacer()
-        Button("Apply") { model.apply() }
-          .buttonStyle(.borderedProminent)
-          .keyboardShortcut(.return)
+        Button("Save As…") {
+          saveName = saved.filters.first(where: { $0.id == loadedSavedId })?.name ?? ""
+          saveSheet = true
+        }
+        Button("Update") {
+          guard let id = loadedSavedId else { return }
+          let name = saved.filters.first(where: { $0.id == id })?.name ?? "Filter"
+          saved.save(model.snapshot(name: name, id: id))
+        }
+        .disabled(loadedSavedId == nil)
+        Button("Apply") {
+          model.apply()
+          if let id = loadedSavedId { saved.setActive(id) } else { saved.setActive(nil) }
+        }
+        .buttonStyle(.borderedProminent)
+        .keyboardShortcut(.return)
       }
 
       Text("Filters bookmarks (waypoints). Tracks can't be hidden individually by the engine. Use Show all to reset.")
         .font(.caption).foregroundStyle(.secondary)
     }
     .padding(16)
-    .frame(minWidth: 560, minHeight: 320)
+  }
+
+  // MARK: - Dialogs
+
+  private var saveDialog: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Save filter").font(.headline)
+      TextField("Name", text: $saveName).textFieldStyle(.roundedBorder)
+      HStack {
+        Spacer()
+        Button("Cancel") { saveSheet = false; saveName = "" }
+        Button("Save") {
+          let new = model.snapshot(name: saveName)
+          saved.save(new)
+          loadedSavedId = new.id
+          saveSheet = false
+          saveName = ""
+        }
+        .keyboardShortcut(.defaultAction)
+        .buttonStyle(.borderedProminent)
+        .disabled(saveName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+      }
+    }
+    .padding(20)
+    .frame(width: 320)
+  }
+
+  private func renameDialog(_ filter: SavedFilter) -> some View {
+    RenameDialog(initial: filter.name) { newName in
+      saved.rename(filter.id, to: newName)
+      renameSheet = nil
+    } onCancel: {
+      renameSheet = nil
+    }
   }
 
   private func options(for property: FilterProperty) -> [String] {
@@ -77,6 +210,31 @@ struct FilterView: View {
     case .region: return regions.allRegions
     default: return []
     }
+  }
+}
+
+private struct RenameDialog: View {
+  let initial: String
+  let onSave: (String) -> Void
+  let onCancel: () -> Void
+  @State private var name: String = ""
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Rename filter").font(.headline)
+      TextField("Name", text: $name).textFieldStyle(.roundedBorder)
+      HStack {
+        Spacer()
+        Button("Cancel", action: onCancel)
+        Button("Save") { onSave(name) }
+          .keyboardShortcut(.defaultAction)
+          .buttonStyle(.borderedProminent)
+          .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+      }
+    }
+    .padding(20)
+    .frame(width: 320)
+    .onAppear { name = initial }
   }
 }
 

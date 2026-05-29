@@ -36,6 +36,13 @@ struct OMapsDesktopApp: App {
       CommandMenu("Filter") {
         Button("Filter Bookmarks…") { openWindow(id: "filter-builder") }
           .keyboardShortcut("f", modifiers: [.command, .shift])
+        SavedFiltersMenu()
+        Button("Clear Filter") {
+          BookmarksManager.shared().setUserCategoriesVisible(true)
+          OMBookmarksHelper.showAllItems()
+          NotificationCenter.default.post(name: .omItemVisibilityChanged, object: nil)
+          SavedFiltersStore.shared.setActive(nil)
+        }
       }
       // Map controls live in the menu bar / shortcuts to keep the map clean.
       CommandGroup(after: .sidebar) {
@@ -61,5 +68,28 @@ struct OMapsDesktopApp: App {
     Settings {
       PreferencesView()
     }
+  }
+}
+
+/// Renders the saved-filter list inside the Filter menu. Pulled out so it can
+/// observe `SavedFiltersStore.shared` and refresh as filters are added or
+/// renamed without rebuilding the menu structure manually.
+private struct SavedFiltersMenu: View {
+  @ObservedObject private var saved = SavedFiltersStore.shared
+
+  var body: some View {
+    Menu("Apply Saved Filter") {
+      if saved.filters.isEmpty {
+        Text("No saved filters yet").foregroundStyle(.secondary)
+      } else {
+        ForEach(saved.filters) { filter in
+          Button(filter.name) {
+            FilterModel.applyOneShot(filter)
+            saved.setActive(filter.id)
+          }
+        }
+      }
+    }
+    .disabled(saved.filters.isEmpty)
   }
 }

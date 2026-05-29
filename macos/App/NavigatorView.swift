@@ -15,6 +15,11 @@ struct NavigatorView: View {
   let onSelectTrack: (MWMTrackID) -> Void
   let onHide: () -> Void
 
+  @ObservedObject private var savedFilters = SavedFiltersStore.shared
+  @Environment(\.openWindow) private var openWindow
+  @State private var expandSmartFilters: Bool = true
+  @State private var renameSmartFilter: SavedFilter?
+
   enum ListSort: String, CaseIterable, Identifiable {
     case dateAdded = "Date Added", nameAsc = "Name A→Z", nameDesc = "Name Z→A"
     var id: String { rawValue }
@@ -57,6 +62,9 @@ struct NavigatorView: View {
       searchField
       Divider()
       List {
+        if !savedFilters.filters.isEmpty {
+          smartFiltersSection
+        }
         ForEach(visibleLists, id: \.categoryId) { list in
           listRow(list)
           if isExpanded(list) {
@@ -68,6 +76,12 @@ struct NavigatorView: View {
     }
     .frame(width: 300)
     .background(.regularMaterial)
+    .sheet(item: $renameSmartFilter) { filter in
+      SmartFilterRenameDialog(initial: filter.name) { newName in
+        savedFilters.rename(filter.id, to: newName)
+        renameSmartFilter = nil
+      } onCancel: { renameSmartFilter = nil }
+    }
     .alert("New List", isPresented: $showNewList) {
       TextField("Name", text: $newListName)
       Button("Create") { model.createList(newListName); newListName = "" }
@@ -101,6 +115,62 @@ struct NavigatorView: View {
     Text(text.uppercased())
       .font(.caption2).fontWeight(.semibold).foregroundStyle(.secondary)
       .padding(.leading, 18).padding(.top, 4)
+  }
+
+  // MARK: - Smart Filters
+
+  @ViewBuilder private var smartFiltersSection: some View {
+    HStack(spacing: 6) {
+      Button { expandSmartFilters.toggle() } label: {
+        Image(systemName: expandSmartFilters ? "chevron.down" : "chevron.right")
+          .frame(width: 12)
+      }
+      .buttonStyle(.borderless)
+      Text("Smart Filters").fontWeight(.medium)
+      Spacer()
+      if savedFilters.activeFilterId != nil {
+        Button {
+          BookmarksManager.shared().setUserCategoriesVisible(true)
+          OMBookmarksHelper.showAllItems()
+          NotificationCenter.default.post(name: .omItemVisibilityChanged, object: nil)
+          savedFilters.setActive(nil)
+        } label: {
+          Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+        }
+        .buttonStyle(.borderless).help("Clear active filter")
+      }
+    }
+    if expandSmartFilters {
+      ForEach(savedFilters.filters) { filter in smartFilterRow(filter) }
+    }
+  }
+
+  private func smartFilterRow(_ filter: SavedFilter) -> some View {
+    let isActive = savedFilters.activeFilterId == filter.id
+    return HStack(spacing: 8) {
+      Image(systemName: isActive ? "line.3.horizontal.decrease.circle.fill"
+                                 : "line.3.horizontal.decrease.circle")
+        .foregroundStyle(isActive ? Color.accentColor : .secondary)
+      Text(filter.name)
+      Spacer()
+    }
+    .padding(.leading, 18)
+    .padding(.vertical, 2)
+    .contentShape(Rectangle())
+    .onTapGesture {
+      FilterModel.applyOneShot(filter)
+      savedFilters.setActive(filter.id)
+    }
+    .contextMenu {
+      Button("Apply") {
+        FilterModel.applyOneShot(filter)
+        savedFilters.setActive(filter.id)
+      }
+      Button("Edit in Builder…") { openWindow(id: "filter-builder") }
+      Button("Rename…") { renameSmartFilter = filter }
+      Divider()
+      Button("Delete", role: .destructive) { savedFilters.delete(filter.id) }
+    }
   }
 
   private var header: some View {
@@ -454,5 +524,30 @@ struct NavigatorView: View {
 
   private func toggle(_ id: MWMMarkGroupID) {
     if expanded.contains(id) { expanded.remove(id) } else { expanded.insert(id) }
+  }
+}
+
+private struct SmartFilterRenameDialog: View {
+  let initial: String
+  let onSave: (String) -> Void
+  let onCancel: () -> Void
+  @State private var name: String = ""
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Text("Rename smart filter").font(.headline)
+      TextField("Name", text: $name).textFieldStyle(.roundedBorder)
+      HStack {
+        Spacer()
+        Button("Cancel", action: onCancel)
+        Button("Save") { onSave(name) }
+          .keyboardShortcut(.defaultAction)
+          .buttonStyle(.borderedProminent)
+          .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+      }
+    }
+    .padding(20)
+    .frame(width: 320)
+    .onAppear { name = initial }
   }
 }
