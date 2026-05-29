@@ -87,9 +87,15 @@ struct NavigatorTableView: View {
       }
     }
     .contextMenu(forSelectionType: NavSelection.self) { items in
-      if items.count >= 2 {
+      // Same bulk menu for single-row and multi-row right-clicks — a single
+      // item is a one-item batch. Items come from the Table's own
+      // right-click hit, so we can feed them straight in.
+      if !items.isEmpty {
+        let bmIds = items.compactMap { if case let .bookmark(id) = $0 { return id } else { return nil } }
+        let trIds = items.compactMap { if case let .track(id) = $0 { return id } else { return nil } }
         BulkContextMenu(selection: selection, model: model,
-                        tagStore: tagStore, projectsModel: projectsModel)
+                        tagStore: tagStore, projectsModel: projectsModel,
+                        bookmarkIds: bmIds, trackIds: trIds)
       }
     } primaryAction: { items in
       // Double-click / Return: open the engine place-page for a single

@@ -1,21 +1,37 @@
 import SwiftUI
 
-/// Bulk-operation context menu shown when 2+ navigator rows are selected.
-/// Used by both the tree (NavigatorView) and table (NavigatorTableView)
-/// presentations so they share identical behaviour and stay in lock-step.
+/// Bulk-operation context menu. Used by both the tree (NavigatorView) and
+/// table (NavigatorTableView) right-click menus, and by single-row
+/// right-clicks too — a single item is just a one-item batch, so the same
+/// Move / Set color / Add tag / Add to project / Show / Hide / Delete
+/// surfaces apply uniformly. The caller passes whichever ids should be
+/// acted on: the full navigator selection when 2+ are selected and the
+/// clicked row is part of it, otherwise just the clicked row's id.
+///
+/// Selection is still injected because the Delete path runs through
+/// ContentView's shared confirmationDialog, which reads from
+/// NavigatorSelectionModel — the menu briefly seeds the selection with the
+/// target ids so the dialog's perform-delete acts on the right items.
 struct BulkContextMenu: View {
   @ObservedObject var selection: NavigatorSelectionModel
   @ObservedObject var model: BookmarksNavigatorModel
   @ObservedObject var tagStore: TagStore
   @ObservedObject var projectsModel: ProjectModel
+  let bookmarkIds: [MWMMarkID]
+  let trackIds: [MWMTrackID]
+
+  private var bmNumbers: [NSNumber] { bookmarkIds.map { NSNumber(value: $0) } }
+  private var trNumbers: [NSNumber] { trackIds.map { NSNumber(value: $0) } }
+  private var totalCount: Int { bookmarkIds.count + trackIds.count }
+  private var deleteLabel: String {
+    "Delete \(totalCount) \(totalCount == 1 ? "item" : "items")…"
+  }
 
   var body: some View {
     Menu("Move to") {
       ForEach(model.lists, id: \.categoryId) { list in
         Button(list.title) {
-          model.moveItems(bookmarkIds: selection.bookmarkNSNumbers,
-                          trackIds: selection.trackNSNumbers,
-                          to: list.categoryId)
+          model.moveItems(bookmarkIds: bmNumbers, trackIds: trNumbers, to: list.categoryId)
         }
       }
     }
@@ -27,8 +43,8 @@ struct BulkContextMenu: View {
     Menu("Set color") {
       ForEach(BookmarkColor.palette, id: \.self) { color in
         Button(color.displayName) {
-          model.setColorForItems(bookmarkIds: selection.bookmarkNSNumbers,
-                                 trackIds: selection.trackNSNumbers,
+          model.setColorForItems(bookmarkIds: bmNumbers,
+                                 trackIds: trNumbers,
                                  color: color)
         }
       }
@@ -39,7 +55,7 @@ struct BulkContextMenu: View {
       } else {
         ForEach(tagStore.allTags, id: \.self) { tag in
           Button(tag) {
-            model.addTag(tag, bookmarkIds: selection.bookmarkIds, trackIds: selection.trackIds)
+            model.addTag(tag, bookmarkIds: bookmarkIds, trackIds: trackIds)
           }
         }
       }
@@ -50,26 +66,29 @@ struct BulkContextMenu: View {
       } else {
         ForEach(projectsModel.projects) { project in
           Button(project.name) {
-            for id in selection.bookmarkIds { projectsModel.addBookmark(id, to: project) }
-            for id in selection.trackIds { projectsModel.addTrack(id, to: project) }
+            for id in bookmarkIds { projectsModel.addBookmark(id, to: project) }
+            for id in trackIds { projectsModel.addTrack(id, to: project) }
           }
         }
       }
     }
     Divider()
     Button("Show") {
-      model.setItemsVisible(bookmarkIds: selection.bookmarkNSNumbers,
-                            trackIds: selection.trackNSNumbers, visible: true)
+      model.setItemsVisible(bookmarkIds: bmNumbers, trackIds: trNumbers, visible: true)
     }
     Button("Hide") {
-      model.setItemsVisible(bookmarkIds: selection.bookmarkNSNumbers,
-                            trackIds: selection.trackNSNumbers, visible: false)
+      model.setItemsVisible(bookmarkIds: bmNumbers, trackIds: trNumbers, visible: false)
     }
     Divider()
-    Button("Delete \(selection.count) items…", role: .destructive) {
-      // ContentView's confirmationDialog observes pendingBulkDelete and
-      // performs the actual delete on confirm — context-menu actions
-      // can't host a confirmation themselves.
+    Button(deleteLabel, role: .destructive) {
+      // ContentView's confirmationDialog watches pendingBulkDelete and reads
+      // from navSelection on confirm. Seed the selection with these ids so a
+      // right-click on a row that wasn't already in a multi-selection still
+      // deletes the right thing.
+      var items: Set<NavSelection> = []
+      for id in bookmarkIds { items.insert(.bookmark(id)) }
+      for id in trackIds { items.insert(.track(id)) }
+      selection.set(items)
       selection.pendingBulkDelete = true
     }
   }

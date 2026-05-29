@@ -372,13 +372,6 @@ struct NavigatorView: View {
     }
   }
 
-  @ViewBuilder private func moveMenu(_ action: @escaping (MWMMarkGroupID) -> Void) -> some View {
-    Menu("Move to") {
-      ForEach(model.lists, id: \.categoryId) { list in
-        Button(list.title) { action(list.categoryId) }
-      }
-    }
-  }
 
   private func bookmarkRow(_ bm: Bookmark, in list: BookmarkGroup) -> some View {
     let item = NavSelection.bookmark(bm.bookmarkId)
@@ -412,8 +405,7 @@ struct NavigatorView: View {
       let entity = DraggableEntity(kind: .bookmark, id: UInt64(bm.bookmarkId))
       return NSItemProvider(object: entity.transferString as NSString)
     }
-    .contextMenu { contextMenu(for: item, singleDelete: { model.deleteBookmark(bm.bookmarkId) },
-                                 singleMove: { model.moveBookmark(bm.bookmarkId, to: $0) }) }
+    .contextMenu { rowContextMenu(for: item) }
     .swipeActions(edge: .trailing) {
       Button(role: .destructive) { model.deleteBookmark(bm.bookmarkId) } label: { Label("Delete", systemImage: "trash") }
     }
@@ -451,8 +443,7 @@ struct NavigatorView: View {
       let entity = DraggableEntity(kind: .track, id: UInt64(track.trackId))
       return NSItemProvider(object: entity.transferString as NSString)
     }
-    .contextMenu { contextMenu(for: item, singleDelete: { model.deleteTrack(track.trackId) },
-                                 singleMove: { model.moveTrack(track.trackId, to: $0) }) }
+    .contextMenu { rowContextMenu(for: item) }
     .swipeActions(edge: .trailing) {
       Button(role: .destructive) { model.deleteTrack(track.trackId) } label: { Label("Delete", systemImage: "trash") }
     }
@@ -487,20 +478,25 @@ struct NavigatorView: View {
     }
   }
 
-  /// Right-click on a row opens this menu. If the right-clicked row is part
-  /// of a 2+ selection, expose bulk operations on the whole set; otherwise
-  /// just the single-item move/delete (the row is not auto-added — match
-  /// Finder, which leaves selection alone when right-clicking outside it).
-  @ViewBuilder private func contextMenu(for item: NavSelection,
-                                        singleDelete: @escaping () -> Void,
-                                        singleMove: @escaping (MWMMarkGroupID) -> Void) -> some View {
-    if selection.contains(item) && selection.count >= 2 {
-      BulkContextMenu(selection: selection, model: model,
-                      tagStore: tagStore, projectsModel: projectsModel)
-    } else {
-      moveMenu(singleMove)
-      Button("Delete", role: .destructive, action: singleDelete)
-    }
+  /// Right-click on a row opens the same bulk menu single-row or multi-row.
+  /// If the row is part of a 2+ selection, the menu's actions target the
+  /// whole selection; otherwise it targets just the right-clicked row. A
+  /// one-row right-click no longer auto-selects (Finder-style) — the bulk
+  /// menu is fed explicit ids and only the Delete path briefly seeds
+  /// selection so the shared confirmation dialog has the right target.
+  @ViewBuilder private func rowContextMenu(for item: NavSelection) -> some View {
+    let (bmIds, trIds): ([MWMMarkID], [MWMTrackID]) = {
+      if selection.count >= 2 && selection.contains(item) {
+        return (selection.bookmarkIds, selection.trackIds)
+      }
+      switch item {
+      case .bookmark(let id): return ([id], [])
+      case .track(let id): return ([], [id])
+      }
+    }()
+    BulkContextMenu(selection: selection, model: model,
+                    tagStore: tagStore, projectsModel: projectsModel,
+                    bookmarkIds: bmIds, trackIds: trIds)
   }
 
   private func bookmarkSubtitle(_ bm: Bookmark) -> String? {
