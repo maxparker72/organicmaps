@@ -4,6 +4,13 @@ extension Notification.Name {
   /// Posted when item visibility changes from elsewhere (e.g. the filter window),
   /// so the navigator's eye icons stay in sync.
   static let omItemVisibilityChanged = Notification.Name("omItemVisibilityChanged")
+  /// Posted whenever bookmark / track *display data* is mutated without an
+  /// accompanying BookmarksObserver callback — color normalization on import,
+  /// bulk Set Color, etc. `MWMBookmark` snapshots the bookmark colour at
+  /// construction time, so a SwiftUI re-render alone isn't enough: the
+  /// navigator has to re-call `sortedUserCategories()` to rebuild the
+  /// snapshots. BookmarksNavigatorModel listens and calls `refresh()`.
+  static let omBookmarkItemsChanged = Notification.Name("omBookmarkItemsChanged")
 }
 
 extension BookmarkColor {
@@ -38,6 +45,7 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
   private var manager: BookmarksManager { BookmarksManager.shared() }
 
   private var visibilityObserver: NSObjectProtocol?
+  private var itemsChangedObserver: NSObjectProtocol?
 
   override init() {
     super.init()
@@ -47,6 +55,10 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
     visibilityObserver = NotificationCenter.default.addObserver(
       forName: .omItemVisibilityChanged, object: nil, queue: .main) { [weak self] _ in
       self?.objectWillChange.send()
+    }
+    itemsChangedObserver = NotificationCenter.default.addObserver(
+      forName: .omBookmarkItemsChanged, object: nil, queue: .main) { [weak self] _ in
+      self?.refresh()
     }
     if manager.areBookmarksLoaded() {
       refresh()
@@ -58,6 +70,7 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
   deinit {
     (BookmarksManager.shared() as any BookmarksObservable).remove(self)
     if let visibilityObserver { NotificationCenter.default.removeObserver(visibilityObserver) }
+    if let itemsChangedObserver { NotificationCenter.default.removeObserver(itemsChangedObserver) }
   }
 
   func refresh() {
@@ -275,7 +288,10 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
     for (c, ids) in bmByColor { OMBookmarksHelper.setBookmarks(ids, color: c) }
     for (c, ids) in trByColor { OMBookmarksHelper.setTracks(ids, color: c) }
     OMBookmarksHelper.invalidateUserMarks()
-    objectWillChange.send()
+    // MWMBookmark / MWMTrack snapshot color at init, so a bare
+    // objectWillChange leaves the navigator rows showing the prior swatch.
+    // Refresh rebuilds the snapshots from the post-edit engine state.
+    refresh()
   }
 
   private func applyVisibility(_ assignment: VisibilityAssignment) {

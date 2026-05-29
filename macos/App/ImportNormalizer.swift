@@ -21,7 +21,15 @@ final class ImportNormalizer: NSObject, ObservableObject, BookmarksObserver {
     // navigator row and the map render show drifted colours until the user
     // re-saves the bookmark by hand).
     DispatchQueue.main.async {
-      OMBookmarksHelper.normalizeAllItems()
+      let modified = OMBookmarksHelper.normalizeAllItems()
+      // MWMBookmark snapshots its color at init, so even after the engine's
+      // kml::BookmarkData is fixed the cached BookmarkGroup.bookmarks keep
+      // the pre-normalize value (None → gray dot in the navigator while the
+      // map renders Red). Force BookmarksNavigatorModel to rebuild from
+      // sortedUserCategories so SwiftUI rows pick up the new color.
+      if modified > 0 {
+        NotificationCenter.default.post(name: .omBookmarkItemsChanged, object: nil)
+      }
     }
   }
 }
