@@ -198,10 +198,16 @@
 {
   if (!m_engineCreated)
     return;
-  m2::PointD const pt = [self enginePointForEvent:event];
-  constexpr double kSensitivity = 0.01;
-  double const factor = event.scrollingDeltaY * kSensitivity;
-  GetFramework().Scale(std::exp(factor), pt, false);
+  CGFloat const w = self.bounds.size.width;
+  CGFloat const h = self.bounds.size.height;
+  if (w <= 0 || h <= 0)
+    return;
+  // Trackpad two-finger scrolls pan the map (pinch handles zoom). A line-step
+  // mouse wheel reports much smaller integer deltas, so amplify those.
+  double const k = event.hasPreciseScrollingDeltas ? 1.0 : 16.0;
+  double const factorX = static_cast<double>(event.scrollingDeltaX) * k / static_cast<double>(w);
+  double const factorY = -static_cast<double>(event.scrollingDeltaY) * k / static_cast<double>(h);
+  GetFramework().Move(factorX, factorY, false);
 }
 
 - (void)magnifyWithEvent:(NSEvent *)event

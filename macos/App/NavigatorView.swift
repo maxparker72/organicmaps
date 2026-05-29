@@ -274,6 +274,10 @@ struct NavigatorView: View {
       .padding(.leading, 18)
     }
     .buttonStyle(.plain)
+    .onDrag {
+      let entity = DraggableEntity(kind: .bookmark, id: UInt64(bm.bookmarkId))
+      return NSItemProvider(object: entity.transferString as NSString)
+    }
     .contextMenu {
       moveMenu { model.moveBookmark(bm.bookmarkId, to: $0) }
       Button("Delete", role: .destructive) { model.deleteBookmark(bm.bookmarkId) }
@@ -303,6 +307,10 @@ struct NavigatorView: View {
       .padding(.leading, 18)
     }
     .buttonStyle(.plain)
+    .onDrag {
+      let entity = DraggableEntity(kind: .track, id: UInt64(track.trackId))
+      return NSItemProvider(object: entity.transferString as NSString)
+    }
     .contextMenu {
       moveMenu { model.moveTrack(track.trackId, to: $0) }
       Button("Delete", role: .destructive) { model.deleteTrack(track.trackId) }

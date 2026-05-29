@@ -3,14 +3,20 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
   @State private var showNavigator = false
+  @State private var showProjects = false
   @State private var paneHidden = false
   @State private var selectedList: BookmarkGroup?
+  @State private var showSearch = false
 
   @StateObject private var downloadModel = MapDownloadModel()
   @StateObject private var layersModel = LayersModel()
   @StateObject private var placePageModel = PlacePageModel()
   @StateObject private var bookmarksModel = BookmarksNavigatorModel()
+  @StateObject private var projectsModel = ProjectModel()
   @StateObject private var routingModel = RoutingModel()
+  @StateObject private var searchModel = SearchModel()
+
+  @State private var buildings3D: Bool = OMPreferences.buildings3D()
 
   private var hasInfo: Bool { selectedList != nil || placePageModel.info != nil }
 
@@ -30,7 +36,7 @@ struct ContentView: View {
         .overlay(alignment: .bottom) {
           DownloadBanner(model: downloadModel).padding(.bottom, 16)
         }
-        .overlay(alignment: .leading) { navigatorOverlay }
+        .overlay(alignment: .leading) { leadingOverlay }
         .overlay(alignment: .trailing) { infoOverlay }
         .overlay(alignment: .top) {
           if routingModel.hasPoints {
@@ -39,13 +45,40 @@ struct ContentView: View {
               .transition(.move(edge: .top))
           }
         }
+        .overlay(alignment: .topLeading) {
+          if showSearch {
+            SearchView(
+              model: searchModel,
+              onDismiss: { searchModel.clearMap(); showSearch = false },
+              // Pick-a-result keeps the dialog open so pins and the picked
+              // place's info pane are visible together; the user dismisses
+              // explicitly via ✕ / Esc / the toolbar toggle.
+              onResultSelected: {})
+              // Shift right when the bookmarks navigator and/or projects pane
+              // (300pt each) are open so the panels don't overlap.
+              .padding(.leading, leadingPanesWidth + 16)
+              .padding(.top, 16)
+              .transition(.move(edge: .leading).combined(with: .opacity))
+          }
+        }
         .animation(.easeInOut(duration: 0.2), value: showNavigator)
+        .animation(.easeInOut(duration: 0.2), value: showProjects)
         .animation(.easeInOut(duration: 0.2), value: paneHidden)
         .animation(.easeInOut(duration: 0.2), value: selectedList?.categoryId)
         .animation(.easeInOut(duration: 0.2), value: placePageModel.info == nil)
+        .animation(.easeInOut(duration: 0.2), value: showSearch)
         .onChange(of: placePageModel.openToken) { _, _ in
           selectedList = nil
           paneHidden = false
+          // Tapping a different feature deactivates the previous selection,
+          // which the engine uses as a trigger to wipe SEARCH user-marks.
+          // Repaint pins after the new selection settles.
+          searchModel.refillPinsIfLive()
+        }
+        .onChange(of: placePageModel.info == nil) { _, isNil in
+          // Tapping empty space deactivates without re-activating; same wipe,
+          // same repaint.
+          if isNil { searchModel.refillPinsIfLive() }
         }
         .onChange(of: bookmarksModel.lists.map(\.categoryId)) { _, ids in
           if let sel = selectedList, !ids.contains(sel.categoryId) {
@@ -63,18 +96,34 @@ struct ContentView: View {
 
   // MARK: - Overlays
 
-  @ViewBuilder private var navigatorOverlay: some View {
-    if showNavigator {
-      NavigatorView(
-        model: bookmarksModel,
-        onSelectList: { list in
-          selectedList = list
-          paneHidden = false
-        },
-        onSelectBookmark: { bookmarksModel.showBookmarkOnMap($0) },
-        onSelectTrack: { bookmarksModel.showTrackOnMap($0) },
-        onHide: { showNavigator = false })
-        .transition(.move(edge: .leading))
+  private var leadingPanesWidth: CGFloat {
+    (showNavigator ? 300 : 0) + (showProjects ? 300 : 0)
+  }
+
+  // Side-by-side leading panes: bookmarks navigator and projects pane. Each is
+  // independently toggleable; the primary projects workflow is dragging items
+  // from the navigator into a project, so both must be able to be visible at once.
+  @ViewBuilder private var leadingOverlay: some View {
+    HStack(spacing: 0) {
+      if showNavigator {
+        NavigatorView(
+          model: bookmarksModel,
+          onSelectList: { list in
+            selectedList = list
+            paneHidden = false
+          },
+          onSelectBookmark: { bookmarksModel.showBookmarkOnMap($0) },
+          onSelectTrack: { bookmarksModel.showTrackOnMap($0) },
+          onHide: { showNavigator = false })
+          .transition(.move(edge: .leading))
+      }
+      if showProjects {
+        ProjectsPaneView(
+          projects: projectsModel,
+          bookmarks: bookmarksModel,
+          onHide: { showProjects = false })
+          .transition(.move(edge: .leading))
+      }
     }
   }
 
@@ -126,14 +175,30 @@ struct ContentView: View {
     ToolbarItemGroup(placement: .navigation) {
       Button { showNavigator.toggle() } label: { Image(systemName: "bookmark") }
         .help("Bookmarks")
+      Button { showProjects.toggle() } label: { Image(systemName: "folder") }
+        .help("Projects")
+        .keyboardShortcut("p", modifiers: [.command, .shift])
+      Button {
+        if showSearch { searchModel.clearMap() }
+        showSearch.toggle()
+      } label: { Image(systemName: "magnifyingglass") }
+        .help("Search")
+        .keyboardShortcut("f", modifiers: .command)
     }
     ToolbarItemGroup(placement: .automatic) {
       Menu {
-        Toggle("Subway", isOn: Binding(get: { layersModel.subway }, set: layersModel.setSubway))
-        Toggle("Isolines", isOn: Binding(get: { layersModel.isolines }, set: layersModel.setIsolines))
-        Toggle("Outdoor", isOn: Binding(get: { layersModel.outdoor }, set: layersModel.setOutdoor))
-        Toggle("Hiking", isOn: Binding(get: { layersModel.hiking }, set: layersModel.setHiking))
-        Toggle("Cycling", isOn: Binding(get: { layersModel.cycling }, set: layersModel.setCycling))
+        Section("Layers") {
+          Toggle("Subway", isOn: Binding(get: { layersModel.subway }, set: layersModel.setSubway))
+          Toggle("Isolines", isOn: Binding(get: { layersModel.isolines }, set: layersModel.setIsolines))
+          Toggle("Outdoor", isOn: Binding(get: { layersModel.outdoor }, set: layersModel.setOutdoor))
+          Toggle("Hiking", isOn: Binding(get: { layersModel.hiking }, set: layersModel.setHiking))
+          Toggle("Cycling", isOn: Binding(get: { layersModel.cycling }, set: layersModel.setCycling))
+        }
+        Section("3D") {
+          Toggle("3D buildings", isOn: Binding(
+            get: { buildings3D },
+            set: { v in buildings3D = v; OMPreferences.setBuildings3D(v) }))
+        }
       } label: {
         Image(systemName: "square.3.layers.3d")
       }
@@ -150,35 +215,23 @@ struct ContentView: View {
   }
 }
 
-/// Mobile-style "download this area" prompt shown over the map when the region
-/// under the viewport is missing, downloading, or failed.
+/// A subtle "Press ⇧⏎ to download <region>" watermark that morphs into a
+/// linear progress card while the download runs, then disappears.
 private struct DownloadBanner: View {
   @ObservedObject var model: MapDownloadModel
 
   var body: some View {
     switch model.status {
     case .notDownloaded, .onDiskOutOfDate:
-      banner {
-        Button { model.download() } label: {
-          Label(actionTitle, systemImage: "arrow.down.circle.fill")
-        }
-        .buttonStyle(.borderedProminent)
+      Button(action: model.download) { promptCard }
+        .buttonStyle(.plain)
         .keyboardShortcut(.return, modifiers: .shift)
-      }
     case .downloading, .inQueue:
-      banner {
-        VStack(alignment: .leading, spacing: 4) {
-          Text(model.status == .inQueue ? "\(model.name) — queued" : "Downloading \(model.name)…")
-            .font(.subheadline)
-          ProgressView(value: model.progressFraction).frame(width: 220)
-        }
-        Button("Cancel", role: .cancel) { model.cancel() }
-      }
+      progressCard
     case .error:
-      banner {
-        Text("Couldn't download \(model.name)").font(.subheadline)
-        Button("Retry") { model.retry() }.buttonStyle(.borderedProminent)
-      }
+      Button(action: model.retry) { retryCard }
+        .buttonStyle(.plain)
+        .keyboardShortcut(.return, modifiers: .shift)
     case .none, .onDisk:
       EmptyView()
     @unknown default:
@@ -186,17 +239,49 @@ private struct DownloadBanner: View {
     }
   }
 
-  private var actionTitle: String {
-    let verb = model.status == .onDiskOutOfDate ? "Update" : "Download"
-    let size = ByteCountFormatter.string(fromByteCount: Int64(model.sizeBytes), countStyle: .file)
-    return "\(verb) \(model.name) • \(size)"
+  private var promptCard: some View {
+    watermarkCard {
+      VStack(spacing: 4) {
+        Text("Press ⇧⏎ to \(verb) \(model.name)").font(.headline)
+        Text(sizeString).font(.caption).foregroundStyle(.secondary)
+      }
+    }
   }
 
-  private func banner<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-    HStack(spacing: 12) { content() }
-      .padding(.horizontal, 16)
-      .padding(.vertical, 10)
-      .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-      .shadow(radius: 8)
+  private var progressCard: some View {
+    watermarkCard {
+      VStack(spacing: 10) {
+        Text(model.status == .inQueue ? "\(model.name) queued" : "Downloading \(model.name)")
+          .font(.headline)
+        ProgressView(value: model.progressFraction)
+          .progressViewStyle(.linear)
+          .frame(width: 260)
+        Text("\(Int(model.progressFraction * 100))%")
+          .font(.caption).foregroundStyle(.secondary)
+      }
+    }
+  }
+
+  private var retryCard: some View {
+    watermarkCard {
+      VStack(spacing: 4) {
+        Text("Couldn't download \(model.name)").font(.headline)
+        Text("Press ⇧⏎ to retry").font(.caption).foregroundStyle(.secondary)
+      }
+    }
+  }
+
+  private var verb: String { model.status == .onDiskOutOfDate ? "update" : "download" }
+  private var sizeString: String {
+    ByteCountFormatter.string(fromByteCount: Int64(model.sizeBytes), countStyle: .file)
+  }
+
+  @ViewBuilder
+  private func watermarkCard<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+    content()
+      .padding(.horizontal, 22)
+      .padding(.vertical, 16)
+      .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+      .shadow(radius: 10)
   }
 }

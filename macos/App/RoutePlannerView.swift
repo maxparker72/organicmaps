@@ -6,6 +6,11 @@ struct RoutePlannerView: View {
   @ObservedObject var model: RoutingModel
   let onSaved: (MWMTrackID) -> Void
 
+  @State private var avoidTolls: Bool = OMPreferences.avoidTolls()
+  @State private var avoidMotorways: Bool = OMPreferences.avoidMotorways()
+  @State private var avoidFerries: Bool = OMPreferences.avoidFerries()
+  @State private var avoidDirty: Bool = OMPreferences.avoidDirty()
+
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
       header
@@ -54,6 +59,27 @@ struct RoutePlannerView: View {
     HStack(spacing: 8) {
       Text("Route").font(.headline)
       Spacer()
+      if model.routerType == .car {
+        Menu {
+          Toggle("Avoid toll roads", isOn: Binding(
+            get: { avoidTolls },
+            set: { v in avoidTolls = v; OMPreferences.setAvoidTolls(v); if model.isBuilt { model.build() } }))
+          Toggle("Avoid motorways", isOn: Binding(
+            get: { avoidMotorways },
+            set: { v in avoidMotorways = v; OMPreferences.setAvoidMotorways(v); if model.isBuilt { model.build() } }))
+          Toggle("Avoid ferries", isOn: Binding(
+            get: { avoidFerries },
+            set: { v in avoidFerries = v; OMPreferences.setAvoidFerries(v); if model.isBuilt { model.build() } }))
+          Toggle("Avoid unpaved roads", isOn: Binding(
+            get: { avoidDirty },
+            set: { v in avoidDirty = v; OMPreferences.setAvoidDirty(v); if model.isBuilt { model.build() } }))
+        } label: {
+          Image(systemName: "slider.horizontal.3")
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .help("Driving options")
+      }
       Picker("", selection: Binding(
         get: { model.routerType },
         set: { model.setRouterType($0) }

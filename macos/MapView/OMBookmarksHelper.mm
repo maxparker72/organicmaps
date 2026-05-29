@@ -161,4 +161,97 @@
   return ms::DistanceOnEarth(user.m_lat, user.m_lon, lat, lon);
 }
 
+#pragma mark - Tags
+
+namespace
+{
+constexpr char const * kTagsKey = "tags";
+NSString * const kTagsDelimiter = @";";
+
+NSArray<NSString *> * SplitTagsString(std::string const & raw)
+{
+  if (raw.empty())
+    return @[];
+  NSString * s = @(raw.c_str());
+  NSMutableArray<NSString *> * out = [NSMutableArray array];
+  for (NSString * part in [s componentsSeparatedByString:kTagsDelimiter])
+  {
+    NSString * trimmed = [part stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+    if (trimmed.length > 0)
+      [out addObject:trimmed];
+  }
+  return out;
+}
+
+// Deduplicates (preserves first-occurrence order), strips ';' chars and whitespace.
+std::string JoinTagsArray(NSArray<NSString *> * tags)
+{
+  NSMutableArray<NSString *> * uniq = [NSMutableArray array];
+  NSMutableSet<NSString *> * seen = [NSMutableSet set];
+  for (NSString * tag in tags)
+  {
+    NSString * clean = [[tag stringByReplacingOccurrencesOfString:kTagsDelimiter withString:@""]
+        stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+    if (clean.length == 0 || [seen containsObject:clean])
+      continue;
+    [seen addObject:clean];
+    [uniq addObject:clean];
+  }
+  NSString * joined = [uniq componentsJoinedByString:kTagsDelimiter];
+  return std::string(joined.UTF8String);
+}
+}  // namespace
+
++ (NSArray<NSString *> *)tagsForBookmark:(MWMMarkID)bookmarkId
+{
+  Bookmark const * bookmark = GetFramework().GetBookmarkManager().GetBookmark(static_cast<kml::MarkId>(bookmarkId));
+  if (!bookmark)
+    return @[];
+  auto const & props = bookmark->GetData().m_properties;
+  auto it = props.find(kTagsKey);
+  return it == props.end() ? @[] : SplitTagsString(it->second);
+}
+
++ (void)setTags:(NSArray<NSString *> *)tags forBookmark:(MWMMarkID)bookmarkId
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  Bookmark * bookmark = session.GetBookmarkForEdit(static_cast<kml::MarkId>(bookmarkId));
+  if (!bookmark)
+    return;
+  kml::BookmarkData data = bookmark->GetData();
+  std::string const joined = JoinTagsArray(tags);
+  if (joined.empty())
+    data.m_properties.erase(kTagsKey);
+  else
+    data.m_properties[kTagsKey] = joined;
+  bookmark->SetData(data);
+}
+
++ (NSArray<NSString *> *)tagsForTrack:(MWMTrackID)trackId
+{
+  Track const * track = GetFramework().GetBookmarkManager().GetTrack(static_cast<kml::TrackId>(trackId));
+  if (!track)
+    return @[];
+  auto const & props = track->GetData().m_properties;
+  auto it = props.find(kTagsKey);
+  return it == props.end() ? @[] : SplitTagsString(it->second);
+}
+
++ (void)setTags:(NSArray<NSString *> *)tags forTrack:(MWMTrackID)trackId
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  Track * track = session.GetTrackForEdit(static_cast<kml::TrackId>(trackId));
+  if (!track)
+    return;
+  kml::TrackData data = track->GetData();
+  std::string const joined = JoinTagsArray(tags);
+  if (joined.empty())
+    data.m_properties.erase(kTagsKey);
+  else
+    data.m_properties[kTagsKey] = joined;
+  track->SetData(data);
+}
+
 @end

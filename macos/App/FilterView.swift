@@ -5,6 +5,7 @@ import SwiftUI
 /// Value inputs adapt to the property so you can only build valid conditions.
 struct FilterView: View {
   @StateObject private var model = FilterModel()
+  @StateObject private var tags = TagStore()
 
   // Real values available to choose from, so a condition can't target something
   // that doesn't exist (which would hide everything).
@@ -71,6 +72,7 @@ struct FilterView: View {
     case .color: return colorOptions
     case .list: return listOptions
     case .type: return typeOptions
+    case .tag: return tags.allTags
     default: return []
     }
   }
@@ -82,6 +84,18 @@ private struct ConditionRow: View {
   let onRemove: () -> Void
 
   private static let choiceOps: [StringOp] = [.isExactly, .isNot]
+
+  // .tag is a set-valued property; "is"/"is not" reads as "has"/"does not have".
+  static func opLabel(_ op: StringOp, property: FilterProperty) -> String {
+    if property == .tag {
+      switch op {
+      case .isExactly: return "has"
+      case .isNot: return "does not have"
+      default: break
+      }
+    }
+    return op.rawValue
+  }
 
   var body: some View {
     HStack(spacing: 8) {
@@ -111,7 +125,7 @@ private struct ConditionRow: View {
         }
       case .choice:
         Picker("", selection: $condition.stringOp) {
-          ForEach(Self.choiceOps) { Text($0.rawValue).tag($0) }
+          ForEach(Self.choiceOps) { op in Text(Self.opLabel(op, property: condition.property)).tag(op) }
         }
       case .text:
         Picker("", selection: $condition.stringOp) {

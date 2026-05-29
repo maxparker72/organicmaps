@@ -8,6 +8,7 @@ enum FilterProperty: String, CaseIterable, Identifiable {
   case description = "Description"
   case color = "Color"
   case list = "List"
+  case tag = "Tag"
   case distance = "Distance (m)"
   case length = "Length (m)"
 
@@ -17,7 +18,7 @@ enum FilterProperty: String, CaseIterable, Identifiable {
   var kind: PropertyKind {
     switch self {
     case .name, .description: return .text
-    case .type, .color, .list: return .choice
+    case .type, .color, .list, .tag: return .choice
     case .distance, .length: return .number
     }
   }
@@ -26,7 +27,7 @@ enum FilterProperty: String, CaseIterable, Identifiable {
   var appliesToBookmarks: Bool { self != .length }
   var appliesToTracks: Bool {
     switch self {
-    case .name, .description, .list, .length: return true
+    case .name, .description, .list, .length, .tag: return true
     default: return false
     }
   }
@@ -123,6 +124,9 @@ final class FilterModel: ObservableObject {
       case .le: return lhs <= rhs
       }
     }
+    if condition.property == .tag {
+      return Self.evaluateTagMembership(OMBookmarksHelper.tags(forTrack: track.trackId), condition)
+    }
     let lhs: String
     switch condition.property {
     case .name: lhs = track.trackName
@@ -131,6 +135,18 @@ final class FilterModel: ObservableObject {
     default: return false
     }
     return compareString(lhs, condition)
+  }
+
+  // For .tag (a set-valued property), reuse StringOp's binary axes: .isExactly
+  // = "has", .isNot = "does not have". The FilterView relabels them when the
+  // property is .tag so the UI reads naturally.
+  static func evaluateTagMembership(_ tags: [String], _ condition: FilterCondition) -> Bool {
+    let has = tags.contains { $0.caseInsensitiveCompare(condition.value) == .orderedSame }
+    switch condition.stringOp {
+    case .isExactly: return has
+    case .isNot: return !has
+    default: return false
+    }
   }
 
   private func compareString(_ lhs: String, _ condition: FilterCondition) -> Bool {
@@ -146,6 +162,9 @@ final class FilterModel: ObservableObject {
   }
 
   private func matches(_ condition: FilterCondition, _ bookmark: Bookmark, _ listName: String) -> Bool {
+    if condition.property == .tag {
+      return Self.evaluateTagMembership(OMBookmarksHelper.tags(forBookmark: bookmark.bookmarkId), condition)
+    }
     if condition.property.isNumeric {
       guard let rhs = Double(condition.value) else { return false }
       let lhs = numericValue(condition.property, bookmark)
@@ -170,7 +189,7 @@ final class FilterModel: ObservableObject {
     case .description: return EntityEditor.bookmarkDescription(bookmark.bookmarkId)
     case .color: return bookmark.bookmarkColor.displayName
     case .list: return listName
-    case .distance, .length: return ""
+    case .tag, .distance, .length: return ""  // handled in matches() directly
     }
   }
 

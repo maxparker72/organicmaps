@@ -45,5 +45,9 @@ struct OMapsDesktopApp: App {
     Window("Filter Bookmarks", id: "filter-builder") {
       FilterView()
     }
+
+    Settings {
+      PreferencesView()
+    }
   }
 }

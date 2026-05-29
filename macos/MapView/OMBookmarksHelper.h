@@ -41,6 +41,18 @@ NS_ASSUME_NONNULL_BEGIN
 // implicit dirty propagation hasn't yet refreshed the rendered tile).
 + (void)invalidateUserMarks;
 
+// Tag operations on bookmarks/tracks. Tags live in kml::*Data::m_properties["tags"]
+// as a semicolon-delimited string and round-trip through KML <ExtendedData>.
+// Tag names containing ';' are stripped. Setting an empty array removes the key.
++ (NSArray<NSString *> *)tagsForBookmark:(MWMMarkID)bookmarkId
+    NS_SWIFT_NAME(tags(forBookmark:));
++ (void)setTags:(NSArray<NSString *> *)tags forBookmark:(MWMMarkID)bookmarkId
+    NS_SWIFT_NAME(setTags(_:forBookmark:));
++ (NSArray<NSString *> *)tagsForTrack:(MWMTrackID)trackId
+    NS_SWIFT_NAME(tags(forTrack:));
++ (void)setTags:(NSArray<NSString *> *)tags forTrack:(MWMTrackID)trackId
+    NS_SWIFT_NAME(setTags(_:forTrack:));
+
 @end
 
 NS_ASSUME_NONNULL_END
