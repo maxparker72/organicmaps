@@ -4,11 +4,13 @@ import UniformTypeIdentifiers
 
 /// Orchestrates a batch import of bookmark files. Receives URLs (files or
 /// folders), expands folders, shows a destination sheet (if 2+ files), then
-/// loads each file through the engine. After each file lands the coordinator
-/// resolves its newly-created category via `OMBookmarksHelper.categoryId(forFile:)`
-/// and applies post-import operations: tag every item, add to a project,
-/// or move into a target list (with the auto-created source category
-/// deleted afterwards).
+/// loads each file through the engine. The engine doesn't tell us which
+/// category a load produced (and even renames the file under the hood), so
+/// the coordinator snapshots the current category set before the batch and
+/// diffs after each file-load callback to find the new id. Once a new
+/// category surfaces we apply post-import operations to it: tag every item,
+/// add to a project, or move into a target list (with the auto-created
+/// source category deleted afterwards).
 ///
 /// Single-file imports skip the sheet so casual drops stay zero-friction.
 ///
@@ -38,11 +40,16 @@ final class ImportCoordinator: NSObject, ObservableObject, BookmarksObserver {
 
   // Live-batch tracking.
   private var inProgress = false
-  private var pendingUrls: [URL] = []     // expanded, queued for the engine
   private var pendingConfirm: ((Options) -> Void)?
   private var options = Options()
   private var submittedCount = 0
   private var callbackCount = 0
+  /// Set of category ids that existed *before* the batch started. New ids
+  /// not in this set (and not in attributedCategoryIds) are the ones the
+  /// engine just created for our newly-loaded files.
+  private var baselineCategoryIds: Set<MWMMarkGroupID> = []
+  /// New category ids we've already applied destination ops to.
+  private var attributedCategoryIds: Set<MWMMarkGroupID> = []
 
   private var manager: BookmarksManager { BookmarksManager.shared() }
 
@@ -97,13 +104,12 @@ final class ImportCoordinator: NSObject, ObservableObject, BookmarksObserver {
 
   private func load(_ urls: [URL], with options: Options) {
     if inProgress {
-      // Rare race: another batch already running. Queue these as a follow-up
-      // by appending to pendingUrls (they all share the same options for now).
-      pendingUrls.append(contentsOf: urls)
+      // Rare race: another batch already running. Stack these on top.
       submittedCount += urls.count
     } else {
       self.options = options
-      pendingUrls = urls
+      baselineCategoryIds = Set(manager.sortedUserCategories().map(\.categoryId))
+      attributedCategoryIds = []
       submittedCount = urls.count
       callbackCount = 0
       inProgress = true
@@ -120,25 +126,34 @@ final class ImportCoordinator: NSObject, ObservableObject, BookmarksObserver {
   private func handleCallback() {
     guard inProgress else { return }
     callbackCount += 1
-    drainPending()
-    if callbackCount >= submittedCount { finalizeBatch() }
+    let isLast = callbackCount >= submittedCount
+    // The engine fires our success callback *before* CreateCategories runs
+    // (both are dispatched to the Gui thread, but the file-success notice is
+    // enqueued first). Defer one runloop so CreateCategories has executed and
+    // the new category is actually in BookmarkManager::m_categories — without
+    // this, GetCategoryByFileName / GetGroup would see the id as invalid.
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      self.drainNewCategories()
+      if isLast { self.finalizeBatch() }
+    }
   }
 
-  /// For every pending URL, ask the engine if it now has a category. Apply
-  /// destination ops to those that do; keep the rest queued. Robust to
-  /// callbacks arriving out of submission order, and to spurious callbacks
-  /// (the inProgress guard already filters foreign ones).
-  private func drainPending() {
-    var i = 0
-    while i < pendingUrls.count {
-      let url = pendingUrls[i]
-      let groupId = OMBookmarksHelper.categoryId(forFile: url.path)
-      if groupId != 0 {
-        applyDestination(to: groupId)
-        pendingUrls.remove(at: i)
-      } else {
-        i += 1
-      }
+  /// Compare the engine's current category set against our pre-batch baseline
+  /// to find categories newly created by this batch. Apply destination ops to
+  /// each one once; track in `attributedCategoryIds` so we don't double-apply
+  /// on later callbacks. This is robust to:
+  ///  - the engine generating its own file paths (we can't look up by drop URL)
+  ///  - out-of-order or coalesced GUI callbacks
+  ///  - the destination ops themselves deleting the source category
+  private func drainNewCategories() {
+    let current = Set(manager.sortedUserCategories().map(\.categoryId))
+    let newIds = current
+      .subtracting(baselineCategoryIds)
+      .subtracting(attributedCategoryIds)
+    for groupId in newIds {
+      applyDestination(to: groupId)
+      attributedCategoryIds.insert(groupId)
     }
   }
 
@@ -180,11 +195,12 @@ final class ImportCoordinator: NSObject, ObservableObject, BookmarksObserver {
   }
 
   private func finalizeBatch() {
-    pendingUrls.removeAll()
     inProgress = false
     options = Options()
     submittedCount = 0
     callbackCount = 0
+    baselineCategoryIds = []
+    attributedCategoryIds = []
     (manager as any BookmarksObservable).remove(self)
     NotificationCenter.default.post(name: .omTagsChanged, object: nil)
     NotificationCenter.default.post(name: .omItemVisibilityChanged, object: nil)

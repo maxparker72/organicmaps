@@ -532,8 +532,13 @@ kml::PredefinedColor KmlColorFromBookmarkColor(MWMBookmarkColor bookmarkColor)
 {
   if (path.length == 0)
     return 0;
-  return static_cast<MWMMarkGroupID>(
-      GetFramework().GetBookmarkManager().GetCategoryByFileName(std::string(path.UTF8String)));
+  auto const groupId = GetFramework().GetBookmarkManager().GetCategoryByFileName(std::string(path.UTF8String));
+  // kInvalidMarkGroupId is std::numeric_limits<MarkGroupId>::max() — *not* 0.
+  // Normalize misses to 0 so Swift callers can do the natural != 0 check
+  // without crashing in GetGroup if they hand the result on to the engine.
+  if (groupId == kml::kInvalidMarkGroupId)
+    return 0;
+  return static_cast<MWMMarkGroupID>(groupId);
 }
 
 + (NSArray<NSNumber *> *)bookmarkIdsInCategory:(MWMMarkGroupID)groupId
