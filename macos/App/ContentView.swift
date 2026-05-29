@@ -16,10 +16,14 @@ struct ContentView: View {
   @StateObject private var routingModel = RoutingModel()
   @StateObject private var searchModel = SearchModel()
   @StateObject private var importNormalizer = ImportNormalizer()
+  @StateObject private var navSelection = NavigatorSelectionModel()
+  @StateObject private var tagStore = TagStore()
 
   @State private var buildings3D: Bool = OMPreferences.buildings3D()
 
-  private var hasInfo: Bool { selectedList != nil || placePageModel.info != nil }
+  private var hasInfo: Bool {
+    selectedList != nil || placePageModel.info != nil || navSelection.count >= 2
+  }
 
   var body: some View {
     NavigationStack {
@@ -86,6 +90,15 @@ struct ContentView: View {
             selectedList = nil
           }
         }
+        .onChange(of: navSelection.count) { _, count in
+          // Once the navigator selection has 2+ items the right pane swaps to
+          // the multi-selection inspector; tell the engine to forget its own
+          // place-page selection so the two don't fight for the same slot.
+          if count >= 2 {
+            paneHidden = false
+            FrameworkHelper.deactivateMapSelection()
+          }
+        }
         .onAppear {
           downloadModel.start()
           placePageModel.start()
@@ -109,6 +122,9 @@ struct ContentView: View {
       if showNavigator {
         NavigatorView(
           model: bookmarksModel,
+          selection: navSelection,
+          tagStore: tagStore,
+          projectsModel: projectsModel,
           onSelectList: { list in
             selectedList = list
             paneHidden = false
@@ -130,10 +146,18 @@ struct ContentView: View {
 
   @ViewBuilder private var infoOverlay: some View {
     if !paneHidden {
-      // Only render a selected list that still exists; deleting it (from here or
-      // the navigator) removes the underlying category, and reading a stale group
-      // would assert in the engine.
-      if let list = selectedList, bookmarksModel.lists.contains(where: { $0.categoryId == list.categoryId }) {
+      // Order matters: a 2+ multi-selection wins, then list inspector, then
+      // engine place-page. Single-item navigator selection routes through the
+      // engine so it falls naturally into the place-page branch.
+      if navSelection.count >= 2 {
+        MultiSelectionInspectorView(
+          selection: navSelection,
+          navigatorModel: bookmarksModel,
+          tagStore: tagStore,
+          projectsModel: projectsModel,
+          onHide: { paneHidden = true })
+          .transition(.move(edge: .trailing))
+      } else if let list = selectedList, bookmarksModel.lists.contains(where: { $0.categoryId == list.categoryId }) {
         ListInfoView(
           list: list,
           onClear: { selectedList = nil },

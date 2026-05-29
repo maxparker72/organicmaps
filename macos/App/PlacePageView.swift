@@ -17,6 +17,7 @@ struct PlacePageView: View {
   let onAppend: () -> Void
 
   @State private var editing = false
+  @State private var trackStats: OMTrackStats?
   @StateObject private var modifiers = ModifierKeyMonitor()
 
   private var isEditable: Bool { info.isBookmark || info.isTrack }
@@ -37,6 +38,12 @@ struct PlacePageView: View {
     }
     .frame(width: 340)
     .background(.regularMaterial)
+    .onAppear { loadTrackStats() }
+    .onChange(of: info.trackId) { _, _ in loadTrackStats() }
+  }
+
+  private func loadTrackStats() {
+    trackStats = info.isTrack ? OMBookmarksHelper.trackStats(forTrack: info.trackId) : nil
   }
 
   private var readContent: some View {
@@ -81,6 +88,9 @@ struct PlacePageView: View {
           }
           .controlSize(.small)
           if info.isTrack {
+            if let stats = trackStats {
+              section("Statistics") { TrackStatsView(mode: .single(stats)) }
+            }
             section("Elevation") { TrackElevationView(trackId: info.trackId) }
           }
           hoursSection

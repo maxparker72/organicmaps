@@ -55,6 +55,10 @@ struct ListInfoView: View {
         if !list.author.isEmpty {
           detail("Author", list.author)
         }
+        if !trackStats.isEmpty {
+          Divider()
+          section("Aggregate statistics") { TrackStatsView(mode: .aggregate(trackStats)) }
+        }
         Divider()
         Menu {
           Button("KMZ") { export(.kmz) }
@@ -69,6 +73,19 @@ struct ListInfoView: View {
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(16)
+    }
+  }
+
+  // Cached so the (potentially expensive) per-track stats lookup isn't
+  // repeated on every body re-evaluation.
+  private var trackStats: [OMTrackStats] {
+    list.tracks.compactMap { OMBookmarksHelper.trackStats(forTrack: $0.trackId) }
+  }
+
+  private func section<Content: View>(_ title: String, @ViewBuilder _ content: () -> Content) -> some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text(title.uppercased()).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+      content()
     }
   }
 

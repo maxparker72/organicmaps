@@ -102,6 +102,74 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
   func moveBookmark(_ id: MWMMarkID, to group: MWMMarkGroupID) { manager.moveBookmark(id, toGroupId: group); refresh() }
   func moveTrack(_ id: MWMTrackID, to group: MWMMarkGroupID) { manager.moveTrack(id, toGroupId: group); refresh() }
 
+  // MARK: - Bulk operations
+
+  /// Delete the union of selected bookmarks and tracks in one edit session.
+  func deleteItems(bookmarkIds: [NSNumber], trackIds: [NSNumber]) {
+    if !bookmarkIds.isEmpty { OMBookmarksHelper.deleteBookmarks(bookmarkIds) }
+    if !trackIds.isEmpty { OMBookmarksHelper.deleteTracks(trackIds) }
+    refresh()
+  }
+
+  func moveItems(bookmarkIds: [NSNumber], trackIds: [NSNumber], to group: MWMMarkGroupID) {
+    if !bookmarkIds.isEmpty { OMBookmarksHelper.moveBookmarks(bookmarkIds, to: group) }
+    if !trackIds.isEmpty { OMBookmarksHelper.moveTracks(trackIds, to: group) }
+    refresh()
+  }
+
+  func setColorForItems(bookmarkIds: [NSNumber], trackIds: [NSNumber], color: BookmarkColor) {
+    if !bookmarkIds.isEmpty { OMBookmarksHelper.setBookmarks(bookmarkIds, color: color) }
+    if !trackIds.isEmpty { OMBookmarksHelper.setTracks(trackIds, color: color) }
+    OMBookmarksHelper.invalidateUserMarks()
+    objectWillChange.send()
+  }
+
+  func setItemsVisible(bookmarkIds: [NSNumber], trackIds: [NSNumber], visible: Bool) {
+    if !bookmarkIds.isEmpty { OMBookmarksHelper.setBookmarks(bookmarkIds, visible: visible) }
+    if !trackIds.isEmpty { OMBookmarksHelper.setTracks(trackIds, visible: visible) }
+    NotificationCenter.default.post(name: .omItemVisibilityChanged, object: nil)
+  }
+
+  /// Add a tag to every selected item (union with each item's existing tags).
+  /// `setTags` collapses duplicates and posts `.omTagsChanged`.
+  func addTag(_ tag: String, bookmarkIds: [MWMMarkID], trackIds: [MWMTrackID]) {
+    let trimmed = tag.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return }
+    for id in bookmarkIds {
+      var existing = OMBookmarksHelper.tags(forBookmark: id)
+      if !existing.contains(where: { $0.caseInsensitiveCompare(trimmed) == .orderedSame }) {
+        existing.append(trimmed)
+        OMBookmarksHelper.setTags(existing, forBookmark: id)
+      }
+    }
+    for id in trackIds {
+      var existing = OMBookmarksHelper.tags(forTrack: id)
+      if !existing.contains(where: { $0.caseInsensitiveCompare(trimmed) == .orderedSame }) {
+        existing.append(trimmed)
+        OMBookmarksHelper.setTags(existing, forTrack: id)
+      }
+    }
+    NotificationCenter.default.post(name: .omTagsChanged, object: nil)
+  }
+
+  func removeTag(_ tag: String, bookmarkIds: [MWMMarkID], trackIds: [MWMTrackID]) {
+    for id in bookmarkIds {
+      let existing = OMBookmarksHelper.tags(forBookmark: id)
+      let filtered = existing.filter { $0.caseInsensitiveCompare(tag) != .orderedSame }
+      if filtered.count != existing.count {
+        OMBookmarksHelper.setTags(filtered, forBookmark: id)
+      }
+    }
+    for id in trackIds {
+      let existing = OMBookmarksHelper.tags(forTrack: id)
+      let filtered = existing.filter { $0.caseInsensitiveCompare(tag) != .orderedSame }
+      if filtered.count != existing.count {
+        OMBookmarksHelper.setTags(filtered, forTrack: id)
+      }
+    }
+    NotificationCenter.default.post(name: .omTagsChanged, object: nil)
+  }
+
   // MARK: - BookmarksObserver
 
   func onBookmarksLoadFinished() { refresh() }

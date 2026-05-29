@@ -1,9 +1,15 @@
+import AppKit
 import SwiftUI
 
 /// Left slide-over pane: a flat list of bookmark lists, each expandable to its
-/// bookmarks and tracks. Selecting an item drives the right-hand info pane.
+/// bookmarks and tracks. Plain click drives the right-hand info pane via the
+/// engine; Cmd/Shift-click extend a parallel multi-selection that the bulk
+/// context menu and multi-selection inspector consume.
 struct NavigatorView: View {
   @ObservedObject var model: BookmarksNavigatorModel
+  @ObservedObject var selection: NavigatorSelectionModel
+  @ObservedObject var tagStore: TagStore
+  @ObservedObject var projectsModel: ProjectModel
   let onSelectList: (BookmarkGroup) -> Void
   let onSelectBookmark: (MWMMarkID) -> Void
   let onSelectTrack: (MWMTrackID) -> Void
@@ -75,17 +81,17 @@ struct NavigatorView: View {
     if groupByType {
       if !bookmarks.isEmpty {
         sectionLabel("Bookmarks")
-        ForEach(bookmarks, id: \.bookmarkId) { bookmarkRow($0) }
+        ForEach(bookmarks, id: \.bookmarkId) { bookmarkRow($0, in: list) }
       }
       if !tracks.isEmpty {
         sectionLabel("Tracks")
-        ForEach(tracks, id: \.trackId) { trackRow($0) }
+        ForEach(tracks, id: \.trackId) { trackRow($0, in: list) }
       }
     } else {
       ForEach(mixed(bookmarks, tracks)) { item in
         switch item {
-        case .bookmark(let b): bookmarkRow(b)
-        case .track(let t): trackRow(t)
+        case .bookmark(let b): bookmarkRow(b, in: list)
+        case .track(let t): trackRow(t, in: list)
         }
       }
     }
@@ -223,7 +229,12 @@ struct NavigatorView: View {
       }
       .buttonStyle(.borderless)
 
-      Button { onSelectList(list) } label: {
+      Button {
+        // Clicking a list header opens the list inspector. Drop any pending
+        // multi-selection so the right pane doesn't fight for space.
+        selection.clear()
+        onSelectList(list)
+      } label: {
         HStack {
           Text(list.title).fontWeight(.medium)
           Spacer()
@@ -254,8 +265,10 @@ struct NavigatorView: View {
     }
   }
 
-  private func bookmarkRow(_ bm: Bookmark) -> some View {
-    Button { onSelectBookmark(bm.bookmarkId) } label: {
+  private func bookmarkRow(_ bm: Bookmark, in list: BookmarkGroup) -> some View {
+    let item = NavSelection.bookmark(bm.bookmarkId)
+    let isSelected = selection.contains(item)
+    return Button { handleClick(item, in: list) } label: {
       HStack(spacing: 8) {
         Circle().fill(bm.bookmarkColor.swiftUIColor).frame(width: 10, height: 10)
         VStack(alignment: .leading, spacing: 1) {
@@ -272,23 +285,25 @@ struct NavigatorView: View {
         .buttonStyle(.borderless)
       }
       .padding(.leading, 18)
+      .padding(.vertical, 2)
+      .background(isSelected ? Color.accentColor.opacity(0.2) : .clear)
     }
     .buttonStyle(.plain)
     .onDrag {
       let entity = DraggableEntity(kind: .bookmark, id: UInt64(bm.bookmarkId))
       return NSItemProvider(object: entity.transferString as NSString)
     }
-    .contextMenu {
-      moveMenu { model.moveBookmark(bm.bookmarkId, to: $0) }
-      Button("Delete", role: .destructive) { model.deleteBookmark(bm.bookmarkId) }
-    }
+    .contextMenu { contextMenu(for: item, singleDelete: { model.deleteBookmark(bm.bookmarkId) },
+                                 singleMove: { model.moveBookmark(bm.bookmarkId, to: $0) }) }
     .swipeActions(edge: .trailing) {
       Button(role: .destructive) { model.deleteBookmark(bm.bookmarkId) } label: { Label("Delete", systemImage: "trash") }
     }
   }
 
-  private func trackRow(_ track: Track) -> some View {
-    Button { onSelectTrack(track.trackId) } label: {
+  private func trackRow(_ track: Track, in list: BookmarkGroup) -> some View {
+    let item = NavSelection.track(track.trackId)
+    let isSelected = selection.contains(item)
+    return Button { handleClick(item, in: list) } label: {
       HStack(spacing: 8) {
         RoundedRectangle(cornerRadius: 1)
           .fill(Color(nsColor: track.trackColor)).frame(width: 12, height: 3)
@@ -305,18 +320,122 @@ struct NavigatorView: View {
         .buttonStyle(.borderless)
       }
       .padding(.leading, 18)
+      .padding(.vertical, 2)
+      .background(isSelected ? Color.accentColor.opacity(0.2) : .clear)
     }
     .buttonStyle(.plain)
     .onDrag {
       let entity = DraggableEntity(kind: .track, id: UInt64(track.trackId))
       return NSItemProvider(object: entity.transferString as NSString)
     }
-    .contextMenu {
-      moveMenu { model.moveTrack(track.trackId, to: $0) }
-      Button("Delete", role: .destructive) { model.deleteTrack(track.trackId) }
-    }
+    .contextMenu { contextMenu(for: item, singleDelete: { model.deleteTrack(track.trackId) },
+                                 singleMove: { model.moveTrack(track.trackId, to: $0) }) }
     .swipeActions(edge: .trailing) {
       Button(role: .destructive) { model.deleteTrack(track.trackId) } label: { Label("Delete", systemImage: "trash") }
+    }
+  }
+
+  // MARK: - Click + context menu
+
+  private func handleClick(_ item: NavSelection, in list: BookmarkGroup) {
+    let flags = NSEvent.modifierFlags
+    if flags.contains(.command) {
+      selection.toggle(item)
+    } else if flags.contains(.shift) {
+      selection.rangeSelect(to: item, in: orderedSelectables(in: list))
+    } else {
+      selection.replace(with: item)
+      switch item {
+      case .bookmark(let id): onSelectBookmark(id)
+      case .track(let id): onSelectTrack(id)
+      }
+    }
+  }
+
+  private func orderedSelectables(in list: BookmarkGroup) -> [NavSelection] {
+    let bms = bookmarksToShow(list).map { NavSelection.bookmark($0.bookmarkId) }
+    let trs = tracksToShow(list).map { NavSelection.track($0.trackId) }
+    if groupByType { return bms + trs }
+    return mixed(bookmarksToShow(list), tracksToShow(list)).map {
+      switch $0 {
+      case .bookmark(let b): return .bookmark(b.bookmarkId)
+      case .track(let t): return .track(t.trackId)
+      }
+    }
+  }
+
+  /// Right-click on a row opens this menu. If the right-clicked row is part
+  /// of a 2+ selection, expose bulk operations on the whole set; otherwise
+  /// just the single-item move/delete (the row is not auto-added — match
+  /// Finder, which leaves selection alone when right-clicking outside it).
+  @ViewBuilder private func contextMenu(for item: NavSelection,
+                                        singleDelete: @escaping () -> Void,
+                                        singleMove: @escaping (MWMMarkGroupID) -> Void) -> some View {
+    if selection.contains(item) && selection.count >= 2 {
+      bulkContextMenu
+    } else {
+      moveMenu(singleMove)
+      Button("Delete", role: .destructive, action: singleDelete)
+    }
+  }
+
+  @ViewBuilder private var bulkContextMenu: some View {
+    Menu("Move to") {
+      ForEach(model.lists, id: \.categoryId) { list in
+        Button(list.title) {
+          model.moveItems(bookmarkIds: selection.bookmarkNSNumbers,
+                          trackIds: selection.trackNSNumbers,
+                          to: list.categoryId)
+        }
+      }
+    }
+    Menu("Set color") {
+      ForEach(BookmarkColor.palette, id: \.self) { color in
+        Button(color.displayName) {
+          model.setColorForItems(bookmarkIds: selection.bookmarkNSNumbers,
+                                 trackIds: selection.trackNSNumbers,
+                                 color: color)
+        }
+      }
+    }
+    Menu("Add tag") {
+      if tagStore.allTags.isEmpty {
+        Text("No tags yet").foregroundStyle(.secondary)
+      } else {
+        ForEach(tagStore.allTags, id: \.self) { tag in
+          Button(tag) {
+            model.addTag(tag, bookmarkIds: selection.bookmarkIds, trackIds: selection.trackIds)
+          }
+        }
+      }
+    }
+    Menu("Add to project") {
+      if projectsModel.projects.isEmpty {
+        Text("No projects yet").foregroundStyle(.secondary)
+      } else {
+        ForEach(projectsModel.projects) { project in
+          Button(project.name) {
+            for id in selection.bookmarkIds { projectsModel.addBookmark(id, to: project) }
+            for id in selection.trackIds { projectsModel.addTrack(id, to: project) }
+          }
+        }
+      }
+    }
+    Divider()
+    Button("Show") {
+      model.setItemsVisible(bookmarkIds: selection.bookmarkNSNumbers,
+                            trackIds: selection.trackNSNumbers, visible: true)
+    }
+    Button("Hide") {
+      model.setItemsVisible(bookmarkIds: selection.bookmarkNSNumbers,
+                            trackIds: selection.trackNSNumbers, visible: false)
+    }
+    Divider()
+    Button("Delete \(selection.count) items", role: .destructive) {
+      let bIds = selection.bookmarkNSNumbers
+      let tIds = selection.trackNSNumbers
+      selection.clear()
+      model.deleteItems(bookmarkIds: bIds, trackIds: tIds)
     }
   }
 

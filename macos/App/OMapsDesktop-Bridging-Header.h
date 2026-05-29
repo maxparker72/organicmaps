@@ -6,6 +6,7 @@
 #import "MapView/OMLocationController.h"
 #import "MapView/OMPlacePage.h"
 #import "MapView/OMBookmarksHelper.h"
+#import "MapView/OMTrackStats.h"
 #import "MapView/OMProjectsHelper.h"
 #import "MapView/OMRoutingHelper.h"
 #import "MapView/OMPreferences.h"
