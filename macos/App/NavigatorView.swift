@@ -15,10 +15,17 @@ struct NavigatorView: View {
   let onSelectTrack: (MWMTrackID) -> Void
   let onHide: () -> Void
 
+  /// Monotonic counter incremented by ContentView when the "Find in Library"
+  /// menu command fires. Changes are observed here to focus the search field.
+  /// A counter (not a Bool) so a second press while focused still re-focuses.
+  let focusSearchRequest: Int
+
   @ObservedObject private var savedFilters = SavedFiltersStore.shared
   @Environment(\.openWindow) private var openWindow
   @State private var expandSmartFilters: Bool = true
   @State private var renameSmartFilter: SavedFilter?
+  @State private var lastSeenFocusRequest: Int = 0
+  @FocusState private var searchFieldFocused: Bool
 
   enum ListSort: String, CaseIterable, Identifiable {
     case dateAdded = "Date Added", nameAsc = "Name A→Z", nameDesc = "Name Z→A"
@@ -76,6 +83,8 @@ struct NavigatorView: View {
     }
     .frame(width: 300)
     .background(.regularMaterial)
+    .onAppear { applyFocusRequestIfNeeded() }
+    .onChange(of: focusSearchRequest) { _, _ in applyFocusRequestIfNeeded() }
     .sheet(item: $renameSmartFilter) { filter in
       SmartFilterRenameDialog(initial: filter.name) { newName in
         savedFilters.rename(filter.id, to: newName)
@@ -210,8 +219,9 @@ struct NavigatorView: View {
   private var searchField: some View {
     HStack(spacing: 6) {
       Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-      TextField("Search lists, bookmarks, tracks", text: $searchText)
+      TextField("Search names, descriptions, tags, regions", text: $searchText)
         .textFieldStyle(.plain)
+        .focused($searchFieldFocused)
       if searching {
         Button { searchText = "" } label: { Image(systemName: "xmark.circle.fill") }
           .buttonStyle(.borderless).foregroundStyle(.secondary)
@@ -219,6 +229,17 @@ struct NavigatorView: View {
     }
     .padding(.horizontal, 16)
     .padding(.bottom, 8)
+  }
+
+  /// When the "Find in Library" command fires, ContentView bumps
+  /// `focusSearchRequest`. The change triggers this handler, which defers a
+  /// runloop tick so a just-mounted NavigatorView has its `@FocusState` wired
+  /// before we set it.
+  private func applyFocusRequestIfNeeded() {
+    if focusSearchRequest != lastSeenFocusRequest {
+      lastSeenFocusRequest = focusSearchRequest
+      DispatchQueue.main.async { searchFieldFocused = true }
+    }
   }
 
   // MARK: - Sorting & filtering
@@ -244,10 +265,41 @@ struct NavigatorView: View {
   }
 
   private func matchingBookmarks(_ list: BookmarkGroup) -> [Bookmark] {
-    list.bookmarks.filter { $0.bookmarkName.localizedCaseInsensitiveContains(searchText) }
+    list.bookmarks.filter { bookmarkMatchesSearch($0) }
   }
   private func matchingTracks(_ list: BookmarkGroup) -> [Track] {
-    list.tracks.filter { $0.trackName.localizedCaseInsensitiveContains(searchText) }
+    list.tracks.filter { trackMatchesSearch($0) }
+  }
+
+  /// Library search: match name, description, tags, and region display name.
+  /// Each field is short and the lookups are cheap (engine reads), so a
+  /// keystroke-driven re-scan is fine up to several thousand items.
+  private func bookmarkMatchesSearch(_ bm: Bookmark) -> Bool {
+    let q = searchText
+    if bm.bookmarkName.localizedCaseInsensitiveContains(q) { return true }
+    if EntityEditor.bookmarkDescription(bm.bookmarkId).localizedCaseInsensitiveContains(q) { return true }
+    for tag in OMBookmarksHelper.tags(forBookmark: bm.bookmarkId)
+      where tag.localizedCaseInsensitiveContains(q) { return true }
+    for region in OMBookmarksHelper.regions(forBookmark: bm.bookmarkId) {
+      if OMBookmarksHelper.displayName(forRegion: region).localizedCaseInsensitiveContains(q) {
+        return true
+      }
+    }
+    return false
+  }
+
+  private func trackMatchesSearch(_ track: Track) -> Bool {
+    let q = searchText
+    if track.trackName.localizedCaseInsensitiveContains(q) { return true }
+    if EntityEditor.trackDescription(track.trackId).localizedCaseInsensitiveContains(q) { return true }
+    for tag in OMBookmarksHelper.tags(forTrack: track.trackId)
+      where tag.localizedCaseInsensitiveContains(q) { return true }
+    for region in OMBookmarksHelper.regions(forTrack: track.trackId) {
+      if OMBookmarksHelper.displayName(forRegion: region).localizedCaseInsensitiveContains(q) {
+        return true
+      }
+    }
+    return false
   }
 
   // When a list's own name matches, show all its items; otherwise only matches.

@@ -1,5 +1,11 @@
 import SwiftUI
 
+extension Notification.Name {
+  /// Posted by the "Find in Library" command. ContentView listens, opens the
+  /// navigator if hidden, and focuses its search field.
+  static let omFindInLibrary = Notification.Name("omFindInLibrary")
+}
+
 @main
 struct OMapsDesktopApp: App {
   @Environment(\.openWindow) private var openWindow
@@ -43,6 +49,11 @@ struct OMapsDesktopApp: App {
           NotificationCenter.default.post(name: .omItemVisibilityChanged, object: nil)
           SavedFiltersStore.shared.setActive(nil)
         }
+        Divider()
+        Button("Find in Library") {
+          NotificationCenter.default.post(name: .omFindInLibrary, object: nil)
+        }
+        .keyboardShortcut("l", modifiers: [.command, .shift])
       }
       // Map controls live in the menu bar / shortcuts to keep the map clean.
       CommandGroup(after: .sidebar) {

@@ -21,6 +21,7 @@ struct ContentView: View {
   @ObservedObject private var importCoordinator = ImportCoordinator.shared
 
   @State private var buildings3D: Bool = OMPreferences.buildings3D()
+  @State private var focusLibrarySearchRequest: Int = 0
 
   private var hasInfo: Bool {
     selectedList != nil || placePageModel.info != nil || navSelection.count >= 2
@@ -109,6 +110,12 @@ struct ContentView: View {
             FrameworkHelper.deactivateMapSelection()
           }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .omFindInLibrary)) { _ in
+          // Show the navigator (if hidden) and bump the focus counter so the
+          // navigator's search field gains keyboard focus on the next runloop.
+          showNavigator = true
+          focusLibrarySearchRequest += 1
+        }
         .onAppear {
           downloadModel.start()
           placePageModel.start()
@@ -151,7 +158,8 @@ struct ContentView: View {
           },
           onSelectBookmark: { bookmarksModel.showBookmarkOnMap($0) },
           onSelectTrack: { bookmarksModel.showTrackOnMap($0) },
-          onHide: { showNavigator = false })
+          onHide: { showNavigator = false },
+          focusSearchRequest: focusLibrarySearchRequest)
           .transition(.move(edge: .leading))
       }
       if showProjects {
