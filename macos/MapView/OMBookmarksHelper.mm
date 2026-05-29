@@ -322,15 +322,39 @@ constexpr double kStandardTrackLineWidth = 5.0;
 
 // Returns the canonical (snapped) ColorData for an arbitrary input, and sets
 // |changed| true if the result differs from the input.
+//
+// Caveat: kml::MapPredefinedColor walks kOrderedPredefinedColors in order;
+// that array lists PredefinedColor::None at index 0, and
+// ColorFromPredefinedColor(None) falls through to Red's RGBA. So an exact
+// match for Red's RGBA returns *None*, not Red. If we naively wrote that
+// back the navigator chip would render BookmarkColor.none -> .secondary
+// (gray) on a bookmark the map renderer still drew red. Two rules avoid it:
+//   1. If the input already carries a valid palette entry (anything other
+//      than None / Count), keep that entry — only realign m_rgba.
+//   2. If we have to derive from m_rgba, force None → Red so the snapped
+//      output is always a real palette colour.
 kml::ColorData SnapColor(kml::ColorData const & in, bool & changed)
 {
+  if (in.m_predefinedColor != kml::PredefinedColor::None &&
+      in.m_predefinedColor != kml::PredefinedColor::Count)
+  {
+    uint32_t const expectedRgba = kml::ColorFromPredefinedColor(in.m_predefinedColor).GetRGBA();
+    if (in.m_rgba != expectedRgba)
+    {
+      changed = true;
+      return {.m_predefinedColor = in.m_predefinedColor, .m_rgba = expectedRgba};
+    }
+    return in;
+  }
+
   uint32_t const sourceRgba = in.m_rgba != 0
       ? in.m_rgba
-      : kml::ColorFromPredefinedColor(in.m_predefinedColor).GetRGBA();
-  kml::PredefinedColor const snapped = kml::MapPredefinedColor(sourceRgba);
+      : kml::ColorFromPredefinedColor(kml::PredefinedColor::Red).GetRGBA();
+  kml::PredefinedColor snapped = kml::MapPredefinedColor(sourceRgba);
+  if (snapped == kml::PredefinedColor::None || snapped == kml::PredefinedColor::Count)
+    snapped = kml::PredefinedColor::Red;
   uint32_t const snappedRgba = kml::ColorFromPredefinedColor(snapped).GetRGBA();
-  if (in.m_predefinedColor != snapped || in.m_rgba != snappedRgba)
-    changed = true;
+  changed = true;
   return {.m_predefinedColor = snapped, .m_rgba = snappedRgba};
 }
 
