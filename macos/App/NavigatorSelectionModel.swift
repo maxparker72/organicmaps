@@ -59,6 +59,15 @@ final class NavigatorSelectionModel: ObservableObject {
     anchor = nil
   }
 
+  /// Bulk replace the entire set — used by SwiftUI Table's selection binding,
+  /// which exposes its own Set<RowID> and expects a setter on the source of
+  /// truth.
+  func set(_ newValue: Set<NavSelection>) {
+    selection = newValue
+    if let anchor, !selection.contains(anchor) { self.anchor = selection.first }
+    if anchor == nil, let first = selection.first { anchor = first }
+  }
+
   // MARK: - Convenience
 
   var isEmpty: Bool { selection.isEmpty }

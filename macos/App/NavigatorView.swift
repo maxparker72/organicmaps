@@ -26,6 +26,7 @@ struct NavigatorView: View {
   @State private var renameSmartFilter: SavedFilter?
   @State private var lastSeenFocusRequest: Int = 0
   @FocusState private var searchFieldFocused: Bool
+  @Binding var viewMode: NavigatorViewMode
 
   enum ListSort: String, CaseIterable, Identifiable {
     case dateAdded = "Date Added", nameAsc = "Name A→Z", nameDesc = "Name Z→A"
@@ -68,20 +69,30 @@ struct NavigatorView: View {
       header
       searchField
       Divider()
-      List {
-        if !savedFilters.filters.isEmpty {
-          smartFiltersSection
-        }
-        ForEach(visibleLists, id: \.categoryId) { list in
-          listRow(list)
-          if isExpanded(list) {
-            listContent(list)
+      switch viewMode {
+      case .tree:
+        List {
+          if !savedFilters.filters.isEmpty {
+            smartFiltersSection
+          }
+          ForEach(visibleLists, id: \.categoryId) { list in
+            listRow(list)
+            if isExpanded(list) {
+              listContent(list)
+            }
           }
         }
+        .listStyle(.sidebar)
+      case .table:
+        NavigatorTableView(
+          model: model,
+          selection: selection,
+          tagStore: tagStore,
+          projectsModel: projectsModel,
+          searchText: searchText)
       }
-      .listStyle(.sidebar)
     }
-    .frame(width: 300)
+    .frame(width: viewMode.paneWidth)
     .background(.regularMaterial)
     .onAppear { applyFocusRequestIfNeeded() }
     .onChange(of: focusSearchRequest) { _, _ in applyFocusRequestIfNeeded() }
@@ -204,6 +215,14 @@ struct NavigatorView: View {
         Image(systemName: "arrow.up.arrow.down")
       }
       .menuStyle(.borderlessButton).fixedSize().help("Sort")
+      Button {
+        viewMode = (viewMode == .tree ? .table : .tree)
+        viewMode.persist()
+      } label: {
+        Image(systemName: viewMode == .tree ? "tablecells" : "list.bullet.indent")
+      }
+      .buttonStyle(.borderless)
+      .help(viewMode == .tree ? "Switch to column view" : "Switch to list view")
       Button { showNewList = true } label: { Image(systemName: "plus") }
         .buttonStyle(.borderless).help("New list")
       Button { model.showAll() } label: { Image(systemName: "eye") }
@@ -265,41 +284,10 @@ struct NavigatorView: View {
   }
 
   private func matchingBookmarks(_ list: BookmarkGroup) -> [Bookmark] {
-    list.bookmarks.filter { bookmarkMatchesSearch($0) }
+    list.bookmarks.filter { LibrarySearch.matchesBookmark($0, query: searchText) }
   }
   private func matchingTracks(_ list: BookmarkGroup) -> [Track] {
-    list.tracks.filter { trackMatchesSearch($0) }
-  }
-
-  /// Library search: match name, description, tags, and region display name.
-  /// Each field is short and the lookups are cheap (engine reads), so a
-  /// keystroke-driven re-scan is fine up to several thousand items.
-  private func bookmarkMatchesSearch(_ bm: Bookmark) -> Bool {
-    let q = searchText
-    if bm.bookmarkName.localizedCaseInsensitiveContains(q) { return true }
-    if EntityEditor.bookmarkDescription(bm.bookmarkId).localizedCaseInsensitiveContains(q) { return true }
-    for tag in OMBookmarksHelper.tags(forBookmark: bm.bookmarkId)
-      where tag.localizedCaseInsensitiveContains(q) { return true }
-    for region in OMBookmarksHelper.regions(forBookmark: bm.bookmarkId) {
-      if OMBookmarksHelper.displayName(forRegion: region).localizedCaseInsensitiveContains(q) {
-        return true
-      }
-    }
-    return false
-  }
-
-  private func trackMatchesSearch(_ track: Track) -> Bool {
-    let q = searchText
-    if track.trackName.localizedCaseInsensitiveContains(q) { return true }
-    if EntityEditor.trackDescription(track.trackId).localizedCaseInsensitiveContains(q) { return true }
-    for tag in OMBookmarksHelper.tags(forTrack: track.trackId)
-      where tag.localizedCaseInsensitiveContains(q) { return true }
-    for region in OMBookmarksHelper.regions(forTrack: track.trackId) {
-      if OMBookmarksHelper.displayName(forRegion: region).localizedCaseInsensitiveContains(q) {
-        return true
-      }
-    }
-    return false
+    list.tracks.filter { LibrarySearch.matchesTrack($0, query: searchText) }
   }
 
   // When a list's own name matches, show all its items; otherwise only matches.
@@ -494,70 +482,11 @@ struct NavigatorView: View {
                                         singleDelete: @escaping () -> Void,
                                         singleMove: @escaping (MWMMarkGroupID) -> Void) -> some View {
     if selection.contains(item) && selection.count >= 2 {
-      bulkContextMenu
+      BulkContextMenu(selection: selection, model: model,
+                      tagStore: tagStore, projectsModel: projectsModel)
     } else {
       moveMenu(singleMove)
       Button("Delete", role: .destructive, action: singleDelete)
-    }
-  }
-
-  @ViewBuilder private var bulkContextMenu: some View {
-    Menu("Move to") {
-      ForEach(model.lists, id: \.categoryId) { list in
-        Button(list.title) {
-          model.moveItems(bookmarkIds: selection.bookmarkNSNumbers,
-                          trackIds: selection.trackNSNumbers,
-                          to: list.categoryId)
-        }
-      }
-    }
-    Menu("Set color") {
-      ForEach(BookmarkColor.palette, id: \.self) { color in
-        Button(color.displayName) {
-          model.setColorForItems(bookmarkIds: selection.bookmarkNSNumbers,
-                                 trackIds: selection.trackNSNumbers,
-                                 color: color)
-        }
-      }
-    }
-    Menu("Add tag") {
-      if tagStore.allTags.isEmpty {
-        Text("No tags yet").foregroundStyle(.secondary)
-      } else {
-        ForEach(tagStore.allTags, id: \.self) { tag in
-          Button(tag) {
-            model.addTag(tag, bookmarkIds: selection.bookmarkIds, trackIds: selection.trackIds)
-          }
-        }
-      }
-    }
-    Menu("Add to project") {
-      if projectsModel.projects.isEmpty {
-        Text("No projects yet").foregroundStyle(.secondary)
-      } else {
-        ForEach(projectsModel.projects) { project in
-          Button(project.name) {
-            for id in selection.bookmarkIds { projectsModel.addBookmark(id, to: project) }
-            for id in selection.trackIds { projectsModel.addTrack(id, to: project) }
-          }
-        }
-      }
-    }
-    Divider()
-    Button("Show") {
-      model.setItemsVisible(bookmarkIds: selection.bookmarkNSNumbers,
-                            trackIds: selection.trackNSNumbers, visible: true)
-    }
-    Button("Hide") {
-      model.setItemsVisible(bookmarkIds: selection.bookmarkNSNumbers,
-                            trackIds: selection.trackNSNumbers, visible: false)
-    }
-    Divider()
-    Button("Delete \(selection.count) items", role: .destructive) {
-      let bIds = selection.bookmarkNSNumbers
-      let tIds = selection.trackNSNumbers
-      selection.clear()
-      model.deleteItems(bookmarkIds: bIds, trackIds: tIds)
     }
   }
 

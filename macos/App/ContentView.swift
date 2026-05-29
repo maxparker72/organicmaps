@@ -22,6 +22,7 @@ struct ContentView: View {
 
   @State private var buildings3D: Bool = OMPreferences.buildings3D()
   @State private var focusLibrarySearchRequest: Int = 0
+  @State private var navigatorViewMode: NavigatorViewMode = NavigatorViewMode.loadPersisted()
 
   private var hasInfo: Bool {
     selectedList != nil || placePageModel.info != nil || navSelection.count >= 2
@@ -79,6 +80,7 @@ struct ContentView: View {
         }
         .animation(.easeInOut(duration: 0.2), value: showNavigator)
         .animation(.easeInOut(duration: 0.2), value: showProjects)
+        .animation(.easeInOut(duration: 0.2), value: navigatorViewMode)
         .animation(.easeInOut(duration: 0.2), value: paneHidden)
         .animation(.easeInOut(duration: 0.2), value: selectedList?.categoryId)
         .animation(.easeInOut(duration: 0.2), value: placePageModel.info == nil)
@@ -138,7 +140,7 @@ struct ContentView: View {
   // MARK: - Overlays
 
   private var leadingPanesWidth: CGFloat {
-    (showNavigator ? 300 : 0) + (showProjects ? 300 : 0)
+    (showNavigator ? navigatorViewMode.paneWidth : 0) + (showProjects ? 300 : 0)
   }
 
   // Side-by-side leading panes: bookmarks navigator and projects pane. Each is
@@ -159,7 +161,8 @@ struct ContentView: View {
           onSelectBookmark: { bookmarksModel.showBookmarkOnMap($0) },
           onSelectTrack: { bookmarksModel.showTrackOnMap($0) },
           onHide: { showNavigator = false },
-          focusSearchRequest: focusLibrarySearchRequest)
+          focusSearchRequest: focusLibrarySearchRequest,
+          viewMode: $navigatorViewMode)
           .transition(.move(edge: .leading))
       }
       if showProjects {
