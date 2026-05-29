@@ -14,16 +14,12 @@ enum BookmarkFiles {
     manager.loadBookmarkFile(url)
   }
 
-  /// Prompt for one or more files to import.
+  /// Prompt for files or folders to import. Multi-file / folder selections
+  /// show the destination sheet from `ImportCoordinator`; a single-file
+  /// selection loads immediately (zero-friction path preserved).
+  @MainActor
   static func runImportPanel() {
-    let panel = NSOpenPanel()
-    panel.allowsMultipleSelection = true
-    panel.canChooseDirectories = false
-    panel.allowedContentTypes = importContentTypes
-    panel.prompt = "Import"
-    if panel.runModal() == .OK {
-      for url in panel.urls { load(url) }
-    }
+    ImportCoordinator.shared.runOpenPanel()
   }
 
   /// Export a list: build the archive, then let the user choose where to save it.

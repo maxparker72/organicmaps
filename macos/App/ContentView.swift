@@ -18,6 +18,7 @@ struct ContentView: View {
   @StateObject private var importNormalizer = ImportNormalizer()
   @StateObject private var navSelection = NavigatorSelectionModel()
   @StateObject private var tagStore = TagStore()
+  @ObservedObject private var importCoordinator = ImportCoordinator.shared
 
   @State private var buildings3D: Bool = OMPreferences.buildings3D()
 
@@ -30,11 +31,20 @@ struct ContentView: View {
       MapView()
         .ignoresSafeArea()
         .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+          // Gather every dropped URL first, then hand the whole batch to
+          // ImportCoordinator. The coordinator skips its sheet for a
+          // single-file drop, so casual single-file behaviour is preserved.
+          var urls: [URL] = []
+          let group = DispatchGroup()
           for provider in providers {
+            group.enter()
             _ = provider.loadObject(ofClass: URL.self) { url, _ in
-              guard let url else { return }
-              DispatchQueue.main.async { BookmarkFiles.load(url) }
+              defer { group.leave() }
+              if let url { urls.append(url) }
             }
+          }
+          group.notify(queue: .main) {
+            ImportCoordinator.shared.begin(urls)
           }
           return true
         }
@@ -105,6 +115,16 @@ struct ContentView: View {
           bookmarksModel.refresh()
         }
         .toolbar { toolbarContent }
+        .sheet(item: $importCoordinator.pendingSheet) { state in
+          ImportDestinationSheet(
+            fileCount: state.fileCount,
+            ignoredCount: state.ignoredCount,
+            bookmarksModel: bookmarksModel,
+            projectsModel: projectsModel,
+            tagStore: tagStore,
+            onConfirm: { importCoordinator.confirm($0) },
+            onCancel: { importCoordinator.cancelSheet() })
+        }
     }
   }
 

@@ -526,4 +526,34 @@ kml::PredefinedColor KmlColorFromBookmarkColor(MWMBookmarkColor bookmarkColor)
   }
 }
 
+#pragma mark - Category lookup
+
++ (MWMMarkGroupID)categoryIdForFile:(NSString *)path
+{
+  if (path.length == 0)
+    return 0;
+  return static_cast<MWMMarkGroupID>(
+      GetFramework().GetBookmarkManager().GetCategoryByFileName(std::string(path.UTF8String)));
+}
+
++ (NSArray<NSNumber *> *)bookmarkIdsInCategory:(MWMMarkGroupID)groupId
+{
+  auto const & ids = GetFramework().GetBookmarkManager().GetUserMarkIds(
+      static_cast<kml::MarkGroupId>(groupId));
+  NSMutableArray<NSNumber *> * result = [NSMutableArray arrayWithCapacity:ids.size()];
+  for (auto markId : ids)
+    [result addObject:@(static_cast<unsigned long long>(markId))];
+  return result;
+}
+
++ (NSArray<NSNumber *> *)trackIdsInCategory:(MWMMarkGroupID)groupId
+{
+  auto const & ids = GetFramework().GetBookmarkManager().GetTrackIds(
+      static_cast<kml::MarkGroupId>(groupId));
+  NSMutableArray<NSNumber *> * result = [NSMutableArray arrayWithCapacity:ids.size()];
+  for (auto trackId : ids)
+    [result addObject:@(static_cast<unsigned long long>(trackId))];
+  return result;
+}
+
 @end

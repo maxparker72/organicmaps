@@ -106,6 +106,20 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setTracks:(NSArray<NSNumber *> *)trackIds color:(MWMBookmarkColor)color
     NS_SWIFT_NAME(setTracks(_:color:));
 
+// Inverse of `loadBookmarkFile:` — given a file path the engine has loaded,
+// return the category id it landed in. Returns 0 if the path isn't mapped
+// (file never loaded, or loaded then deleted). Used by ImportCoordinator
+// to find a newly-imported category without diffing the whole list.
++ (MWMMarkGroupID)categoryIdForFile:(NSString *)path
+    NS_SWIFT_NAME(categoryId(forFile:));
+
+// Enumerate the items currently in a category. Wraps GetUserMarkIds and
+// GetTrackIds. Order is the engine's internal id order (not display sort).
++ (NSArray<NSNumber *> *)bookmarkIdsInCategory:(MWMMarkGroupID)groupId
+    NS_SWIFT_NAME(bookmarkIds(inCategory:));
++ (NSArray<NSNumber *> *)trackIdsInCategory:(MWMMarkGroupID)groupId
+    NS_SWIFT_NAME(trackIds(inCategory:));
+
 @end
 
 NS_ASSUME_NONNULL_END
