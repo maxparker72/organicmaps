@@ -12,6 +12,7 @@ struct MultiSelectionInspectorView: View {
 
   @State private var newTagSheet = false
   @State private var newTagText = ""
+  @State private var showColorPicker = false
 
   private var bookmarkCount: Int { selection.bookmarkIds.count }
   private var trackCount: Int { selection.trackIds.count }
@@ -183,22 +184,38 @@ struct MultiSelectionInspectorView: View {
   }
 
   private var colorMenu: some View {
-    Menu {
-      ForEach(BookmarkColor.palette, id: \.self) { color in
-        Button {
-          navigatorModel.setColorForItems(
-            bookmarkIds: selection.bookmarkNSNumbers,
-            trackIds: selection.trackNSNumbers,
-            color: color)
-        } label: {
-          Label {
-            Text(color.displayName)
-          } icon: {
-            Image(systemName: "circle.fill").foregroundStyle(color.swiftUIColor)
-          }
-        }
-      }
+    Button {
+      showColorPicker.toggle()
     } label: { Label("Set color…", systemImage: "paintpalette") }
+    .popover(isPresented: $showColorPicker, arrowEdge: .leading) {
+      colorSwatchGrid
+    }
+  }
+
+  /// Popover content for Set Color. Native macOS menus template-tint their
+  /// item images to the system text colour and ignore SwiftUI's
+  /// foregroundStyle on a Label icon, so colored swatches in a Menu render
+  /// black; a popover sidesteps the bridge entirely and lets us draw real
+  /// SwiftUI Circles. Mirrors the swatch grid in EntityEditView.
+  private var colorSwatchGrid: some View {
+    let columns = Array(repeating: GridItem(.fixed(28), spacing: 6), count: 8)
+    return LazyVGrid(columns: columns, spacing: 6) {
+      ForEach(BookmarkColor.palette, id: \.self) { color in
+        Circle()
+          .fill(color.swiftUIColor)
+          .frame(width: 22, height: 22)
+          .overlay(Circle().stroke(.secondary.opacity(0.3), lineWidth: 0.5))
+          .onTapGesture {
+            navigatorModel.setColorForItems(
+              bookmarkIds: selection.bookmarkNSNumbers,
+              trackIds: selection.trackNSNumbers,
+              color: color)
+            showColorPicker = false
+          }
+          .help(color.displayName)
+      }
+    }
+    .padding(10)
   }
 
   private var tagAddMenu: some View {

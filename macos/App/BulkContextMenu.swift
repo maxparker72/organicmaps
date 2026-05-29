@@ -19,18 +19,17 @@ struct BulkContextMenu: View {
         }
       }
     }
+    // Plain-text items: native macOS context-menu submenus template-tint
+    // every NSMenuItem image to the system text colour, so a SwiftUI Label
+    // icon would render black regardless of foregroundStyle. The inspector's
+    // Set Color uses a popover swatch grid for that reason; here we keep
+    // the names so the action is still labelled.
     Menu("Set color") {
       ForEach(BookmarkColor.palette, id: \.self) { color in
-        Button {
+        Button(color.displayName) {
           model.setColorForItems(bookmarkIds: selection.bookmarkNSNumbers,
                                  trackIds: selection.trackNSNumbers,
                                  color: color)
-        } label: {
-          Label {
-            Text(color.displayName)
-          } icon: {
-            Image(systemName: "circle.fill").foregroundStyle(color.swiftUIColor)
-          }
         }
       }
     }
