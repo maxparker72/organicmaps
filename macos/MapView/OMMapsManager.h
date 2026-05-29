@@ -34,6 +34,12 @@ NS_ASSUME_NONNULL_BEGIN
 // Flat list of regions (groups and leaves) whose name or id matches the query.
 - (NSArray<OMCountryNode *> *)search:(NSString *)query;
 
+// Flat list of leaf regions currently OnDisk or OnDiskOutOfDate, sorted by
+// localized name. Used by the Downloads window's "Downloaded" filter so the
+// user can review and remove already-downloaded maps without paging through
+// the full continent tree.
+- (NSArray<OMCountryNode *> *)downloadedLeafNodes;
+
 - (void)download:(NSString *)countryId;
 - (void)update:(NSString *)countryId;
 - (void)deleteCountry:(NSString *)countryId;

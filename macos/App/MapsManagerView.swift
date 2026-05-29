@@ -1,36 +1,122 @@
 import SwiftUI
 
 struct MapsManagerView: View {
+  enum Scope: String, CaseIterable, Identifiable {
+    case all = "All Regions"
+    case downloaded = "Downloaded"
+    var id: String { rawValue }
+  }
+
   @StateObject private var model = MapsManagerModel()
   @State private var searchText = ""
   @State private var results: [MapNode] = []
+  @State private var scope: Scope = .all
+
+  /// Downloaded-mode rows, filtered by the current search text. Cheap —
+  /// the downloaded list is short relative to the full tree.
+  private var visibleDownloaded: [MapNode] {
+    let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return model.downloaded }
+    return model.downloaded.filter {
+      $0.name.localizedCaseInsensitiveContains(trimmed) ||
+      $0.id.localizedCaseInsensitiveContains(trimmed)
+    }
+  }
+
+  private var downloadedSummary: String {
+    let count = model.downloaded.count
+    let bytes = model.downloaded.reduce(UInt64(0)) { $0 + $1.sizeBytes }
+    let size = ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
+    return "\(count) \(count == 1 ? "map" : "maps") · \(size)"
+  }
 
   var body: some View {
-    Group {
-      if searchText.isEmpty {
-        List {
-          ForEach(model.roots) { node in
-            MapNodeRow(node: node, model: model)
-          }
+    VStack(spacing: 0) {
+      Picker("", selection: $scope) {
+        ForEach(Scope.allCases) { Text($0.rawValue).tag($0) }
+      }
+      .pickerStyle(.segmented)
+      .labelsHidden()
+      .padding(.horizontal, 12)
+      .padding(.top, 10)
+      .padding(.bottom, 6)
+
+      Group {
+        switch scope {
+        case .all: allRegionsList
+        case .downloaded: downloadedList
         }
-      } else {
-        List(results) { node in
+      }
+    }
+    .frame(minWidth: 480, minHeight: 440)
+    .navigationTitle("Download Maps")
+    .searchable(text: $searchText, prompt: scope == .all ? "Search regions" : "Filter downloaded")
+    .onChange(of: searchText) { _, query in
+      if scope == .all {
+        results = query.count >= 2 ? model.search(query) : []
+      }
+    }
+    .onChange(of: scope) { _, _ in
+      // Reset the All-mode search results when flipping back; downloaded-mode
+      // filters live off model.downloaded so it doesn't need its own buffer.
+      results = []
+    }
+  }
+
+  @ViewBuilder private var allRegionsList: some View {
+    if searchText.isEmpty {
+      List {
+        ForEach(model.roots) { node in
+          MapNodeRow(node: node, model: model)
+        }
+      }
+    } else {
+      List(results) { node in
+        HStack {
+          VStack(alignment: .leading, spacing: 2) {
+            Text(node.name.isEmpty ? node.id : node.name)
+            Text(node.id).font(.caption).foregroundStyle(.secondary)
+          }
+          Spacer()
+          NodeActionButton(node: node, model: model)
+        }
+      }
+    }
+  }
+
+  @ViewBuilder private var downloadedList: some View {
+    if model.downloaded.isEmpty {
+      VStack(spacing: 6) {
+        Image(systemName: "tray")
+          .font(.system(size: 32, weight: .light))
+          .foregroundStyle(.secondary)
+        Text("No maps downloaded yet")
+          .font(.headline)
+        Text("Switch to All Regions to find and download maps.")
+          .font(.caption).foregroundStyle(.secondary)
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+    } else {
+      VStack(spacing: 0) {
+        HStack {
+          Text(downloadedSummary)
+            .font(.subheadline).foregroundStyle(.secondary)
+          Spacer()
+        }
+        .padding(.horizontal, 16).padding(.vertical, 8)
+        Divider()
+        List(visibleDownloaded) { node in
           HStack {
             VStack(alignment: .leading, spacing: 2) {
               Text(node.name.isEmpty ? node.id : node.name)
-              Text(node.id).font(.caption).foregroundStyle(.secondary)
+              Text(ByteCountFormatter.string(fromByteCount: Int64(node.sizeBytes), countStyle: .file))
+                .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
             NodeActionButton(node: node, model: model)
           }
         }
       }
-    }
-    .frame(minWidth: 480, minHeight: 440)
-    .navigationTitle("Download Maps")
-    .searchable(text: $searchText, prompt: "Search regions")
-    .onChange(of: searchText) { _, query in
-      results = query.count >= 2 ? model.search(query) : []
     }
   }
 }

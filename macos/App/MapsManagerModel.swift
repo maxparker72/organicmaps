@@ -33,6 +33,10 @@ final class MapNode: Identifiable, ObservableObject {
 /// status and download/delete actions. Independent of the in-map prompt.
 final class MapsManagerModel: NSObject, ObservableObject, OMMapsManagerDelegate {
   @Published var roots: [MapNode] = []
+  /// Flat list of leaf regions currently OnDisk / OnDiskOutOfDate. Refreshed
+  /// whenever the storage delegate fires so the "Downloaded" tab stays current
+  /// while a download finishes or a delete completes.
+  @Published var downloaded: [MapNode] = []
 
   private let manager = OMMapsManager()
 
@@ -41,6 +45,7 @@ final class MapsManagerModel: NSObject, ObservableObject, OMMapsManagerDelegate 
     manager.delegate = self
     manager.start()
     roots = manager.children(of: "").map(MapNode.init)
+    refreshDownloaded()
   }
 
   func children(of countryId: String) -> [MapNode] {
@@ -60,6 +65,7 @@ final class MapsManagerModel: NSObject, ObservableObject, OMMapsManagerDelegate 
 
   func mapsManagerDidChange() {
     refresh(nodes: roots)
+    refreshDownloaded()
   }
 
   /// Refresh status/progress of already-loaded nodes in place (no full rebuild),
@@ -74,5 +80,11 @@ final class MapsManagerModel: NSObject, ObservableObject, OMMapsManagerDelegate 
         refresh(nodes: children)
       }
     }
+  }
+
+  /// Rebuild the flat downloaded list. Cheap — the engine walk skips
+  /// not-downloaded subtrees in practice because we only descend to leaves.
+  private func refreshDownloaded() {
+    downloaded = manager.downloadedLeafNodes().map(MapNode.init)
   }
 }

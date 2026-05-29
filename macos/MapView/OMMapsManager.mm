@@ -115,6 +115,41 @@ OMCountryNode * MakeNode(storage::Storage const & storage, storage::CountryId co
   return result;
 }
 
+- (NSArray<OMCountryNode *> *)downloadedLeafNodes
+{
+  auto const & storage = GetFramework().GetStorage();
+  NSMutableArray<OMCountryNode *> * result = [NSMutableArray array];
+
+  std::function<void(storage::CountryId const &)> walk = [&](storage::CountryId const & cid)
+  {
+    storage::CountriesVec children;
+    storage.GetChildren(cid, children);
+    if (children.empty())
+    {
+      storage::NodeAttrs attrs;
+      storage.GetNodeAttrs(cid, attrs);
+      if (attrs.m_status == storage::NodeStatus::OnDisk ||
+          attrs.m_status == storage::NodeStatus::OnDiskOutOfDate)
+      {
+        [result addObject:MakeNode(storage, cid)];
+      }
+      return;
+    }
+    for (auto const & child : children)
+      walk(child);
+  };
+
+  storage::CountriesVec roots;
+  storage.GetChildren(storage.GetRootId(), roots);
+  for (auto const & cid : roots)
+    walk(cid);
+
+  [result sortUsingComparator:^NSComparisonResult(OMCountryNode * a, OMCountryNode * b) {
+    return [a.name localizedCaseInsensitiveCompare:b.name];
+  }];
+  return result;
+}
+
 - (void)download:(NSString *)countryId
 {
   storage::CountryId const cid = countryId.UTF8String;
