@@ -12,7 +12,6 @@ struct MultiSelectionInspectorView: View {
 
   @State private var newTagSheet = false
   @State private var newTagText = ""
-  @State private var confirmDelete = false
 
   private var bookmarkCount: Int { selection.bookmarkIds.count }
   private var trackCount: Int { selection.trackIds.count }
@@ -49,12 +48,6 @@ struct MultiSelectionInspectorView: View {
     }
     .frame(width: 340)
     .background(.regularMaterial)
-    .alert("Delete \(selection.count) items?", isPresented: $confirmDelete) {
-      Button("Delete", role: .destructive) { performDelete() }
-      Button("Cancel", role: .cancel) { }
-    } message: {
-      Text("This removes the selected bookmarks and tracks from your library. Cmd-Z can undo moves, tags, colors and visibility — but not deletions.")
-    }
     .sheet(isPresented: $newTagSheet) {
       newTagDialog
     }
@@ -110,6 +103,12 @@ struct MultiSelectionInspectorView: View {
     for bm in matchedBookmarks() {
       counts[bm.bookmarkColor.displayName, default: 0] += 1
     }
+    // Tracks store an arbitrary dp::Color; snap to the nearest palette entry
+    // so the breakdown groups by visual colour rather than by exact RGBA.
+    for track in matchedTracks() {
+      let snapped = BookmarkColor.closest(to: track.trackColor)
+      counts[snapped.displayName, default: 0] += 1
+    }
     return counts.sorted { $0.value > $1.value }.map { "\($0.key) · \($0.value)" }
   }
 
@@ -133,6 +132,16 @@ struct MultiSelectionInspectorView: View {
     return result
   }
 
+  private func matchedTracks() -> [Track] {
+    var result: [Track] = []
+    for list in navigatorModel.lists {
+      for track in list.tracks where selection.contains(.track(track.trackId)) {
+        result.append(track)
+      }
+    }
+    return result
+  }
+
   // MARK: - Actions
 
   private var actions: some View {
@@ -150,7 +159,10 @@ struct MultiSelectionInspectorView: View {
           Label("Hide", systemImage: "eye.slash")
         }
       }
-      Button(role: .destructive) { confirmDelete = true } label: {
+      Button(role: .destructive) {
+        // Same shared confirmation as the context-menu Delete path.
+        selection.pendingBulkDelete = true
+      } label: {
         Label("Delete \(selection.count) items…", systemImage: "trash")
       }
       .controlSize(.regular)
@@ -179,7 +191,11 @@ struct MultiSelectionInspectorView: View {
             trackIds: selection.trackNSNumbers,
             color: color)
         } label: {
-          Label(color.displayName, systemImage: "circle.fill")
+          Label {
+            Text(color.displayName)
+          } icon: {
+            Image(systemName: "circle.fill").foregroundStyle(color.swiftUIColor)
+          }
         }
       }
     } label: { Label("Set color…", systemImage: "paintpalette") }
@@ -246,13 +262,6 @@ struct MultiSelectionInspectorView: View {
   }
 
   // MARK: - Action implementations
-
-  private func performDelete() {
-    navigatorModel.deleteItems(
-      bookmarkIds: selection.bookmarkNSNumbers,
-      trackIds: selection.trackNSNumbers)
-    selection.clear()
-  }
 
   private func setVisible(_ visible: Bool) {
     navigatorModel.setItemsVisible(

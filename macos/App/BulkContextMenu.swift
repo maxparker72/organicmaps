@@ -21,10 +21,16 @@ struct BulkContextMenu: View {
     }
     Menu("Set color") {
       ForEach(BookmarkColor.palette, id: \.self) { color in
-        Button(color.displayName) {
+        Button {
           model.setColorForItems(bookmarkIds: selection.bookmarkNSNumbers,
                                  trackIds: selection.trackNSNumbers,
                                  color: color)
+        } label: {
+          Label {
+            Text(color.displayName)
+          } icon: {
+            Image(systemName: "circle.fill").foregroundStyle(color.swiftUIColor)
+          }
         }
       }
     }
@@ -61,11 +67,11 @@ struct BulkContextMenu: View {
                             trackIds: selection.trackNSNumbers, visible: false)
     }
     Divider()
-    Button("Delete \(selection.count) items", role: .destructive) {
-      let bIds = selection.bookmarkNSNumbers
-      let tIds = selection.trackNSNumbers
-      selection.clear()
-      model.deleteItems(bookmarkIds: bIds, trackIds: tIds)
+    Button("Delete \(selection.count) items…", role: .destructive) {
+      // ContentView's confirmationDialog observes pendingBulkDelete and
+      // performs the actual delete on confirm — context-menu actions
+      // can't host a confirmation themselves.
+      selection.pendingBulkDelete = true
     }
   }
 }

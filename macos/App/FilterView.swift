@@ -153,6 +153,16 @@ struct FilterView: View {
           saved.save(model.snapshot(name: name, id: id))
         }
         .disabled(loadedSavedId == nil)
+        Button("Select Matching") {
+          let (bms, trs) = model.matchingIds()
+          NotificationCenter.default.post(
+            name: .omSelectMatchingFilter, object: nil,
+            userInfo: [
+              "bookmarks": bms.map { UInt64($0) },
+              "tracks": trs.map { UInt64($0) },
+            ])
+        }
+        .help("Open the navigator with every matching item selected for bulk actions")
         Button("Apply") {
           model.apply()
           if let id = loadedSavedId { saved.setActive(id) } else { saved.setActive(nil) }

@@ -21,6 +21,12 @@ enum NavSelection: Hashable, Identifiable {
 final class NavigatorSelectionModel: ObservableObject {
   @Published private(set) var selection: Set<NavSelection> = []
 
+  /// Flipped to true by any bulk-delete trigger (inspector button, tree
+  /// context menu, table context menu). ContentView observes and shows the
+  /// confirmation dialog, so every entry point lands on the same prompt
+  /// and there's no path that silently destroys data.
+  @Published var pendingBulkDelete: Bool = false
+
   /// The previous single-click target. Shift-click range-selects from this
   /// anchor to the new item. Reset on plain click.
   private(set) var anchor: NavSelection? = nil

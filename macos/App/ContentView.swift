@@ -90,7 +90,10 @@ struct ContentView: View {
         .animation(.easeInOut(duration: 0.2), value: showSearch)
         .onChange(of: placePageModel.openToken) { _, _ in
           selectedList = nil
-          paneHidden = false
+          // paneHidden is sticky on purpose — once the user closes the info
+          // pane (Cmd-I or the toolbar info button), subsequent map clicks
+          // shouldn't reopen it. Quick Look (Space / Cmd-Y) is the inline
+          // alternative for casual previews.
           // Tapping a different feature deactivates the previous selection,
           // which the engine uses as a trigger to wipe SEARCH user-marks.
           // Repaint pins after the new selection settles.
@@ -122,20 +125,34 @@ struct ContentView: View {
           focusLibrarySearchRequest += 1
         }
         .onReceive(NotificationCenter.default.publisher(for: .omToggleQuickLook)) { _ in
-          // Toggle: an open Quick Look closes; otherwise resolve a target from
-          // the navigator selection (single item) or, failing that, the
-          // engine's currently-open place page.
+          // Toggle: an open Quick Look closes; otherwise resolve a target.
+          // Engine selection (a map-pin click, an in-app search result) wins
+          // over the navigator's last selection — Cmd-Y on a freshly-clicked
+          // pin used to surface stale navigator state instead of the pin the
+          // user just touched.
           if quickLookItem != nil {
             quickLookItem = nil
             return
           }
-          if navSelection.count == 1, let only = navSelection.selection.first {
-            quickLookItem = only
-          } else if let info = placePageModel.info, info.isBookmark {
+          if let info = placePageModel.info, info.isBookmark {
             quickLookItem = .bookmark(info.bookmarkId)
           } else if let info = placePageModel.info, info.isTrack {
             quickLookItem = .track(info.trackId)
+          } else if navSelection.count == 1, let only = navSelection.selection.first {
+            quickLookItem = only
           }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .omSelectMatchingFilter)) { note in
+          // "Select Matching" from the Filter window — pop the navigator open
+          // and load the filter's matched ids into navSelection so the user
+          // can run bulk Move / Set Color / Add Tag against the result.
+          guard let bms = note.userInfo?["bookmarks"] as? [UInt64],
+                let trs = note.userInfo?["tracks"] as? [UInt64] else { return }
+          var items: Set<NavSelection> = []
+          for id in bms { items.insert(.bookmark(MWMMarkID(id))) }
+          for id in trs { items.insert(.track(MWMTrackID(id))) }
+          navSelection.set(items)
+          showNavigator = true
         }
         .onAppear {
           downloadModel.start()
@@ -156,6 +173,21 @@ struct ContentView: View {
         }
         .sheet(item: $quickLookItem) { item in
           QuickLookView(item: item, onClose: { quickLookItem = nil })
+        }
+        .confirmationDialog(
+          "Delete \(navSelection.count) items?",
+          isPresented: $navSelection.pendingBulkDelete,
+          titleVisibility: .visible
+        ) {
+          Button("Delete", role: .destructive) {
+            let b = navSelection.bookmarkNSNumbers
+            let t = navSelection.trackNSNumbers
+            navSelection.clear()
+            bookmarksModel.deleteItems(bookmarkIds: b, trackIds: t)
+          }
+          Button("Cancel", role: .cancel) {}
+        } message: {
+          Text("Cmd-Z can undo moves, tags, colors and visibility — but not deletions.")
         }
     }
   }
@@ -183,7 +215,13 @@ struct ContentView: View {
           },
           onSelectBookmark: { bookmarksModel.showBookmarkOnMap($0) },
           onSelectTrack: { bookmarksModel.showTrackOnMap($0) },
-          onHide: { showNavigator = false },
+          onHide: {
+            // Drop the multi-selection when the pane is hidden — otherwise
+            // Cmd-Y / "Find in Library" / Show-Hide commands resurface stale
+            // state long after the user has visibly cleared the workspace.
+            showNavigator = false
+            navSelection.clear()
+          },
           focusSearchRequest: focusLibrarySearchRequest,
           viewMode: $navigatorViewMode)
           .transition(.move(edge: .leading))
@@ -252,9 +290,12 @@ struct ContentView: View {
 
   @ToolbarContentBuilder private var toolbarContent: some ToolbarContent {
     ToolbarItemGroup(placement: .navigation) {
-      Button { showNavigator.toggle() } label: { Image(systemName: "bookmark") }
+      // Folder reads as "library / collection" — the navigator is the
+      // bookmark organisation surface. Projects move to rectangle.stack
+      // (collections of items) so the two are visually distinct.
+      Button { showNavigator.toggle() } label: { Image(systemName: "folder") }
         .help("Bookmarks")
-      Button { showProjects.toggle() } label: { Image(systemName: "folder") }
+      Button { showProjects.toggle() } label: { Image(systemName: "rectangle.stack") }
         .help("Projects")
         .keyboardShortcut("p", modifiers: [.command, .shift])
       Button {
@@ -289,6 +330,7 @@ struct ContentView: View {
         .help("Orient north")
       Button { paneHidden.toggle() } label: { Image(systemName: "info.circle") }
         .help(paneHidden ? "Show info pane" : "Hide info pane")
+        .keyboardShortcut("i", modifiers: .command)
         .disabled(!hasInfo)
     }
   }

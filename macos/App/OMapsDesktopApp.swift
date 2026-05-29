@@ -7,6 +7,11 @@ extension Notification.Name {
   /// Posted by Cmd-Y and the navigator's Space key. ContentView toggles the
   /// Quick Look sheet, resolving the target item from the selection.
   static let omToggleQuickLook = Notification.Name("omToggleQuickLook")
+  /// Posted by FilterView's "Select Matching" button with userInfo
+  /// {"bookmarks": [UInt64], "tracks": [UInt64]}. ContentView replaces the
+  /// navigator selection with those ids so the user can run bulk ops
+  /// against the filter result.
+  static let omSelectMatchingFilter = Notification.Name("omSelectMatchingFilter")
 }
 
 @main

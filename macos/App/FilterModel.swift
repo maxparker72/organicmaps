@@ -116,6 +116,25 @@ final class FilterModel: ObservableObject {
     m.apply()
   }
 
+  /// Evaluate every bookmark/track against the current condition set and
+  /// return the matching ids — used by the "Select Matching" button so the
+  /// user can run bulk operations on the filter's result through the
+  /// navigator's selection model.
+  func matchingIds() -> (bookmarks: [MWMMarkID], tracks: [MWMTrackID]) {
+    let lists = BookmarksManager.shared().sortedUserCategories()
+    var bms: [MWMMarkID] = []
+    var trs: [MWMTrackID] = []
+    for list in lists {
+      for bm in list.bookmarks where evaluateBookmark(bm, listName: list.title) {
+        bms.append(bm.bookmarkId)
+      }
+      for track in list.tracks where evaluateTrack(track, listName: list.title) {
+        trs.append(track.trackId)
+      }
+    }
+    return (bms, trs)
+  }
+
   /// Hide items that don't match; show those that do. An item is evaluated only
   /// against the conditions that apply to its type; an item with no applicable
   /// condition is hidden (the filter is clearly targeting the other type).

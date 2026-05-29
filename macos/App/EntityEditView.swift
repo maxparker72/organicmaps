@@ -15,6 +15,7 @@ struct EntityEditView: View {
   @State private var lists: [BookmarkGroup] = []
   @State private var tags: [String] = []
   @State private var newTag: String = ""
+  @StateObject private var tagStore = TagStore()
 
   private let columns = Array(repeating: GridItem(.fixed(24), spacing: 8), count: 8)
 
@@ -76,14 +77,38 @@ struct EntityEditView: View {
         }
       }
       HStack(spacing: 6) {
-        TextField("Add tag", text: $newTag, prompt: Text("Add tag and press Return"))
+        TextField("Add tag", text: $newTag, prompt: Text("Type to search or add"))
           .textFieldStyle(.roundedBorder)
           .onSubmit { commitNewTag() }
+        existingTagsMenu
         if !newTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
           Button("Add", action: commitNewTag)
             .controlSize(.small)
         }
       }
+    }
+  }
+
+  /// Dropdown of tags already in use across the library that aren't already
+  /// on this item. Filters by what the user has typed so it doubles as
+  /// search: pick a match, or commit the typed value as a new tag.
+  @ViewBuilder private var existingTagsMenu: some View {
+    let q = newTag.trimmingCharacters(in: .whitespacesAndNewlines)
+    let suggestions: [String] = tagStore.allTags.filter { existing in
+      let onItem = tags.contains { $0.caseInsensitiveCompare(existing) == .orderedSame }
+      if onItem { return false }
+      return q.isEmpty || existing.localizedCaseInsensitiveContains(q)
+    }
+    if !suggestions.isEmpty {
+      Menu {
+        ForEach(suggestions, id: \.self) { existing in
+          Button(existing) {
+            tags.append(existing)
+            newTag = ""
+          }
+        }
+      } label: { Image(systemName: "tag") }
+      .menuStyle(.borderlessButton).fixedSize().help("Pick from existing tags")
     }
   }
 
