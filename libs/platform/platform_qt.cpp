@@ -7,13 +7,22 @@
 
 #include "base/logging.hpp"
 
+#include "std/target_os.hpp"
+
 #include <future>
 #include <memory>
 #include <regex>
 
+#ifdef OMIM_OS_MAC
+#include <CoreFoundation/CoreFoundation.h>
+#include <dirent.h>
+#include <errno.h>
+#include <sys/stat.h>
+#else
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QLocale>
+#endif
 
 std::unique_ptr<ModelReader> Platform::GetReader(std::string const & file, std::string searchScope) const
 {
@@ -37,6 +46,20 @@ void Platform::GetFilesByRegExp(std::string const & directory, std::string const
 {
   std::regex exp(regexp);
 
+#ifdef OMIM_OS_MAC
+  // Avoid linking Qt for macOS-only builds (BDSM.app); the qt/ desktop tool on
+  // Linux/Windows still uses the Qt branch below.
+  DIR * dir = ::opendir(directory.c_str());
+  if (dir == nullptr)
+    return;
+  while (struct dirent * entry = ::readdir(dir))
+  {
+    std::string name(entry->d_name);
+    if (std::regex_search(name.begin(), name.end(), exp))
+      outFiles.push_back(std::move(name));
+  }
+  ::closedir(dir);
+#else
   QDir dir(QString::fromUtf8(directory.c_str()));
   int const count = dir.count();
 
@@ -46,6 +69,7 @@ void Platform::GetFilesByRegExp(std::string const & directory, std::string const
     if (std::regex_search(name.begin(), name.end(), exp))
       outFiles.push_back(std::move(name));
   }
+#endif
 }
 
 int Platform::PreCachingDepth() const
@@ -61,6 +85,16 @@ int Platform::VideoMemoryLimit() const
 // static
 Platform::EError Platform::MkDir(std::string const & dirName)
 {
+#ifdef OMIM_OS_MAC
+  if (::mkdir(dirName.c_str(), 0755))
+  {
+    if (errno == EEXIST)
+      return Platform::ERR_FILE_ALREADY_EXISTS;
+    LOG(LWARNING, ("Can't create directory: ", dirName, "errno:", errno));
+    return Platform::ERR_UNKNOWN;
+  }
+  return Platform::ERR_OK;
+#else
   if (QDir().exists(dirName.c_str()))
     return Platform::ERR_FILE_ALREADY_EXISTS;
   if (!QDir().mkdir(dirName.c_str()))
@@ -69,6 +103,7 @@ Platform::EError Platform::MkDir(std::string const & dirName)
     return Platform::ERR_UNKNOWN;
   }
   return Platform::ERR_OK;
+#endif
 }
 
 void Platform::SetupMeasurementSystem() const
@@ -76,7 +111,14 @@ void Platform::SetupMeasurementSystem() const
   auto units = measurement_utils::Units::Metric;
   if (settings::Get(settings::kMeasurementUnits, units))
     return;
+#ifdef OMIM_OS_MAC
+  CFLocaleRef locale = CFLocaleCopyCurrent();
+  CFBooleanRef metricRef = static_cast<CFBooleanRef>(CFLocaleGetValue(locale, kCFLocaleUsesMetricSystem));
+  bool const isMetric = metricRef && CFBooleanGetValue(metricRef);
+  CFRelease(locale);
+#else
   bool const isMetric = QLocale::system().measurementSystem() == QLocale::MetricSystem;
+#endif
   units = isMetric ? measurement_utils::Units::Metric : measurement_utils::Units::Imperial;
   settings::Set(settings::kMeasurementUnits, units);
 }

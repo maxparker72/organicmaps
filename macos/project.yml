@@ -103,10 +103,13 @@ targets:
       - path: ../iphone/Maps/Core/MapRendering/MetalContextFactory.mm
     settings:
       base:
-        PRODUCT_NAME: Organic Maps
+        PRODUCT_NAME: BDSM
         PRODUCT_BUNDLE_IDENTIFIER: app.organicmaps.desktop
         INFOPLIST_FILE: Info.plist
         GENERATE_INFOPLIST_FILE: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "alpha1"
         SDKROOT: macosx
         SUPPORTED_PLATFORMS: macosx
         MACOSX_DEPLOYMENT_TARGET: "14.0"
@@ -119,6 +122,13 @@ targets:
         # project two levels under the repo (iphone/Maps, xcode/<lib>). This project
         # is at macos/ (one level), so correct OMIM_ROOT to the repo root here.
         OMIM_ROOT: $(PROJECT_DIR)/..
+        # common.xcconfig's macOS OTHER_LDFLAGS bakes in Qt framework links with
+        # absolute paths to /opt/homebrew/opt/qtbase/... — fine for the qt/ tool,
+        # but breaks distribution: testers without Homebrew Qt cannot launch the
+        # app. The engine static libs do not use any Qt symbols (confirmed via
+        # nm), so override OTHER_LDFLAGS to drop Qt entirely. SDK frameworks
+        # below (Cocoa, Metal, etc.) cover what the app actually links.
+        OTHER_LDFLAGS: -framework IOKit -framework Network -framework OpenGL
         # Project includes resolve relative to repo root and libs/ (matches lib projects).
         HEADER_SEARCH_PATHS:
           - $(inherited)
@@ -135,6 +145,40 @@ targets:
           mkdir -p "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources"
           cp -f "${BUILT_PRODUCTS_DIR}/shaders_metal.metallib" \
             "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources/shaders_metal.metallib"
+      # For Release builds, bundle the same data files the iOS app ships with
+      # so a distributed .app boots offline without MWM_RESOURCES_DIR set. Skipped
+      # in Debug because the scheme injects MWM_RESOURCES_DIR pointing at the repo.
+      - name: Bundle engine data (Release)
+        basedOnDependencyAnalysis: false
+        script: |
+          if [ "${CONFIGURATION}" != "Release" ]; then
+            echo "Skipping data bundling for ${CONFIGURATION} build."
+            exit 0
+          fi
+          DATA_DIR="${SRCROOT}/../data"
+          RES_DIR="${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Resources"
+          mkdir -p "$RES_DIR"
+          ITEMS=( \
+            categories_brands.txt categories_cuisines.txt categories.txt \
+            classificator.txt colors.txt copyright.html countries.txt \
+            countries-strings \
+            drules_proto_default_dark.bin drules_proto_default_light.bin \
+            drules_proto_outdoors_dark.bin drules_proto_outdoors_dark.txt \
+            drules_proto_outdoors_light.bin drules_proto_outdoors_light.txt \
+            drules_proto_vehicle_dark.bin drules_proto_vehicle_light.bin \
+            editor.config faq.html fonts icudt78l.dat \
+            opening_hours_how_to_edit.html packed_polygons.bin patterns.txt \
+            strings symbols synonyms.txt transit_colors.txt types.txt \
+            World.mwm WorldCoasts.mwm \
+          )
+          for item in "${ITEMS[@]}"; do
+            src="$DATA_DIR/$item"
+            if [ ! -e "$src" ]; then
+              echo "error: required data item missing: $src" >&2
+              exit 1
+            fi
+            rsync -a --delete "$src" "$RES_DIR/"
+          done
     dependencies:
       - target: CoreApi
         embed: false

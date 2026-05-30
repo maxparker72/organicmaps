@@ -146,6 +146,10 @@ iphone/Maps/app.omaps/
 /cmake-build-*
 build/
 /build*/
+macos/build-release/
+
+# Claude Code local runtime state
+.claude/scheduled_tasks.lock
 
 qt/res/Info.plist
 

@@ -6,5 +6,10 @@
         "repo": "anthropics/claude-code"
       }
     }
+  },
+  "permissions": {
+    "allow": [
+      "Bash(xcodegen generate *)"
+    ]
   }
 }
