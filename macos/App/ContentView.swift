@@ -39,17 +39,21 @@ struct ContentView: View {
           // Gather every dropped URL first, then hand the whole batch to
           // ImportCoordinator. The coordinator skips its sheet for a
           // single-file drop, so casual single-file behaviour is preserved.
-          var urls: [URL] = []
+          // loadObject completes on background queues, so each result is stored
+          // on the main queue in its own slot, which also keeps the drop order.
+          var urls = [URL?](repeating: nil, count: providers.count)
           let group = DispatchGroup()
-          for provider in providers {
+          for (index, provider) in providers.enumerated() {
             group.enter()
             _ = provider.loadObject(ofClass: URL.self) { url, _ in
-              defer { group.leave() }
-              if let url { urls.append(url) }
+              DispatchQueue.main.async {
+                urls[index] = url
+                group.leave()
+              }
             }
           }
           group.notify(queue: .main) {
-            ImportCoordinator.shared.begin(urls)
+            ImportCoordinator.shared.begin(urls.compactMap { $0 })
           }
           return true
         }
