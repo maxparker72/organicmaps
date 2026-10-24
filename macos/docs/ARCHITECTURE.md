@@ -30,6 +30,7 @@ Rendering              libs/drape       Metal backend → MetalContextFactory (i
 - `Track::SetColor` writes only `m_rgba` on layer 0. Set both `m_predefinedColor` and `m_rgba` on every layer.
 - `Bookmark::SetIsVisible` is runtime-only. Hidden bookmarks reappear after a relaunch unless `m_data.m_visible` is also set.
 - `DeactivateMapSelection` clears the search pins unless viewport search is active, so the desktop refills them when the place page closes (`OMSearch.refillPins`).
+- After an import, `assignPaletteColorsToUncoloredBookmarks` gives bookmarks with `PredefinedColor::None` the nearest palette entry. Upstream has since added `GetCustomColor()` for custom bookmark colors. If upstream stores those as None plus RGBA, this repair would overwrite them, so re-check it during the rebase (T-030).
 - `GetBuildInfo().m_mercator` is the click point. Use the place's own coordinate (`info.GetMercator()`) for bookmarks, route stops and links.
 
 ## Lifecycle

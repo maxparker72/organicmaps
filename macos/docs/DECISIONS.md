@@ -61,7 +61,7 @@ The drape engine and its Metal context factory belong to an app-lifetime owner, 
 ## D-09 · Import never rewrites the user's styling
 *Accepted · Oct 2026*
 
-Imports keep the file's colors and line widths. Normalization is an explicit, undoable command.
+Imports keep the file's colors and line widths. Normalization is an explicit command (File menu). It isn't undoable yet; making it undoable is a follow-up.
 
 **Why:** Automatic normalization forced every track to width 5 and snapped colors, which silently destroyed imported styling (SPEC: LIB-06).
 

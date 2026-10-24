@@ -428,7 +428,7 @@
       "test": "untested",
       "scope": "Import keeps the file's colors and line widths. Normalization is opt-in, never automatic.",
       "accept": "Import a GPX with a 2px blue track: it stays 2px and blue.",
-      "notes": "Imports no longer rewrite track widths or colors (25a7503); acceptance check not run yet."
+      "notes": "Imports no longer rewrite track widths or colors (25a7503), and editing a track keeps its own color. Acceptance check not run yet. Re-check against upstream's custom bookmark colors on rebase."
     },
     {
       "fid": "LIB-07",
