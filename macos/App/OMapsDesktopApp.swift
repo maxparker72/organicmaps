@@ -25,7 +25,8 @@ struct OMapsDesktopApp: App {
   }
 
   var body: some Scene {
-    WindowGroup {
+    // A single main window: the map engine exists once per process (D-08).
+    Window("BDSM", id: "main") {
       ContentView()
     }
     .windowStyle(.titleBar)

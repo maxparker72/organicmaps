@@ -83,6 +83,29 @@
 {
   [super viewDidMoveToWindow];
   [self createEngineIfNeeded];
+
+  // The drape engine lives for the whole process and renders through m_contextFactory,
+  // which this view owns. Closing the map window would free the factory while render
+  // threads still use it, so the app quits with its map window instead (D-08).
+  if (self.window != nil)
+  {
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(windowWillClose:)
+                                               name:NSWindowWillCloseNotification
+                                             object:self.window];
+  }
+}
+
+- (void)viewWillMoveToWindow:(NSWindow *)newWindow
+{
+  if (self.window != nil)
+    [NSNotificationCenter.defaultCenter removeObserver:self name:NSWindowWillCloseNotification object:self.window];
+  [super viewWillMoveToWindow:newWindow];
+}
+
+- (void)windowWillClose:(NSNotification *)notification
+{
+  [NSApp terminate:nil];
 }
 
 - (void)createEngineIfNeeded
@@ -137,6 +160,9 @@
 - (void)setFrameSize:(NSSize)newSize
 {
   [super setFrameSize:newSize];
+  // SwiftUI may attach the view to its window before giving it a size; create the engine
+  // on the first real size in that case.
+  [self createEngineIfNeeded];
   [self updateSurfaceSize];
 }
 
