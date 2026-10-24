@@ -22,6 +22,13 @@ struct PlacePageView: View {
 
   private var isEditable: Bool { info.isBookmark || info.isTrack }
 
+  /// Identifies the selected bookmark or track. The pane is reused across
+  /// selections, so the editor is keyed on this and closed when it changes;
+  /// otherwise a form loaded for one item could save onto the next (LIB-02).
+  private var itemKey: String {
+    info.isBookmark ? "b\(info.bookmarkId)" : info.isTrack ? "t\(info.trackId)" : ""
+  }
+
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       header
@@ -32,6 +39,7 @@ struct PlacePageView: View {
           onSave: { editing = false; onChanged() },
           onCancel: { editing = false },
           onDelete: { editing = false; onDeleted() })
+        .id(itemKey)
       } else {
         readContent
       }
@@ -40,6 +48,7 @@ struct PlacePageView: View {
     .background(.regularMaterial)
     .onAppear { loadTrackStats() }
     .onChange(of: info.trackId) { _, _ in loadTrackStats() }
+    .onChange(of: itemKey) { _, _ in editing = false }
   }
 
   private func loadTrackStats() {
