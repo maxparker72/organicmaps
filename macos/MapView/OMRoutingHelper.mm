@@ -76,7 +76,7 @@ void AddCurrentPlaceAsPoint(OMRoutePointKind kind)
   data.m_pointType = ToMarkType(kind);
   if (kind == OMRoutePointKindIntermediate)
     data.m_intermediateIndex = f.GetRoutingManager().GetRoutePointsCount();
-  f.GetRoutingManager().AddRoutePoint(std::move(data));
+  f.GetRoutingManager().AddRoutePoint(std::move(data), false /* reorderIntermediatePoints */);
 }
 }  // namespace
 
@@ -156,12 +156,12 @@ void AddCurrentPlaceAsPoint(OMRoutePointKind kind)
   auto existing = rm.GetRoutePoints();
   if (existing.empty())
   {
-    rm.AddRoutePoint(std::move(newPoint));
+    rm.AddRoutePoint(std::move(newPoint), false /* reorderIntermediatePoints */);
   }
   else
   {
     rm.RemoveRoutePoints();
-    rm.AddRoutePoint(std::move(newPoint));
+    rm.AddRoutePoint(std::move(newPoint), false /* reorderIntermediatePoints */);
     for (size_t i = 0; i < existing.size(); ++i)
     {
       RouteMarkData d = existing[i];
@@ -175,7 +175,7 @@ void AddCurrentPlaceAsPoint(OMRoutePointKind kind)
         d.m_pointType = RouteMarkType::Intermediate;
         d.m_intermediateIndex = i;
       }
-      rm.AddRoutePoint(std::move(d));
+      rm.AddRoutePoint(std::move(d), false /* reorderIntermediatePoints */);
     }
   }
   [[OMRoutingHelper shared].delegate routingDidUpdate];
@@ -185,6 +185,8 @@ namespace
 {
 // Shared body for "add stop" — preserves start/finish; new point lands as an
 // intermediate at `targetIndex`, or fills the start/finish slot if missing.
+// Every AddRoutePoint call in this file passes reorderIntermediatePoints = false: the
+// engine's default re-sorts intermediates by proximity, which overrides the index chosen here.
 void AddStopForCurrentPlaceAt(size_t targetIndex)
 {
   auto & f = GetFramework();
@@ -218,7 +220,7 @@ void AddStopForCurrentPlaceAt(size_t targetIndex)
     data.m_pointType = RouteMarkType::Intermediate;
     data.m_intermediateIndex = targetIndex;
   }
-  rm.AddRoutePoint(std::move(data));
+  rm.AddRoutePoint(std::move(data), false /* reorderIntermediatePoints */);
 }
 }  // namespace
 
@@ -262,12 +264,12 @@ void AddStopForCurrentPlaceAt(size_t targetIndex)
   if (!hasStart)
   {
     data.m_pointType = RouteMarkType::Start;
-    rm.AddRoutePoint(std::move(data));
+    rm.AddRoutePoint(std::move(data), false /* reorderIntermediatePoints */);
   }
   else if (!hasFinish)
   {
     data.m_pointType = RouteMarkType::Finish;
-    rm.AddRoutePoint(std::move(data));
+    rm.AddRoutePoint(std::move(data), false /* reorderIntermediatePoints */);
   }
   else
   {
@@ -362,7 +364,7 @@ void AddStopForCurrentPlaceAt(size_t targetIndex)
 + (MWMTrackID)saveAsTrack
 {
   auto const trackId = GetFramework().GetRoutingManager().SaveRoute();
-  return static_cast<MWMTrackID>(trackId);
+  return trackId == kml::kInvalidTrackId ? 0 : static_cast<MWMTrackID>(trackId);
 }
 
 @end
