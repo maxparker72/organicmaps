@@ -79,6 +79,13 @@ NS_ASSUME_NONNULL_BEGIN
 // whose data was actually rewritten.
 + (NSInteger)normalizeAllItems;
 
+// Give bookmarks without a palette color (PredefinedColor::None/Count, common in
+// imported files) the nearest palette entry, so the navigator doesn't show them as
+// gray while the map draws them red. Leaves m_rgba, every other bookmark and every
+// track untouched. Run after imports; normalizeAllItems stays an explicit command.
+// Returns the count of bookmarks changed.
++ (NSInteger)assignPaletteColorsToUncoloredBookmarks;
+
 // Per-track statistics snapshot (length, ascent/descent, duration, point
 // count, date range). Returns nil if the track no longer exists.
 + (nullable OMTrackStats *)trackStatsForTrack:(MWMTrackID)trackId

@@ -411,6 +411,38 @@ bool NormalizeTrack(Track * track)
   return modified;
 }
 
++ (NSInteger)assignPaletteColorsToUncoloredBookmarks
+{
+  auto & bm = GetFramework().GetBookmarkManager();
+  auto session = bm.GetEditSession();
+  NSInteger modified = 0;
+  for (auto const groupId : bm.GetUnsortedBmGroupsIdList())
+  {
+    for (auto const markId : bm.GetUserMarkIds(groupId))
+    {
+      auto const * bookmark = bm.GetBookmark(markId);
+      if (bookmark == nullptr)
+        continue;
+      auto const predefined = bookmark->GetData().m_color.m_predefinedColor;
+      if (predefined != kml::PredefinedColor::None && predefined != kml::PredefinedColor::Count)
+        continue;
+      Bookmark * editable = session.GetBookmarkForEdit(markId);
+      kml::BookmarkData data = editable->GetData();
+      bool changed = false;
+      // Only the palette entry is taken from SnapColor; the file's own RGBA is kept.
+      data.m_color.m_predefinedColor = SnapColor(data.m_color, changed).m_predefinedColor;
+      editable->SetData(data);
+      ++modified;
+    }
+  }
+  if (modified > 0)
+  {
+    if (auto engine = GetFramework().GetDrapeEngine())
+      engine->InvalidateUserMarks();
+  }
+  return modified;
+}
+
 #pragma mark - Statistics
 
 + (nullable OMTrackStats *)trackStatsForTrack:(MWMTrackID)trackId
