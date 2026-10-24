@@ -80,7 +80,8 @@ OMPlaceInfo * BuildPlaceInfo()
   place.canAdd = info.ShouldShowAddPlace();
   place.bookmarkId = info.IsBookmark() ? info.GetBookmarkId() : 0;
   place.trackId = info.IsTrack() ? info.GetTrackId() : 0;
-  place.categoryId = info.GetBookmarkCategoryId();
+  auto const categoryId = info.GetBookmarkCategoryId();
+  place.categoryId = categoryId == kml::kInvalidMarkGroupId ? 0 : categoryId;
 
   using MetadataID = osm::MapObject::MetadataID;
   info.ForEachMetadataReadable([&place](MetadataID metaID, std::string const & value)

@@ -420,14 +420,18 @@ bool NormalizeTrack(Track * track)
 
 + (NSInteger)bookmarkCountForList:(MWMMarkGroupID)groupId
 {
-  return static_cast<NSInteger>(
-      GetFramework().GetBookmarkManager().GetUserMarkIds(static_cast<kml::MarkGroupId>(groupId)).size());
+  auto const & bm = GetFramework().GetBookmarkManager();
+  if (!bm.HasBmCategory(groupId))
+    return 0;
+  return static_cast<NSInteger>(bm.GetUserMarkIds(groupId).size());
 }
 
 + (NSInteger)trackCountForList:(MWMMarkGroupID)groupId
 {
-  return static_cast<NSInteger>(
-      GetFramework().GetBookmarkManager().GetTrackIds(static_cast<kml::MarkGroupId>(groupId)).size());
+  auto const & bm = GetFramework().GetBookmarkManager();
+  if (!bm.HasBmCategory(groupId))
+    return 0;
+  return static_cast<NSInteger>(bm.GetTrackIds(groupId).size());
 }
 
 #pragma mark - Batched mutations
@@ -557,9 +561,9 @@ kml::PredefinedColor KmlColorFromBookmarkColor(MWMBookmarkColor bookmarkColor)
   if (path.length == 0)
     return 0;
   auto const groupId = GetFramework().GetBookmarkManager().GetCategoryByFileName(std::string(path.UTF8String));
-  // kInvalidMarkGroupId is std::numeric_limits<MarkGroupId>::max() — *not* 0.
-  // Normalize misses to 0 so Swift callers can do the natural != 0 check
-  // without crashing in GetGroup if they hand the result on to the engine.
+  // kInvalidMarkGroupId is std::numeric_limits<MarkGroupId>::max(), not 0. The bridge
+  // reports "no list" as 0 everywhere. 0 is not a valid list id either, so every getter
+  // that takes a group id checks HasBmCategory before calling into the engine.
   if (groupId == kml::kInvalidMarkGroupId)
     return 0;
   return static_cast<MWMMarkGroupID>(groupId);
@@ -567,8 +571,10 @@ kml::PredefinedColor KmlColorFromBookmarkColor(MWMBookmarkColor bookmarkColor)
 
 + (NSArray<NSNumber *> *)bookmarkIdsInCategory:(MWMMarkGroupID)groupId
 {
-  auto const & ids = GetFramework().GetBookmarkManager().GetUserMarkIds(
-      static_cast<kml::MarkGroupId>(groupId));
+  auto const & bm = GetFramework().GetBookmarkManager();
+  if (!bm.HasBmCategory(groupId))
+    return @[];
+  auto const & ids = bm.GetUserMarkIds(groupId);
   NSMutableArray<NSNumber *> * result = [NSMutableArray arrayWithCapacity:ids.size()];
   for (auto markId : ids)
     [result addObject:@(static_cast<unsigned long long>(markId))];
@@ -577,8 +583,10 @@ kml::PredefinedColor KmlColorFromBookmarkColor(MWMBookmarkColor bookmarkColor)
 
 + (NSArray<NSNumber *> *)trackIdsInCategory:(MWMMarkGroupID)groupId
 {
-  auto const & ids = GetFramework().GetBookmarkManager().GetTrackIds(
-      static_cast<kml::MarkGroupId>(groupId));
+  auto const & bm = GetFramework().GetBookmarkManager();
+  if (!bm.HasBmCategory(groupId))
+    return @[];
+  auto const & ids = bm.GetTrackIds(groupId);
   NSMutableArray<NSNumber *> * result = [NSMutableArray arrayWithCapacity:ids.size()];
   for (auto trackId : ids)
     [result addObject:@(static_cast<unsigned long long>(trackId))];
