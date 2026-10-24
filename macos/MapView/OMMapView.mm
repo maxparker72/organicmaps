@@ -228,11 +228,18 @@
   CGFloat const h = self.bounds.size.height;
   if (w <= 0 || h <= 0)
     return;
-  // Trackpad two-finger scrolls pan the map (pinch handles zoom). A line-step
-  // mouse wheel reports much smaller integer deltas, so amplify those.
-  double const k = event.hasPreciseScrollingDeltas ? 1.0 : 16.0;
-  double const factorX = static_cast<double>(event.scrollingDeltaX) * k / static_cast<double>(w);
-  double const factorY = -static_cast<double>(event.scrollingDeltaY) * k / static_cast<double>(h);
+  // A line-step mouse wheel zooms around the pointer, matching the Qt app's step
+  // (about 12% per notch). Trackpads and other precise devices pan with two fingers;
+  // pinch handles their zoom.
+  if (!event.hasPreciseScrollingDeltas)
+  {
+    double const lines = static_cast<double>(event.scrollingDeltaY);
+    if (lines != 0)
+      GetFramework().Scale(std::exp(lines / 9.0), [self enginePointForEvent:event], false);
+    return;
+  }
+  double const factorX = static_cast<double>(event.scrollingDeltaX) / static_cast<double>(w);
+  double const factorY = -static_cast<double>(event.scrollingDeltaY) / static_cast<double>(h);
   GetFramework().Move(factorX, factorY, false);
 }
 
