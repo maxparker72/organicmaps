@@ -15,14 +15,14 @@ Tasks, commits and tests refer to these IDs, for example `[macos] LIB-06: Keep i
 - **P0** needed for the first tester build, **P1** for beta, **P2** nice to have, **P3** later or never.
 - `R-B`, `R-S` and `R-E` references point to findings in REVIEW-2026-10.md.
 
-Status on 2026-10-24: 21 built, 32 partial, 11 missing, 0 planned, 3 dropped.
+Status on 2026-10-24: 25 built, 28 partial, 11 missing, 0 planned, 3 dropped.
 
 ## Map and navigation (MAP)
 
 | ID | Feature | Pri | Built | Behaviour | Acceptance check | Known gaps |
 |---|---|---|---|---|---|---|
-| MAP-01 | Metal map view | P0 | Partial | Map renders through drape's Metal backend in an NSView backed by CAMetalLayer, Retina-correct, survives resize and moving between displays. | Resize the window and drag it between a Retina and non-Retina display: the map stays sharp, with no blank frames or crashes. | Engine is owned by the view and never torn down: closing the main window can crash, Cmd-N creates a second engine (R-B1). Rendering isn't paused when hidden (R-B8); on-map widgets keep the old scale after a display change (R-B9). |
-| MAP-02 | Pan and zoom | P0 | Partial | Trackpad: two-finger scroll pans, pinch zooms. Mouse: wheel zooms around the cursor, click-drag pans. Cmd +/- zoom. | With a plain mouse, the wheel zooms in and out around the pointer. With a trackpad, two-finger scroll pans. | Mouse wheel pans instead of zooming (OMMapView.mm scrollWheel). |
+| MAP-01 | Metal map view | P0 | Partial | Map renders through drape's Metal backend in an NSView backed by CAMetalLayer, Retina-correct, survives resize and moving between displays. | Resize the window and drag it between a Retina and non-Retina display: the map stays sharp, with no blank frames or crashes. | Single main window and quit-on-close prevent the second engine and the use-after-free (7b587a6, R-B1). Still open: rendering isn't paused when hidden (R-B8); on-map widgets keep the old scale after a display change (R-B9); app-lifetime engine owner (T-054). |
+| MAP-02 | Pan and zoom | P0 | Built | Trackpad: two-finger scroll pans, pinch zooms. Mouse: wheel zooms around the cursor, click-drag pans. Cmd +/- zoom. | With a plain mouse, the wheel zooms in and out around the pointer. With a trackpad, two-finger scroll pans. | Mouse wheel zooms around the pointer (b4f7867); acceptance check not run yet. |
 | MAP-03 | Map rotation | P1 | Partial | Trackpad twist rotates. Mouse: right-drag or Option-drag rotates. | Rotate the map with a mouse only, then reset with Orient North. | Only trackpad rotate works; mouse users can't rotate. |
 | MAP-04 | Orient north | P1 | Partial | Menu item and shortcut (Cmd-Shift-N) reset rotation; clicking the compass does the same. | Rotate, press the shortcut, map snaps north; click compass, same result. | Menu item has no shortcut; compass click unverified. |
 | MAP-05 | Scale ruler | P0 | Built | Engine ruler widget, respects measurement units. | Switch units in Settings: ruler changes between km and mi. |  |
@@ -66,7 +66,7 @@ Status on 2026-10-24: 21 built, 32 partial, 11 missing, 0 planned, 3 dropped.
 
 | ID | Feature | Pri | Built | Behaviour | Acceptance check | Known gaps |
 |---|---|---|---|---|---|---|
-| RTE-01 | Route planner | P0 | Partial | Planner panel with start/stops/end, drag to reorder, remove, distance and time. | Add start, two stops and end; reorder stops; the route rebuilds. | Engine reorders stops the bridge placed explicitly (reorderIntermediatePoints defaults to true, R-B3). |
+| RTE-01 | Route planner | P0 | Built | Planner panel with start/stops/end, drag to reorder, remove, distance and time. | Add start, two stops and end; reorder stops; the route rebuilds. | Stop reordering fixed (5a65322); acceptance check not run yet. |
 | RTE-02 | Routing profiles | P0 | Built | Car, walk, bike, transit, ruler. | Switch profile on the same points: route and time change. | Transit depends on transit data in the maps; untested. |
 | RTE-03 | Avoid options | P1 | Built | Tolls, motorways, ferries, unpaved. | Enable avoid tolls on a toll route: the route changes. |  |
 | RTE-04 | Defaults vs per-route options | P1 | Partial | Settings hold defaults. Planner changes apply to the current route only. | Change profile and avoid options in the planner, open Settings: defaults are unchanged. | Planner rewrites global defaults; Settings caption claims otherwise. |
@@ -78,12 +78,12 @@ Status on 2026-10-24: 21 built, 32 partial, 11 missing, 0 planned, 3 dropped.
 
 | ID | Feature | Pri | Built | Behaviour | Acceptance check | Known gaps |
 |---|---|---|---|---|---|---|
-| LIB-01 | Lists, bookmarks and tracks | P0 | Partial | Navigator panes: create, rename, delete lists; edit, move, delete items. | Create a list, add a bookmark, move it to another list, delete the list. | Lists and single items delete without confirmation or undo (R-S24). List count getters abort on a stale or 0 id (R-B2). |
-| LIB-02 | Metadata editing | P0 | Partial | Edit name, description, color, list and tags for items; name and description for lists. | Edit a bookmark's description, quit and relaunch: the edit persists. | The editor can save one item's fields onto another: open the editor on A, click B, Save (R-S1). |
+| LIB-01 | Lists, bookmarks and tracks | P0 | Partial | Navigator panes: create, rename, delete lists; edit, move, delete items. | Create a list, add a bookmark, move it to another list, delete the list. | Lists and single items delete without confirmation or undo (R-S24). Stale-id aborts fixed (ebd5d77). |
+| LIB-02 | Metadata editing | P0 | Built | Edit name, description, color, list and tags for items; name and description for lists. | Edit a bookmark's description, quit and relaunch: the edit persists. | Cross-item save fixed (38632c7); acceptance check not run yet. |
 | LIB-03 | Sorting and views | P1 | Built | Sort by date, name, distance, length; group by type; tree or column view. | Switch to column view and sort by length. |  |
 | LIB-04 | Type filter | P2 | Partial | One-click All / Bookmarks / Tracks filter in the navigator. | Choose Tracks: only tracks are listed. | Only grouping and filter-builder conditions exist. |
-| LIB-05 | Import | P0 | Partial | KML, KMZ, GPX, GeoJSON by menu, drag-and-drop, or folder; choose destination list, tag or project. | Drop a folder of GPX files: each lands in the chosen list with its names intact. | Import treats any list created during a batch as imported and may delete it (R-S4); a second batch's options are dropped. |
-| LIB-06 | Import keeps styling | P0 | Partial | Import keeps the file's colors and line widths. Normalization is opt-in, never automatic. | Import a GPX with a 2px blue track: it stays 2px and blue. | Every import forces width 5.0 and snaps colors to the palette. |
+| LIB-05 | Import | P0 | Partial | KML, KMZ, GPX, GeoJSON by menu, drag-and-drop, or folder; choose destination list, tag or project. | Drop a folder of GPX files: each lands in the chosen list with its names intact. | Import treats any list created during a batch as imported and may delete it (R-S4); a second batch's options are dropped. Multi-file drop race fixed (46db5fd). |
+| LIB-06 | Import keeps styling | P0 | Built | Import keeps the file's colors and line widths. Normalization is opt-in, never automatic. | Import a GPX with a 2px blue track: it stays 2px and blue. | Imports no longer rewrite track widths or colors (25a7503); acceptance check not run yet. |
 | LIB-07 | Export | P1 | Partial | Export a list, a selection, or a single track as KMZ, KML, GPX or GeoJSON. | Export one track as GPX and open it in another app. | List export works; single-track export has no UI. |
 | LIB-08 | Backup and restore | P1 | Partial | Back up the whole library to one KMZ; restore by import. | Back up, delete a list, import the backup: the list returns with tags. | Restore path untested. |
 | LIB-09 | Track styling | P2 | Partial | Color picker and stroke width for tracks. | Change a track's width: map updates immediately. | Color only, no width. A recolor is reverted by the next import, because SetColor leaves m_predefinedColor stale (R-B4). |

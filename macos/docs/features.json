@@ -21,18 +21,18 @@
       "test": "untested",
       "scope": "Map renders through drape's Metal backend in an NSView backed by CAMetalLayer, Retina-correct, survives resize and moving between displays.",
       "accept": "Resize the window and drag it between a Retina and non-Retina display: the map stays sharp, with no blank frames or crashes.",
-      "notes": "Engine is owned by the view and never torn down: closing the main window can crash, Cmd-N creates a second engine (R-B1). Rendering isn't paused when hidden (R-B8); on-map widgets keep the old scale after a display change (R-B9)."
+      "notes": "Single main window and quit-on-close prevent the second engine and the use-after-free (7b587a6, R-B1). Still open: rendering isn't paused when hidden (R-B8); on-map widgets keep the old scale after a display change (R-B9); app-lifetime engine owner (T-054)."
     },
     {
       "fid": "MAP-02",
       "category": "Map and navigation",
       "name": "Pan and zoom",
       "priority": "P0",
-      "status": "partial",
+      "status": "done",
       "test": "untested",
       "scope": "Trackpad: two-finger scroll pans, pinch zooms. Mouse: wheel zooms around the cursor, click-drag pans. Cmd +/- zoom.",
       "accept": "With a plain mouse, the wheel zooms in and out around the pointer. With a trackpad, two-finger scroll pans.",
-      "notes": "Mouse wheel pans instead of zooming (OMMapView.mm scrollWheel)."
+      "notes": "Mouse wheel zooms around the pointer (b4f7867); acceptance check not run yet."
     },
     {
       "fid": "MAP-03",
@@ -292,11 +292,11 @@
       "category": "Route planning",
       "name": "Route planner",
       "priority": "P0",
-      "status": "partial",
+      "status": "done",
       "test": "untested",
       "scope": "Planner panel with start/stops/end, drag to reorder, remove, distance and time.",
       "accept": "Add start, two stops and end; reorder stops; the route rebuilds.",
-      "notes": "Engine reorders stops the bridge placed explicitly (reorderIntermediatePoints defaults to true, R-B3)."
+      "notes": "Stop reordering fixed (5a65322); acceptance check not run yet."
     },
     {
       "fid": "RTE-02",
@@ -373,18 +373,18 @@
       "test": "untested",
       "scope": "Navigator panes: create, rename, delete lists; edit, move, delete items.",
       "accept": "Create a list, add a bookmark, move it to another list, delete the list.",
-      "notes": "Lists and single items delete without confirmation or undo (R-S24). List count getters abort on a stale or 0 id (R-B2)."
+      "notes": "Lists and single items delete without confirmation or undo (R-S24). Stale-id aborts fixed (ebd5d77)."
     },
     {
       "fid": "LIB-02",
       "category": "Bookmark library",
       "name": "Metadata editing",
       "priority": "P0",
-      "status": "partial",
+      "status": "done",
       "test": "untested",
       "scope": "Edit name, description, color, list and tags for items; name and description for lists.",
       "accept": "Edit a bookmark's description, quit and relaunch: the edit persists.",
-      "notes": "The editor can save one item's fields onto another: open the editor on A, click B, Save (R-S1)."
+      "notes": "Cross-item save fixed (38632c7); acceptance check not run yet."
     },
     {
       "fid": "LIB-03",
@@ -417,18 +417,18 @@
       "test": "untested",
       "scope": "KML, KMZ, GPX, GeoJSON by menu, drag-and-drop, or folder; choose destination list, tag or project.",
       "accept": "Drop a folder of GPX files: each lands in the chosen list with its names intact.",
-      "notes": "Import treats any list created during a batch as imported and may delete it (R-S4); a second batch's options are dropped."
+      "notes": "Import treats any list created during a batch as imported and may delete it (R-S4); a second batch's options are dropped. Multi-file drop race fixed (46db5fd)."
     },
     {
       "fid": "LIB-06",
       "category": "Bookmark library",
       "name": "Import keeps styling",
       "priority": "P0",
-      "status": "partial",
+      "status": "done",
       "test": "untested",
       "scope": "Import keeps the file's colors and line widths. Normalization is opt-in, never automatic.",
       "accept": "Import a GPX with a 2px blue track: it stays 2px and blue.",
-      "notes": "Every import forces width 5.0 and snaps colors to the palette."
+      "notes": "Imports no longer rewrite track widths or colors (25a7503); acceptance check not run yet."
     },
     {
       "fid": "LIB-07",
