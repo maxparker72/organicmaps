@@ -64,7 +64,7 @@ Resolve conflicts with these rules:
 ```sh
 cd macos && xcodegen generate && cd ..
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project macos/mapo.xcodeproj \
-  -scheme mapo -configuration Debug -destination 'platform=macOS' build 2>&1 | grep -E 'error:|BUILD'
+  -scheme mapo -configuration Debug -destination 'platform=macOS' build 2>&1 | grep -E 'error:|^\*\* BUILD'
 ```
 
 Known kinds of breakage, cheapest checks first:

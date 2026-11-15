@@ -33,7 +33,7 @@ Commit it: `[macos] Release <version> (<build>)`, signed off (`git commit -s`), 
 cd macos && xcodegen generate && cd ..
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project macos/mapo.xcodeproj -scheme mapo \
   -configuration Release -destination 'platform=macOS' -derivedDataPath macos/build-release build 2>&1 \
-  | grep -E 'error:|BUILD'
+  | grep -E 'error:|^\*\* BUILD'
 APP=macos/build-release/Build/Products/Release/mapo.app
 ```
 
@@ -72,12 +72,13 @@ open /Applications/mapo.app
 sleep 15
 pgrep -lf '/Applications/mapo.app'          # still running
 /usr/bin/log show --last 1m --style compact --predicate 'subsystem == "com.maxparker72.mapo"' \
-  | grep -E 'Writable Directory|Renderer|^.* E\(|^.* C\('
+  | grep -E 'Renderer| E\(| C\('            # a Metal renderer line, no E( or C( lines
 ls ~/Library/Logs/DiagnosticReports | grep -i mapo   # no new crash report
+ls ~/Library/Application\ Support/com.maxparker72.mapo  # bookmarks/, settings.ini (or the user's override)
 ```
 
-Use `/usr/bin/log`: in zsh, plain `log` is a shell builtin. Expect the writable directory to be
-`~/Library/Application Support/com.maxparker72.mapo/` (or the user's override) and a Metal renderer line.
+Use `/usr/bin/log`: in zsh, plain `log` is a shell builtin. Release builds don't log debug lines such as
+the data folders.
 Leave the app running for the user.
 
 ## 7. Finish
