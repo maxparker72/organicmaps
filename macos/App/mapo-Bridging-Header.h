@@ -21,3 +21,4 @@
 #import <CoreApi/MWMBookmark.h>
 #import <CoreApi/MWMTrack.h>
 #import <CoreApi/MWMFrameworkHelper.h>
+#import <CoreApi/Logger.h>

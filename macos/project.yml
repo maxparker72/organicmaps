@@ -1,7 +1,7 @@
-name: OMapsDesktop
+name: mapo
 
 options:
-  bundleIdPrefix: app.organicmaps.desktop
+  bundleIdPrefix: com.maxparker72
   developmentLanguage: en
   createIntermediateGroups: true
   deploymentTarget:
@@ -70,7 +70,7 @@ targets:
     settings:
       base:
         PRODUCT_NAME: CoreApi
-        PRODUCT_BUNDLE_IDENTIFIER: app.organicmaps.desktop.CoreApi
+        PRODUCT_BUNDLE_IDENTIFIER: com.maxparker72.mapo.CoreApi
         MACH_O_TYPE: staticlib
         DEFINES_MODULE: YES
         MODULEMAP_FILE: ../iphone/CoreApi/CoreApi.modulemap
@@ -88,7 +88,7 @@ targets:
           - $(OMIM_ROOT)/3party/glm
           - $(OMIM_ROOT)/3party/pugixml/pugixml/src
 
-  OMapsDesktop:
+  mapo:
     type: application
     platform: macOS
     deploymentTarget: "14.0"
@@ -104,18 +104,20 @@ targets:
       - path: ../iphone/Maps/Core/MapRendering/MetalContextFactory.mm
     settings:
       base:
-        PRODUCT_NAME: BDSM
-        PRODUCT_BUNDLE_IDENTIFIER: app.organicmaps.desktop
+        PRODUCT_NAME: mapo
+        PRODUCT_BUNDLE_IDENTIFIER: com.maxparker72.mapo
         INFOPLIST_FILE: Info.plist
         GENERATE_INFOPLIST_FILE: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        MARKETING_VERSION: "0.1.0"
-        CURRENT_PROJECT_VERSION: "alpha1"
+        # The only place the version lives. Date-based like upstream, because the engine sends it to the
+        # map servers (X-OM-AppVersion). Core/PlatformVersion.mm reads it from Info.plist.
+        MARKETING_VERSION: "2026.11.15"
+        CURRENT_PROJECT_VERSION: "1"
         SDKROOT: macosx
         SUPPORTED_PLATFORMS: macosx
         MACOSX_DEPLOYMENT_TARGET: "14.0"
         SWIFT_VERSION: "5.5"
-        SWIFT_OBJC_BRIDGING_HEADER: App/OMapsDesktop-Bridging-Header.h
+        SWIFT_OBJC_BRIDGING_HEADER: App/mapo-Bridging-Header.h
         CLANG_ENABLE_MODULES: YES
         CLANG_ENABLE_OBJC_ARC: YES
         CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES: YES
@@ -161,15 +163,12 @@ targets:
           mkdir -p "$RES_DIR"
           ITEMS=( \
             categories_brands.txt categories_cuisines.txt categories.txt \
-            classificator.txt colors.txt copyright.html countries.txt \
+            classificator.txt colors.txt copyright.html countries.json \
             countries-strings \
-            drules_proto_default_dark.bin drules_proto_default_light.bin \
-            drules_proto_outdoors_dark.bin drules_proto_outdoors_dark.txt \
-            drules_proto_outdoors_light.bin drules_proto_outdoors_light.txt \
-            drules_proto_vehicle_dark.bin drules_proto_vehicle_light.bin \
+            drules_default.bin drules_outdoors.bin drules_vehicle.bin \
             editor.config faq.html fonts icudt78l.dat \
             opening_hours_how_to_edit.html packed_polygons.bin patterns.txt \
-            strings symbols synonyms.txt transit_colors.txt types.txt \
+            strings symbols synonyms.txt transit_colors.txt twm_grid.json types.txt \
             World.mwm WorldCoasts.mwm \
           )
           for item in "${ITEMS[@]}"; do
@@ -235,16 +234,13 @@ targets:
       - sdk: libz.tbd
 
 schemes:
-  OMapsDesktop:
+  mapo:
     build:
       targets:
-        OMapsDesktop: all
+        mapo: all
     run:
       config: Debug
-      # Point the engine at the repo data dir (styles, fonts, World.mwm, classificator)
-      # instead of bundling hundreds of MB. Dev-only; refine before distribution.
-      environmentVariables:
-        MWM_RESOURCES_DIR: /Users/maxwellparker/Development/organicmaps/data
-        MWM_WRITABLE_DIR: /Users/maxwellparker/Library/Application Support/OMapsDesktop
     profile:
+      config: Release
+    archive:
       config: Release

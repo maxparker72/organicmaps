@@ -681,7 +681,7 @@
       "test": "untested",
       "scope": "Decide: build it, or remove it from the README.",
       "accept": "",
-      "notes": "README claims it; no code exists."
+      "notes": "No code exists. The README no longer claims it."
     },
     {
       "fid": "PLAT-02",
@@ -698,23 +698,23 @@
       "fid": "PLAT-03",
       "category": "Platform and distribution",
       "name": "Signed and notarized",
-      "priority": "P1",
+      "priority": "P3",
       "status": "missing",
       "test": "untested",
       "scope": "Developer ID signature, hardened runtime, notarized and stapled.",
-      "accept": "spctl -a -vv BDSM.app reports 'accepted, Notarized Developer ID'.",
-      "notes": "Ad-hoc signed; no hardened runtime."
+      "accept": "spctl -a -vv mapo.app reports 'accepted, Notarized Developer ID'.",
+      "notes": "Deferred (Nov 2026): personal use only, so builds are ad-hoc signed and installed locally (T-008). Needed only to share the app."
     },
     {
       "fid": "PLAT-04",
       "category": "Platform and distribution",
       "name": "App identity",
       "priority": "P0",
-      "status": "missing",
+      "status": "done",
       "test": "untested",
       "scope": "Own bundle ID and name, version from one place, correct strings throughout.",
       "accept": "About window and Info.plist show the same version; no 'Organic Maps' product strings remain.",
-      "notes": "Bundle ID is upstream's; version hard-coded in PlatformVersion.cpp."
+      "notes": "Renamed to mapo, bundle ID com.maxparker72.mapo, version only in project.yml MARKETING_VERSION, data in Application Support/com.maxparker72.mapo (Nov 2026). Acceptance check not run yet."
     },
     {
       "fid": "PLAT-05",

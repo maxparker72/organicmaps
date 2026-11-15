@@ -32,15 +32,15 @@ Note: in zsh, write `"${B}:path"`, not `$B:path` (`:l`, `:h` etc. are history mo
 
 ## 2. Protect the user's data
 
-The Debug scheme runs against the user's real library. Before the first launch of a merged build:
+Debug and Release builds share the user's real library. Before the first launch of a merged build:
 
 ```sh
 D="$HOME/Library/Application Support/mapo-backups/pre-sync-$(date +%F)"
-mkdir -p "$D" && cp -cR "$HOME/Library/Application Support/OMapsDesktop/bookmarks" "$D/"
+mkdir -p "$D" && cp -cR "$HOME/Library/Application Support/com.maxparker72.mapo/bookmarks" "$D/"
 ```
 
 (`cp -c` makes an APFS clone: instant, no extra space.) Maps can be re-downloaded and aren't backed up.
-If the data folder has moved (rename to mapo), use the path from `MWM_WRITABLE_DIR` in `macos/project.yml`.
+If the user moved the data folder in Settings, back up that folder instead (`defaults read com.maxparker72.mapo OMDataDirectoryOverride`).
 
 ## 3. Merge on a throwaway branch
 
@@ -63,11 +63,13 @@ Resolve conflicts with these rules:
 
 ```sh
 cd macos && xcodegen generate && cd ..
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project macos/OMapsDesktop.xcodeproj \
-  -scheme OMapsDesktop -configuration Debug -destination 'platform=macOS' build 2>&1 | grep -E 'error:|BUILD'
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project macos/mapo.xcodeproj \
+  -scheme mapo -configuration Debug -destination 'platform=macOS' build 2>&1 | grep -E 'error:|BUILD'
 ```
 
 Known kinds of breakage, cheapest checks first:
+- **Data files renamed or added upstream** (`data/`). Release bundles a fixed list in `project.yml`; compare it
+  with the `data/` files the iOS app bundles, or a Release build fails or starts without styles.
 - **Library projects added/removed upstream.** Compare `macos/project.yml` `projectReferences` and
   `dependencies` with the projects in `xcode/omim.xcworkspace/contents.xcworkspacedata` and the `lib*.a`
   linked by `iphone/Maps/Maps.xcodeproj`. Delete stale `xcode/<lib>/` folders that only hold `xcuserdata`.
@@ -84,10 +86,9 @@ Known kinds of breakage, cheapest checks first:
 
 1. Launch through LaunchServices (a bare binary launch may show no window):
    ```sh
-   APP=$(DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project macos/OMapsDesktop.xcodeproj \
-     -scheme OMapsDesktop -configuration Debug -showBuildSettings 2>/dev/null | awk -F' = ' '/ CODESIGNING_FOLDER_PATH /{print $2}')
-   open -n --env MWM_RESOURCES_DIR="$PWD/data" --env "MWM_WRITABLE_DIR=<from project.yml>" \
-     --stdout "$LOG" --stderr "$LOG" "$APP"
+   APP=$(DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project macos/mapo.xcodeproj \
+     -scheme mapo -configuration Debug -showBuildSettings 2>/dev/null | awk -F' = ' '/ CODESIGNING_FOLDER_PATH /{print $2}')
+   open -n --stdout "$LOG" --stderr "$LOG" "$APP"   # the app sets its own data folders
    ```
 2. After ~15 s: process alive; `grep -E '^E\(|^C\(|ASSERT|CHECK' "$LOG"` is empty; a `screencapture -x`
    shows the map with bookmarks in their colors.

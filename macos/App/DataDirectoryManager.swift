@@ -1,51 +1,65 @@
 import AppKit
 import Foundation
 
-/// User-chosen override for the engine's writable directory (where bookmarks,
-/// downloaded MWMs, and settings live). Reads from NSUserDefaults and exports
-/// it to the C++ `Platform` via the `MWM_WRITABLE_DIR` env var at app launch.
-/// Changes only take effect after the app is relaunched (the Platform reads
-/// the env var once in its constructor — see libs/platform/platform_mac.mm).
+/// Chooses the engine's folders and exports them as `MWM_RESOURCES_DIR` and
+/// `MWM_WRITABLE_DIR`, which `libs/platform/platform_mac.mm` reads once (both
+/// must be set). The writable folder holds bookmarks, downloaded maps and
+/// settings; the user can move it in Settings, which takes effect on relaunch.
 enum DataDirectoryManager {
   private static let overrideKey = "OMDataDirectoryOverride"
+  /// Fixed folder name, independent of the app's display name, so renaming the
+  /// app never strands the user's data.
+  private static let folderName = "com.maxparker72.mapo"
   private static var defaults: UserDefaults { .standard }
 
-  /// Called from `OMapsDesktopApp.init()` *before* any C++ code touches the
-  /// `Platform` singleton. If the user has chosen a custom data folder, set
-  /// the env vars `platform_mac.mm` looks at; otherwise leave the launch
-  /// environment alone so the existing fallbacks (Xcode scheme env, then
-  /// `~/Library/Application Support/OMapsData/`) apply.
-  static func applyOverrideIfPresent() {
-    guard let path = defaults.string(forKey: overrideKey) else { return }
+  /// Called from `MapoApp.init()` *before* any C++ code touches `Platform`.
+  /// Variables already in the launch environment win, for debugging.
+  static func configureEnvironment() {
+    if getenv("MWM_RESOURCES_DIR") == nil {
+      setenv("MWM_RESOURCES_DIR", resourcesDirectory().path + "/", 1)
+    }
+    if getenv("MWM_WRITABLE_DIR") == nil {
+      let writable = usableOverride() ?? defaultDirectory()
+      try? FileManager.default.createDirectory(at: writable, withIntermediateDirectories: true)
+      setenv("MWM_WRITABLE_DIR", writable.path + "/", 1)
+    }
+  }
+
+  /// Debug builds read the repo's `data/` (found from this source file's path),
+  /// so style and data edits show up without a Release build. Release builds use
+  /// the copy bundled into Resources.
+  private static func resourcesDirectory() -> URL {
+    #if DEBUG
+    let repo = URL(fileURLWithPath: #filePath)
+      .deletingLastPathComponent()  // App
+      .deletingLastPathComponent()  // macos
+      .deletingLastPathComponent()
+    let data = repo.appendingPathComponent("data", isDirectory: true)
+    if FileManager.default.fileExists(atPath: data.path) { return data }
+    #endif
+    return URL(fileURLWithPath: Bundle.main.resourcePath!, isDirectory: true)
+  }
+
+  private static func usableOverride() -> URL? {
+    guard let path = defaults.string(forKey: overrideKey) else { return nil }
     var isDir: ObjCBool = false
     let exists = FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
     guard exists, isDir.boolValue, FileManager.default.isWritableFile(atPath: path) else {
-      NSLog("[OMaps] Data folder override '\(path)' is missing or not writable; falling back.")
-      return
+      NSLog("[mapo] Data folder override '\(path)' is missing or not writable; using the default.")
+      return nil
     }
-    setenv("MWM_WRITABLE_DIR", path, 1)
-    // platform_mac.mm only takes the env-var branch when both vars are set
-    // together. Dev builds get MWM_RESOURCES_DIR from the Xcode scheme; a
-    // shipped binary does not, so fall back to the app bundle Resources.
-    if getenv("MWM_RESOURCES_DIR") == nil, let resources = Bundle.main.resourcePath {
-      setenv("MWM_RESOURCES_DIR", resources + "/", 1)
-    }
+    return URL(fileURLWithPath: path, isDirectory: true)
   }
 
-  /// The directory the engine is *actually* using right now. Override wins;
-  /// otherwise reflect whatever the launch environment resolved to.
+  /// The directory the engine is actually using, as set by configureEnvironment().
   static func currentDirectory() -> URL {
-    if let path = defaults.string(forKey: overrideKey) { return URL(fileURLWithPath: path) }
-    if let env = ProcessInfo.processInfo.environment["MWM_WRITABLE_DIR"] {
-      return URL(fileURLWithPath: env)
-    }
+    if let env = getenv("MWM_WRITABLE_DIR") { return URL(fileURLWithPath: String(cString: env), isDirectory: true) }
     return defaultDirectory()
   }
 
-  /// Mirrors the shipped-app fallback in `platform_mac.mm` lines 103–114.
   static func defaultDirectory() -> URL {
     let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-    return support.appendingPathComponent("OMapsData", isDirectory: true)
+    return support.appendingPathComponent(folderName, isDirectory: true)
   }
 
   static var hasOverride: Bool { defaults.string(forKey: overrideKey) != nil }

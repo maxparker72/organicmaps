@@ -86,5 +86,3 @@ Keep this table current. Each row costs time on every upstream sync (D-05).
 - **Known gaps:**
   - arm64-only (R-E7)
   - no hardened runtime (R-E8)
-  - hard-coded scheme paths (R-E3)
-  - version stored in two places (R-E5)

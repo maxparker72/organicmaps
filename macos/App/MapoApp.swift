@@ -15,18 +15,21 @@ extension Notification.Name {
 }
 
 @main
-struct OMapsDesktopApp: App {
+struct MapoApp: App {
   @Environment(\.openWindow) private var openWindow
 
   init() {
-    // Set MWM_WRITABLE_DIR from user override before anything constructs the
-    // C++ Platform singleton (which reads it once and caches the path).
-    DataDirectoryManager.applyOverrideIfPresent()
+    // Touching CoreApi's Logger installs its hooks, so engine logs reach the
+    // unified log (subsystem com.maxparker72.mapo) instead of a lost stderr.
+    _ = Logger.canLog(.info)
+    // Before anything constructs the C++ Platform singleton, which reads the
+    // data folders once and caches them.
+    DataDirectoryManager.configureEnvironment()
   }
 
   var body: some Scene {
     // A single main window: the map engine exists once per process (D-08).
-    Window("BDSM", id: "main") {
+    Window("mapo", id: "main") {
       ContentView()
     }
     .windowStyle(.titleBar)
