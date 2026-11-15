@@ -3,6 +3,7 @@
 #include "map/framework.hpp"
 
 #include "platform/platform.hpp"
+#include "platform/preferred_languages.hpp"
 #include "platform/settings.hpp"
 
 #include "base/logging.hpp"
@@ -38,7 +39,7 @@ DEFINE_string(data_path, "", "Path to data directory.");
 DEFINE_string(log_abort_level, base::ToString(base::GetDefaultLogAbortLevel()),
               "Log messages severity that causes termination.");
 DEFINE_string(resources_path, "", "Path to resources directory.");
-DEFINE_string(lang, "", "Device language.");
+DEFINE_string(lang, "", "Preferred language override.");
 
 #if defined(OMIM_OS_MAC) || defined(OMIM_OS_LINUX) || defined(OMIM_OS_WINDOWS)
 drape_ptr<dp::GraphicsContextFactory> CreateContextFactory(GLFWwindow * window, dp::ApiVersion api, m2::PointU size);
@@ -213,6 +214,9 @@ int main(int argc, char * argv[])
   gflags::SetVersionString(platform.Version());
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
+  if (!FLAGS_lang.empty())
+    languages::SetPreferredLanguageOverride(FLAGS_lang);
+
   if (!FLAGS_resources_path.empty())
     platform.SetResourceDir(FLAGS_resources_path);
   if (!FLAGS_data_path.empty())
@@ -260,9 +264,6 @@ int main(int argc, char * argv[])
   if (!settings::Get(settings::kDeveloperMode, outvalue))
     settings::Set(settings::kDeveloperMode, true);
 
-  if (!FLAGS_lang.empty())
-    (void)::setenv("LANGUAGE", FLAGS_lang.c_str(), 1);
-
   FrameworkParams frameworkParams;
   Framework framework(frameworkParams);
 
@@ -276,6 +277,8 @@ int main(int argc, char * argv[])
       .m_visualScale = visualScale,
       .m_surfaceWidth = fbWidth,
       .m_surfaceHeight = fbHeight,
+      .m_widgetsInitInfo = {},
+      .m_hints = {},
       .m_renderInjectionHandler = [&](ref_ptr<dp::GraphicsContext> context, ref_ptr<dp::TextureManager> textureManager,
                                       ref_ptr<gpu::ProgramManager> programManager, bool shutdown)
   {
@@ -395,26 +398,28 @@ int main(int argc, char * argv[])
       return;
 
     auto const & storage = framework.GetStorage();
-    auto status = storage.CountryStatusEx(countryId);
+    storage::NodeAttrs attrs;
+    storage.GetNodeAttrs(countryId, attrs);
+    auto const status = attrs.m_status;
     auto const & countryName = countryId;
 
-    if (status == storage::Status::NotDownloaded)
+    if (status == storage::NodeStatus::NotDownloaded)
     {
       std::string units;
       size_t sizeToDownload = 0;
-      FormatMapSize(storage.CountrySizeInBytes(countryId).second, units, sizeToDownload);
+      FormatMapSize(attrs.m_downloadSize, units, sizeToDownload);
       std::stringstream str;
       str << "Download (" << countryName << ") " << sizeToDownload << units;
       downloadButtonLabel = str.str();
     }
-    else if (status == storage::Status::InQueue)
+    else if (status == storage::NodeStatus::InQueue)
     {
       std::stringstream str;
       str << countryName << " is waiting for downloading";
       downloadStatusLabel = str.str();
     }
-    else if (status != storage::Status::Downloading && status != storage::Status::OnDisk &&
-             status != storage::Status::OnDiskOutOfDate)
+    else if (status != storage::NodeStatus::Downloading && status != storage::NodeStatus::Applying &&
+             status != storage::NodeStatus::OnDisk && status != storage::NodeStatus::OnDiskOutOfDate)
     {
       std::stringstream str;
       str << "Retry to download " << countryName;
@@ -426,13 +431,18 @@ int main(int argc, char * argv[])
   framework.GetStorage().Subscribe(
       [&](storage::CountryId const & countryId)
   {
-    // Storage also calls notifications for parents, but we are interested in leafs only.
-    if (framework.GetStorage().IsLeaf(countryId))
+    // Storage also notifies the parents and the regions sharing terrain: refresh the current country only.
+    if (countryId == lastCountry)
       onCountryChanged(countryId);
-  }, [&](storage::CountryId const & countryId, downloader::Progress const & progress)
+  }, [&](storage::CountryId const & countryId, storage::Progress const & progress)
   {
+    auto const combined = progress.GetCombined();
+    if (countryId != lastCountry || combined.m_bytesTotal == 0)
+      return;
+
+    auto const percent = combined.m_bytesDownloaded * 100 / combined.m_bytesTotal;
     std::stringstream str;
-    str << "Downloading (" << countryId << ") " << (progress.m_bytesDownloaded * 100 / progress.m_bytesTotal) << "%";
+    str << "Downloading (" << countryId << ") " << percent << "%";
     downloadStatusLabel = str.str();
     framework.MakeFrameActive();
   });
@@ -564,7 +574,8 @@ int main(int argc, char * argv[])
         CreateDrapeEngine(apiVersion);
         framework.EnableDebugRectRendering(enableDebugRectRendering);
         framework.GetDrapeEngine()->SetPosteffectEnabled(df::PostprocessRenderer::Antialiasing, enableAA);
-        framework.GetDrapeEngine()->SetTileBackgroundMode(static_cast<dp::BackgroundMode>(currentTileBackground));
+        framework.GetDrapeEngine()->SetTileBackgroundMode(static_cast<dp::BackgroundMode>(currentTileBackground),
+                                                          0.5f /* satelliteAreaOpacity */);
       }
     }
     if (ImGui::Checkbox("Debug rect rendering", &enableDebugRectRendering))
@@ -624,7 +635,8 @@ int main(int argc, char * argv[])
     if (ImGui::Combo("Tile Background", &currentTileBackground, tileBackgroundLabels,
                      IM_ARRAYSIZE(tileBackgroundLabels)))
     {
-      framework.GetDrapeEngine()->SetTileBackgroundMode(static_cast<dp::BackgroundMode>(currentTileBackground));
+      framework.GetDrapeEngine()->SetTileBackgroundMode(static_cast<dp::BackgroundMode>(currentTileBackground),
+                                                        0.5f /* satelliteAreaOpacity */);
     }
     ImGui::NewLine();
     ImGui::Separator();

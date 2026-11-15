@@ -202,6 +202,7 @@
     <string name="type.barrier.city_wall">Міська стіна</string>
     <string name="type.barrier.cycle_barrier">Велосипедна перешкода</string>
     <string name="type.waterway.ditch">Дренажна канава</string>
+    <string name="type.waterway.ditch.intermittent">Пересихаюча дренажна канава</string>
     <string name="type.natural.water.moat">Рів</string>
     <string name="type.natural.water.wastewater">Стічні води</string>
     <string name="type.barrier.entrance">Прохід</string>
@@ -387,49 +388,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Дорога</string>
     <string name="type.highway.bridleway">Кінна доріжка</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Міст</string>
     <string name="type.highway.bridleway.permissive">Кінна доріжка</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Тунель</string>
     <string name="type.highway.busway">Виділена автобусна дорога</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Тунель</string>
     <string name="type.highway.bus_stop">Зупинка</string>
     <string name="type.highway.construction">Дорога, що будується</string>
     <string name="type.highway.cycleway">Велодоріжка</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Міст</string>
     <string name="type.highway.cycleway.permissive">Велодоріжка</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Тунель</string>
     <string name="type.highway.elevator">Ліфт</string>
     <string name="type.highway.footway">Пішохідна доріжка</string>
     <string name="type.highway.footway.sidewalk">Тротуар</string>
     <string name="type.highway.footway.crossing">Пішохідний перехід</string>
     <string name="type.highway.footway.area">Пішохідна зона</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Тунель</string>
     <string name="type.highway.ford">Брід</string>
     <string name="type.highway.living_street">Житлова зона</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Тунель</string>
     <string name="type.highway.motorway">Автомагістраль</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Тунель</string>
     <string name="type.highway.motorway_junction">З\'їзд</string>
     <string name="type.highway.motorway_link">З\'їзд з автомагістралі</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Тунель</string>
     <string name="type.highway.path">Стежка</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -438,103 +439,104 @@
     <string name="type.highway.path.expert">Дуже складна або невиразна стежка</string>
     <string name="type.highway.path.bicycle">Велопішохідна доріжка</string>
     <string name="type.highway.footway.bicycle">Велопішохідна доріжка</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Міст</string>
     <string name="type.highway.path.horse">Кінна стежка</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Тунель</string>
     <string name="type.highway.pedestrian">Пішохідна вулиця</string>
     <string name="type.highway.pedestrian.area">Пішохідна зона</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Тунель</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.highway.platform">Платформа</string>
     <string name="type.highway.primary">Шосе</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Тунель</string>
     <string name="type.highway.primary_link">З\'їзд з шосе</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Тунель</string>
     <string name="type.highway.raceway">Гоночний трек</string>
     <string name="type.highway.residential">Вулиця</string>
     <string name="type.highway.residential.area">Вулиця</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Тунель</string>
     <string name="type.highway.rest_area">Зона відпочинку</string>
     <string name="type.highway.road">Дорога</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Міст</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Тунель</string>
     <string name="type.highway.secondary">Автодорога</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Тунель</string>
     <string name="type.highway.secondary_link">З\'їзд з автодороги</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Тунель</string>
     <string name="type.highway.service">Проїзд</string>
     <string name="type.highway.service.area">Проїзд</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Міст</string>
     <string name="type.highway.service.driveway">Під\'їзд</string>
     <string name="type.highway.service.parking_aisle">Паркувальний проїзд</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Тунель</string>
     <string name="type.highway.services">Зона обслуговування</string>
     <string name="type.highway.speed_camera">Камера швидкості</string>
     <string name="type.highway.steps">Сходи</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Тунель</string>
     <string name="type.highway.ladder">Драбина</string>
     <string name="type.highway.tertiary">Дорога</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Тунель</string>
     <string name="type.highway.tertiary_link">З\'їзд з дороги</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Тунель</string>
     <string name="type.highway.track">Ґрунтівка</string>
     <string name="type.highway.track.area">Ґрунтівка</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Міст</string>
     <string name="type.highway.track.grade1">Ґрунтівка</string>
     <string name="type.highway.track.no.access">Ґрунтівка</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Тунель</string>
     <string name="type.highway.traffic_signals">Світлофор</string>
     <string name="type.highway.trunk">Траса</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Тунель</string>
     <string name="type.highway.trunk_link">З\'їзд з траси</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Тунель</string>
     <string name="type.highway.unclassified">Невелика дорога</string>
     <string name="type.highway.unclassified.area">Невелика дорога</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Міст</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Тунель</string>
     <string name="type.area_highway.cycleway">Велодоріжка</string>
     <string name="type.area_highway.footway">Пішохідна доріжка</string>
@@ -572,6 +574,7 @@
     <string name="type.historic.castle.shiro">Японський замок</string>
     <string name="type.historic.castle.stately">Шато</string>
     <string name="type.historic.city_gate">Міська брама</string>
+    <string name="type.man_made.ceremonial_gate">Церемоніальна брама</string>
     <string name="type.historic.citywalls">Міська стіна</string>
     <string name="type.historic.fort">Форт</string>
     <string name="type.historic.gallows">Шибениця</string>
@@ -605,6 +608,7 @@
     <string name="type.landuse">Землевикористання</string>
     <string name="type.landuse.allotments">Земельні ділянки</string>
     <string name="type.landuse.basin">Резервуар</string>
+    <string name="type.landuse.basin.intermittent">Пересихаючий резервуар</string>
     <string name="type.landuse.brownfield">Земля для будівництва</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Цвинтар</string>
@@ -635,7 +639,6 @@
     <string name="type.landuse.quarry">Кар\'єр</string>
     <string name="type.landuse.railway">Залізничні споруди</string>
     <string name="type.landuse.recreation_ground">База відпочинку</string>
-    <string name="type.landuse.reservoir">Водоймище</string>
     <string name="type.landuse.residential">Житлова зона</string>
     <string name="type.landuse.retail">Зона торгівлі</string>
     <string name="type.landuse.salt_pond">Соляний став</string>
@@ -657,6 +660,7 @@
     <string name="type.leisure.ice_rink">Каток</string>
     <string name="type.leisure.marina">Пристань</string>
     <string name="type.leisure.nature_reserve">Заповідник</string>
+    <string name="type.leisure.bird_hide">Укриття для спостереження за птахами</string>
     <string name="type.leisure.outdoor_seating">Сидіння на відкритому повітрі</string>
     <string name="type.leisure.firepit">Вогняна яма</string>
     <string name="type.leisure.park">Парк</string>
@@ -691,6 +695,8 @@
     <string name="type.man_made.pier">Пірс</string>
     <string name="type.man_made.pipeline">Трубопровід</string>
     <string name="type.man_made.pipeline.overground">Наземний трубопровід</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Критий резервуар</string>
     <string name="type.man_made.silo">Силос</string>
     <string name="type.man_made.storage_tank">Резервуар</string>
     <string name="type.man_made.surveillance">Камера спостереження</string>
@@ -709,6 +715,8 @@
     <string name="type.man_made.water_tower">Водонапірна вежа</string>
     <string name="type.man_made.water_well">Криниця</string>
     <string name="type.man_made.water_well.drinking_water_no">Криниця</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Водопровідна станція</string>
     <string name="type.man_made.windmill">Вітряний млин</string>
     <string name="type.man_made.works">Промислове виробництво</string>
     <string name="type.military">Військові об\'єкти</string>
@@ -743,10 +751,13 @@
     <string name="type.natural.water.reservoir">Водосховище</string>
     <string name="type.natural.water.basin">Резервуар</string>
     <string name="type.natural.water.river">Річка</string>
+    <string name="type.natural.water.intermittent">Пересихаюче водоймище</string>
     <string name="type.natural.land">Суша</string>
     <string name="type.natural.meadow">Луг</string>
     <string name="type.natural.orchard">Сад</string>
     <string name="type.natural.peak">Гора</string>
+    <string name="type.natural.hill">Пагорб</string>
+    <string name="type.natural.arch">Скельна арка</string>
     <string name="type.natural.saddle">Сідловина</string>
     <string name="type.natural.rock">Камінь</string>
     <string name="type.natural.scrub">Зарості</string>
@@ -838,6 +849,7 @@
     <string name="type.psurface.unpaved_bad">psurface-unpaved_bad</string>
     <string name="type.psurface.unpaved_good">psurface-unpaved_good</string>
     <string name="type.public_transport">Громадський транспорт</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.public_transport.platform">Платформа</string>
     <string name="type.railway">Залізниця</string>
     <string name="type.railway.abandoned">Закинута залізниця</string>
@@ -1195,6 +1207,8 @@
     <string name="type.shop.greengrocer">Овочі та фрукти</string>
     <string name="type.shop.grocery">Бакалія</string>
     <string name="type.shop.hairdresser">Перукарня</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Барбершоп</string>
     <string name="type.shop.hardware">Господарськи товари</string>
     <string name="type.shop.health_food">Магазин здорового харчування</string>
     <string name="type.shop.hearing_aids">Магазин слухових апаратів</string>
@@ -1318,6 +1332,7 @@
     <string name="type.sport.rugby_union">Регбі-15</string>
     <string name="type.sport.running">Біг</string>
     <string name="type.sport.softball">Софтбол</string>
+    <string name="type.sport.pilates">Пілатес</string>
     <string name="type.tourism">Туризм</string>
     <string name="type.tourism.aquarium">Акваріум</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1371,22 +1386,25 @@
     <string name="type.waterway">Водяний шлях</string>
     <string name="type.waterway.access_point">Пункт доступу до водного шляху</string>
     <string name="type.waterway.canal">Канал</string>
+    <string name="type.waterway.canal.intermittent">Пересихаючий канал</string>
     <string name="type.waterway.canal.tunnel">Канал</string>
     <string name="type.waterway.fish_pass">Рибохід</string>
+    <string name="type.waterway.fish_pass.intermittent">Пересихаючий рибохід</string>
     <string name="type.waterway.dam">Дамба</string>
     <string name="type.barrier.ditch">Канава</string>
     <string name="type.natural.water.ditch">Дренажна канава</string>
     <string name="type.waterway.ditch.tunnel">Водопропускна труба</string>
     <string name="type.waterway.dock">Причал</string>
     <string name="type.waterway.drain">Водовідвід</string>
+    <string name="type.waterway.drain.intermittent">Пересихаючий водовідвід</string>
     <string name="type.natural.water.drain">Водовідвід</string>
     <string name="type.waterway.drain.tunnel">Водопропускна труба</string>
     <string name="type.waterway.lock_gate">Шлюз</string>
     <string name="type.waterway.river">Річка</string>
+    <string name="type.waterway.river.intermittent">Пересихаюча річка</string>
     <string name="type.waterway.river.tunnel">Річка</string>
     <string name="type.waterway.stream">Струмок</string>
-    <string name="type.waterway.stream.ephemeral">Струмок</string>
-    <string name="type.waterway.stream.intermittent">Струмок</string>
+    <string name="type.waterway.stream.intermittent">Пересихаючий струмок</string>
     <string name="type.waterway.stream.tunnel">Струмок</string>
     <string name="type.waterway.waterfall">Водоспад</string>
     <string name="type.waterway.weir">Гребля</string>
@@ -1428,6 +1446,7 @@
     <string name="type.self_service.no">Самообслуговування відсутнє</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Соціальна установа</string>
+    <string name="type.amenity.stage">Сцена</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Вхід до відділення невідкладної допомоги</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1457,6 +1476,8 @@
     <string name="type.man_made.monitoring_station.weather">Станція моніторингу погоди</string>
     <string name="type.amenity.student_accommodation">Проживання студентів</string>
     <string name="type.craft.watchmaker">Годинникар</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Виготовлення вікон</string>
     <string name="type.xmas_feature.market">Різдвяний ярмарок</string>
     <string name="type.xmas_feature.tree">Різдвяна ялинка</string>
     <string name="type.amenity.hookah_lounge">Кальянна</string>

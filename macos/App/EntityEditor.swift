@@ -15,12 +15,12 @@ enum EntityEditor {
   // MARK: - Bookmarks
 
   static func bookmarkName(_ id: MWMMarkID) -> String { manager.bookmark(withId: id).bookmarkName }
-  static func bookmarkColor(_ id: MWMMarkID) -> BookmarkColor { manager.bookmark(withId: id).bookmarkColor }
+  static func bookmarkColor(_ id: MWMMarkID) -> NSColor { manager.bookmark(withId: id).bookmarkColor }
   static func bookmarkDescription(_ id: MWMMarkID) -> String { manager.description(forBookmarkId: id) }
   static func bookmarkGroup(_ id: MWMMarkID) -> MWMMarkGroupID { manager.category(forBookmarkId: id).categoryId }
 
   static func saveBookmark(_ id: MWMMarkID, group: MWMMarkGroupID, title: String,
-                           color: BookmarkColor, description: String) {
+                           color: NSColor, description: String) {
     manager.updateBookmark(id, setGroupId: group, title: title, color: color, description: description)
   }
 

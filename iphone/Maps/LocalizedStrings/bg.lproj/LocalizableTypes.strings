@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "Градска стена";
 "type.barrier.cycle_barrier" = "Преграда за колела";
 "type.waterway.ditch" = "Отводнителна канавка";
+"type.waterway.ditch.intermittent" = "Пресъхваща отводнителна канавка";
 "type.natural.water.moat" = "Ров";
 "type.natural.water.wastewater" = "Отпадъчни води";
 "type.barrier.entrance" = "Вход";
@@ -407,28 +408,28 @@
 "type.highway" = "Магистрала";
 "type.highway.bridleway" = "Bridle Path";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Мост";
 "type.highway.bridleway.permissive" = "Bridle Path";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Тунел";
 "type.highway.busway" = "Обособен автобусен път";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Тунел";
 "type.highway.bus_stop" = "Спирка";
 "type.highway.construction" = "Road Under Construction";
 "type.highway.cycleway" = "Пътека за колела";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Мост";
 "type.highway.cycleway.permissive" = "Пътека за колела";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Тунел";
 "type.highway.elevator" = "Асансьор";
 "type.highway.footway" = "Пътека";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Пешеходно пресичане";
 "type.highway.footway.area" = "Пешеходно поле";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Тунел";
 "type.highway.ford" = "Брод";
 "type.highway.living_street" = "Living Street";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Тунел";
 "type.highway.motorway" = "Магистрала";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Тунел";
 "type.highway.motorway_junction" = "Разклонение";
 "type.highway.motorway_link" = "Магистрала";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Тунел";
 "type.highway.path" = "Път";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Пътека за колела и пешеходци";
 "type.highway.footway.bicycle" = "Път за колела и пешеходци";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Мост";
 "type.highway.path.horse" = "Конен път";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Тунел";
 "type.highway.pedestrian" = "Пешеходна улица";
 "type.highway.pedestrian.area" = "Пешеходна улица";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Тунел";
-"type.highway.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "Перон";
 "type.highway.primary" = "Главен път";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Тунел";
 "type.highway.primary_link" = "Главен път";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Тунел";
 "type.highway.raceway" = "Състезателен път";
 "type.highway.residential" = "Жилищна улица";
 "type.highway.residential.area" = "Жилищна улица";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Тунел";
 "type.highway.rest_area" = "Място за отдих";
 "type.highway.road" = "Път";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Мост";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Тунел";
 "type.highway.secondary" = "Второстепенен пър";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Тунел";
 "type.highway.secondary_link" = "Второстепенен пър";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Тунел";
 "type.highway.service" = "Обслужващ път";
 "type.highway.service.area" = "Обслужващ път";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Мост";
 "type.highway.service.driveway" = "Отбивка";
 "type.highway.service.parking_aisle" = "Обслужващ път";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Тунел";
 "type.highway.services" = "Service Area";
 "type.highway.speed_camera" = "Радар";
 "type.highway.steps" = "Стълби";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Тунел";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "Третостепенен път";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Тунел";
 "type.highway.tertiary_link" = "Третостепенен път";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Тунел";
 "type.highway.track" = "Пътека";
 "type.highway.track.area" = "Пътека";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Мост";
 "type.highway.track.grade1" = "Пътека";
 "type.highway.track.no.access" = "Пътека";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Тунел";
 "type.highway.traffic_signals" = "Светофар";
 "type.highway.trunk" = "Автомагистрала";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Тунел";
 "type.highway.trunk_link" = "Изход от магистрала";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Тунел";
 "type.highway.unclassified" = "Малък път";
 "type.highway.unclassified.area" = "Малък път";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Мост";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Тунел";
 "type.area_highway.cycleway" = "Пътека за колела";
 "type.area_highway.footway" = "Пътека";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Японски замък";
 "type.historic.castle.stately" = "Замък";
 "type.historic.city_gate" = "Градска порта";
+"type.man_made.ceremonial_gate" = "Церемониална порта";
 "type.historic.citywalls" = "Градска стена";
 "type.historic.fort" = "Форт";
 "type.historic.gallows" = "Бесилка";
@@ -717,7 +721,8 @@
 "type.junction.roundabout" = "Кръгово";
 "type.landuse" = "Landuse";
 "type.landuse.allotments" = "Allotments";
-"type.landuse.basin" = "Езерце";
+"type.landuse.basin" = "Резервоар";
+"type.landuse.basin.intermittent" = "Пресъхващ резервоар";
 "type.landuse.brownfield" = "Brownfield";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Quarry";
 "type.landuse.railway" = "Railway Premises";
 "type.landuse.recreation_ground" = "Recreation Ground";
-"type.landuse.reservoir" = "Reservoir";
 "type.landuse.residential" = "Residential Area";
 "type.landuse.retail" = "Retail Area";
 "type.landuse.salt_pond" = "Salt Pond";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Ice Rink";
 "type.leisure.marina" = "Marina";
 "type.leisure.nature_reserve" = "Nature Reserve";
+"type.leisure.bird_hide" = "Укритие за наблюдение на птици";
 "type.leisure.outdoor_seating" = "Места за сядане на открито";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "Park";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Pier";
 "type.man_made.pipeline" = "Pipeline";
 "type.man_made.pipeline.overground" = "Overground Pipeline";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Покрит резервоар";
 "type.man_made.silo" = "Складова кула";
 "type.man_made.storage_tank" = "Storage Tank";
 "type.man_made.surveillance" = "Surveillance Camera";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Water Tower";
 "type.man_made.water_well" = "Water Well";
 "type.man_made.water_well.drinking_water_no" = "Water Well";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Водопроводна станция";
 "type.man_made.windmill" = "Windmill";
 "type.man_made.works" = "Industrial Works";
 
@@ -868,13 +879,16 @@
 "type.natural.water.lake" = "Езеро";
 "type.natural.water.lock" = "Заключваща камера";
 "type.natural.water.pond" = "Езерце";
-"type.natural.water.reservoir" = "Резервоар";
+"type.natural.water.reservoir" = "Язовир";
 "type.natural.water.basin" = "Резервоар";
 "type.natural.water.river" = "Река";
+"type.natural.water.intermittent" = "Пресъхващ водоем";
 "type.natural.land" = "Суша";
 "type.natural.meadow" = "Ливада";
 "type.natural.orchard" = "Овощна градина";
 "type.natural.peak" = "Връх";
+"type.natural.hill" = "Хълм";
+"type.natural.arch" = "Скална арка";
 "type.natural.saddle" = "Седло";
 "type.natural.rock" = "Камък";
 "type.natural.scrub" = "Гъсталаци";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "Public Transport";
-"type.public_transport.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "Перон";
 "type.railway" = "Railway";
 "type.railway.abandoned" = "Abandoned Railway";
 "type.railway.abandoned.bridge" = "Abandoned Railway Bridge";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Greengrocer";
 "type.shop.grocery" = "Хранителни стоки";
 "type.shop.hairdresser" = "Hairdresser";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Бръснарница";
 "type.shop.hardware" = "Железария";
 "type.shop.health_food" = "Магазин за здравословни храни";
 "type.shop.hearing_aids" = "Магазин за слухови апарати";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Ръгби юнион";
 "type.sport.running" = "Бягане";
 "type.sport.softball" = "Софтбол";
+"type.sport.pilates" = "Пилатес";
 "type.tourism" = "Tourism";
 "type.tourism.aquarium" = "Аквариум";
 
@@ -1513,23 +1533,26 @@
 "type.traffic_calming.hump" = "Traffic Hump";
 "type.waterway" = "Waterway";
 "type.waterway.access_point" = "Точка за достъп до водния път";
-"type.waterway.canal" = "Canal";
+"type.waterway.canal" = "Канал";
+"type.waterway.canal.intermittent" = "Пресъхващ канал";
 "type.waterway.canal.tunnel" = "Canal Tunnel";
 "type.waterway.fish_pass" = "Стълба за риба";
+"type.waterway.fish_pass.intermittent" = "Пресъхваща стълба за риба";
 "type.waterway.dam" = "Язовир";
 "type.barrier.ditch" = "Ditch";
 "type.natural.water.ditch" = "Отводнителна канавка";
 "type.waterway.ditch.tunnel" = "водосток";
 "type.waterway.dock" = "Waterway Dock";
-"type.waterway.drain" = "Drain";
-"type.natural.water.drain" = "Drain";
+"type.waterway.drain" = "Отводнителен канал";
+"type.waterway.drain.intermittent" = "Пресъхващ отводнителен канал";
+"type.natural.water.drain" = "Отводнителен канал";
 "type.waterway.drain.tunnel" = "водосток";
 "type.waterway.lock_gate" = "Lock Gate";
 "type.waterway.river" = "Река";
+"type.waterway.river.intermittent" = "Пресъхваща река";
 "type.waterway.river.tunnel" = "Река";
 "type.waterway.stream" = "Поток";
-"type.waterway.stream.ephemeral" = "Ephemeral Stream";
-"type.waterway.stream.intermittent" = "Intermittent Stream";
+"type.waterway.stream.intermittent" = "Пресъхващ поток";
 "type.waterway.stream.tunnel" = "Поток";
 "type.waterway.waterfall" = "Водопад";
 "type.waterway.weir" = "Weir";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Социално съоръжение";
+"type.amenity.stage" = "Сцена";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Вход на спешното отделение";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Станция за наблюдение на времето";
 "type.amenity.student_accommodation" = "Настаняване на студенти";
 "type.craft.watchmaker" = "Часовникар";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Производство на прозорци";
 "type.xmas_feature.market" = "Коледен пазар";
 "type.xmas_feature.tree" = "Коледна елха";
 "type.amenity.hookah_lounge" = "Наргиле бар";

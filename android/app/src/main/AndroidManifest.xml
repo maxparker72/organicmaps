@@ -182,11 +182,8 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="http"/>
-        <data android:scheme="https"/>
         <data android:scheme="content"/>
         <data android:scheme="file"/>
-        <data android:scheme="data"/>
         <data android:host="*"/>
         <data android:mimeType="application/vnd.google-earth.kml+xml"/>
         <data android:mimeType="application/vnd.google-earth.kmz"/>
@@ -210,11 +207,8 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="http"/>
-        <data android:scheme="https"/>
         <data android:scheme="content"/>
         <data android:scheme="file"/>
-        <data android:scheme="data"/>
         <data android:host="*"/>
         <data android:mimeType="application/geo+json"/>
         <data android:mimeType="application/vnd.geo+json"/>
@@ -236,7 +230,6 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="content"/>
         <data android:scheme="file"/>
-        <data android:scheme="data"/>
         <data android:host="*"/>
         <data android:mimeType="*/*"/>
         <!-- See http://stackoverflow.com/questions/3400072/pathpattern-to-match-file-extension-does-not-work-if-a-period-exists-elsewhere-i -->
@@ -332,7 +325,6 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="content"/>
         <data android:scheme="file"/>
-        <data android:scheme="data"/>
         <data android:host="*"/>
         <!-- See http://stackoverflow.com/questions/3400072/pathpattern-to-match-file-extension-does-not-work-if-a-period-exists-elsewhere-i -->
         <data android:pathPattern="/.*\\.kmz" />
@@ -438,7 +430,7 @@
         android:launchMode="singleTask"
         android:configChanges="uiMode"
         android:screenOrientation="fullUser"
-        android:windowSoftInputMode="stateAlwaysHidden|adjustPan"/>
+        android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
 
     <activity-alias
         android:name="${applicationId}.ManageSpaceActivity"
@@ -453,15 +445,6 @@
         android:label="@string/download_maps"
         android:parentActivityName="app.organicmaps.MwmActivity"
         android:windowSoftInputMode="adjustResize" />
-
-    <activity
-        android:name="app.organicmaps.search.SearchActivity"
-        android:theme="@style/MwmTheme.CardBg"
-        android:configChanges="orientation|screenLayout|screenSize"
-        android:screenOrientation="fullUser"
-        android:label="@string/search_map"
-        android:parentActivityName="app.organicmaps.MwmActivity"
-        android:windowSoftInputMode="stateVisible|adjustResize" />
 
     <activity
         android:name="app.organicmaps.settings.SettingsActivity"
@@ -483,7 +466,7 @@
 
     <activity
         android:name="app.organicmaps.bookmarks.BookmarkCategoriesActivity"
-        android:theme="@style/MwmTheme.WindowBg"
+        android:theme="@style/MwmTheme.CardBg"
         android:configChanges="orientation|screenLayout|screenSize"
         android:screenOrientation="fullUser"
         android:label="@string/bookmarks_and_tracks"
@@ -508,6 +491,15 @@
         android:windowSoftInputMode="adjustResize" />
 
     <activity
+        android:name="app.organicmaps.routing.TransitDetailsActivity"
+        android:enableOnBackInvokedCallback="true"
+        android:launchMode="singleTop"
+        android:configChanges="orientation|screenLayout|screenSize"
+        android:screenOrientation="fullUser"
+        android:label="@string/transit_details_title"
+        android:parentActivityName="app.organicmaps.MwmActivity" />
+
+    <activity
         android:name="app.organicmaps.editor.ProfileActivity"
         android:parentActivityName="app.organicmaps.settings.SettingsActivity" />
 
@@ -517,17 +509,15 @@
         android:windowSoftInputMode="adjustResize" />
 
     <activity
-        android:name="app.organicmaps.editor.ReportActivity"
-        android:parentActivityName="app.organicmaps.MwmActivity" />
-
-    <activity
         android:name="app.organicmaps.editor.OsmLoginActivity"
         android:parentActivityName="app.organicmaps.MwmActivity" />
 
+    <!-- "adjustNothing" would leave WindowInsetsCompat reporting no Type.ime() below API 30, where
+         the platform has no IME inset type; BookmarkCategorySettingsActivity swaps it from API 30 -->
     <activity
       android:name="app.organicmaps.bookmarks.BookmarkCategorySettingsActivity"
       android:label="@string/edit"
-      android:windowSoftInputMode="stateVisible"/>
+      android:windowSoftInputMode="stateVisible|adjustResize"/>
     <activity
       android:name="app.organicmaps.widget.placepage.WikiArticleActivity"
       android:label="@string/place_description_title"/>
@@ -560,6 +550,25 @@
       android:enabled="true"
       android:stopWithTask="false"
       />
+
+    <activity
+      android:name=".widget.TrackRecordingStartActivity"
+      android:excludeFromRecents="true"
+      android:exported="false"
+      android:noHistory="true"
+      android:taskAffinity=""
+      android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+    <receiver android:name=".widget.TrackRecordingWidget"
+      android:exported="false"
+      android:label="@string/track_recording_title">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/track_recording_widget_info" />
+    </receiver>
 
     <service
         android:name=".downloader.DownloaderService"

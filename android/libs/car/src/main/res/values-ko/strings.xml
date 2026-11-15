@@ -12,7 +12,7 @@
     <string name="country_status_download_failed">다운로드에 실패하였습니다</string>
     <string name="close">닫기</string>
     <string name="download">다운로드</string>
-    <string name="download_resources">시작하시기 전에 일반 세계 지도를 귀하의 장치로 다운로드하겠습니다.\n%s 데이터가 필요합니다。</string>
+    <string name="download_resources">앱을 사용하기 전에 기기에 세계 개요 지도를 다운로드해 주세요.\n저장 공간 %s가 필요합니다.</string>
     <!-- Should be used in the bookmarks-only context, see bookmarks_and_tracks if tracks are also implied. -->
     <string name="bookmarks">북마크</string>
     <!-- Settings button in system menu -->
@@ -47,6 +47,8 @@
     <string name="auto">자동</string>
     <!-- Settings «Map» category: «3D buildings» title -->
     <string name="pref_map_3d_buildings_title">주변 건물 3D</string>
+    <!-- Settings «Route» category: «Tts unavailable» subtitle. Also used as a CarToast in Android Auto when the user taps the muted voice icon. -->
+    <string name="pref_tts_unavailable">사용할 수 없음</string>
     <!-- Text in menu -->
     <string name="help">도움말</string>
     <!-- In maps downloader and country place page shows how many maps are downloaded / to download, e.g. "Maps: 3 of 10" -->
@@ -66,9 +68,12 @@
     <string name="editor_time_open">개점</string>
     <string name="twentyfour_seven">24 시간</string>
     <string name="day_off_today">오늘 영업 종료됨</string>
+    <string name="midnight">자정</string>
+    <string name="noon">정오</string>
     <string name="opens_in">%s에서 열립니다</string>
     <string name="closes_in">%s로 마감</string>
     <string name="closed">닫음</string>
+    <!-- Short label for minutes (time unit), placed after a number -->
     <string name="minute">분</string>
     <string name="big_font">지도에서 글꼴 크기 늘리기</string>
     <string name="transliteration_title">라틴어로 음역</string>

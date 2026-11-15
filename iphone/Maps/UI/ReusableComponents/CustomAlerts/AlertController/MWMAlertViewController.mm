@@ -79,9 +79,9 @@ static NSString * const kAlertControllerNibIdentifier = @"MWMAlertViewController
   [self displayAlert:[MWMAlert noWiFiAlertWithOkBlock:okBlock andCancelBlock:cancelBlock]];
 }
 
-- (void)presentIncorrectFeauturePositionAlert
+- (void)presentIncorrectFeaturePositionAlertWithOkBlock:(nullable MWMVoidBlock)okBlock
 {
-  [self displayAlert:[MWMAlert incorrectFeaturePositionAlert]];
+  [self displayAlert:[MWMAlert incorrectFeaturePositionAlertWithOkBlock:okBlock]];
 }
 
 - (void)presentNotEnoughSpaceAlert
@@ -108,7 +108,21 @@ static NSString * const kAlertControllerNibIdentifier = @"MWMAlertViewController
 
 - (void)presentRoutingDisclaimerAlertWithOkBlock:(MWMVoidBlock)block
 {
-  [self displayAlert:[MWMAlert routingDisclaimerAlertWithOkBlock:block]];
+  NSString * message = [@[
+    L(@"dialog_routing_disclaimer_priority"), L(@"dialog_routing_disclaimer_precision"),
+    L(@"dialog_routing_disclaimer_recommendations"), L(@"dialog_routing_disclaimer_borders"),
+    L(@"dialog_routing_disclaimer_beware")
+  ] componentsJoinedByString:@"\n\n"];
+  UIAlertController * alert = [UIAlertController alertControllerWithTitle:L(@"dialog_routing_disclaimer_title")
+                                                                  message:message
+                                                           preferredStyle:UIAlertControllerStyleAlert];
+  [alert addAction:[UIAlertAction actionWithTitle:L(@"decline") style:UIAlertActionStyleCancel handler:nil]];
+  UIAlertAction * acceptAction = [UIAlertAction actionWithTitle:L(@"accept")
+                                                          style:UIAlertActionStyleDefault
+                                                        handler:^(UIAlertAction * action) { block(); }];
+  [alert addAction:acceptAction];
+  alert.preferredAction = acceptAction;
+  [self.ownerViewController presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)presentDisabledLocationAlert
@@ -258,7 +272,7 @@ static NSString * const kAlertControllerNibIdentifier = @"MWMAlertViewController
       if ([view isKindOfClass:[MWMLocationAlert class]])
         return;
   }
-  [UIView animateWithDuration:kDefaultAnimationDuration
+  [UIView animateWithDuration:AppConstants.defaultAnimationDuration
                         delay:0
                       options:UIViewAnimationOptionBeginFromCurrentState
                    animations:^{
@@ -274,13 +288,13 @@ static NSString * const kAlertControllerNibIdentifier = @"MWMAlertViewController
   alert.alpha = 0.;
   CGFloat const scale = 1.1;
   alert.transform = CGAffineTransformMakeScale(scale, scale);
-  [UIView animateWithDuration:kDefaultAnimationDuration
+  [UIView animateWithDuration:AppConstants.defaultAnimationDuration
                    animations:^{
                      self.view.alpha = 1.;
                      alert.alpha = 1.;
                      alert.transform = CGAffineTransformIdentity;
                    }];
-  [[MapsAppDelegate theApp].window endEditing:YES];
+  [ownerVC.view.window endEditing:YES];
 }
 
 - (void)closeAlert:(nullable MWMVoidBlock)completion
@@ -288,7 +302,7 @@ static NSString * const kAlertControllerNibIdentifier = @"MWMAlertViewController
   NSArray * subviews = self.view.subviews;
   MWMAlert * closeAlert = subviews.lastObject;
   MWMAlert * showAlert = (subviews.count >= 2 ? subviews[subviews.count - 2] : nil);
-  [UIView animateWithDuration:kDefaultAnimationDuration
+  [UIView animateWithDuration:AppConstants.defaultAnimationDuration
       delay:0
       options:UIViewAnimationOptionBeginFromCurrentState
       animations:^{

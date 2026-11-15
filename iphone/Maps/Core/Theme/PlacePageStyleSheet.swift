@@ -1,7 +1,8 @@
 enum PlacePageStyleSheet: String, CaseIterable {
   case ppTitlePopularView = "PPTitlePopularView"
   case ppActionBarTitle = "PPActionBarTitle"
-  case ppActionBarTitlePartner = "PPActionBarTitlePartner"
+  case ppActionBarTitleBlue = "PPActionBarTitleBlue"
+  case ppActionBarTitleRed = "PPActionBarTitleRed"
   case ppElevationProfileDescriptionCell = "ElevationProfileDescriptionCell"
   case ppElevationProfileExtendedDifficulty = "ElevationProfileExtendedDifficulty"
   case ppRouteBasePreview = "RouteBasePreview"
@@ -25,7 +26,7 @@ enum PlacePageStyleSheet: String, CaseIterable {
 }
 
 extension PlacePageStyleSheet: IStyleSheet {
-  func styleResolverFor(fonts: IFonts) -> Theme.StyleResolver {
+  var styleResolver: Theme.StyleResolver {
     switch self {
     case .ppTitlePopularView:
       return .add { s in
@@ -34,13 +35,16 @@ extension PlacePageStyleSheet: IStyleSheet {
       }
     case .ppActionBarTitle:
       return .add { s in
-        s.font = fonts.regular10
+        s.fontStyle = .fixed(.regular10)
         s.fontColor = .blackSecondaryText
       }
-    case .ppActionBarTitlePartner:
-      return .add { s in
-        s.font = fonts.regular10
-        s.fontColor = UIColor.whitePrimary
+    case .ppActionBarTitleBlue:
+      return .addFrom(Self.ppActionBarTitle) { s in
+        s.fontColor = .linkBlue
+      }
+    case .ppActionBarTitleRed:
+      return .addFrom(Self.ppActionBarTitle) { s in
+        s.fontColor = .redPrimary
       }
     case .ppElevationProfileDescriptionCell:
       return .add { s in
@@ -51,7 +55,7 @@ extension PlacePageStyleSheet: IStyleSheet {
       return .add { s in
         s.backgroundColor = .blackSecondaryText
         s.fontColor = .whitePrimary
-        s.font = fonts.medium14
+        s.fontStyle = .dynamic(.medium14)
         s.textContainerInset = UIEdgeInsets(top: 4, left: 6, bottom: 4, right: 6)
       }
     case .ppRouteBasePreview:
@@ -70,7 +74,7 @@ extension PlacePageStyleSheet: IStyleSheet {
       }
     case .ppRatingSummaryView24:
       return .add { s in
-        s.font = fonts.bold16
+        s.fontStyle = .dynamic(.bold16)
         s.fontColorHighlighted = .ratingYellow
         s.fontColorDisabled = .blackDividers
         s.colors = [
@@ -92,7 +96,7 @@ extension PlacePageStyleSheet: IStyleSheet {
       }
     case .ppRatingSummaryView12:
       return .addFrom(Self.ppRatingSummaryView24) { s in
-        s.font = fonts.bold12
+        s.fontStyle = .dynamic(.bold12)
         s.images = [
           "ic_12px_rating_normal",
           "ic_12px_rating_horrible",
@@ -143,7 +147,8 @@ extension PlacePageStyleSheet: IStyleSheet {
       return .add { s in
         s.backgroundColor = .whitePrimary
         s.fontColor = .blackSecondaryText
-        s.font = fonts.regular12
+        // Chart view labels should use a static font size to avoid layout issues caused by insufficient space.
+        s.fontStyle = .fixed(.regular12)
         s.gridColor = .blackDividers
         s.previewSelectorColor = .elevationPreviewSelector
         s.previewTintColor = .elevationPreviewTint

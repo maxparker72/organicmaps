@@ -1,7 +1,9 @@
 #include "testing/testing.hpp"
 
+#include "drape_frontend/drape_frontend_tests/visual_params_fixture.hpp"
 #include "drape_frontend/user_event_stream.hpp"
 
+#include "base/scope_guard.hpp"
 #include "base/thread.hpp"
 
 #include <cmath>
@@ -9,6 +11,9 @@
 #include <functional>
 #include <list>
 
+namespace user_event_stream_test
+{
+using df::test_support::VisualParamsFixture;
 using namespace std::placeholders;
 
 #ifdef DEBUG
@@ -134,7 +139,7 @@ df::TouchEvent MakeTouchEvent(m2::PointD const & pt, df::TouchEvent::ETouchType 
 }
 }  // namespace
 
-UNIT_TEST(SimpleTap)
+UNIT_CLASS_TEST(VisualParamsFixture, SimpleTap)
 {
   UserEventStreamTest test(false);
   test.AddExpectation(df::UserEventStream::TRY_FILTER);
@@ -147,7 +152,7 @@ UNIT_TEST(SimpleTap)
   test.RunTest();
 }
 
-UNIT_TEST(SimpleLongTap)
+UNIT_CLASS_TEST(VisualParamsFixture, SimpleLongTap)
 {
   UserEventStreamTest test(false);
   test.AddExpectation(df::UserEventStream::TRY_FILTER);
@@ -163,7 +168,7 @@ UNIT_TEST(SimpleLongTap)
   test.RunTest();
 }
 
-UNIT_TEST(SimpleDrag)
+UNIT_CLASS_TEST(VisualParamsFixture, SimpleDrag)
 {
   size_t const moveEventCount = 5;
   UserEventStreamTest test(false);
@@ -186,7 +191,7 @@ UNIT_TEST(SimpleDrag)
   test.RunTest();
 }
 
-UNIT_TEST(SimpleScale)
+UNIT_CLASS_TEST(VisualParamsFixture, SimpleScale)
 {
   size_t const moveEventCount = 5;
   UserEventStreamTest test(false);
@@ -211,7 +216,62 @@ UNIT_TEST(SimpleScale)
   test.RunTest();
 }
 
-UNIT_TEST(SetCenter_AlignsToVisibleViewportCenter)
+UNIT_CLASS_TEST(VisualParamsFixture, DragThresholdFollowsVisualScale)
+{
+  SCOPE_GUARD(restoreScale, []() { df::VisualParams::Instance().SetVisualScale(1.0); });
+  for (auto const & scales : {std::pair{1.0, 2.0}, std::pair{2.0, 1.0}})
+  {
+    df::VisualParams::Instance().SetVisualScale(scales.first);
+    UserEventStreamTest test(false);
+    test.AddExpectation(df::UserEventStream::TRY_FILTER);
+    test.AddExpectation(df::UserEventStream::BEGIN_TAP_DETECTOR);
+    test.AddUserEvent(MakeTouchEvent(m2::PointD::Zero(), df::TouchEvent::TOUCH_DOWN));
+    test.RunTest();
+
+    df::VisualParams::Instance().SetVisualScale(scales.second);
+    double const threshold = 10.0 * scales.second;
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold - 1, 0), df::TouchEvent::TOUCH_MOVE));
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold, 0), df::TouchEvent::TOUCH_MOVE));
+    test.RunTest();
+
+    test.AddExpectation(df::UserEventStream::CANCEL_TAP_DETECTOR);
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold + 1, 0), df::TouchEvent::TOUCH_MOVE));
+    test.RunTest();
+    test.AddExpectation(df::UserEventStream::BEGIN_DRAG);
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold + 2, 0), df::TouchEvent::TOUCH_MOVE));
+    test.AddExpectation(df::UserEventStream::END_DRAG);
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold + 2, 0), df::TouchEvent::TOUCH_UP));
+    test.RunTest();
+  }
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, TwoFingerThresholdFollowsVisualScale)
+{
+  SCOPE_GUARD(restoreScale, []() { df::VisualParams::Instance().SetVisualScale(1.0); });
+  for (auto const & scales : {std::pair{1.0, 2.0}, std::pair{2.0, 1.0}})
+  {
+    df::VisualParams::Instance().SetVisualScale(scales.first);
+    UserEventStreamTest test(false);
+    test.SetRect(m2::RectD(-250.0, -250.0, 250.0, 250.0));
+    test.AddExpectation(df::UserEventStream::TWO_FINGERS_TAP);
+    m2::PointD const second(100, 0);
+    test.AddUserEvent(MakeTouchEvent(m2::PointD::Zero(), second, df::TouchEvent::TOUCH_DOWN));
+    test.RunTest();
+
+    df::VisualParams::Instance().SetVisualScale(scales.second);
+    double const threshold = 10.0 * scales.second;
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold - 1, 0), second, df::TouchEvent::TOUCH_MOVE));
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold, 0), second, df::TouchEvent::TOUCH_MOVE));
+    test.RunTest();
+    test.AddExpectation(df::UserEventStream::BEGIN_SCALE);
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold + 1, 0), second, df::TouchEvent::TOUCH_MOVE));
+    test.AddExpectation(df::UserEventStream::END_SCALE);
+    test.AddUserEvent(MakeTouchEvent(m2::PointD(threshold + 1, 0), second, df::TouchEvent::TOUCH_UP));
+    test.RunTest();
+  }
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, SetCenter_AlignsToVisibleViewportCenter)
 {
   // With an asymmetric visible viewport (e.g. host UI panel covering bottom 30%),
   // SetCenter must place the geographic target at the visible-viewport center
@@ -243,3 +303,4 @@ UNIT_TEST(SetCenter_AlignsToVisibleViewportCenter)
 }
 
 #endif
+}  // namespace user_event_stream_test

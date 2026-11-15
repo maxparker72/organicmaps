@@ -126,6 +126,12 @@
       app:singleLineTitle="false"
       android:persistent="false"
         android:order="19"/>
+    <Preference
+      android:key="@string/pref_bg_tiles_screen"
+      android:title="@string/pref_bg_tiles_title"
+      app:singleLineTitle="false"
+      android:persistent="false"
+      android:order="20"/>
   </androidx.preference.PreferenceCategory>
 
   <androidx.preference.PreferenceCategory
@@ -158,11 +164,6 @@
       android:key="@string/prefs_routing"
       android:order="5"
       android:title="@string/driving_options_title">
-      <intent
-        android:targetClass="app.organicmaps.settings.DrivingOptionsActivity"
-        android:targetPackage="@string/app_id">
-        <extra android:name="from" android:value="settings" />
-      </intent>
     </PreferenceScreen>
   </androidx.preference.PreferenceCategory>
   <androidx.preference.PreferenceCategory
@@ -182,6 +183,13 @@
       app:singleLineTitle="false"
       android:defaultValue="true"
       android:order="2" />
+    <Preference
+      android:key="@string/pref_bookmarks_backup"
+      android:title="@string/bookmarks_backup_title"
+      app:singleLineTitle="false"
+      android:summary="@string/bookmarks_backup_description"
+      android:persistent="false"
+      android:order="3" />
   </androidx.preference.PreferenceCategory>
   <androidx.preference.PreferenceCategory
     android:key="@string/pref_information"

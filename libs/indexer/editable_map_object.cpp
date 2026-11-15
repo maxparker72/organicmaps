@@ -164,6 +164,12 @@ void EditableMapObject::SetEditableProperties(osm::EditableProperties const & pr
   m_editableProperties = props;
 }
 
+void EditableMapObject::SetFromFeatureType(FeatureType & ft)
+{
+  MapObject::SetFromFeatureType(ft);
+  m_selectionPoint.reset();
+}
+
 void EditableMapObject::SetName(std::string_view name, int8_t langCode)
 {
   m_name.Add(langCode, name);
@@ -409,7 +415,8 @@ bool EditableMapObject::ValidateFlats(std::string const & flats)
       return false;
 
     for (auto const & rangeBorder : range)
-      if (!std::all_of(std::begin(rangeBorder), std::end(rangeBorder), ::isalnum))
+      if (!std::all_of(std::begin(rangeBorder), std::end(rangeBorder),
+                       [](char c) { return strings::IsASCIIDigit(c) || strings::IsASCIILatin(c); }))
         return false;
   }
   return true;
@@ -453,10 +460,10 @@ bool EditableMapObject::ValidatePhoneList(std::string const & phone)
     std::string const symbols = "+-() ";
     for (; curr != last; ++curr)
     {
-      if (!isdigit(*curr) && std::find(symbols.begin(), symbols.end(), *curr) == symbols.end())
+      if (!strings::IsASCIIDigit(*curr) && std::find(symbols.begin(), symbols.end(), *curr) == symbols.end())
         return false;
 
-      if (isdigit(*curr))
+      if (strings::IsASCIIDigit(*curr))
         ++digitsCount;
     }
 

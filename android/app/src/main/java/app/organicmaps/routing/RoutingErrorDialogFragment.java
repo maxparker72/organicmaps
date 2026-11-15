@@ -18,6 +18,7 @@ import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
 import app.organicmaps.downloader.MapManagerHelper;
 import app.organicmaps.sdk.downloader.CountryItem;
+import app.organicmaps.sdk.downloader.MapManager;
 import app.organicmaps.sdk.util.Utils;
 import app.organicmaps.util.UiUtils;
 
@@ -69,15 +70,9 @@ public class RoutingErrorDialogFragment extends BaseRoutingErrorDialogFragment
   @Override
   public void onDismiss(DialogInterface dialog)
   {
+    // Dismissing a missing-maps prompt keeps planning; only a found route can be started.
     if (mNeedMoreMaps && mCancelled)
-    {
       mCancelled = false;
-
-      /// @todo Actually, should cancel if there is no valid route only.
-      // I didn't realize how to distinguish NEED_MORE_MAPS but valid route is present.
-      // Should refactor RoutingController states.
-      // RoutingController.get().cancel();
-    }
 
     super.onDismiss(dialog);
   }
@@ -102,23 +97,22 @@ public class RoutingErrorDialogFragment extends BaseRoutingErrorDialogFragment
       return;
     }
 
-    long size = 0;
-    for (CountryItem country : mMissingMaps)
-    {
-      if (country.status != CountryItem.STATUS_PROGRESS && country.status != CountryItem.STATUS_APPLYING)
-      {
-        size += country.totalSize;
-      }
-    }
+    MapManagerHelper.warnOn3g(
+        requireActivity(), MapManager.nativeGetDownloadSize(mMapsArray, false /* withTerrain */), () -> {
+          // The mobile-data confirmation may outlive this dialog fragment.
+          if (!isAdded())
+            return;
 
-    MapManagerHelper.warnOn3g(requireActivity(), size, () -> {
-      final FragmentManager manager = requireActivity().getSupportFragmentManager();
-      RoutingMapsDownloadFragment downloader =
-          RoutingMapsDownloadFragment.create(manager.getFragmentFactory(), getAppContextOrThrow(), mMapsArray);
-      downloader.show(manager, downloader.getClass().getSimpleName());
-      mCancelled = false;
-      dismiss();
-    });
+          final FragmentManager manager = getParentFragmentManager();
+          if (manager.isStateSaved() || manager.isDestroyed())
+            return;
+
+          RoutingMapsDownloadFragment downloader =
+              RoutingMapsDownloadFragment.create(manager.getFragmentFactory(), getAppContextOrThrow(), mMapsArray);
+          downloader.show(manager, downloader.getClass().getSimpleName());
+          mCancelled = false;
+          dismiss();
+        });
   }
 
   @Override

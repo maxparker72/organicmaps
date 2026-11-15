@@ -3,6 +3,7 @@
 #include "base/string_utils.hpp"
 #include "indexer/categories_holder.hpp"
 #include "indexer/classificator.hpp"
+#include "platform/preferred_languages.hpp"
 #include "platform/settings.hpp"
 
 #include <algorithm>
@@ -34,18 +35,19 @@ NewFeatureCategories::NewFeatureCategories(editor::EditorConfig const & config)
 NewFeatureCategories::NewFeatureCategories(NewFeatureCategories && other) noexcept
   : m_index(std::move(other.m_index))
   , m_types(std::move(other.m_types))
-{
-  // Do not move m_addedLangs, see Framework::GetEditorCategories() usage.
-}
+{}
 
 void NewFeatureCategories::AddLanguage(std::string lang)
 {
+  // Regional translations cover only some categories, so index their base language too.
+  // GetTwine() drops the region while retaining the Chinese script, whose translations are independent.
+  auto base = languages::GetTwine(lang);
+  if (base != lang)
+    AddLanguage(std::move(base));
+
   auto langCode = CategoriesHolder::MapLocaleToInteger(lang);
   if (langCode == CategoriesHolder::kUnsupportedLocaleCode)
-  {
-    lang = "en";
     langCode = CategoriesHolder::kEnglishCode;
-  }
   if (m_addedLangs.Contains(langCode))
     return;
 
@@ -97,6 +99,6 @@ NewFeatureCategories::TypeNames NewFeatureCategories::GetRecentCategories() cons
   if (recentlyUsedCategories.size() > kMaxRecentlyUsedCategoriesCount)
     recentlyUsedCategories.resize(kMaxRecentlyUsedCategoriesCount);
   return recentlyUsedCategories;
-}  // namespace search
+}
 
 }  // namespace osm

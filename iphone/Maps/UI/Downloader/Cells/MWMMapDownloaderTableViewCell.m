@@ -1,6 +1,7 @@
 #import "MWMMapDownloaderTableViewCell.h"
 #import "MWMCircularProgress.h"
 #import "NSString+Ranges.h"
+#import "SwiftBridge.h"
 
 #import <CoreApi/MWMCommon.h>
 #import <CoreApi/MWMFrameworkHelper.h>
@@ -26,6 +27,12 @@
   UILongPressGestureRecognizer * lpGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self
                                                                                       action:@selector(onLongPress:)];
   [self addGestureRecognizer:lpGR];
+}
+
+- (void)layoutSubviews
+{
+  [super layoutSubviews];
+  [self alignSeparatorWithView:self.title];
 }
 
 - (void)prepareForReuse
@@ -65,12 +72,10 @@
   [self configProgress:nodeAttrs];
 
   self.title.attributedText = [self matchedString:nodeAttrs.nodeName
-                                    selectedAttrs:@{NSFontAttributeName: [UIFont bold17]}
-                                  unselectedAttrs:@{NSFontAttributeName: [UIFont regular17]}];
+                                    selectedAttrs:@{NSFontAttributeName: UIFont.bold17.dynamic}
+                                  unselectedAttrs:@{NSFontAttributeName: UIFont.regular17.dynamic}];
 
   uint64_t size = 0;
-  BOOL isModeDownloaded = self.mode == MWMMapDownloaderModeDownloaded;
-
   switch (nodeAttrs.nodeStatus)
   {
   case MWMMapNodeStatusUndefined:
@@ -79,11 +84,11 @@
   case MWMMapNodeStatusNotDownloaded:
   case MWMMapNodeStatusApplying:
   case MWMMapNodeStatusInQueue:
-  case MWMMapNodeStatusPartly: size = isModeDownloaded ? nodeAttrs.downloadedSize : nodeAttrs.totalSize; break;
-  case MWMMapNodeStatusDownloading:
-    size = isModeDownloaded ? nodeAttrs.totalUpdateSizeBytes : nodeAttrs.totalSize - nodeAttrs.downloadingSize;
+  case MWMMapNodeStatusDownloading: size = nodeAttrs.downloadingSize; break;
+  case MWMMapNodeStatusPartly:
+    size = self.mode == MWMMapDownloaderModeDownloaded ? nodeAttrs.downloadedSize : nodeAttrs.downloadingSize;
     break;
-  case MWMMapNodeStatusOnDisk: size = isModeDownloaded ? nodeAttrs.totalSize : 0; break;
+  case MWMMapNodeStatusOnDisk: size = nodeAttrs.downloadedSize; break;
   }
 
   self.downloadSize.text = formattedSize(size);
@@ -107,11 +112,7 @@
     progress.state = MWMCircularProgressStateNormal;
     break;
   }
-  case MWMMapNodeStatusDownloading:
-    CGFloat const downloadProgress = nodeAttrs.downloadingProgress;
-    if (downloadProgress > 0)
-      [self setDownloadProgress:downloadProgress];
-    break;
+  case MWMMapNodeStatusDownloading: [self setDownloadProgress:nodeAttrs.downloadingProgress]; break;
   case MWMMapNodeStatusApplying:
   case MWMMapNodeStatusInQueue: progress.state = MWMCircularProgressStateSpinner; break;
   case MWMMapNodeStatusUndefined:
@@ -131,7 +132,7 @@
 
 - (void)setDownloadProgress:(CGFloat)progress
 {
-  self.progress.progress = kMaxProgress * progress;
+  self.progress.progress = AppConstants.maxProgress * progress;
 }
 
 #pragma mark - MWMCircularProgressProtocol

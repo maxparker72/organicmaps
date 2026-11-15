@@ -1,92 +1,197 @@
-enum ColorPickerType {
-  case defaultColorPicker(UIColor?)
-  case bookmarkColorPicker(BookmarkColor?)
-}
-
 final class ColorPicker: NSObject {
   static let shared = ColorPicker()
 
+  private var pickerViewController: ColorGridViewController?
+  // Strong reference: on macOS the "Show Colors..." button closes the picker and hands the
+  // selection over to the system color panel, which keeps reporting through this picker's
+  // delegate only while the picker is alive (FB8981193).
+  private var nativeColorPickerViewController: UIColorPickerViewController?
   private var onUpdateColorHandler: ((UIColor) -> Void)?
+  private var isIOSAppOnMac: Bool { ProcessInfo.processInfo.isiOSAppOnMac }
+  private var nativePickedColor: UIColor?
 
-  // MARK: - Public
+  /// Presents the default bookmark/track color grid.
+  /// `currentColor` preselects a matching color in the palette; pass nil when there is no
+  /// current color (e.g. when selecting a color for the whole group).
+  /// With an `anchor` the grid is always shown as a compact popover anchored to the tapped view.
+  func present(from rootViewController: UIViewController,
+               anchor: UIView?,
+               currentColor: UIColor?,
+               completionHandler: ((UIColor) -> Void)?) {
+    present(from: rootViewController,
+            anchorView: anchor,
+            anchorBarButtonItem: nil,
+            currentColor: currentColor,
+            completionHandler: completionHandler)
+  }
 
-  /// Presents a color picker view controller modally from a specified root view controller.
-  ///
-  /// - Uses native color picker on the iOS 14.0+ for the `defaultColorPicker` type on iPhone and iPad.
-  /// - For the rest of the iOS versions, `bookmarkColorPicker` type and iPad designed for Mac uses a custom color picker.
-  ///
-  func present(from rootViewController: UIViewController, pickerType: ColorPickerType, completionHandler: ((UIColor) -> Void)?) {
-    onUpdateColorHandler = completionHandler
-    let colorPickerViewController: UIViewController
+  /// Presents the color grid as a popover anchored to a bar button item.
+  func present(from rootViewController: UIViewController,
+               anchor: UIBarButtonItem,
+               currentColor: UIColor?,
+               completionHandler: ((UIColor) -> Void)?) {
+    present(from: rootViewController,
+            anchorView: nil,
+            anchorBarButtonItem: anchor,
+            currentColor: currentColor,
+            completionHandler: completionHandler)
+  }
 
-    switch pickerType {
-    case .defaultColorPicker(let color):
-      if !ProcessInfo.processInfo.isiOSAppOnMac {
-        colorPickerViewController = defaultColorPickerViewController(with: color)
+  private func present(from rootViewController: UIViewController,
+                       anchorView: UIView?,
+                       anchorBarButtonItem: UIBarButtonItem?,
+                       currentColor: UIColor?,
+                       completionHandler: ((UIColor) -> Void)?) {
+    nativeColorPickerViewController = nil
+    let picker = ColorGridViewController(currentColor: currentColor,
+                                         predefinedColors: BookmarksManager.predefinedColors().compactMap {
+                                           PredefinedColor(rawValue: $0.intValue)
+                                         }) { [weak self] color in
+      self?.selectColor(color)
+    } onSelectCustomColor: { [weak self] viewController in
+      self?.presentNativeColorPicker(from: viewController, currentColor: currentColor)
+    }
+    picker.onDismiss = { [weak self] in
+      self?.endColorPicker()
+    }
+    picker.modalPresentationStyle = .popover
+    if let popover = picker.popoverPresentationController {
+      if let anchorBarButtonItem {
+        popover.barButtonItem = anchorBarButtonItem
       } else {
-        var selectedColor: BookmarkColor?
-        if let color {
-          selectedColor = BookmarkColor.bookmarkColor(from: color)
-        }
-        colorPickerViewController = bookmarksColorPickerViewController(with: selectedColor)
+        let sourceView: UIView = anchorView ?? rootViewController.view
+        popover.sourceView = sourceView
+        popover.sourceRect = anchorView?.bounds ?? CGRect(x: sourceView.bounds.midX,
+                                                          y: sourceView.bounds.midY,
+                                                          width: 1,
+                                                          height: 1)
       }
-    case .bookmarkColorPicker(let bookmarkColor):
-      colorPickerViewController = bookmarksColorPickerViewController(with: bookmarkColor)
+      popover.permittedArrowDirections = .any
+      popover.delegate = picker
     }
-    rootViewController.present(colorPickerViewController, animated: true)
+
+    pickerViewController = picker
+    onUpdateColorHandler = completionHandler
+    updatePopoverUserInterfaceStyle(rootViewController.traitCollection.userInterfaceStyle)
+    subscribeToTraitChanges()
+    // Animated presentation can cause visual artifacts on macOS; dismissal can remain animated.
+    rootViewController.present(picker, animated: !isIOSAppOnMac)
   }
 
-  // MARK: - Private
+  private func selectColor(_ color: UIColor) {
+    onUpdateColorHandler?(color)
+    endColorPicker()
+  }
 
-  private func defaultColorPickerViewController(with selectedColor: UIColor?) -> UIViewController {
-    let colorPickerController = UIColorPickerViewController()
-    colorPickerController.supportsAlpha = false
-    if let selectedColor {
-      colorPickerController.selectedColor = selectedColor
+  private func presentNativeColorPicker(from rootViewController: UIViewController, currentColor: UIColor?) {
+    let picker = DismissReportingColorPickerViewController()
+    picker.supportsAlpha = false
+    if let currentColor {
+      picker.selectedColor = currentColor
     }
-    colorPickerController.delegate = self
-    colorPickerController.presentationController?.delegate = self
-    return colorPickerController
+    picker.delegate = self
+    picker.onDismiss = { [weak self] in
+      guard let self else { return }
+      let didCommitSelection = self.commitNativeSelection()
+
+      // On macOS the system color panel ("Show Colors...") keeps reporting through the
+      // dismissed picker's delegate. On iOS a cancelled picker can be released immediately.
+      if didCommitSelection {
+        self.endColorPicker(keepingNativePicker: isIOSAppOnMac)
+      } else if !isIOSAppOnMac {
+        self.nativeColorPickerViewController = nil
+      }
+    }
+    nativeColorPickerViewController = picker
+    nativePickedColor = nil
+    rootViewController.present(picker, animated: true)
   }
 
-  private func bookmarksColorPickerViewController(with selectedColor: BookmarkColor?) -> UIViewController {
-    let bookmarksColorViewController = BookmarkColorViewController(bookmarkColor: selectedColor)
-    bookmarksColorViewController.delegate = self
-    // The navigation controller is used for getting the navigation item with the title and the close button.
-    return UINavigationController(rootViewController: bookmarksColorViewController)
+  @discardableResult
+  private func commitNativeSelection() -> Bool {
+    guard let nativePickedColor else { return false }
+
+    self.nativePickedColor = nil
+    onUpdateColorHandler?(nativePickedColor)
+    return true
   }
 
-  private func commitSelection(_ color: UIColor) {
-    guard let onUpdateColorHandler else { return }
-    self.onUpdateColorHandler = nil
-    onUpdateColorHandler(color)
+  private func subscribeToTraitChanges() {
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(userInterfaceStyleDidChange(_:)),
+                                           name: .userInterfaceStyleDidChange,
+                                           object: nil)
   }
-}
 
-// MARK: - BookmarkColorViewControllerDelegate
-
-extension ColorPicker: BookmarkColorViewControllerDelegate {
-  func bookmarkColorViewController(_ viewController: BookmarkColorViewController, didSelect bookmarkColor: BookmarkColor) {
-    commitSelection(bookmarkColor.color)
-    viewController.dismiss(animated: true)
+  private func unsubscribeFromTraitChanges() {
+    NotificationCenter.default.removeObserver(self,
+                                              name: .userInterfaceStyleDidChange,
+                                              object: nil)
   }
-}
 
-// MARK: - UIColorPickerViewControllerDelegate
-
-extension ColorPicker: UIColorPickerViewControllerDelegate {
-  func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
-    commitSelection(viewController.selectedColor.sRGBColor)
-  }
-}
-
-// MARK: - UIAdaptivePresentationControllerDelegate
-
-extension ColorPicker: UIAdaptivePresentationControllerDelegate {
-  func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-    guard let colorPickerViewController = presentationController.presentedViewController as? UIColorPickerViewController else {
+  @objc private func userInterfaceStyleDidChange(_ notification: Notification) {
+    guard let rawValue = notification.userInfo?[kUserInterfaceStyleKey] as? Int,
+          let userInterfaceStyle = UIUserInterfaceStyle(rawValue: rawValue) else {
       return
     }
-    commitSelection(colorPickerViewController.selectedColor.sRGBColor)
+    updatePopoverUserInterfaceStyle(userInterfaceStyle)
+  }
+
+  private func updatePopoverUserInterfaceStyle(_ userInterfaceStyle: UIUserInterfaceStyle) {
+    pickerViewController?.overrideUserInterfaceStyle = userInterfaceStyle
+  }
+
+  private func closeColorGrid() {
+    unsubscribeFromTraitChanges()
+    let picker = pickerViewController
+    pickerViewController = nil
+    picker?.onDismiss = nil
+    picker?.dismiss(animated: true)
+  }
+
+  private func endColorPicker(keepingNativePicker: Bool = false) {
+    closeColorGrid()
+    if !keepingNativePicker {
+      nativeColorPickerViewController = nil
+      onUpdateColorHandler = nil
+    }
+  }
+}
+
+extension ColorGridViewController: UIPopoverPresentationControllerDelegate {
+  func adaptivePresentationStyle(for _: UIPresentationController) -> UIModalPresentationStyle {
+    .none
+  }
+
+  func presentationControllerDidDismiss(_: UIPresentationController) {
+    onDismiss?()
+  }
+}
+
+extension ColorPicker: UIColorPickerViewControllerDelegate {
+  func colorPickerViewController(_ viewController: UIColorPickerViewController, didSelect color: UIColor, continuously: Bool) {
+    nativePickedColor = color.sRGBColor
+    // On macOS colorPickerViewControllerDidFinish is never called, so commit and close
+    // the picker as soon as the user clicks a color.
+    if isIOSAppOnMac, !continuously {
+      commitNativeSelection()
+      viewController.dismiss(animated: true)
+      closeColorGrid()
+    }
+  }
+}
+
+/// Reports the start of the picker's dismissal — the only signal delivered on every platform.
+/// colorPickerViewControllerDidFinish is not called at all on macOS, and on iOS it is not
+/// called for the interactive swipe-down dismissal.
+private final class DismissReportingColorPickerViewController: UIColorPickerViewController {
+  var onDismiss: (() -> Void)?
+
+  override func viewWillDisappear(_ animated: Bool) {
+    // Skip transient disappearances (e.g. the eyedropper): commit only on a real dismissal.
+    if isBeingDismissed {
+      onDismiss?()
+    }
+    super.viewWillDisappear(animated)
   }
 }

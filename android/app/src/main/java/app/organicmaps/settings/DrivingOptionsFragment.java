@@ -1,31 +1,43 @@
 package app.organicmaps.settings;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.view.ViewCompat;
 import app.organicmaps.R;
 import app.organicmaps.base.BaseMwmToolbarFragment;
+import app.organicmaps.sdk.Router;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.routing.RoutingOptions;
 import app.organicmaps.sdk.settings.RoadType;
+import app.organicmaps.util.UiUtils;
+import app.organicmaps.util.WindowInsetUtils.PaddingInsetsListener;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 public class DrivingOptionsFragment extends BaseMwmToolbarFragment
 {
-  public static final String BUNDLE_ROAD_TYPES = "road_types";
+  private static final String BUNDLE_ROUTER = "router_type";
+  private static final String BUNDLE_ROAD_TYPES = "road_type_ids";
+  private static final String BUNDLE_ROUTE_OPTIMIZATION = "route_optimization";
+  // Road types of every mode, as the route mode can change while this screen is open (e.g. by Android Auto).
   @NonNull
-  private Set<RoadType> mRoadTypes = Collections.emptySet();
+  private final Map<Router, Set<RoadType>> mRoadTypes = new EnumMap<>(Router.class);
+  private boolean mOptimizationEnabledOnLoad;
+  @NonNull
+  private Router mRouter = Router.Vehicle;
+  private View mContent;
 
   @Nullable
   @Override
@@ -33,22 +45,42 @@ public class DrivingOptionsFragment extends BaseMwmToolbarFragment
                            @Nullable Bundle savedInstanceState)
   {
     View root = inflater.inflate(R.layout.fragment_driving_options, container, false);
+    mRouter = savedInstanceState != null ? Router.valueOf(savedInstanceState.getInt(BUNDLE_ROUTER)) : initialRouter();
     initViews(root);
-    mRoadTypes = savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_ROAD_TYPES)
-                   ? makeRouteTypes(savedInstanceState)
-                   : RoutingOptions.getActiveRoadTypes();
+    ViewCompat.setOnApplyWindowInsetsListener(mContent, new PaddingInsetsListener(false, true, true, true));
+    for (Router router : Router.values())
+    {
+      final String key = roadTypesKey(router);
+      mRoadTypes.put(router, savedInstanceState != null && savedInstanceState.containsKey(key)
+                                 ? makeRouteTypes(savedInstanceState, key)
+                                 : RoutingOptions.getActiveRoadTypes(router));
+    }
+    mOptimizationEnabledOnLoad = savedInstanceState != null ? savedInstanceState.getBoolean(BUNDLE_ROUTE_OPTIMIZATION)
+                                                            : RoutingOptions.isRouteOptimizationEnabled();
     return root;
   }
 
   @NonNull
-  private Set<RoadType> makeRouteTypes(@NonNull Bundle bundle)
+  private static Router initialRouter()
+  {
+    final Router router = RoutingController.get().getLastRouterType();
+    // Only modes with avoid options have a tab.
+    return router == Router.Pedestrian || router == Router.Bicycle ? router : Router.Vehicle;
+  }
+
+  @NonNull
+  private static String roadTypesKey(@NonNull Router router)
+  {
+    return BUNDLE_ROAD_TYPES + "_" + router.name();
+  }
+
+  @NonNull
+  private Set<RoadType> makeRouteTypes(@NonNull Bundle bundle, @NonNull String key)
   {
     Set<RoadType> result = new HashSet<>();
-    List<Integer> items = Objects.requireNonNull(bundle.getIntegerArrayList(BUNDLE_ROAD_TYPES));
+    List<Integer> items = Objects.requireNonNull(bundle.getIntegerArrayList(key));
     for (Integer each : items)
-    {
-      result.add(RoadType.values()[each]);
-    }
+      result.add(RoadType.fromNativeValue(each));
     return result;
   }
 
@@ -56,76 +88,85 @@ public class DrivingOptionsFragment extends BaseMwmToolbarFragment
   public void onSaveInstanceState(@NonNull Bundle outState)
   {
     super.onSaveInstanceState(outState);
-    ArrayList<Integer> savedRoadTypes = new ArrayList<>();
-    for (RoadType each : mRoadTypes)
+    outState.putInt(BUNDLE_ROUTER, mRouter.getType());
+    for (Map.Entry<Router, Set<RoadType>> entry : mRoadTypes.entrySet())
     {
-      savedRoadTypes.add(each.ordinal());
+      ArrayList<Integer> savedRoadTypes = new ArrayList<>();
+      for (RoadType each : entry.getValue())
+        savedRoadTypes.add(each.nativeValue);
+      outState.putIntegerArrayList(roadTypesKey(entry.getKey()), savedRoadTypes);
     }
-    outState.putIntegerArrayList(BUNDLE_ROAD_TYPES, savedRoadTypes);
-  }
-
-  private boolean areSettingsNotChanged()
-  {
-    Set<RoadType> lastActiveRoadTypes = RoutingOptions.getActiveRoadTypes();
-    return mRoadTypes.equals(lastActiveRoadTypes);
+    outState.putBoolean(BUNDLE_ROUTE_OPTIMIZATION, mOptimizationEnabledOnLoad);
   }
 
   @Override
-  public boolean onBackPressed()
+  public void onStop()
   {
-    if (areSettingsNotChanged())
-    {
-      requireActivity().setResult(Activity.RESULT_CANCELED);
-    }
-    else
-    {
-      requireActivity().setResult(Activity.RESULT_OK);
-      RoutingController.get().rebuildLastRoute();
-    }
+    super.onStop();
+    // A configuration change recreates the screen and reports nothing.
+    if (requireActivity().isChangingConfigurations())
+      return;
 
-    return super.onBackPressed();
+    final Router router = RoutingController.get().getLastRouterType();
+    final boolean changed = !RoutingOptions.getActiveRoadTypes(router).equals(mRoadTypes.get(router));
+    // A temporary switch to On must not reorder stops if the user switches back before leaving this screen.
+    final boolean enabled = RoutingOptions.isRouteOptimizationEnabled();
+    final boolean reordered = enabled && !mOptimizationEnabledOnLoad && RoutingController.get().optimizeRoutePoints();
+    if (changed || reordered)
+      RoutingController.get().onRoutingOptionsChanged();
+    // Re-baseline so leaving this screen again (e.g. after Home) reports only what changed since.
+    for (Router each : Router.values())
+      mRoadTypes.put(each, RoutingOptions.getActiveRoadTypes(each));
+    mOptimizationEnabledOnLoad = enabled;
   }
 
   private void initViews(@NonNull View root)
   {
-    SwitchCompat tollsBtn = root.findViewById(R.id.avoid_tolls_btn);
-    tollsBtn.setChecked(RoutingOptions.hasOption(RoadType.Toll));
-    CompoundButton.OnCheckedChangeListener tollBtnListener = new ToggleRoutingOptionListener(RoadType.Toll);
-    tollsBtn.setOnCheckedChangeListener(tollBtnListener);
+    mContent = root.findViewById(R.id.content);
 
-    SwitchCompat motorwaysBtn = root.findViewById(R.id.avoid_motorways_btn);
-    motorwaysBtn.setChecked(RoutingOptions.hasOption(RoadType.Motorway));
-    CompoundButton.OnCheckedChangeListener motorwayBtnListener = new ToggleRoutingOptionListener(RoadType.Motorway);
-    motorwaysBtn.setOnCheckedChangeListener(motorwayBtnListener);
+    SwitchCompat optimizationBtn = root.findViewById(R.id.route_optimization_btn);
+    optimizationBtn.setChecked(RoutingOptions.isRouteOptimizationEnabled());
+    optimizationBtn.setOnCheckedChangeListener(
+        (buttonView, isChecked) -> RoutingOptions.setRouteOptimizationEnabled(isChecked));
 
-    SwitchCompat ferriesBtn = root.findViewById(R.id.avoid_ferries_btn);
-    ferriesBtn.setChecked(RoutingOptions.hasOption(RoadType.Ferry));
-    CompoundButton.OnCheckedChangeListener ferryBtnListener = new ToggleRoutingOptionListener(RoadType.Ferry);
-    ferriesBtn.setOnCheckedChangeListener(ferryBtnListener);
-
-    SwitchCompat dirtyRoadsBtn = root.findViewById(R.id.avoid_dirty_roads_btn);
-    dirtyRoadsBtn.setChecked(RoutingOptions.hasOption(RoadType.Dirty));
-    CompoundButton.OnCheckedChangeListener dirtyBtnListener = new ToggleRoutingOptionListener(RoadType.Dirty);
-    dirtyRoadsBtn.setOnCheckedChangeListener(dirtyBtnListener);
+    initRouterTab(root, R.id.vehicle, Router.Vehicle);
+    initRouterTab(root, R.id.pedestrian, Router.Pedestrian);
+    initRouterTab(root, R.id.bicycle, Router.Bicycle);
+    bindOptions(root);
   }
 
-  private static class ToggleRoutingOptionListener implements CompoundButton.OnCheckedChangeListener
+  private void initRouterTab(@NonNull View root, @IdRes int buttonId, @NonNull Router router)
   {
-    @NonNull
-    private final RoadType mRoadType;
+    RadioButton button = root.findViewById(buttonId);
+    button.setChecked(router == mRouter);
+    button.setOnClickListener(v -> {
+      mRouter = router;
+      bindOptions(root);
+    });
+  }
 
-    private ToggleRoutingOptionListener(@NonNull RoadType roadType)
-    {
-      mRoadType = roadType;
-    }
+  private void bindOptions(@NonNull View root)
+  {
+    bindOption(root, R.id.avoid_tolls_btn, RoadType.Toll);
+    bindOption(root, R.id.avoid_motorways_btn, RoadType.Motorway);
+    bindOption(root, R.id.avoid_ferries_btn, RoadType.Ferry);
+    bindOption(root, R.id.avoid_dirty_roads_btn, RoadType.Dirty);
+  }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-    {
+  private void bindOption(@NonNull View root, @IdRes int buttonId, @NonNull RoadType roadType)
+  {
+    final Router router = mRouter;
+    SwitchCompat button = root.findViewById(buttonId);
+    UiUtils.showIf(RoutingOptions.supportsOption(router, roadType), (View) button.getParent());
+    button.setOnCheckedChangeListener(null);
+    button.setChecked(RoutingOptions.hasOption(router, roadType));
+    // Another mode's settings are shown as they are, without animating the switches.
+    button.jumpDrawablesToCurrentState();
+    button.setOnCheckedChangeListener((unused, isChecked) -> {
       if (isChecked)
-        RoutingOptions.addOption(mRoadType);
+        RoutingOptions.addOption(router, roadType);
       else
-        RoutingOptions.removeOption(mRoadType);
-    }
+        RoutingOptions.removeOption(router, roadType);
+    });
   }
 }

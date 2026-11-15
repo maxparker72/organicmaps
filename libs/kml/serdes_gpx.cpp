@@ -8,7 +8,10 @@
 #include "geometry/mercator.hpp"
 
 #include "base/assert.hpp"
+#include "base/stl_helpers.hpp"
 #include "base/string_utils.hpp"
+
+#include <limits>
 
 namespace kml
 {
@@ -45,10 +48,7 @@ std::string_view constexpr kGpxFooter = "</gpx>";
 int constexpr kInvalidColor = 0;
 }  // namespace
 
-GpxParser::GpxParser(FileData & data)
-  : m_data{data}
-  , m_categoryData{&m_data.m_categoryData}
-  , m_globalColor{kInvalidColor}
+GpxParser::GpxParser(FileData & data) : m_data{data}, m_globalColor{kInvalidColor}
 {
   ResetPoint();
 }
@@ -59,31 +59,35 @@ void GpxParser::ResetPoint()
   m_description.clear();
   m_comment.clear();
   m_org = {};
-  m_predefinedColor = PredefinedColor::None;
   m_color = kInvalidColor;
-  m_customName.clear();
   m_geometry.Clear();
   m_geometryType = GEOMETRY_TYPE_UNKNOWN;
-  m_lat = 0.;
-  m_lon = 0.;
+  ResetCoordinates();
   m_altitude = geometry::kInvalidAltitude;
   m_timestamp = base::INVALID_TIME_STAMP;
+  m_rteptName.clear();
+  m_stopCandidates.clear();
+  m_rteptOrdinal = 0;
+}
+
+// A <wpt>/<trkpt>/<rtept> with a missing or unparseable lat/lon attribute must be skipped instead
+// of silently reusing the previous point's coordinates. AddAttr writes m_lat/m_lon only on a
+// successful parse, so this out-of-range sentinel survives and IsValidLatLon rejects the point.
+void GpxParser::ResetCoordinates()
+{
+  m_lat = std::numeric_limits<double>::max();
+  m_lon = std::numeric_limits<double>::max();
 }
 
 bool GpxParser::MakeValid()
 {
   if (GEOMETRY_TYPE_POINT == m_geometryType)
   {
-    m2::PointD const & pt = m_org.GetPoint();
-    if (mercator::ValidX(pt.x) && mercator::ValidY(pt.y))
+    if (IsValidLatLon(m_lat, m_lon))
     {
       // Set default name.
       if (m_name.empty())
         m_name = kml::PointToLineString(m_org);
-      if (m_color != kInvalidColor)
-        m_predefinedColor = MapPredefinedColor(m_color);
-      else
-        m_predefinedColor = PredefinedColor::Red;
       return true;
     }
     return false;
@@ -99,9 +103,15 @@ bool GpxParser::MakeValid()
 bool GpxParser::Push(std::string tag)
 {
   if (tag == gpx::kWpt)
+  {
     m_geometryType = GEOMETRY_TYPE_POINT;
+    ResetCoordinates();
+  }
   else if (tag == gpx::kTrkPt || tag == gpx::kRtePt)
+  {
     m_geometryType = GEOMETRY_TYPE_LINE;
+    ResetCoordinates();
+  }
 
   m_tags.emplace_back(std::move(tag));
 
@@ -246,18 +256,32 @@ void GpxParser::Pop(std::string_view tag)
 
   if (tag == gpx::kTrkPt || tag == gpx::kRtePt)
   {
-    m2::PointD const p = mercator::FromLatLon(m_lat, m_lon);
-    if (m_line.empty() || !AlmostEqualAbs(m_line.back().GetPoint(), p, kMwmPointAccuracy))
+    if (!IsValidLatLon(m_lat, m_lon))
+      LOG(LWARNING, ("Skipping gpx point with invalid coordinates:", m_lat, m_lon));
+    else
     {
-      m_line.emplace_back(p, m_altitude);
+      auto const p = mercator::FromLatLon(m_lat, m_lon);
+      if (m_line.empty() || !AlmostEqualAbs(m_line.back().GetPoint(), p, kMwmPointAccuracy))
+      {
+        m_line.emplace_back(p, m_altitude);
 
-      if (!m_timestamps.empty() && m_timestamp != base::INVALID_TIME_STAMP)
-        ASSERT_LESS_OR_EQUAL(m_timestamps.back(), m_timestamp, ());
-      m_timestamps.emplace_back(m_timestamp);
+        if (!m_timestamps.empty() && m_timestamp != base::INVALID_TIME_STAMP)
+          ASSERT_LESS_OR_EQUAL(m_timestamps.back(), m_timestamp, ());
+        m_timestamps.emplace_back(m_timestamp);
+      }
+
+      if (tag == gpx::kRtePt && GetTagFromEnd(1) == gpx::kRte)
+      {
+        if (!m_rteptName.empty())
+          m_stopCandidates.push_back({m_rteptOrdinal, {p, std::move(m_rteptName)}});
+        // Count valid occurrences even when consecutive duplicates are omitted from the geometry.
+        ++m_rteptOrdinal;
+      }
     }
 
     m_altitude = geometry::kInvalidAltitude;
     m_timestamp = base::INVALID_TIME_STAMP;
+    m_rteptName.clear();
   }
   else if (tag == gpx::kTrkSeg || tag == gpx::kRte)
   {
@@ -275,8 +299,13 @@ void GpxParser::Pop(std::string_view tag)
   }
   else if (tag == gpx::kWpt)
   {
-    m_org.SetPoint(mercator::FromLatLon(m_lat, m_lon));
-    m_org.SetAltitude(m_altitude);
+    if (IsValidLatLon(m_lat, m_lon))
+    {
+      m_org.SetPoint(mercator::FromLatLon(m_lat, m_lon));
+      m_org.SetAltitude(m_altitude);
+    }
+    else
+      LOG(LWARNING, ("Skipping gpx waypoint with invalid coordinates:", m_lat, m_lon));
     m_altitude = geometry::kInvalidAltitude;
   }
 
@@ -291,16 +320,16 @@ void GpxParser::Pop(std::string_view tag)
           data.m_name[kDefaultLang] = std::move(m_name);
         if (!m_description.empty() || !m_comment.empty())
           data.m_description[kDefaultLang] = BuildDescription();
-        data.m_color.m_predefinedColor = m_predefinedColor;
-        data.m_color.m_rgba = m_color;
+        // A colored waypoint imports as an explicit custom color (forced opaque); a colorless
+        // one gets the default preset. See NormalizeBookmarkColorData.
+        data.m_color = NormalizeBookmarkColorData({PredefinedColor::None, m_color});
         data.m_point = m_org;
-        if (!m_customName.empty())
-          data.m_customName[kDefaultLang] = std::move(m_customName);
-        else if (!data.m_name.empty())
-        {
-          // Here we set custom name from 'name' field for KML-files exported from 3rd-party services.
-          data.m_customName = data.m_name;
-        }
+        // A GPX file carries no OM extended data, so its <name> is the only name it has. Store it
+        // in m_customName as well: that is the field the place page, search and every exporter
+        // treat as the user's own name, and a later rename replaces it instead of leaving two
+        // competing names behind. The KML parser copies the name for the same reason, but only for
+        // a plain single-language one - which is all this parser ever produces.
+        data.m_customName = data.m_name;
 
         m_data.m_bookmarksData.push_back(std::move(data));
       }
@@ -332,6 +361,13 @@ void GpxParser::Pop(std::string_view tag)
           data.m_description[kDefaultLang] = BuildDescription();
         data.m_layers.push_back(layer);
         data.m_geometry = std::move(m_geometry);
+
+        // Only intermediate route points become stops: the first and the last valid rtept are the
+        // route's start/finish -- already the geometry's endpoints. Filter by position, not by
+        // coordinates, so a loop route's middle stop coinciding with the start survives.
+        for (auto & [ordinal, stop] : m_stopCandidates)
+          if (ordinal != 0 && ordinal + 1 != m_rteptOrdinal)
+            data.m_stops.push_back(std::move(stop));
 
         m_data.m_tracksData.push_back(std::move(data));
       }
@@ -386,12 +422,12 @@ void GpxParser::ParseDescription(std::string const & value, std::string const & 
   else if (prevTag == kTrk || prevTag == kRte)
   {
     m_description = value;
-    if (m_categoryData->m_description[kDefaultLang].empty())
-      m_categoryData->m_description[kDefaultLang] = value;
+    if (m_data.m_categoryData.m_description[kDefaultLang].empty())
+      m_data.m_categoryData.m_description[kDefaultLang] = value;
   }
   else if (prevTag == kMetadata)
   {
-    m_categoryData->m_description[kDefaultLang] = value;
+    m_data.m_categoryData.m_description[kDefaultLang] = value;
   }
 }
 
@@ -401,15 +437,20 @@ void GpxParser::ParseName(std::string const & value, std::string const & prevTag
   {
     m_name = value;
   }
+  else if (prevTag == kRtePt)
+  {
+    // A named route point becomes a stop of the track (see Pop).
+    m_rteptName = value;
+  }
   else if (prevTag == kTrk || prevTag == kRte)
   {
     m_name = value;
-    if (m_categoryData->m_name[kDefaultLang].empty())
-      m_categoryData->m_name[kDefaultLang] = value;
+    if (m_data.m_categoryData.m_name[kDefaultLang].empty())
+      m_data.m_categoryData.m_name[kDefaultLang] = value;
   }
   else if (prevTag == kMetadata)
   {
-    m_categoryData->m_name[kDefaultLang] = value;
+    m_data.m_categoryData.m_name[kDefaultLang] = value;
   }
 }
 
@@ -417,7 +458,7 @@ void GpxParser::ParseAltitude(std::string const & value)
 {
   double rawAltitude;
   if (strings::to_double(value, rawAltitude))
-    m_altitude = static_cast<geometry::Altitude>(std::round(rawAltitude));
+    m_altitude = ToAltitude(rawAltitude);
   else
     m_altitude = geometry::kInvalidAltitude;
 }
@@ -462,16 +503,16 @@ void SaveColorToARGB(Writer & writer, uint32_t rgba)
 void SaveCategoryData(Writer & writer, CategoryData const & categoryData)
 {
   writer << "<metadata>\n";
-  if (auto const name = GetDefaultLanguage(categoryData.m_name))
+  if (auto const name = GetStringForExport(categoryData.m_name); !name.empty())
   {
     writer << kIndent2 << "<name>";
-    SaveStringWithCDATA(writer, *name);
+    SaveStringWithCDATA(writer, name);
     writer << "</name>\n";
   }
-  if (auto const description = GetDefaultLanguage(categoryData.m_description))
+  if (auto const description = GetStringForExport(categoryData.m_description); !description.empty())
   {
     writer << kIndent2 << "<desc>";
-    SaveStringWithCDATA(writer, *description);
+    SaveStringWithCDATA(writer, description);
     writer << "</desc>\n";
   }
   writer << "</metadata>\n";
@@ -491,20 +532,16 @@ void SaveBookmarkData(Writer & writer, BookmarkData const & bookmarkData)
 {
   auto const [lat, lon] = mercator::ToLatLon(bookmarkData.m_point);
   writer << "<wpt lat=\"" << CoordToString(lat) << "\" lon=\"" << CoordToString(lon) << "\">\n";
-  // If user customized the default bookmark name, it's saved in m_customName.
-  auto name = GetDefaultLanguage(bookmarkData.m_customName);
-  if (!name)
-    name = GetDefaultLanguage(bookmarkData.m_name);  // Original POI name stored when bookmark was created.
-  if (name)
+  if (auto const name = GetPreferredBookmarkName(bookmarkData, "default"); !name.empty())
   {
     writer << kIndent2 << "<name>";
-    SaveStringWithCDATA(writer, *name);
+    SaveStringWithCDATA(writer, name);
     writer << "</name>\n";
   }
-  if (auto const description = GetDefaultLanguage(bookmarkData.m_description))
+  if (auto const description = GetStringForExport(bookmarkData.m_description); !description.empty())
   {
     writer << kIndent2 << "<desc>";
-    SaveStringWithCDATA(writer, *description);
+    SaveStringWithCDATA(writer, description);
     writer << "</desc>\n";
   }
   if (auto const color = BookmarkColor(bookmarkData); color != kInvalidColor)
@@ -518,13 +555,22 @@ void SaveBookmarkData(Writer & writer, BookmarkData const & bookmarkData)
   writer << "</wpt>\n";
 }
 
+// Track stops are exported as plain waypoints readable by other apps (GPX has no notion of
+// per-track stops), so reimporting yields bookmarks, not stops. KML keeps full fidelity.
+void SaveTrackStopData(Writer & writer, TrackStopData const & stop)
+{
+  BookmarkData bookmarkData;
+  bookmarkData.m_point = stop.m_point;
+  SetDefaultStr(bookmarkData.m_name, stop.m_name);
+  SaveBookmarkData(writer, bookmarkData);
+}
+
+// True if any line in the track carries real elevation (see LineHasAltitude). Scanning every
+// point (not just the first) keeps GPX export consistent with the elevation chart
+// (Track::HasAltitudes) for mixed tracks whose first point lacks altitude.
 bool TrackHasAltitudes(TrackData const & trackData)
 {
-  auto const & lines = trackData.m_geometry.m_lines;
-  if (lines.empty() || lines.front().empty())
-    return false;
-  auto const altitude = lines.front().front().GetAltitude();
-  return altitude != geometry::kDefaultAltitudeMeters && altitude != geometry::kInvalidAltitude;
+  return base::AnyOf(trackData.m_geometry.m_lines, LineHasAltitude);
 }
 
 uint32_t TrackColor(TrackData const & trackData)
@@ -537,17 +583,16 @@ uint32_t TrackColor(TrackData const & trackData)
 void SaveTrackData(Writer & writer, TrackData const & trackData)
 {
   writer << "<trk>\n";
-  auto name = GetDefaultLanguage(trackData.m_name);
-  if (name)
+  if (auto const name = GetStringForExport(trackData.m_name); !name.empty())
   {
     writer << kIndent2 << "<name>";
-    SaveStringWithCDATA(writer, *name);
+    SaveStringWithCDATA(writer, name);
     writer << "</name>\n";
   }
-  if (auto const description = GetDefaultLanguage(trackData.m_description))
+  if (auto const description = GetStringForExport(trackData.m_description); !description.empty())
   {
     writer << kIndent2 << "<desc>";
-    SaveStringWithCDATA(writer, *description);
+    SaveStringWithCDATA(writer, description);
     writer << "</desc>\n";
   }
   if (auto const color = TrackColor(trackData); color != kDefaultTrackColor)
@@ -584,10 +629,10 @@ void SaveTrackData(Writer & writer, TrackData const & trackData)
 
       writer << kIndent4 << "<trkpt lat=\"" << CoordToString(lat) << "\" lon=\"" << CoordToString(lon) << "\">\n";
 
-      if (trackHasAltitude)
+      if (trackHasAltitude && point.GetAltitude() != geometry::kInvalidAltitude)
         writer << kIndent6 << "<ele>" << CoordToString(point.GetAltitude()) << "</ele>\n";
 
-      if (lineHasTimestamps)
+      if (lineHasTimestamps && timestampsForLine[pointIndex] != base::INVALID_TIME_STAMP)
         writer << kIndent6 << "<time>" << base::SecondsSinceEpochToString(timestampsForLine[pointIndex]) << "</time>\n";
 
       writer << kIndent4 << "</trkpt>\n";
@@ -600,10 +645,16 @@ void SaveTrackData(Writer & writer, TrackData const & trackData)
 
 void GpxWriter::Write(FileData const & fileData)
 {
+  if (!fileData.m_areasData.empty())
+    MYTHROW(WriteGpxException, ("GPX cannot store polygon areas. Use KML or KMZ."));
   m_writer << kGpxHeader;
   SaveCategoryData(m_writer, fileData.m_categoryData);
   for (auto const & bookmarkData : fileData.m_bookmarksData)
     SaveBookmarkData(m_writer, bookmarkData);
+  // The GPX schema requires wpt* elements before trk*, so track stops are written here.
+  for (auto const & trackData : fileData.m_tracksData)
+    for (auto const & stop : trackData.m_stops)
+      SaveTrackStopData(m_writer, stop);
   for (auto const & trackData : fileData.m_tracksData)
     SaveTrackData(m_writer, trackData);
   m_writer << kGpxFooter;

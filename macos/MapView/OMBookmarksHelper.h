@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#import <CoreApi/MWMBookmarkColor.h>
+#import "OMBookmarkColor.h"
 #import <CoreApi/MWMTypes.h>
 
 @class OMTrackStats;
@@ -72,19 +72,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)displayNameForRegion:(NSString *)countryId
     NS_SWIFT_NAME(displayName(forRegion:));
 
-// Coerce every bookmark and track to a standard look: snap arbitrary RGBA
-// colors to the 16-color predefined palette (kml::MapPredefinedColor) and set
+// Coerce every bookmark and track to a standard look: snap custom colors to the
+// nearest entry of the 16-color palette (kml::MapPredefinedColor) and set
 // every track layer's line width to a single standard value. Idempotent;
 // already-standard items are left untouched. Returns the count of items
 // whose data was actually rewritten.
 + (NSInteger)normalizeAllItems;
-
-// Give bookmarks without a palette color (PredefinedColor::None/Count, common in
-// imported files) the nearest palette entry, so the navigator doesn't show them as
-// gray while the map draws them red. Leaves m_rgba, every other bookmark and every
-// track untouched. Run after imports; normalizeAllItems stays an explicit command.
-// Returns the count of bookmarks changed.
-+ (NSInteger)assignPaletteColorsToUncoloredBookmarks;
 
 // Per-track statistics snapshot (length, ascent/descent, duration, point
 // count, date range). Returns nil if the track no longer exists.
@@ -108,9 +101,9 @@ NS_ASSUME_NONNULL_BEGIN
     NS_SWIFT_NAME(moveBookmarks(_:to:));
 + (void)moveTracks:(NSArray<NSNumber *> *)trackIds toList:(MWMMarkGroupID)groupId
     NS_SWIFT_NAME(moveTracks(_:to:));
-+ (void)setBookmarks:(NSArray<NSNumber *> *)bookmarkIds color:(MWMBookmarkColor)color
++ (void)setBookmarks:(NSArray<NSNumber *> *)bookmarkIds color:(OMBookmarkColor)color
     NS_SWIFT_NAME(setBookmarks(_:color:));
-+ (void)setTracks:(NSArray<NSNumber *> *)trackIds color:(MWMBookmarkColor)color
++ (void)setTracks:(NSArray<NSNumber *> *)trackIds color:(OMBookmarkColor)color
     NS_SWIFT_NAME(setTracks(_:color:));
 
 // Inverse of `loadBookmarkFile:` — given a file path the engine has loaded,

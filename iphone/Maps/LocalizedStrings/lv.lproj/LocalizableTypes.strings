@@ -209,7 +209,8 @@
 "type.barrier.chain" = "Chain";
 "type.barrier.city_wall" = "City Wall";
 "type.barrier.cycle_barrier" = "Cycle Barrier";
-"type.waterway.ditch" = "Drainage Ditch";
+"type.waterway.ditch" = "Meliorācijas grāvis";
+"type.waterway.ditch.intermittent" = "Pagaidu meliorācijas grāvis";
 "type.natural.water.moat" = "Moat";
 "type.natural.water.wastewater" = "Wastewater";
 "type.barrier.entrance" = "Entrance";
@@ -407,28 +408,28 @@
 "type.highway" = "Highway";
 "type.highway.bridleway" = "Bridle Path";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Bridge";
 "type.highway.bridleway.permissive" = "Bridle Path";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Tunnel";
 "type.highway.busway" = "Dedicated Bus Road";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Tilts";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Tunelis";
 "type.highway.bus_stop" = "Pietura";
 "type.highway.construction" = "Road Under Construction";
 "type.highway.cycleway" = "Cycle Path";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Bridge";
 "type.highway.cycleway.permissive" = "Cycle Path";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Tunnel";
 "type.highway.elevator" = "Elevator";
 "type.highway.footway" = "Foot Path";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Pedestrian Crossing";
 "type.highway.footway.area" = "Pedestrian Area";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Pedestrian Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Pedestrian Tunnel";
 "type.highway.ford" = "Ford";
 "type.highway.living_street" = "Living Street";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Tunnel";
 "type.highway.motorway" = "Motorway";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Motorway Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Motorway Tunnel";
 "type.highway.motorway_junction" = "Road Exit";
 "type.highway.motorway_link" = "Motorway Ramp";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Tunnel";
 "type.highway.path" = "Path";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Cycle & Foot Path";
 "type.highway.footway.bicycle" = "Cycle & Foot Path";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Bridge";
 "type.highway.path.horse" = "Bridle Path";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Tunnel";
 "type.highway.pedestrian" = "Pedestrian Street";
 "type.highway.pedestrian.area" = "Pedestrian Area";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Pedestrian Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Pedestrian Tunnel";
-"type.highway.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "Perons";
 "type.highway.primary" = "Primary Road";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Tunnel";
 "type.highway.primary_link" = "Primary Road Ramp";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Tunnel";
 "type.highway.raceway" = "Racetrack";
 "type.highway.residential" = "Residential Street";
 "type.highway.residential.area" = "Residential Street";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Tunnel";
 "type.highway.rest_area" = "Rest Area";
 "type.highway.road" = "Road";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Bridge";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Tunnel";
 "type.highway.secondary" = "Secondary Road";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Tunnel";
 "type.highway.secondary_link" = "Secondary Road Ramp";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Tunnel";
 "type.highway.service" = "Service Road";
 "type.highway.service.area" = "Service Road";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Bridge";
 "type.highway.service.driveway" = "Driveway";
 "type.highway.service.parking_aisle" = "Parking Aisle";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Tunnel";
 "type.highway.services" = "Service Area";
 "type.highway.speed_camera" = "Speed Camera";
 "type.highway.steps" = "Stairs";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Tunnel";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "Tertiary Road";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Tunnel";
 "type.highway.tertiary_link" = "Tertiary Road Ramp";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Tunnel";
 "type.highway.track" = "Track";
 "type.highway.track.area" = "Track";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Bridge";
 "type.highway.track.grade1" = "Track";
 "type.highway.track.no.access" = "Track";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Tunnel";
 "type.highway.traffic_signals" = "Traffic Lights";
 "type.highway.trunk" = "Trunk Road";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Tunnel";
 "type.highway.trunk_link" = "Trunk Road Ramp";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Tunnel";
 "type.highway.unclassified" = "Minor Road";
 "type.highway.unclassified.area" = "Minor Road";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Bridge";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Tunnel";
 "type.area_highway.cycleway" = "Cycle Path";
 "type.area_highway.footway" = "Foot Path";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Japanese Castle";
 "type.historic.castle.stately" = "Stately Castle";
 "type.historic.city_gate" = "City Gate";
+"type.man_made.ceremonial_gate" = "Ceremonijas vārti";
 "type.historic.citywalls" = "City Wall";
 "type.historic.fort" = "Fort";
 "type.historic.gallows" = "Gallows";
@@ -718,6 +722,7 @@
 "type.landuse" = "Landuse";
 "type.landuse.allotments" = "Allotments";
 "type.landuse.basin" = "Basin";
+"type.landuse.basin.intermittent" = "Pagaidu baseins";
 "type.landuse.brownfield" = "Brownfield";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Quarry";
 "type.landuse.railway" = "Railway Premises";
 "type.landuse.recreation_ground" = "Recreation Ground";
-"type.landuse.reservoir" = "Reservoir";
 "type.landuse.residential" = "Residential Area";
 "type.landuse.retail" = "Retail Area";
 "type.landuse.salt_pond" = "Salt Pond";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Ice Rink";
 "type.leisure.marina" = "Marina";
 "type.leisure.nature_reserve" = "Nature Reserve";
+"type.leisure.bird_hide" = "Putnu vērošanas slēpnis";
 "type.leisure.outdoor_seating" = "Outdoor Seating";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "Park";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Pier";
 "type.man_made.pipeline" = "Pipeline";
 "type.man_made.pipeline.overground" = "Overground Pipeline";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Segts ūdens rezervuārs";
 "type.man_made.silo" = "Silo";
 "type.man_made.storage_tank" = "Storage Tank";
 "type.man_made.surveillance" = "Surveillance Camera";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Water Tower";
 "type.man_made.water_well" = "Water Well";
 "type.man_made.water_well.drinking_water_no" = "Water Well";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Ūdens attīrīšanas stacija";
 "type.man_made.windmill" = "Windmill";
 "type.man_made.works" = "Industrial Works";
 
@@ -871,10 +882,13 @@
 "type.natural.water.reservoir" = "Reservoir";
 "type.natural.water.basin" = "Basin";
 "type.natural.water.river" = "River";
+"type.natural.water.intermittent" = "Pagaidu ūdenstilpe";
 "type.natural.land" = "Land";
 "type.natural.meadow" = "Meadow";
 "type.natural.orchard" = "Orchard";
 "type.natural.peak" = "Peak";
+"type.natural.hill" = "Pakalns";
+"type.natural.arch" = "Akmeņu arka";
 "type.natural.saddle" = "Mountain Saddle";
 "type.natural.rock" = "Rock";
 "type.natural.scrub" = "Scrub";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "Public Transport";
-"type.public_transport.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "Perons";
 "type.railway" = "Railway";
 "type.railway.abandoned" = "Abandoned Railway";
 "type.railway.abandoned.bridge" = "Abandoned Railway Bridge";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Greengrocer";
 "type.shop.grocery" = "Grocery Store";
 "type.shop.hairdresser" = "Hairdresser";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Bārddzinis";
 "type.shop.hardware" = "Hardware Store";
 "type.shop.health_food" = "Health Food Shop";
 "type.shop.hearing_aids" = "Dzirdes aparātu veikals";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Regbijs-15";
 "type.sport.running" = "Skriešana";
 "type.sport.softball" = "Softbols";
+"type.sport.pilates" = "Pilates";
 "type.tourism" = "Tourism";
 "type.tourism.aquarium" = "Aquarium";
 
@@ -1513,24 +1533,27 @@
 "type.traffic_calming.hump" = "Traffic Hump";
 "type.waterway" = "Waterway";
 "type.waterway.access_point" = "Piekļuves punkts pie ūdensceļiem";
-"type.waterway.canal" = "Canal";
+"type.waterway.canal" = "Kanāls";
+"type.waterway.canal.intermittent" = "Pagaidu kanāls";
 "type.waterway.canal.tunnel" = "Canal Tunnel";
-"type.waterway.fish_pass" = "Fish Pass";
+"type.waterway.fish_pass" = "Zivju ceļš";
+"type.waterway.fish_pass.intermittent" = "Pagaidu zivju ceļš";
 "type.waterway.dam" = "Dam";
 "type.barrier.ditch" = "Ditch";
-"type.natural.water.ditch" = "Drainage Ditch";
+"type.natural.water.ditch" = "Meliorācijas grāvis";
 "type.waterway.ditch.tunnel" = "Culvert";
 "type.waterway.dock" = "Waterway Dock";
-"type.waterway.drain" = "Drain";
-"type.natural.water.drain" = "Drain";
+"type.waterway.drain" = "Notekgrāvis";
+"type.waterway.drain.intermittent" = "Pagaidu notekgrāvis";
+"type.natural.water.drain" = "Notekgrāvis";
 "type.waterway.drain.tunnel" = "Culvert";
 "type.waterway.lock_gate" = "Lock Gate";
-"type.waterway.river" = "River";
-"type.waterway.river.tunnel" = "River";
-"type.waterway.stream" = "Stream";
-"type.waterway.stream.ephemeral" = "Ephemeral Stream";
-"type.waterway.stream.intermittent" = "Intermittent Stream";
-"type.waterway.stream.tunnel" = "Stream";
+"type.waterway.river" = "Upe";
+"type.waterway.river.intermittent" = "Pagaidu upe";
+"type.waterway.river.tunnel" = "Upe";
+"type.waterway.stream" = "Strauts";
+"type.waterway.stream.intermittent" = "Pagaidu strauts";
+"type.waterway.stream.tunnel" = "Strauts";
 "type.waterway.waterfall" = "Waterfall";
 "type.waterway.weir" = "Weir";
 "type.wheelchair" = "Wheelchair";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Social Facility";
+"type.amenity.stage" = "Skatuve";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Emergency Ward Entrance";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Laikapstākļu monitoringa stacija";
 "type.amenity.student_accommodation" = "Studentu izmitināšana";
 "type.craft.watchmaker" = "Pulksteņmeistars";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Logu ražošana";
 "type.xmas_feature.market" = "Ziemassvētku tirdziņš";
 "type.xmas_feature.tree" = "Ziemassvētku eglīte";
 "type.amenity.hookah_lounge" = "Ūdenspīpes bārs";

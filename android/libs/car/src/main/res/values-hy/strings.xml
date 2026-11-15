@@ -47,6 +47,8 @@
     <string name="auto">Ավտոմատ</string>
     <!-- Settings «Map» category: «3D buildings» title -->
     <string name="pref_map_3d_buildings_title">3D շենքեր</string>
+    <!-- Settings «Route» category: «Tts unavailable» subtitle. Also used as a CarToast in Android Auto when the user taps the muted voice icon. -->
+    <string name="pref_tts_unavailable">Անհասանելի է</string>
     <!-- Text in menu -->
     <string name="help">Օգնություն</string>
     <!-- In maps downloader and country place page shows how many maps are downloaded / to download, e.g. "Maps: 3 of 10" -->
@@ -66,9 +68,12 @@
     <string name="editor_time_open">Բաց է</string>
     <string name="twentyfour_seven">24/7</string>
     <string name="day_off_today">Այսօր փակ է</string>
+    <string name="midnight">Կեսգիշեր</string>
+    <string name="noon">Կեսօր</string>
     <string name="opens_in">Բացվում է %s</string>
     <string name="closes_in">Փակվում է %s</string>
     <string name="closed">Փակ է</string>
+    <!-- Short label for minutes (time unit), placed after a number -->
     <string name="minute">ր</string>
     <string name="big_font">Մեծացնել քարտեզի գրությունների չափսը</string>
     <string name="transliteration_title">Տառադարձել լատինատառի</string>

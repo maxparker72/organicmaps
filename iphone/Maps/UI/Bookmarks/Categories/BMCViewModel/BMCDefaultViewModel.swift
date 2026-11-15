@@ -47,8 +47,6 @@ final class BMCDefaultViewModel: NSObject {
       if manager.recentlyDeletedCategoriesCount() != .zero {
         sections.append(.recentlyDeleted)
       }
-    } else {
-      sections.append(.notifications)
     }
 
     view?.update(sections: [])
@@ -77,8 +75,11 @@ extension BMCDefaultViewModel {
     case .categories: return categories.count
     case .actions: return actions.count
     case .recentlyDeleted: return 1
-    case .notifications: return 1
     }
+  }
+
+  func shouldShowLoadingPlaceholder() -> Bool {
+    !manager.areBookmarksLoaded()
   }
 
   func category(at index: Int) -> BookmarkGroup {
@@ -98,9 +99,7 @@ extension BMCDefaultViewModel {
   }
 
   func areAllCategoriesHidden() -> Bool {
-    var result = true
-    categories.forEach { if $0.isVisible { result = false } }
-    return result
+    !categories.contains { $0.isVisible }
   }
 
   func updateAllCategoriesVisibility(isShowAll: Bool) {
@@ -169,7 +168,7 @@ extension BMCDefaultViewModel: BookmarksObserver {
     reloadData()
   }
 
-  func onBookmarkDeleted(_: MWMMarkID) {
+  func onBookmarksDeleted(_: [NSNumber]) {
     reloadData()
   }
 }

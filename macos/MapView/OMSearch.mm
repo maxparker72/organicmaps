@@ -130,7 +130,7 @@ OMSearchResult * Wrap(search::Result const & r, NSUInteger index)
       m_locale,
       {} /* default timeout */,
       m_isCategory,
-      [weakSelf, token](search::Results results, std::vector<search::ProductInfo> /*productInfo*/)
+      [weakSelf, token](search::Results results)
       {
         OMSearch * self = weakSelf;
         if (!self || token != self->m_queryToken.load())

@@ -163,6 +163,7 @@
     <string name="type.barrier.border_control">ด่านตรวจคนเข้าเมือง</string>
     <string name="type.barrier.city_wall">กำแพงเมือง</string>
     <string name="type.waterway.ditch">คูระบายน้ำ</string>
+    <string name="type.waterway.ditch.intermittent">คูระบายน้ำชั่วคราว</string>
     <string name="type.natural.water.moat">คูเมือง</string>
     <string name="type.natural.water.wastewater">น้ำเสีย</string>
     <string name="type.barrier.entrance">ทางเข้า</string>
@@ -329,45 +330,45 @@
     <string name="type.healthcare.speech_therapist">การบำบัดด้วยการพูด</string>
 
     <!-- SECTION: Types: Roads -->
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">อุโมงค์</string>
     <string name="type.highway.busway">ถนนทางเดินรถโดยเฉพาะ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">อุโมงค์</string>
     <string name="type.highway.bus_stop">ป้ายรถเมล์</string>
     <string name="type.highway.construction">ทางกำลังอยู่ในการก่อสร้าง</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">อุโมงค์</string>
     <string name="type.highway.footway">เส้นทาง</string>
     <string name="type.highway.footway.sidewalk">ทางเท้า</string>
     <string name="type.highway.footway.crossing">ทางม้าลาย</string>
     <string name="type.highway.footway.area">เส้นทาง</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">อุโมงค์</string>
     <string name="type.highway.ford">ที่ตื้นของทางน้ำ</string>
     <string name="type.highway.living_street">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">อุโมงค์</string>
     <string name="type.highway.motorway">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">อุโมงค์</string>
     <string name="type.highway.motorway_junction">ทางออก</string>
     <string name="type.highway.motorway_link">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">อุโมงค์</string>
     <string name="type.highway.path">เส้นทาง</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -376,100 +377,102 @@
     <string name="type.highway.path.expert">เส้นทางที่ยากมากหรือแยกไม่ออก</string>
     <string name="type.highway.path.bicycle">เส้นทาง</string>
     <string name="type.highway.footway.bicycle">เส้นทาง</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">สะพาน</string>
     <string name="type.highway.path.horse">เส้นทาง</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">อุโมงค์</string>
     <string name="type.highway.pedestrian">ถนน</string>
     <string name="type.highway.pedestrian.area">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">อุโมงค์</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">จุดรับส่งผู้โดยสาร</string>
     <string name="type.highway.primary">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">อุโมงค์</string>
     <string name="type.highway.primary_link">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">อุโมงค์</string>
     <string name="type.highway.raceway">สนามแข่ง</string>
     <string name="type.highway.residential">ถนน</string>
     <string name="type.highway.residential.area">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">อุโมงค์</string>
     <string name="type.highway.rest_area">บริเวณพักผ่อน</string>
     <string name="type.highway.road">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">สะพาน</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">อุโมงค์</string>
     <string name="type.highway.secondary">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">อุโมงค์</string>
     <string name="type.highway.secondary_link">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">อุโมงค์</string>
     <string name="type.highway.service">ถนน</string>
     <string name="type.highway.service.area">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">สะพาน</string>
     <string name="type.highway.service.driveway">ถนน</string>
     <string name="type.highway.service.parking_aisle">ถนน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">อุโมงค์</string>
     <string name="type.highway.speed_camera">กล้องตรวจจับความเร็ว</string>
     <string name="type.highway.steps">เส้นทาง</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">อุโมงค์</string>
     <string name="type.highway.tertiary">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">อุโมงค์</string>
     <string name="type.highway.tertiary_link">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">อุโมงค์</string>
     <string name="type.highway.track">ถนน</string>
     <string name="type.highway.track.area">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">สะพาน</string>
     <string name="type.highway.track.grade1">ถนน</string>
     <string name="type.highway.track.no.access">ถนน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">อุโมงค์</string>
     <string name="type.highway.traffic_signals">สัญญาณไฟจราจร</string>
     <string name="type.highway.trunk">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">อุโมงค์</string>
     <string name="type.highway.trunk_link">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">อุโมงค์</string>
     <string name="type.highway.unclassified">ถนน</string>
     <string name="type.highway.unclassified.area">ถนน</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">สะพาน</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">อุโมงค์</string>
     <string name="type.area_highway.footway">เส้นทาง</string>
     <string name="type.area_highway.living_street">ถนน</string>
@@ -506,6 +509,7 @@
     <string name="type.historic.castle.shiro">ปราสาทญี่ปุ่น</string>
     <string name="type.historic.castle.stately">ปราสาท</string>
     <string name="type.historic.city_gate">ประตูเมือง</string>
+    <string name="type.man_made.ceremonial_gate">ประตูพิธีการ</string>
     <string name="type.historic.citywalls">กำแพงเมือง</string>
     <string name="type.historic.fort">ป้อม</string>
     <string name="type.historic.locomotive">หัวรถจักรประวัติศาสตร์</string>
@@ -533,6 +537,7 @@
     <string name="type.internet_access">อินเทอร์เน็ต</string>
     <string name="type.internet_access.wlan">อินเทอร์เน็ต</string>
     <string name="type.landuse.basin">อ่างน้ำ</string>
+    <string name="type.landuse.basin.intermittent">อ่างน้ำชั่วคราว</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">สุสาน</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
@@ -548,7 +553,6 @@
     <string name="type.landuse.grass">สนามหญ้า</string>
     <string name="type.landuse.landfill">พื้นที่ฝังกลบ</string>
     <string name="type.landuse.railway">ที่ก่อสร้างทางรถไฟ</string>
-    <string name="type.landuse.reservoir">น้ำ</string>
     <string name="type.landuse.residential">เขตที่อยู่อาศัย</string>
     <string name="type.leisure.dog_park">สถานที่พาสุนัขเดินเล่น</string>
     <string name="type.leisure.fitness_centre">ฟิตเนสเซ็นเตอร์</string>
@@ -560,6 +564,7 @@
     <string name="type.leisure.miniature_golf">มินิกอล์ฟ</string>
     <string name="type.leisure.hackerspace">แฮกเกอร์สเปซ</string>
     <string name="type.leisure.nature_reserve">เขตอนุรักษ์ธรรมชาติ</string>
+    <string name="type.leisure.bird_hide">ที่ซ่อนดูนก</string>
     <string name="type.leisure.outdoor_seating">ที่นั่งกลางแจ้ง</string>
     <string name="type.leisure.park">สวนสาธารณะ</string>
     <string name="type.leisure.park.no.access">สวนสาธารณะ</string>
@@ -580,6 +585,8 @@
     <string name="type.leisure.water_park">สวนน้ำ</string>
     <string name="type.man_made.chimney">ปล่องควันโรงงาน</string>
     <string name="type.man_made.lighthouse">ประภาคาร</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">อ่างเก็บน้ำแบบปิด</string>
     <string name="type.man_made.surveillance">กล้องวงจรปิด</string>
     <string name="type.man_made.tower">หอคอย</string>
     <!-- A huge telecommunications tower. Often a local monument or a landmark. -->
@@ -595,6 +602,8 @@
     <string name="type.man_made.water_tower">อ่างเก็บน้ำ</string>
     <string name="type.man_made.water_well">บ่อน้ำ</string>
     <string name="type.man_made.water_well.drinking_water_no">บ่อน้ำ</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">โรงผลิตน้ำประปา</string>
     <string name="type.man_made.windmill">กังหันลม</string>
     <string name="type.military.bunker">บังเกอร์</string>
     <string name="type.natural">ธรรมชาติ</string>
@@ -625,10 +634,13 @@
     <string name="type.natural.water.reservoir">อ่างเก็บน้ำ</string>
     <string name="type.natural.water.basin">อ่างน้ำ</string>
     <string name="type.natural.water.river">แม่น้ำ</string>
+    <string name="type.natural.water.intermittent">แหล่งน้ำชั่วคราว</string>
     <string name="type.natural.land">พื้นดิน</string>
     <string name="type.natural.meadow">ทุ่งหญ้า</string>
     <string name="type.natural.orchard">สวนผลไม้</string>
     <string name="type.natural.peak">จุดสูงสุด</string>
+    <string name="type.natural.hill">เนินเขา</string>
+    <string name="type.natural.arch">ซุ้มหิน</string>
     <string name="type.natural.saddle">อานภูเขา</string>
     <string name="type.natural.rock">หิน</string>
     <string name="type.natural.scrub">ป่าละเมาะ</string>
@@ -701,6 +713,8 @@
     <string name="type.power.substation">สถานีไฟฟ้า</string>
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">เสาไฟฟ้า</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">จุดรับส่งผู้โดยสาร</string>
     <string name="type.railway.disused.tunnel">อุโมงค์รถไฟเลิกใช้</string>
     <string name="type.railway.funicular">รถกระเช้าไฟฟ้า</string>
     <string name="type.railway.halt">สถานีรถไฟ</string>
@@ -1023,6 +1037,8 @@
     <string name="type.shop.greengrocer">ร้านขายผัด</string>
     <string name="type.shop.grocery">ร้านขายของชำ</string>
     <string name="type.shop.hairdresser">ช่างทำผม</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">ร้านตัดผมชาย</string>
     <string name="type.shop.hardware">ร้านฮาร์ดแวร์</string>
     <string name="type.shop.health_food">ร้านอาหารเพื่อสุขภาพ</string>
     <string name="type.shop.hearing_aids">ร้านเครื่องช่วยฟัง</string>
@@ -1143,6 +1159,7 @@
     <string name="type.sport.rugby_union">รักบี้ยูเนี่ยน</string>
     <string name="type.sport.running">วิ่ง</string>
     <string name="type.sport.softball">ซอฟต์บอล</string>
+    <string name="type.sport.pilates">พิลาทิส</string>
     <string name="type.tourism.aquarium">พิพิธภัณฑ์สัตว์น้ำ</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
     <string name="type.tourism.alpine_hut">บ้านพักบนภูเขา</string>
@@ -1188,18 +1205,23 @@
     <string name="type.tourism.zoo.petting">สวนสัตว์ลูบคลำ</string>
     <string name="type.waterway.access_point">จุดเข้าถึงทางน้ำ</string>
     <string name="type.waterway.canal">คลอง</string>
+    <string name="type.waterway.canal.intermittent">คลองชั่วคราว</string>
     <string name="type.waterway.canal.tunnel">คลอง</string>
     <string name="type.waterway.fish_pass">บันไดปลา</string>
+    <string name="type.waterway.fish_pass.intermittent">บันไดปลาชั่วคราว</string>
     <string name="type.natural.water.ditch">คูระบายน้ำ</string>
     <string name="type.waterway.ditch.tunnel">ท่อระบายน้ำ</string>
+    <string name="type.waterway.drain">ร่องระบายน้ำ</string>
+    <string name="type.waterway.drain.intermittent">ร่องระบายน้ำชั่วคราว</string>
+    <string name="type.natural.water.drain">ร่องระบายน้ำ</string>
     <string name="type.waterway.drain.tunnel">ท่อระบายน้ำ</string>
     <string name="type.waterway.lock_gate">ประตูระบายน้ำ</string>
     <string name="type.waterway.river">แม่น้ำ</string>
+    <string name="type.waterway.river.intermittent">แม่น้ำชั่วคราว</string>
     <string name="type.waterway.river.tunnel">แม่น้ำ</string>
-    <string name="type.waterway.stream">แม่น้ำ</string>
-    <string name="type.waterway.stream.ephemeral">แม่น้ำ</string>
-    <string name="type.waterway.stream.intermittent">แม่น้ำ</string>
-    <string name="type.waterway.stream.tunnel">แม่น้ำ</string>
+    <string name="type.waterway.stream">ลำธาร</string>
+    <string name="type.waterway.stream.intermittent">ลำธารชั่วคราว</string>
+    <string name="type.waterway.stream.tunnel">ลำธาร</string>
     <string name="type.waterway.waterfall">น้ำตก</string>
     <string name="type.wheelchair.limited">พื้นที่จำกัดการใช้รถเข็นสำหรับผู้ป่วย/ผู้สูงอายุ</string>
     <string name="type.wheelchair.no">พื้นที่ไม่สามารถใช้รถเข็นสำหรับผู้ป่วย/ผู้สูงอายุ</string>
@@ -1217,6 +1239,7 @@
     <string name="type.self_service.no">ไม่มีบริการตนเอง</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">สิ่งอำนวยความสะดวกทางสังคม</string>
+    <string name="type.amenity.stage">เวที</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">ทางเข้าแผนกฉุกเฉิน</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1238,6 +1261,8 @@
     <string name="type.man_made.monitoring_station.weather">สถานีตรวจวัดสภาพอากาศ</string>
     <string name="type.amenity.student_accommodation">ที่พักนักศึกษา</string>
     <string name="type.craft.watchmaker">ช่างซ่อมนาฬิกา</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">ช่างทำหน้าต่าง</string>
     <string name="type.xmas_feature.market">ตลาดคริสต์มาส</string>
     <string name="type.xmas_feature.tree">ต้นคริสต์มาส</string>
     <string name="type.amenity.hookah_lounge">ร้านบารากู่</string>

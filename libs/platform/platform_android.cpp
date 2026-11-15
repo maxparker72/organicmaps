@@ -12,6 +12,8 @@
 #include "base/string_utils.hpp"
 #include "base/thread.hpp"
 
+#include "defines.hpp"
+
 #include <algorithm>
 #include <memory>
 #include <ranges>
@@ -114,9 +116,12 @@ std::unique_ptr<ModelReader> Platform::GetReader(std::string const & file, std::
       ASSERT_EQUAL(file.find("assets/"), std::string::npos, ());
       try
       {
-        return make_unique<ZipFileReader>(m_resourcesDir, "assets/" + file, logPageSize, logPageCount);
+        return ZipFileReader::CreateModelReader(m_resourcesDir, "assets/" + file, logPageSize, logPageCount);
       }
-      catch (Reader::OpenException const & e)
+      // Catch std::exception, not just Reader::OpenException: inflating a compressed asset can throw
+      // std::bad_alloc (low-memory devices), which must fall through to FileAbsentException rather than
+      // terminate. RootException derives from std::exception, so locate/open failures are still caught.
+      catch (std::exception const & e)
       {
         LOG(LWARNING, ("Can't get reader:", e.what()));
       }
@@ -158,16 +163,6 @@ void Platform::GetFilesByRegExp(std::string const & directory, std::string const
   }
   else
     pl::EnumerateFilesByRegExp(directory, regexp, res);
-}
-
-int Platform::VideoMemoryLimit() const
-{
-  return 10 * 1024 * 1024;
-}
-
-int Platform::PreCachingDepth() const
-{
-  return 3;
 }
 
 bool Platform::GetFileSizeByName(std::string const & fileName, uint64_t & size) const

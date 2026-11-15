@@ -25,8 +25,8 @@ class DownloadMapsViewController: MWMViewController {
   var dataSource: IDownloaderDataSource!
   @objc var mode: MWMMapDownloaderMode = .downloaded
   private var skipCountryEvent = false
+  private var footerShowsProgress = false
   private var hasAddMapSection: Bool { dataSource.isRoot && mode == .downloaded }
-  private let allMapsViewBottomOffsetConstant: CGFloat = 64
 
   lazy var noSerchResultViewController: SearchNoResultsViewController = {
     let vc = storyboard!.instantiateViewController(ofType: SearchNoResultsViewController.self)
@@ -106,6 +106,11 @@ class DownloadMapsViewController: MWMViewController {
     Storage.shared().remove(self)
   }
 
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    updateTableViewContentInset()
+  }
+
   fileprivate func showChildren(_ nodeAttrs: MapNodeAttributes) {
     let vc = storyboard!.instantiateViewController(ofType: DownloadMapsViewController.self)
     vc.mode = dataSource.isSearching ? .available : mode
@@ -126,7 +131,8 @@ class DownloadMapsViewController: MWMViewController {
     case .undefined:
       actions = []
     case .downloading, .applying, .inQueue:
-      actions = [.cancelDownload]
+      // An installed map stays usable while its update or terrain downloads.
+      actions = nodeAttrs.downloadedMwmCount > 0 ? [.showOnMap, .cancelDownload] : [.cancelDownload]
     case .error:
       actions = nodeAttrs.downloadedMwmCount > 0 ? [.retryDownload, .delete] : [.retryDownload]
     case .onDiskOutOfDate:
@@ -157,13 +163,13 @@ class DownloadMapsViewController: MWMViewController {
         })
       case .download:
         let prefix = nodeAttrs.totalMwmCount == 1 ? L("downloader_download_map") : L("downloader_download_all_button")
-        action = UIAlertAction(title: "\(prefix) (\(formattedSize(nodeAttrs.totalSize)))",
+        action = UIAlertAction(title: "\(prefix) (\(formattedSize(nodeAttrs.downloadingSize)))",
                                style: .default,
                                handler: { _ in
                                  Storage.shared().downloadNode(nodeAttrs.countryId)
                                })
       case .update:
-        let size = formattedSize(nodeAttrs.totalUpdateSizeBytes)
+        let size = formattedSize(nodeAttrs.downloadingSize)
         let title = "\(L("downloader_status_outdated")) \(size)"
         action = UIAlertAction(title: title, style: .default, handler: { _ in
           Storage.shared().updateNode(nodeAttrs.countryId)
@@ -194,46 +200,66 @@ class DownloadMapsViewController: MWMViewController {
     noMapsContainer.isHidden = !dataSource.isEmpty || Storage.shared().downloadInProgress()
   }
 
+  private func updateTableViewContentInset() {
+    let bottomInset: CGFloat
+    if downloadAllViewContainer.isHidden {
+      bottomInset = 0
+    } else {
+      let containerFrame = downloadAllViewContainer.convert(downloadAllViewContainer.bounds, to: view)
+      bottomInset = max(0, view.bounds.maxY - containerFrame.minY)
+    }
+
+    tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: bottomInset, right: 0)
+  }
+
   fileprivate func configButtons() {
-    downloadAllView.state = .none
-    downloadAllView.isSizeHidden = false
+    var state: DownloadAllView.State = .none
+    var isSizeHidden = false
     let parentAttributes = dataSource.parentAttributes()
     let error = parentAttributes.nodeStatus == .error || parentAttributes.nodeStatus == .undefined
-    let downloading = parentAttributes.nodeStatus == .downloading || parentAttributes.nodeStatus == .inQueue || parentAttributes.nodeStatus == .applying
+    let rootDownloading = dataSource.isRoot && dataSource is DownloadedMapsDataSource && Storage.shared().downloadInProgress()
+    let downloading = rootDownloading || parentAttributes.nodeStatus == .downloading
+      || parentAttributes.nodeStatus == .inQueue || parentAttributes.nodeStatus == .applying
     switch mode {
     case .available:
       if dataSource.isRoot {
         break
       }
       if error {
-        downloadAllView.state = .error
+        state = .error
       } else if downloading {
-        downloadAllView.state = .dowloading
+        state = .dowloading
       } else if parentAttributes.downloadedMwmCount < parentAttributes.totalMwmCount {
-        downloadAllView.state = .ready
+        state = .ready
         downloadAllView.style = .download
-        downloadAllView.downloadSize = parentAttributes.totalSize - parentAttributes.downloadedSize
+        downloadAllView.downloadSize = Storage.shared().downloadSize(forCountry: parentAttributes.countryId)
       }
     case .downloaded:
-      let isUpdate = parentAttributes.totalUpdateSizeBytes > 0
-      let size = isUpdate ? parentAttributes.totalUpdateSizeBytes : parentAttributes.downloadingSize
-      if error {
-        downloadAllView.state = dataSource.isRoot ? .none : .error
-        downloadAllView.downloadSize = parentAttributes.downloadingSize
-      } else if downloading, dataSource is DownloadedMapsDataSource {
-        downloadAllView.state = .dowloading
+      let isUpdate = parentAttributes.nodeStatus == .onDiskOutOfDate && parentAttributes.downloadingSize > 0
+      if downloading, dataSource is DownloadedMapsDataSource {
+        state = .dowloading
         if dataSource.isRoot {
           downloadAllView.style = .download
-          downloadAllView.isSizeHidden = true
+          isSizeHidden = true
         }
+      } else if error {
+        state = dataSource.isRoot ? .none : .error
+        downloadAllView.downloadSize = parentAttributes.downloadingSize
       } else if isUpdate {
-        downloadAllView.state = .ready
+        state = .ready
         downloadAllView.style = .update
-        downloadAllView.downloadSize = size
+        downloadAllView.downloadSize = parentAttributes.downloadingSize
       }
     @unknown default:
       fatalError()
     }
+    if state == .dowloading {
+      downloadAllView.downloadProgress = CGFloat(parentAttributes.downloadingProgress)
+      downloadAllView.downloadSize = parentAttributes.downloadingSize
+    }
+    downloadAllView.isSizeHidden = isSizeHidden
+    downloadAllView.state = state
+    footerShowsProgress = state == .dowloading
   }
 
   @objc func onAddMaps() {
@@ -293,7 +319,7 @@ extension DownloadMapsViewController: UITableViewDataSource {
   }
 
   func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
-    dataSource.title(for: section)
+    section != dataSource.numberOfSections() ? dataSource.title(for: section) : nil
   }
 
   func sectionIndexTitles(for _: UITableView) -> [String]? {
@@ -328,22 +354,6 @@ extension DownloadMapsViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension DownloadMapsViewController: UITableViewDelegate {
-  func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    let headerView = MWMMapDownloaderCellHeader()
-    if section != dataSource.numberOfSections() {
-      headerView.text = dataSource.title(for: section)
-    }
-    return headerView
-  }
-
-  func tableView(_: UITableView, heightForHeaderInSection _: Int) -> CGFloat {
-    28
-  }
-
-  func tableView(_: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-    section == dataSource.numberOfSections() - 1 ? 68 : 0
-  }
-
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
     if indexPath.section == dataSource.numberOfSections() {
@@ -414,28 +424,28 @@ extension DownloadMapsViewController: StorageObserver {
       reloadTableView()
     } else {
       for cell in tableView.visibleCells {
-        guard let downloaderCell = cell as? MWMMapDownloaderTableViewCell else { continue }
-        if downloaderCell.nodeAttrs.countryId != countryId { continue }
-        guard let indexPath = tableView.indexPath(for: downloaderCell) else { continue }
+        guard let downloaderCell = cell as? MWMMapDownloaderTableViewCell,
+              downloaderCell.nodeAttrs.countryId == countryId,
+              let indexPath = tableView.indexPath(for: downloaderCell) else { continue }
         downloaderCell.config(dataSource.item(at: indexPath), searchQuery: searchController.searchBar.text)
       }
       configButtons()
     }
   }
 
-  func processCountry(_ countryId: String, downloadedBytes: UInt64, totalBytes: UInt64) {
+  func processCountry(_ countryId: String, progress: StorageProgress) {
+    let total = progress.mwmTotal + progress.twmTotal
+    guard total > 0 else { return }
+    let fraction = CGFloat(progress.mwmDownloaded + progress.twmDownloaded) / CGFloat(total)
     for cell in tableView.visibleCells {
-      guard let downloaderCell = cell as? MWMMapDownloaderTableViewCell else { continue }
-      if downloaderCell.nodeAttrs.countryId != countryId { continue }
-      downloaderCell.setDownloadProgress(CGFloat(downloadedBytes) / CGFloat(totalBytes))
+      guard let downloaderCell = cell as? MWMMapDownloaderTableViewCell,
+            downloaderCell.nodeAttrs.countryId == countryId else { continue }
+      downloaderCell.setDownloadProgress(fraction)
     }
 
-    if countryId == dataSource.getParentCountryId() {
-      downloadAllView.downloadProgress = CGFloat(downloadedBytes) / CGFloat(totalBytes)
-      downloadAllView.downloadSize = totalBytes
-    } else if dataSource.isRoot, dataSource is DownloadedMapsDataSource {
-      downloadAllView.state = .dowloading
-      downloadAllView.isSizeHidden = true
+    if footerShowsProgress, countryId == dataSource.getParentCountryId() {
+      downloadAllView.downloadProgress = fraction
+      downloadAllView.downloadSize = total
     }
   }
 }
@@ -467,11 +477,11 @@ extension DownloadMapsViewController: DownloadAllViewDelegate {
   func onStateChanged(state: DownloadAllView.State) {
     if state == .none {
       downloadAllViewContainer.isHidden = true
-      tableView.contentInset = UIEdgeInsets.zero
     } else {
       downloadAllViewContainer.isHidden = false
-      tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: allMapsViewBottomOffsetConstant, right: 0)
     }
+    view.layoutIfNeeded()
+    updateTableViewContentInset()
   }
 
   func onDownloadButtonPressed() {

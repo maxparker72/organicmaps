@@ -12,8 +12,10 @@
 #include "indexer/feature_decl.hpp"
 
 #include "geometry/point2d.hpp"
+#include "geometry/rect2d.hpp"
 
 #include <limits>
+#include <span>
 #include <string>
 
 namespace df
@@ -73,8 +75,11 @@ struct AreaViewParams : CommonViewParams
   float m_minPosZ = 0;
   float m_posZ = 0;
   bool m_is3D = false;
-  std::string_view m_hatching;
+  std::string_view m_areaPattern;  // analytic pattern key (hatch or solid-fill), empty for a plain fill
   double m_baseGtoPScale = 1.0;
+  // Translucent fills use the opaque fill program too, to share one bucket and blend in their paint order.
+  // The Less depth test keeps a fill from blending twice with its copy in a tile that is being replaced.
+  bool m_blendInPaintOrder = false;
 };
 
 struct LineViewParams : CommonViewParams
@@ -87,6 +92,10 @@ struct LineViewParams : CommonViewParams
   dp::PenPatternT m_pattern;
   double m_baseGtoPScale = 1.0;
   int m_zoomLevel = -1;
+  // Round joins are line triangles too, and thin lines aren't GL lines, so that translucent lines of one bucket
+  // blend in their paint order. Caps must be butt ones. The Less depth test keeps a line from blending twice where
+  // its segments and joins overlap.
+  bool m_blendInPaintOrder = false;
 
   /// Optional rainbow mode: colors for a multi-stripe overlay.
   /// When non-empty, LineShape allocates a color strip texture in Prepare().
@@ -110,6 +119,11 @@ struct PathTextViewParams : CommonOverlayViewParams
   std::string m_mainText;
   std::string m_auxText;
   double m_baseGtoPScale = 1.0;
+  bool m_allowRepositioning = false;
+  // StringUtf8Multilang code of m_mainText for HarfBuzz `locl` shaping. The concatenated
+  // "main + aux" path-text is shaped under this single tag (aux is the minority case and
+  // typically shares main's script). kUnsupportedLanguageCode means "no locl hint".
+  int8_t m_lang = StringUtf8Multilang::kUnsupportedLanguageCode;
 
   std::string ConcatRenderText() const
   {
@@ -136,6 +150,13 @@ struct PathSymbolViewParams : CommonViewParams
   std::string m_symbolName;
   float m_offset = 0;
   float m_step = 0;
+  float m_symbolScale = 1.0f;
+  // Optional placement controls. A negative max deviation disables curvature filtering.
+  float m_placementLength = 0.0f;
+  float m_maxPathDeviation = -1.0f;
+  float m_searchRadius = 0.0f;
+  // Borrowed global-coordinate areas that must not intersect the symbol quad; must outlive Draw().
+  std::span<m2::RectD const> m_exclusionRects;
   double m_baseGtoPScale = 1.0;
 };
 
@@ -156,5 +177,8 @@ struct ColoredSymbolViewParams : CommonOverlayViewParams
   m2::PointF m_sizeInPixels{0, 0};
   float m_outlineWidth = 0;
   m2::PointF m_offset{0, 0};
+  // RoundedRectangle only: draw a triangular tail pointing from the body's nearest edge
+  // back to the pivot (i.e., the tail tip lands at -m_offset in body-local coords).
+  bool m_drawTail = false;
 };
 }  // namespace df

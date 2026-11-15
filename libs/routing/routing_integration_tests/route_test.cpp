@@ -5,11 +5,20 @@
 
 #include "routing/routing_integration_tests/routing_test_tools.hpp"
 
+#include "routing/route.hpp"
+
 #include "platform/platform_tests_support/helpers.hpp"
 
 #include "geometry/mercator.hpp"
 
+#include "base/scope_guard.hpp"
+#include "base/stl_helpers.hpp"
+
+#include <algorithm>
 #include <limits>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace route_test
 {
@@ -69,16 +78,18 @@ UNIT_TEST(Russia_Ufa_UstKatav)
                                    FromLatLon(54.9228, 58.1469), 160565);
 }
 
-UNIT_TEST(RussiaMoscowNoServiceCrossing)
+// By the service road, like OSRM, GraphHopper and Valhalla: the way around is 3140 m.
+UNIT_TEST(RussiaMoscowServiceCrossing)
 {
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(55.77787, 37.70405), {0., 0.},
-                                   FromLatLon(55.77682, 37.70391), 3140.);
+                                   FromLatLon(55.77682, 37.70391), 211.634);
 }
 
-UNIT_TEST(RussiaMoscowShortWayToService)
+UNIT_TEST(RussiaNskServiceEndpoints)
 {
-  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(55.77787, 37.70405), {0., 0.},
-                                   FromLatLon(55.77691, 37.70428), 171.);
+  // Service-road endpoints must allow the direct route along the public street, улица Забалуева.
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(54.989101, 82.814544), {0., 0.},
+                                   FromLatLon(54.988947, 82.80889), 425.484);
 }
 
 UNIT_TEST(PriceIslandLoadCrossGeometryTest)
@@ -163,6 +174,36 @@ UNIT_TEST(GermanyToTallinCrossMwmRoute)
 {
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(48.397416, 16.515289), {0.0, 0.0},
                                    FromLatLon(59.437214, 24.745355), 1650000.);
+}
+
+// https://github.com/organicmaps/organicmaps/issues/13346
+UNIT_TEST(Canada_Lethbridge_Inuvik_NoBacktrack)
+{
+  std::set<std::string> const mwmNames = {
+      "Canada_Alberta_Edmonton",
+      "Canada_Alberta_North",
+      "Canada_Alberta_South",
+      "Canada_British Columbia_Central",
+      "Canada_British Columbia_Far_North",
+      "Canada_British Columbia_North",
+      "Canada_British Columbia_Northeast",
+      "Canada_Northwest Territories_North",
+      "Canada_Yukon_North",
+      "Canada_Yukon_Whitehorse",
+  };
+
+  // Keep the complete dataset on disk and register only the maps needed for this route in a dedicated router.
+  std::vector<LocalCountryFile> localFiles;
+  GetAllLocalFiles(localFiles);
+  base::EraseIf(localFiles,
+                [&mwmNames](LocalCountryFile const & file) { return !mwmNames.contains(file.GetCountryName()); });
+  TEST_EQUAL(localFiles.size(), mwmNames.size(), (mwmNames));
+  std::sort(localFiles.begin(), localFiles.end(), [](LocalCountryFile const & lhs, LocalCountryFile const & rhs)
+  { return lhs.GetCountryName() < rhs.GetCountryName(); });
+
+  VehicleRouterComponents components(localFiles, VehicleType::Car);
+  CalculateRouteAndTestRouteLength(components, FromLatLon(49.6956, -112.8451), {0., 0.}, FromLatLon(68.3607, -133.7230),
+                                   3'717'609, 0.05);
 }
 
 UNIT_TEST(Russia_Moscow_Leningradskiy39RepublicOfSouthAfricaCapeTownCenterRouteTest)
@@ -559,7 +600,7 @@ UNIT_TEST(USA_NorthCarolina_CrossMWMs)
 UNIT_TEST(Cyprus_NoUTurnFromFake)
 {
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(34.70639, 33.1184951), {0., 0.},
-                                   FromLatLon(34.7065239, 33.1184222), 384.238);
+                                   FromLatLon(34.7065239, 33.1184222), 394.096);
 
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(34.7068976, 33.1199084), {0., 0.},
                                    FromLatLon(34.7070505, 33.1198391), 670.077);
@@ -603,10 +644,19 @@ UNIT_TEST(Hawaii_KeepH1)
 }
 
 // https://github.com/organicmaps/organicmaps/issues/1668
+/// @todo Fails: the finish projection onto the parking service road is 2 m closer than onto Большая Серпуховская,
+/// and 2 m of the 0.01 km/h offroad weight outweigh the 3 min detour through the parking.
 UNIT_TEST(Russia_Moscow_KeepPrimary)
 {
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(55.7083688, 37.6213856), {0., 0.},
                                    FromLatLon(55.724623, 37.62588), 1921.88);
+}
+
+UNIT_TEST(Russia_Moscow_KeepPrimary_WayBack)
+{
+  // Like OSRM and GraphHopper, without the 6.3 km detour of Valhalla.
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(55.724623, 37.62588), {0., 0.},
+                                   FromLatLon(55.7083688, 37.6213856), 4199.75);
 }
 
 // https://github.com/organicmaps/organicmaps/issues/1727
@@ -659,7 +709,7 @@ UNIT_TEST(Turkey_AvoidMountainsSecondary)
   // Valhalla makes a long route. I think it is correct.
   /// @todo Should "split" ways for better inCity/outCity classification. Now long ways are detected as outCity (wrong).
   TestRouteLength(*res.first, 100399);
-  TestRouteTime(*res.first, 5319.01);
+  TestRouteTime(*res.first, 5207.47);
 }
 
 // https://github.com/organicmaps/organicmaps/issues/4110
@@ -679,7 +729,7 @@ UNIT_TEST(USA_Birmingham_AL_KeyWest_FL_NoMotorway)
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), start, {0., 0.}, finish, 1'471'410);
 
   RoutingOptionSetter optionsGuard(RoutingOptions::Motorway);
-  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), start, {0., 0.}, finish, 1'495'860);
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), start, {0., 0.}, finish, 1'531'210);
 }
 
 UNIT_TEST(Turkey_Salarialaca_Sanliurfa)
@@ -842,7 +892,7 @@ UNIT_TEST(LATAM_UsePrimary_NotTrunkDetour)
 {
   // 10247 or less should be here.
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(4.737768, -74.077599), {0., 0.},
-                                   FromLatLon(4.684999, -74.046393), 10247.3);
+                                   FromLatLon(4.684999, -74.046393), 9814.94);
 
   /// @todo Still have the strange detour at the end. Due to the 20/30 km/h assignment for the primary_link.
   /// Looks like it is bad to assign maxspeed for _all_ connected links if it is defined for the middle one.
@@ -855,8 +905,9 @@ UNIT_TEST(USA_UseDirt_WithMaxspeed)
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(46.5361985, -111.943183),
                                    {0., 0.}, FromLatLon(46.4925409, -112.105446), 20906.5);
 
+  // Big Belt Drive instead of the service road between two parts of Timber Trail Drive.
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(46.7336967, -111.926), {0., 0.},
-                                   FromLatLon(46.7467037, -111.917147), 3527.79);
+                                   FromLatLon(46.7467037, -111.917147), 3324.62);
 
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(42.3889581, 19.7812567), {0., 0.},
                                    FromLatLon(42.3878106, 19.7831402), 247.139);
@@ -865,8 +916,9 @@ UNIT_TEST(USA_UseDirt_WithMaxspeed)
 // https://github.com/organicmaps/organicmaps/issues/8507
 UNIT_TEST(Norway_MotorVehicleBackward_No)
 {
+  // Hausmanns gate instead of the service road with a tunnel between Trondheimsveien and Korsgata.
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(59.91734, 10.75949), {0., 0.},
-                                   FromLatLon(59.91877, 10.75936), 1091.88);
+                                   FromLatLon(59.91877, 10.75936), 1519.57);
 
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(59.919597, 10.759392), {0., 0.},
                                    FromLatLon(59.92056, 10.759317), 419);
@@ -925,9 +977,7 @@ UNIT_TEST(Colombia_MotorVehicle_Conditional_No)
 
 UNIT_TEST(Belarus_Kopyl_Minsk)
 {
-  // Use P23 ASAP.
-  // OSRM makes a shorter but strange route here:
-  // https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=53.131897%2C27.018889%3B53.57253%2C27.47209
+  /// @todo OM now uses secondary H8544 (longer) instead of primary P61.
   CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(53.131897, 27.018889), {0., 0.},
                                    FromLatLon(53.57253, 27.47209), 82109);
 }
@@ -957,6 +1007,179 @@ UNIT_TEST(Lithuania_MaxspeedConditional)
   auto const eta2 = result.first->GetTotalTimeSec();
 
   TEST_LESS(eta2 * 1.1, eta1, ());
+}
+
+// https://github.com/organicmaps/organicmaps/issues/10848
+UNIT_TEST(Russia_Nsk_NoPassThrough)
+{
+  // Direct route via "Забалуева"
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(54.989096, 82.814513), {0., 0.},
+                                   FromLatLon(54.988888, 82.808875), 418.7);
+  // Detour route via "Порт-Артурская" avoiding pass through service
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(54.9886261, 82.8091597), {0., 0.},
+                                   FromLatLon(54.9924478, 82.8082036), 1254.17);
+  // Direct route via "Магаданская" between the start and the finish on service roads
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(55.074347, 82.939134), {0., 0.},
+                                   FromLatLon(55.076779, 82.935965), 389.916);
+}
+
+// https://github.com/organicmaps/organicmaps/issues/3715
+UNIT_TEST(USA_Salem_CustomersParking)
+{
+  // Around the customers parking, like GraphHopper and Valhalla.
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(44.9435, -123.0331), {0., 0.},
+                                   FromLatLon(44.9423, -123.0332), 489.673);
+  /// @todo The way back is 589 m around the parking: its passage costs two turn penalties.
+  /// GraphHopper and Valhalla go 179 m through the parking, OSRM 294 m.
+}
+
+// https://github.com/organicmaps/organicmaps/issues/7081
+UNIT_TEST(UK_Scotland_Biggar_KeepMainRoad)
+{
+  // The main road, not the longer residential one, like OSRM, GraphHopper and Valhalla.
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(55.49446, -3.69184), {0., 0.},
+                                   FromLatLon(55.49042, -3.69469), 535.159);
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(55.49042, -3.69469), {0., 0.},
+                                   FromLatLon(55.49446, -3.69184), 535.159);
+}
+
+/// @todo Fails: 847 m by two residential streets, OSRM, GraphHopper and Valhalla keep the primary road (870 m).
+/// It is not about service roads: the turn penalty doesn't apply to the residential streets.
+UNIT_TEST(Cyprus_Episkopi_KeepPrimary)
+{
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(34.665564, 32.906134), {0., 0.},
+                                   FromLatLon(34.663808, 32.897648), 870.);
+}
+
+UNIT_TEST(Cyprus_Larnaca_Roundabout)
+{
+  // The way back is long by the one-way roads, like OSRM, GraphHopper and Valhalla.
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(34.905396, 33.568956), {0., 0.},
+                                   FromLatLon(34.907287, 33.564954), 521.9);
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(34.907287, 33.564954), {0., 0.},
+                                   FromLatLon(34.905396, 33.568956), 12927.4);
+}
+
+// The destination (43.5298373, 5.44563164) lies on Rue de la Treille. The route must
+// reach it along a road, not end ~120 m away (on the parallel Rue du Bon Pasteur) with a long straight
+// offroad "snap" onto the destination.
+// https://github.com/organicmaps/organicmaps/issues/11709
+UNIT_TEST(France_RueDeLaTreille_FinishSnap)
+{
+  auto const finish = FromLatLon(43.5298373, 5.44563164);
+  m2::PointD const starts[] = {
+      FromLatLon(43.5322251, 5.44530922),  // far start (long one-way detour, but must still reach the finish).
+      FromLatLon(43.5308099, 5.44491621),  // near start.
+  };
+
+  for (auto const & start : starts)
+  {
+    TRouteResult const res = CalculateRoute(GetVehicleComponents(VehicleType::Car), start, {0., 0.}, finish);
+    TEST_EQUAL(res.second, RouterResultCode::NoError, ());
+
+    auto const & segments = res.first->GetRouteSegments();
+    TEST(!segments.empty(), ());
+
+    // The last real road point must be next to the destination: a missing final segment shows up as a
+    // long straight offroad jump from the last road point to the finish.
+    m2::PointD lastRoadPoint = finish;
+    for (auto it = segments.rbegin(); it != segments.rend(); ++it)
+    {
+      if (it->GetSegment().IsRealSegment())
+      {
+        lastRoadPoint = it->GetJunction().GetPoint();
+        break;
+      }
+    }
+    double const snapM = mercator::DistanceOnEarth(lastRoadPoint, finish);
+    TEST_LESS(snapM, 30.0, ("Finish reached with a", snapM, "m offroad snap instead of a final road segment"));
+  }
+}
+
+// Regression test: forward and backward A* waves meet on a two-way feature, which used to wire a
+// same-feature cycle into the connectibility "parents" graph and hang IndexGraph::IsRestricted forever.
+// https://github.com/organicmaps/organicmaps/issues/13063
+UNIT_TEST(India_Bangalore_ShortRoute)
+{
+  CalculateRouteAndTestRouteLength(GetVehicleComponents(VehicleType::Car), FromLatLon(12.963008, 77.648966), {0., 0.},
+                                   FromLatLon(12.9600501, 77.6451721), 1997.79);
+}
+
+// The variant the user picked must survive a rebuild: after switching to the shorter alternative,
+// recalculating the route (as happens after every off-route deviation) has to keep the
+// distance-biased weights instead of silently returning the fastest route again.
+// https://github.com/organicmaps/organicmaps/issues/13205
+UNIT_TEST(Germany_FrankfurtDarmstadt_KeepAlternativeAfterRebuild)
+{
+  auto & components = GetVehicleComponents(VehicleType::Car);
+  // Frankfurt -> Darmstadt: A5 motorway (fastest) vs the shorter B3 (about 1.4 km less).
+  Checkpoints const checkpoints(FromLatLon(50.1109, 8.6821), FromLatLon(49.8728, 8.6512));
+
+  // The router keeps the chosen variant until the next route is built; don't leak it into the
+  // tests that share these components.
+  SCOPE_GUARD(clearRouter, [&components] { components.GetRouter().ClearState(); });
+
+  auto const initial = CalculateRoutes(components, checkpoints);
+  TEST_EQUAL(initial.second, RouterResultCode::NoError, ());
+  TEST_EQUAL(initial.first.size(), 2, ());
+
+  double const fastestM = initial.first[0]->GetTotalDistanceMeters();
+  double const shortestM = initial.first[1]->GetTotalDistanceMeters();
+  TEST_LESS(shortestM, fastestM, ());
+
+  // The user switches to the shorter alternative, then the route is rebuilt.
+  components.GetRouter().SwapAltRouteToActive();
+
+  auto const rebuilt = CalculateRoutes(components, checkpoints);
+  TEST_EQUAL(rebuilt.second, RouterResultCode::NoError, ());
+  TEST_EQUAL(rebuilt.first.size(), 2, ());
+  TEST_ALMOST_EQUAL_ABS(rebuilt.first[0]->GetTotalDistanceMeters(), shortestM, 1.0, ());
+  TEST_ALMOST_EQUAL_ABS(rebuilt.first[1]->GetTotalDistanceMeters(), fastestM, 1.0, ());
+
+  // Switching back to the fastest one is remembered just the same.
+  components.GetRouter().SwapAltRouteToActive();
+
+  auto const restored = CalculateRoutes(components, checkpoints);
+  TEST_EQUAL(restored.second, RouterResultCode::NoError, ());
+  TEST_EQUAL(restored.first.size(), 2, ());
+  TEST_ALMOST_EQUAL_ABS(restored.first[0]->GetTotalDistanceMeters(), fastestM, 1.0, ());
+
+  // A new journey resets the choice, including when the distance-biased route was active.
+  components.GetRouter().SwapAltRouteToActive();
+  components.GetRouter().ClearState();
+  auto const newJourney = CalculateRoutes(components, checkpoints);
+  TEST_EQUAL(newJourney.second, RouterResultCode::NoError, ());
+  TEST_EQUAL(newJourney.first.size(), 2, ());
+  TEST_ALMOST_EQUAL_ABS(newJourney.first[0]->GetTotalDistanceMeters(), fastestM, 1.0, ());
+
+  // Move along the selected route far enough to exercise its cached suffix during adjustment.
+  auto const & selected = *newJourney.first[1];
+  auto const & segments = selected.GetRouteSegments();
+  auto const startIt = std::find_if(segments.begin(), segments.end(), [](RouteSegment const & segment)
+  { return segment.GetDistFromBeginningMeters() >= 2000.0; });
+  TEST(startIt != segments.end(), ());
+  Checkpoints const advanced(startIt->GetJunction().GetPoint(), checkpoints.GetFinish());
+  components.GetRouter().SwapAltRouteToActive();
+
+  RouterDelegate delegate;
+  RoutesResult adjusted;
+  TEST_EQUAL(components.GetRouter().CalculateRoute(advanced, {} /* startDirection */, true /* adjust */,
+                                                   true /* needAlternatives */, delegate, adjusted),
+             RouterResultCode::NoError, ());
+  TEST_EQUAL(adjusted.m_routes.size(), 1, ());
+  TEST_LESS(Route(adjusted.GetActive()).GetTotalDistanceMeters(), shortestM, ());
+
+  // An adjustment publishes only the active route, but must retain its strategy for a later
+  // full rebuild. Compare that rebuild with a fresh fastest-first calculation at the same start.
+  auto const afterAdjust = CalculateRoutes(components, advanced);
+  TEST_EQUAL(afterAdjust.second, RouterResultCode::NoError, ());
+  components.GetRouter().ClearState();
+  auto const reference = CalculateRoutes(components, advanced);
+  TEST_EQUAL(reference.second, RouterResultCode::NoError, ());
+  TEST_EQUAL(reference.first.size(), 2, ());
+  TEST_EQUAL(afterAdjust.first.size(), 2, ());
+  TEST_ALMOST_EQUAL_ABS(afterAdjust.first[0]->GetTotalDistanceMeters(), reference.first[1]->GetTotalDistanceMeters(),
+                        1.0, ());
 }
 
 }  // namespace route_test

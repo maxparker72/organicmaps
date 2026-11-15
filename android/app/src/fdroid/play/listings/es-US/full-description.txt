@@ -12,10 +12,6 @@ El zoom, la búsqueda y el cálculo de rutas funcionan notablemente rápido.
 
 Los mapas son muy detallados y se actualizan dos veces al mes para reflejar las condiciones del mundo real. A diferencia de muchos competidores conocidos, incluyen nombres de edificios, bancos, senderos y otra información útil.
 
-<b>BASADA EN OPENSTREETMAP:</b>
-
-OpenStreetMap es un mapa mundial de estilo wiki creado y mantenido por millones de voluntarios, gente local que conoce mejor sus zonas. Este esfuerzo comunitario da como resultado mapas muy detallados, a menudo más precisos que los comerciales en regiones menos cartografiadas. Organic Maps actualiza sus datos de OpenStreetMap cada dos semanas, lo que mantiene tus mapas actualizados y confiables. Y si notas que falta algo, puedes agregarlo a OpenStreetMap y ayudar a mejorar el mapa para todos.
-
 <b>LA PRIVACIDAD ES LO PRIMERO:</b>
 
 No recopilamos ningún dato ni identificador. Esto significa que no hay riesgo de fugas de datos ni distracciones como anuncios o notificaciones molestas, solo una experiencia de mapas limpia y privada.
@@ -28,15 +24,19 @@ Busca por dirección, nombre o categoría, descubre millones de puntos de inter�
 
 <b>NAVEGACIÓN GPS:</b>
 
-Disfruta de indicaciones paso a paso con guía de voz. Crea rutas a pie, de senderismo, en bicicleta o en auto, incluyendo rutas entre ciudades, países y múltiples puntos de referencia. Encuentra las mejores rutas para tus viajes en metro y desplazamientos diarios. Compatible con Android Auto.
+Disfruta de indicaciones paso a paso con guía de voz. Crea rutas a pie, de senderismo, en bicicleta o en auto, incluyendo rutas entre ciudades, países y múltiples puntos de referencia. Compatible con Android Auto.
 
 <b>RUTAS DE SENDERISMO Y CICLISMO DE TODO EL MUNDO:</b>
 
 Activa capas de mapas especiales para descubrir rutas populares de senderismo y ciclismo en todo el mundo, todas ellas procedentes de OpenStreetMap. Cambia entre capas para ver rutas de bicicleta y MTB en color, así como senderos oficiales de senderismo.
 
+<b>TERRENO 3D Y PROFUNDIDADES:</b>
+
+Explora las alturas de las montañas, las profundidades del mar y curvas de nivel detalladas. Toca cualquier punto del mapa para ver su altitud.
+
 <b>TRANSPORTE PÚBLICO:</b>
 
-Consulta los números de las rutas de transporte público en las paradas. Los horarios de transporte en tiempo real y el cálculo de rutas están actualmente en desarrollo.
+Planifica rutas de transporte público. Los horarios en tiempo real están en desarrollo.
 
 <b>ESTILOS DE MAPA:</b>
 
@@ -57,3 +57,14 @@ Contribuye a OpenStreetMap añadiendo lugares que falten o editando el mapa dire
 <b>MODO OSCURO:</b>
 
 Cambia a un tema oscuro para una visualización cómoda por la noche.
+
+Organic Maps es un proyecto independiente, impulsado por la comunidad y de código abierto, con cientos de colaboradores que ayudan a desarrollar nuevas funciones, solucionar problemas, traducir y hacer avanzar el proyecto.
+
+O conoce otras formas de apoyar el proyecto: https://organicmaps.app/contribute/
+
+¡Tus comentarios y reseñas sinceros en la tienda nos motivan! Nos encanta recibir tus comentarios allí.
+
+¿Tienes alguna pregunta? Visita el sitio web organicmaps.app para obtener más detalles y consultar las preguntas frecuentes.
+
+Instagram: @organicmaps.app
+Telegram: @OrganicMapsES

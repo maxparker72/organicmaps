@@ -45,6 +45,20 @@ Track MakeTrack(std::initializer_list<std::initializer_list<PointWithAltitude>> 
   return Track(std::move(data));
 }
 
+UNIT_TEST(Track_HasDirection)
+{
+  for (auto const id : {kml::TrackId{1}, kml::kTempRelationTrackId})
+  {
+    kml::TrackData data;
+    data.m_id = id;
+    data.m_layers.emplace_back();
+    data.m_geometry.AddLine({PointWithAltitude({0.0, 0.0}), PointWithAltitude({1.0, 0.0})});
+    data.m_geometry.AddTimestamps({});
+    Track const track(std::move(data));
+    TEST_EQUAL(track.HasDirection(), id != kml::kTempRelationTrackId, (id));
+  }
+}
+
 // ===================== ElevationInfo tests =====================
 
 UNIT_TEST(ElevationInfo_EmptyMultiGeometry)
@@ -352,6 +366,21 @@ UNIT_TEST(TrackStatistics_Duration)
   TrackStatistics ts;
   ts.CalculateDuration(geometry);
   TEST_EQUAL(ts.m_duration, 8, ());  // (5 - 0) + (13 - 10)
+}
+
+UNIT_TEST(TrackStatistics_Duration_PartialTimestamps)
+{
+  // A track may carry timestamps on some lines only (e.g. GeoJSON import drops a line's broken
+  // timestamps). CalculateDuration must skip the timestamp-less line, not assert/crash.
+  kml::MultiGeometry geometry;
+  geometry.AddLine({PointWithAltitude({0.0, 0.0}, 100), PointWithAltitude({1.0, 1.0}, 150)});
+  geometry.AddTimestamps({0, 5});
+  geometry.AddLine({PointWithAltitude({2.0, 2.0}, 50), PointWithAltitude({3.0, 3.0}, 75)});
+  geometry.AddTimestamps({});  // Second line has no timestamps.
+
+  TrackStatistics ts;
+  ts.CalculateDuration(geometry);
+  TEST_EQUAL(ts.m_duration, 5, ());  // Only the first line contributes (5 - 0).
 }
 
 UNIT_TEST(TrackStatistics_GpsPoints)

@@ -35,14 +35,44 @@
 #include "geometry/triangle2d.hpp"
 
 #include <condition_variable>
+#include <cstdint>
 #include <functional>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <vector>
 
 namespace df
 {
+#ifdef SCENARIO_ENABLE
+struct ScenarioViewportRequest;
+
+class ScenarioViewportMessage : public Message
+{
+public:
+  ScenarioViewportMessage(std::shared_ptr<ScenarioViewportRequest> request, bool fence, uint64_t revision = 0,
+                          bool afterReads = false)
+    : m_request(std::move(request))
+    , m_fence(fence)
+    , m_revision(revision)
+    , m_afterReads(afterReads)
+  {}
+
+  Type GetType() const override { return Type::ScenarioViewport; }
+  std::shared_ptr<ScenarioViewportRequest> const & GetRequest() const { return m_request; }
+  bool IsFence() const { return m_fence; }
+  uint64_t GetRevision() const { return m_revision; }
+  bool IsAfterReads() const { return m_afterReads; }
+
+private:
+  std::shared_ptr<ScenarioViewportRequest> m_request;
+  bool m_fence;
+  uint64_t m_revision;
+  bool m_afterReads;
+};
+#endif
+
 class BaseBlockingMessage : public Message
 {
 public:
@@ -233,17 +263,20 @@ class UpdateUserMarksMessage : public Message
 public:
   UpdateUserMarksMessage(drape_ptr<IDCollections> && justCreatedIds, drape_ptr<IDCollections> && removedIds,
                          drape_ptr<UserMarksRenderCollection> && marksRenderParams,
-                         drape_ptr<UserLinesRenderCollection> && linesRenderParams)
+                         drape_ptr<UserLinesRenderCollection> && linesRenderParams,
+                         drape_ptr<UserAreasRenderCollection> && areasRenderParams)
     : m_justCreatedIds(std::move(justCreatedIds))
     , m_removedIds(std::move(removedIds))
     , m_marksRenderParams(std::move(marksRenderParams))
     , m_linesRenderParams(std::move(linesRenderParams))
+    , m_areasRenderParams(std::move(areasRenderParams))
   {}
 
   Type GetType() const override { return Type::UpdateUserMarks; }
 
   drape_ptr<UserMarksRenderCollection> AcceptMarkRenderParams() { return std::move(m_marksRenderParams); }
   drape_ptr<UserLinesRenderCollection> AcceptLineRenderParams() { return std::move(m_linesRenderParams); }
+  drape_ptr<UserAreasRenderCollection> AcceptAreaRenderParams() { return std::move(m_areasRenderParams); }
   drape_ptr<IDCollections> AcceptRemovedIds() { return std::move(m_removedIds); }
   drape_ptr<IDCollections> AcceptJustCreatedIds() { return std::move(m_justCreatedIds); }
 
@@ -252,6 +285,7 @@ private:
   drape_ptr<IDCollections> m_removedIds;
   drape_ptr<UserMarksRenderCollection> m_marksRenderParams;
   drape_ptr<UserLinesRenderCollection> m_linesRenderParams;
+  drape_ptr<UserAreasRenderCollection> m_areasRenderParams;
 };
 
 class UpdateUserMarkGroupMessage : public Message
@@ -384,10 +418,11 @@ class SetAddNewPlaceModeMessage : public Message
 {
 public:
   SetAddNewPlaceModeMessage(bool enable, std::vector<m2::TriangleD> && boundArea, bool enableKineticScroll,
-                            m2::PointD const * optionalPosition)
+                            m2::PointD const * optionalPosition, bool shouldChangeViewport)
     : m_enable(enable)
     , m_boundArea(std::move(boundArea))
     , m_enableKineticScroll(enableKineticScroll)
+    , m_shouldChangeViewport(shouldChangeViewport)
   {
     if (optionalPosition)
       m_position = *optionalPosition;
@@ -398,12 +433,14 @@ public:
   std::vector<m2::TriangleD> && AcceptBoundArea() { return std::move(m_boundArea); }
   bool IsEnabled() const { return m_enable; }
   bool IsKineticScrollEnabled() const { return m_enableKineticScroll; }
+  bool ShouldChangeViewport() const { return m_shouldChangeViewport; }
   auto const & GetOptionalPosition() const { return m_position; }
 
 private:
   bool m_enable;
   std::vector<m2::TriangleD> m_boundArea;
   bool m_enableKineticScroll;
+  bool m_shouldChangeViewport;
   std::optional<m2::PointD> m_position;
 };
 
@@ -694,6 +731,14 @@ private:
   bool m_deactivateFollowing;
 };
 
+class RemoveAlternativeSubroutesMessage : public Message
+{
+public:
+  RemoveAlternativeSubroutesMessage() = default;
+
+  Type GetType() const override { return Type::RemoveAlternativeSubroutes; }
+};
+
 using FlushSubrouteMessage = FlushRenderDataMessage<drape_ptr<SubrouteData>, Message::Type::FlushSubroute>;
 using FlushSubrouteArrowsMessage =
     FlushRenderDataMessage<drape_ptr<SubrouteArrowsData>, Message::Type::FlushSubrouteArrows>;
@@ -909,6 +954,30 @@ public:
 
 private:
   int8_t const m_mapLangIndex;
+};
+
+// The terrain hillshade light (see MapProgramParams::m_terrainLightDir): azimuth
+// degrees clockwise from north TOWARDS the light, altitude degrees above the horizon,
+// and the shadow gamma (the gentle slopes lift, 1 = linear).
+class SetTerrainLightMessage : public Message
+{
+public:
+  SetTerrainLightMessage(double azimuthDeg, double altitudeDeg, double shadowGamma)
+    : m_azimuthDeg(azimuthDeg)
+    , m_altitudeDeg(altitudeDeg)
+    , m_shadowGamma(shadowGamma)
+  {}
+
+  Type GetType() const override { return Type::SetTerrainLight; }
+
+  double AzimuthDeg() const { return m_azimuthDeg; }
+  double AltitudeDeg() const { return m_altitudeDeg; }
+  double ShadowGamma() const { return m_shadowGamma; }
+
+private:
+  double const m_azimuthDeg;
+  double const m_altitudeDeg;
+  double const m_shadowGamma;
 };
 
 class EnablePerspectiveMessage : public Message
@@ -1450,12 +1519,13 @@ private:
   std::optional<Arrow3dCustomDecl> m_arrow3dCustomDecl;
 };
 
-class SetTileBackgroundDataMessage : public Message
+class AddTileBackgroundImageMessage : public Message
 {
 public:
-  SetTileBackgroundDataMessage(df::TileKey const & tileKey, uint32_t width, uint32_t height, dp::TextureFormat format,
-                               dp::BackgroundMode mode, std::vector<uint8_t> && bytes)
+  AddTileBackgroundImageMessage(df::TileKey const & tileKey, std::string const & uid, uint32_t width, uint32_t height,
+                                dp::TextureFormat format, dp::BackgroundMode mode, std::vector<uint8_t> && bytes)
     : m_tileKey(tileKey)
+    , m_uid(uid)
     , m_width(width)
     , m_height(height)
     , m_format(format)
@@ -1463,9 +1533,10 @@ public:
     , m_bytes(std::move(bytes))
   {}
 
-  Type GetType() const override { return Type::SetTileBackgroundData; }
+  Type GetType() const override { return Type::AddTileBackgroundImage; }
 
   df::TileKey const & GetTileKey() const { return m_tileKey; }
+  std::string const & GetUid() const { return m_uid; }
   uint32_t GetWidth() const { return m_width; }
   uint32_t GetHeight() const { return m_height; }
   dp::TextureFormat GetFormat() const { return m_format; }
@@ -1474,6 +1545,7 @@ public:
 
 private:
   df::TileKey m_tileKey;
+  std::string m_uid;
   uint32_t m_width;
   uint32_t m_height;
   dp::TextureFormat m_format;
@@ -1481,38 +1553,69 @@ private:
   std::vector<uint8_t> m_bytes;
 };
 
+class SetTileBackgroundDataMessage : public Message
+{
+public:
+  SetTileBackgroundDataMessage(df::TileKey const & tileKey, std::string const & imageUid, m2::RectF const & rect)
+    : m_tileKey(tileKey)
+    , m_imageUid(imageUid)
+    , m_rect(rect)
+  {}
+
+  Type GetType() const override { return Type::SetTileBackgroundData; }
+
+  df::TileKey const & GetTileKey() const { return m_tileKey; }
+  std::string const & GetImageUid() const { return m_imageUid; }
+  m2::RectF const & GetRect() const { return m_rect; }
+
+private:
+  df::TileKey m_tileKey;
+  std::string m_imageUid;
+  m2::RectF m_rect;
+};
+
 class SetTileBackgroundModeMessage : public Message
 {
 public:
-  explicit SetTileBackgroundModeMessage(dp::BackgroundMode mode) : m_mode(mode) {}
+  SetTileBackgroundModeMessage(dp::BackgroundMode mode, float areaOpacity, bool needInvalidate = false)
+    : m_mode(mode)
+    , m_areaOpacity(areaOpacity)
+    , m_needInvalidate(needInvalidate)
+  {}
 
   Type GetType() const override { return Type::SetTileBackgroundMode; }
 
   dp::BackgroundMode GetMode() const { return m_mode; }
+  float GetAreaOpacity() const { return m_areaOpacity; }
+  bool NeedInvalidate() const { return m_needInvalidate; }
 
 private:
   dp::BackgroundMode m_mode;
+  float m_areaOpacity;
+  bool m_needInvalidate;
 };
 
-class AssignTileBackgroundTextureMessage : public Message
+class AssignTileBackgroundImageMessage : public Message
 {
 public:
-  AssignTileBackgroundTextureMessage(ref_ptr<dp::GraphicsContext> context, df::TileKey const & tileKey,
-                                     ref_ptr<dp::TexturePool> texturePool, dp::TexturePool::TextureId textureId,
-                                     dp::BackgroundMode mode)
+  AssignTileBackgroundImageMessage(ref_ptr<dp::GraphicsContext> context, df::TileKey const & tileKey,
+                                   std::string const & uid, ref_ptr<dp::TexturePool> texturePool,
+                                   dp::TexturePool::TextureId textureId, dp::BackgroundMode mode)
     : m_context(context)
     , m_tileKey(tileKey)
+    , m_uid(uid)
     , m_texturePool(texturePool)
     , m_textureId(textureId)
     , m_mode(mode)
   {}
 
-  AssignTileBackgroundTextureMessage(ref_ptr<dp::GraphicsContext> context, df::TileKey const & tileKey,
-                                     ref_ptr<dp::TexturePool> texturePool, dp::TexturePool::TextureId textureId,
-                                     dp::BackgroundMode mode, std::vector<uint8_t> && bytes, uint32_t width,
-                                     uint32_t height)
+  AssignTileBackgroundImageMessage(ref_ptr<dp::GraphicsContext> context, df::TileKey const & tileKey,
+                                   std::string const & uid, ref_ptr<dp::TexturePool> texturePool,
+                                   dp::TexturePool::TextureId textureId, dp::BackgroundMode mode,
+                                   std::vector<uint8_t> && bytes, uint32_t width, uint32_t height)
     : m_context(context)
     , m_tileKey(tileKey)
+    , m_uid(uid)
     , m_texturePool(texturePool)
     , m_textureId(textureId)
     , m_mode(mode)
@@ -1521,13 +1624,13 @@ public:
     , m_height(height)
   {}
 
-  ~AssignTileBackgroundTextureMessage() override
+  ~AssignTileBackgroundImageMessage() override
   {
     if (m_context && m_texturePool)
       m_texturePool->ReleaseTexture(m_context, m_textureId);
   }
 
-  Type GetType() const override { return Type::AssignTileBackgroundTexture; }
+  Type GetType() const override { return Type::AssignTileBackgroundImage; }
   bool IsGraphicsContextDependent() const override { return true; }
 
   std::vector<uint8_t> & GetBytes() { return m_bytes; }
@@ -1535,6 +1638,7 @@ public:
   uint32_t GetHeight() const { return m_height; }
 
   df::TileKey const & GetTileKey() const { return m_tileKey; }
+  std::string const & GetUid() const { return m_uid; }
   ref_ptr<dp::TexturePool> GetTexturePool() const { return m_texturePool; }
   dp::TexturePool::TextureId GetTextureId() const { return m_textureId; }
   dp::BackgroundMode GetMode() const { return m_mode; }
@@ -1549,6 +1653,7 @@ public:
 private:
   ref_ptr<dp::GraphicsContext> m_context;
   df::TileKey m_tileKey;
+  std::string m_uid;
   ref_ptr<dp::TexturePool> m_texturePool;
   dp::TexturePool::TextureId m_textureId;
   dp::BackgroundMode m_mode;

@@ -23,6 +23,7 @@ import app.organicmaps.widget.SearchToolbarController;
 import app.organicmaps.widget.ToolbarController;
 import app.organicmaps.widget.recycler.DividerItemDecorationWithPadding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import java.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -122,14 +123,13 @@ public class FeatureCategoryFragment
     }
 
     if (sort)
-      Arrays.sort(categories, Comparator.comparing(FeatureCategory::getLocalizedTypeName));
+      Arrays.sort(categories, Comparator.comparing(FeatureCategory::getLocalizedTypeName, Collator.getInstance()));
 
     return categories;
   }
 
   public void selectCategory(FeatureCategory category)
   {
-    Editor.nativeAddToRecentCategories(category.getType());
     if (requireActivity() instanceof FeatureCategoryListener)
       ((FeatureCategoryListener) requireActivity()).onFeatureCategorySelected(category);
     else if (getParentFragment() instanceof FeatureCategoryListener)
@@ -160,8 +160,8 @@ public class FeatureCategoryFragment
     final Bundle args = requireArguments();
     final double lat = args.getDouble(FeatureCategoryActivity.EXTRA_POSITION_LAT, Double.NaN);
     final double lon = args.getDouble(FeatureCategoryActivity.EXTRA_POSITION_LON, Double.NaN);
-    // No native CHECK on the note path (unlike CreateMapObject), so an invariant
-    // break would silently post the note to (0, 0). Crash explicitly instead.
+    // Require the chosen position: native note creation rejects invalid coordinates without reporting
+    // a failure to the caller, which would otherwise show a success toast.
     if (Double.isNaN(lat) || Double.isNaN(lon))
       throw new IllegalStateException("FeatureCategoryFragment missing position extras");
 

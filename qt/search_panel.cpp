@@ -1,5 +1,6 @@
 #include "qt/search_panel.hpp"
 #include "qt/draw_widget.hpp"
+#include "qt/qt_common/translations.hpp"
 
 #include "search/search_params.hpp"
 
@@ -34,6 +35,7 @@ SearchPanel::SearchPanel(DrawWidget * drawWidget, QWidget * parent)
 {
   m_pEditor = new QLineEdit(this);
   connect(m_pEditor, &QLineEdit::textChanged, this, &SearchPanel::OnSearchTextChanged);
+  connect(m_pEditor, &QLineEdit::returnPressed, this, &SearchPanel::OnReturnPressed);
 
   m_pTable = new QTableWidget(0, 4 /*columns*/, this);
   m_pTable->setFocusPolicy(Qt::NoFocus);
@@ -56,10 +58,10 @@ SearchPanel::SearchPanel(DrawWidget * drawWidget, QWidget * parent)
   QButtonGroup * searchModeButtons = new QButtonGroup(this);
   QGroupBox * groupBox = new QGroupBox();
   QHBoxLayout * modeLayout = new QHBoxLayout();
-  QRadioButton * buttonE = new QRadioButton(tr("Everywhere"));
+  QRadioButton * buttonE = new QRadioButton(Tr("search_everywhere"));
   modeLayout->addWidget(buttonE);
   searchModeButtons->addButton(buttonE, static_cast<int>(search::Mode::Everywhere));
-  QRadioButton * buttonV = new QRadioButton(tr("Viewport"));
+  QRadioButton * buttonV = new QRadioButton(Tr("search_viewport"));
   modeLayout->addWidget(buttonV);
   searchModeButtons->addButton(buttonV, static_cast<int>(search::Mode::Viewport));
   groupBox->setLayout(modeLayout);
@@ -67,9 +69,9 @@ SearchPanel::SearchPanel(DrawWidget * drawWidget, QWidget * parent)
   searchModeButtons->button(static_cast<int>(search::Mode::Everywhere))->setChecked(true);
   connect(searchModeButtons, SIGNAL(idClicked(int)), this, SLOT(OnSearchModeChanged(int)));
 
-  m_isCategory = new QCheckBox(tr("Category request"));
+  m_isCategory = new QCheckBox(Tr("category_request"));
   m_isCategory->setCheckState(Qt::Unchecked);
-  connect(m_isCategory, &QCheckBox::stateChanged, std::bind(&SearchPanel::RunSearch, this));
+  connect(m_isCategory, &QCheckBox::toggled, this, &SearchPanel::RunSearch);
 
   QHBoxLayout * requestLayout = new QHBoxLayout();
   requestLayout->addWidget(m_pEditor);
@@ -253,7 +255,7 @@ void SearchPanel::OnSearchTextChanged(QString const & str)
                                   {} /* timeout */,
                                   isCategory,
                                   // m_onResults
-                                  [this, timestamp](Results results, std::vector<ProductInfo> /* productInfo */)
+                                  [this, timestamp](Results results)
     { OnEverywhereSearchResults(timestamp, std::move(results)); }};
 
     if (GetFramework().GetSearchAPI().SearchEverywhere(std::move(params)))
@@ -282,6 +284,12 @@ void SearchPanel::OnSearchTextChanged(QString const & str)
 
     GetFramework().GetSearchAPI().SearchInViewport(std::move(params));
   }
+}
+
+void SearchPanel::OnReturnPressed()
+{
+  // The same as the search button on mobile: apply the search results viewport policy.
+  GetFramework().UpdateViewport(m_results);
 }
 
 void SearchPanel::OnSearchModeChanged(int mode)
@@ -320,8 +328,8 @@ void SearchPanel::OnSearchPanelItemClicked(int row, int)
   }
   else
   {
-    // center viewport on clicked item
-    GetFramework().ShowSearchResult(m_results[row]);
+    // Select the result without cancelling the search or clearing its marks.
+    GetFramework().SelectSearchResult(m_results[row], true /* animation */);
   }
 }
 

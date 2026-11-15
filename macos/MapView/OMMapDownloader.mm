@@ -58,8 +58,11 @@ OMDownloadStatus ToDownloadStatus(storage::NodeStatus s)
     if ([cid isEqualToString:weakSelf.currentCountryId])
       [weakSelf emitAreaForCountryId:cid];
   },
-      [weakSelf](storage::CountryId const & countryId, downloader::Progress const & progress)
-  { [weakSelf emitProgressForCountryId:@(countryId.c_str()) downloaded:progress.m_bytesDownloaded total:progress.m_bytesTotal]; });
+      [weakSelf](storage::CountryId const & countryId, storage::Progress const & batch)
+  {
+    auto const progress = batch.GetCombined();
+    [weakSelf emitProgressForCountryId:@(countryId.c_str()) downloaded:progress.m_bytesDownloaded total:progress.m_bytesTotal];
+  });
 }
 
 - (void)emitAreaForCountryId:(NSString *)countryId

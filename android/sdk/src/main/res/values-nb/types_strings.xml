@@ -165,6 +165,7 @@
     <string name="type.barrier.border_control">Grensekontroll</string>
     <string name="type.barrier.city_wall">Bymur</string>
     <string name="type.waterway.ditch">Dreneringsgrøft</string>
+    <string name="type.waterway.ditch.intermittent">Periodisk dreneringsgrøft</string>
     <string name="type.natural.water.moat">Vollgrav</string>
     <string name="type.natural.water.wastewater">Avløpsvann</string>
     <string name="type.barrier.entrance">Inngangspassasje</string>
@@ -333,48 +334,48 @@
 
     <!-- SECTION: Types: Roads -->
     <string name="type.highway.bridleway">Ridevei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Bru</string>
     <string name="type.highway.bridleway.permissive">Ridevei</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Tunnel</string>
     <string name="type.highway.busway">Dedikert bussvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Tunnel</string>
     <string name="type.highway.bus_stop">Busstopp</string>
     <string name="type.highway.construction">Veikonstruksjon</string>
     <string name="type.highway.cycleway">Sykkelvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Bru</string>
     <string name="type.highway.cycleway.permissive">Sykkelvei</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Tunnel</string>
     <string name="type.highway.footway">Gangvei</string>
     <string name="type.highway.footway.sidewalk">Fortau</string>
     <string name="type.highway.footway.crossing">Fotgjengerovergang</string>
     <string name="type.highway.footway.area">Gangvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Tunnel</string>
     <string name="type.highway.ford">Vadested</string>
     <string name="type.highway.living_street">Gate</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Tunnel</string>
     <string name="type.highway.motorway">Motorvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Tunnel</string>
     <string name="type.highway.motorway_junction">Avkjørsel</string>
     <string name="type.highway.motorway_link">Motorvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Tunnel</string>
     <string name="type.highway.path">Sti</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -383,100 +384,102 @@
     <string name="type.highway.path.expert">Svært vanskelig eller umulig å skille ut stien</string>
     <string name="type.highway.path.bicycle">Sti</string>
     <string name="type.highway.footway.bicycle">Sti</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Bru</string>
     <string name="type.highway.path.horse">Sti</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Tunnel</string>
     <string name="type.highway.pedestrian">Gågate</string>
     <string name="type.highway.pedestrian.area">Gågate</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Tunnel</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Påstigningssted</string>
     <string name="type.highway.primary">Hovedvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Tunnel</string>
     <string name="type.highway.primary_link">Hovedvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Tunnel</string>
     <string name="type.highway.raceway">Løpebane</string>
     <string name="type.highway.residential">Gate</string>
     <string name="type.highway.residential.area">Gate</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Tunnel</string>
     <string name="type.highway.rest_area">Rasteplass</string>
     <string name="type.highway.road">Vei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Bru</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Tunnel</string>
     <string name="type.highway.secondary">Sekundærvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Tunnel</string>
     <string name="type.highway.secondary_link">Sekundærvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Tunnel</string>
     <string name="type.highway.service">Service-vei</string>
     <string name="type.highway.service.area">Service-vei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Bru</string>
     <string name="type.highway.service.driveway">Service-vei</string>
     <string name="type.highway.service.parking_aisle">Service-vei</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Tunnel</string>
     <string name="type.highway.speed_camera">Fotoboks</string>
     <string name="type.highway.steps">Trapper</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Tunnel</string>
     <string name="type.highway.tertiary">Tertiærvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Tunnel</string>
     <string name="type.highway.tertiary_link">Tertiærvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Tunnel</string>
     <string name="type.highway.track">Traktor/Skogsbilvei</string>
     <string name="type.highway.track.area">Traktor/Skogsbilvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Bru</string>
     <string name="type.highway.track.grade1">Traktor/Skogsbilvei</string>
     <string name="type.highway.track.no.access">Traktor/Skogsbilvei</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Tunnel</string>
     <string name="type.highway.traffic_signals">Trafikklys</string>
     <string name="type.highway.trunk">Riksvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Tunnel</string>
     <string name="type.highway.trunk_link">Riksvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Tunnel</string>
     <string name="type.highway.unclassified">Småvei</string>
     <string name="type.highway.unclassified.area">Småvei</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Bru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Tunnel</string>
     <string name="type.area_highway.cycleway">Sykkelvei</string>
     <string name="type.area_highway.footway">Gangvei</string>
@@ -514,6 +517,7 @@
     <string name="type.historic.castle.shiro">Japanske borger</string>
     <string name="type.historic.castle.stately">Slott</string>
     <string name="type.historic.city_gate">Byport</string>
+    <string name="type.man_made.ceremonial_gate">Seremoniell port</string>
     <string name="type.historic.citywalls">Bymur</string>
     <string name="type.historic.fort">Fort</string>
     <string name="type.historic.gallows">Galge</string>
@@ -539,6 +543,7 @@
     <string name="type.historic.wayside_shrine">Helligdom ved veikanten</string>
     <string name="type.historic.wreck">Skipsvrak</string>
     <string name="type.landuse.basin">Basseng</string>
+    <string name="type.landuse.basin.intermittent">Periodisk basseng</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Gravplass</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
@@ -554,7 +559,6 @@
     <string name="type.landuse.grass">Plen</string>
     <string name="type.landuse.landfill">Land-deponi</string>
     <string name="type.landuse.railway">Jernbaneområde</string>
-    <string name="type.landuse.reservoir">Vann</string>
     <string name="type.leisure.dog_park">Hundeområde</string>
     <string name="type.leisure.fitness_centre">Treningssenter</string>
     <string name="type.leisure.fitness_station">Treningsstasjon</string>
@@ -564,6 +568,7 @@
     <string name="type.leisure.golf_course">Golfbane</string>
     <string name="type.leisure.miniature_golf">Minigolf</string>
     <string name="type.leisure.nature_reserve">Naturreservat</string>
+    <string name="type.leisure.bird_hide">Fugleskjul</string>
     <string name="type.leisure.outdoor_seating">Uteservering</string>
     <string name="type.leisure.park">Park</string>
     <string name="type.leisure.park.no.access">Park</string>
@@ -584,6 +589,8 @@
     <string name="type.leisure.water_park">Vannpark</string>
     <string name="type.man_made.chimney">Fabrikkpipe</string>
     <string name="type.man_made.lighthouse">Fyr</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Overdekket reservoar</string>
     <string name="type.man_made.surveillance">Overvåkingskamera</string>
     <string name="type.man_made.tower">Tårn</string>
     <!-- A huge telecommunications tower. Often a local monument or a landmark. -->
@@ -599,6 +606,8 @@
     <string name="type.man_made.water_tower">Vanntårn</string>
     <string name="type.man_made.water_well">Brønn</string>
     <string name="type.man_made.water_well.drinking_water_no">Brønn</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Vannverk</string>
     <string name="type.man_made.windmill">Vindmølle</string>
     <string name="type.natural">Natur</string>
     <!-- A rocky land cover. -->
@@ -629,10 +638,13 @@
     <string name="type.natural.water.reservoir">Reservoar</string>
     <string name="type.natural.water.basin">Basseng</string>
     <string name="type.natural.water.river">Elv</string>
+    <string name="type.natural.water.intermittent">Periodisk vann</string>
     <string name="type.natural.land">Land</string>
     <string name="type.natural.meadow">Eng</string>
     <string name="type.natural.orchard">Frukthage</string>
     <string name="type.natural.peak">Topp</string>
+    <string name="type.natural.hill">Bakke</string>
+    <string name="type.natural.arch">Steinbuen</string>
     <string name="type.natural.saddle">Fjellsadel</string>
     <string name="type.natural.rock">Fjell</string>
     <string name="type.natural.scrub">Kratt</string>
@@ -706,6 +718,8 @@
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">Strømmast</string>
     <string name="type.public_transport">Offentlig transport</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Påstigningssted</string>
     <string name="type.railway">Jernbane</string>
     <string name="type.railway.disused.tunnel">Nedlagt jernbanetunnel</string>
     <string name="type.railway.funicular">Kabelbane</string>
@@ -1031,6 +1045,8 @@
     <string name="type.shop.greengrocer">Frukt- og grønnsakshandler</string>
     <string name="type.shop.grocery">Dagligvare</string>
     <string name="type.shop.hairdresser">Frisør</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Barber</string>
     <string name="type.shop.health_food">Helsekostbutikk</string>
     <string name="type.shop.hearing_aids">Høreapparatbutikk</string>
     <string name="type.shop.herbalist">Urtebutikk</string>
@@ -1153,6 +1169,7 @@
     <string name="type.sport.rugby_union">Rugby</string>
     <string name="type.sport.running">Løping</string>
     <string name="type.sport.softball">Softball</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turisme</string>
     <string name="type.tourism.aquarium">Akvarium</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1198,18 +1215,23 @@
     <string name="type.tourism.zoo.petting">Dyrehage</string>
     <string name="type.waterway.access_point">Adkomstpunkt for vannvei</string>
     <string name="type.waterway.canal">Kanal</string>
+    <string name="type.waterway.canal.intermittent">Periodisk kanal</string>
     <string name="type.waterway.canal.tunnel">Kanal</string>
     <string name="type.waterway.fish_pass">Fiskestige</string>
+    <string name="type.waterway.fish_pass.intermittent">Periodisk fiskestige</string>
     <string name="type.natural.water.ditch">Dreneringsgrøft</string>
     <string name="type.waterway.ditch.tunnel">Kulvert</string>
+    <string name="type.waterway.drain">Dreneringskanal</string>
+    <string name="type.waterway.drain.intermittent">Periodisk dreneringskanal</string>
+    <string name="type.natural.water.drain">Dreneringskanal</string>
     <string name="type.waterway.drain.tunnel">Kulvert</string>
     <string name="type.waterway.lock_gate">Sluseport</string>
     <string name="type.waterway.river">Elv</string>
+    <string name="type.waterway.river.intermittent">Periodisk elv</string>
     <string name="type.waterway.river.tunnel">Elv</string>
-    <string name="type.waterway.stream">Elv</string>
-    <string name="type.waterway.stream.ephemeral">Elv</string>
-    <string name="type.waterway.stream.intermittent">Elv</string>
-    <string name="type.waterway.stream.tunnel">Elv</string>
+    <string name="type.waterway.stream">Bekk</string>
+    <string name="type.waterway.stream.intermittent">Periodisk bekk</string>
+    <string name="type.waterway.stream.tunnel">Bekk</string>
     <string name="type.waterway.waterfall">Foss</string>
     <string name="type.wheelchair.limited">Begrenset tilgang for rullestol</string>
     <string name="type.wheelchair.no">Ingen tilgang for rullestol</string>
@@ -1227,6 +1249,7 @@
     <string name="type.self_service.no">Ingen selvbetjening</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Sosialt anlegg</string>
+    <string name="type.amenity.stage">Scene</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Inngang til akuttmottaket</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1248,6 +1271,8 @@
     <string name="type.man_made.monitoring_station.weather">Værovervåkningsstasjon</string>
     <string name="type.amenity.student_accommodation">Studentboliger</string>
     <string name="type.craft.watchmaker">Urmaker</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Vindusproduksjon</string>
     <string name="type.xmas_feature.market">Julemarked</string>
     <string name="type.xmas_feature.tree">Juletre</string>
     <string name="type.amenity.hookah_lounge">Vannpipebar</string>

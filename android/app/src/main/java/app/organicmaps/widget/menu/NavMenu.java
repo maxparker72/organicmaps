@@ -1,5 +1,6 @@
 package app.organicmaps.widget.menu;
 
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Pair;
 import android.view.View;
@@ -9,21 +10,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
 import app.organicmaps.sdk.routing.RoutingInfo;
 import app.organicmaps.sdk.sound.TtsPlayer;
 import app.organicmaps.sdk.util.StringUtils;
+import app.organicmaps.sdk.widgets.speedlimit.Mode;
+import app.organicmaps.sdk.widgets.speedlimit.SpeedThresholds;
 import app.organicmaps.util.Graphics;
 import app.organicmaps.util.ThemeUtils;
 import app.organicmaps.util.UiUtils;
+import app.organicmaps.util.Utils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
-public class NavMenu
+public class NavMenu implements DefaultLifecycleObserver
 {
   private final BottomSheetBehavior<View> mNavBottomSheetBehavior;
   private final View mBottomSheetBackground;
@@ -44,8 +48,11 @@ public class NavMenu
 
   private final AppCompatActivity mActivity;
   private final NavMenuListener mNavMenuListener;
+  private final Runnable mTtsStateListener = this::refreshTts;
 
   private int currentPeekHeight = 0;
+  private Mode mSpeedMode = Mode.Normal;
+  private int mSpeedLimit = 0;
 
   public interface OnMenuSizeChangedListener
   {
@@ -112,6 +119,15 @@ public class NavMenu
     Button stop = bottomFrame.findViewById(R.id.stop);
     stop.setOnClickListener(v -> onStopClicked());
     UiUtils.updateRedButton(stop);
+
+    TtsPlayer.addStateChangedListener(mTtsStateListener);
+    mActivity.getLifecycle().addObserver(this);
+  }
+
+  @Override
+  public void onDestroy(@NonNull LifecycleOwner owner)
+  {
+    TtsPlayer.removeStateChangedListener(mTtsStateListener);
   }
 
   private void onStopClicked()
@@ -126,8 +142,15 @@ public class NavMenu
 
   private void onTtsClicked()
   {
-    TtsPlayer.setEnabled(!TtsPlayer.isEnabled());
-    refreshTts();
+    switch (TtsPlayer.getState())
+    {
+    case INITIALIZING: return;
+    case UNAVAILABLE:
+    case NEEDS_LANGUAGE: mNavMenuListener.onTtsVoiceSettingsClicked(); return;
+    case READY_ON:
+    case READY_OFF: TtsPlayer.setEnabled(!TtsPlayer.isEnabled()); return;
+    default: return;
+    }
   }
 
   private void toggleNavMenu()
@@ -166,9 +189,19 @@ public class NavMenu
 
   public void refreshTts()
   {
-    mTts.setImageDrawable(TtsPlayer.isEnabled()
-                              ? Graphics.tint(mActivity, R.drawable.ic_voice_on, androidx.appcompat.R.attr.colorAccent)
-                              : Graphics.tint(mActivity, R.drawable.ic_voice_off));
+    final Drawable icon;
+    switch (TtsPlayer.getState())
+    {
+    case READY_ON:
+      icon = Graphics.tint(mActivity, R.drawable.ic_voice_on, androidx.appcompat.R.attr.colorAccent);
+      break;
+    case READY_OFF: icon = Graphics.tint(mActivity, R.drawable.ic_voice_off); break;
+    case INITIALIZING:
+    case UNAVAILABLE:
+    case NEEDS_LANGUAGE:
+    default: icon = Graphics.tint(mActivity, R.drawable.ic_voice_off, R.attr.iconTintDisabled); break;
+    }
+    mTts.setImageDrawable(icon);
   }
 
   private void updateTime(int seconds)
@@ -179,11 +212,13 @@ public class NavMenu
 
   private void updateTimeLeft(int seconds)
   {
-    final long hours = TimeUnit.SECONDS.toHours(seconds);
-    final long minutes = TimeUnit.SECONDS.toMinutes(seconds) % 60;
+    final long totalMinutes = Utils.getRoutingMinutes(seconds);
+    final long hours = TimeUnit.MINUTES.toHours(totalMinutes);
+    final long minutes = totalMinutes % 60;
     mTimeMinuteValue.setText(String.valueOf(minutes));
     String min = mActivity.getResources().getString(R.string.minute);
     mTimeMinuteUnits.setText(min);
+    UiUtils.showIf(hours == 0 || minutes > 0, mTimeMinuteUnits, mTimeMinuteValue);
     if (hours == 0)
     {
       UiUtils.hide(mTimeHourUnits, mTimeHourValue);
@@ -196,10 +231,7 @@ public class NavMenu
 
   private void updateTimeEstimate(int seconds)
   {
-    final String format =
-        android.text.format.DateFormat.is24HourFormat(mTimeMinuteValue.getContext()) ? "HH:mm" : "h:mm a";
-    final LocalTime localTime = LocalTime.now().plusSeconds(seconds);
-    mTimeEstimate.setText(localTime.format(DateTimeFormatter.ofPattern(format)));
+    mTimeEstimate.setText(Utils.formatArrivalTime(mActivity, seconds));
   }
 
   private void updateSpeedView(@NonNull RoutingInfo info)
@@ -208,21 +240,37 @@ public class NavMenu
     if (last == null)
       return;
 
-    Pair<String, String> speedAndUnits = StringUtils.nativeFormatSpeedAndUnits(last.getSpeed());
+    final double speedMps = last.hasSpeed() ? last.getSpeed() : 0;
+    final Pair<String, String> speedAndUnits = StringUtils.nativeFormatSpeedAndUnits(speedMps);
     mSpeedValue.setText(speedAndUnits.first);
 
-    if (info.speedLimitMps > 0.0 && last.getSpeed() > info.speedLimitMps)
+    final int speed = StringUtils.nativeFormatSpeed(speedMps);
+    final int speedLimit = info.speedLimitMps > 0 ? StringUtils.nativeFormatSpeed(info.speedLimitMps) : 0;
+    if (mSpeedLimit != speedLimit || !speedAndUnits.second.contentEquals(mSpeedUnits.getText()))
+      mSpeedMode = Mode.Normal;
+    mSpeedLimit = speedLimit;
+    mSpeedMode = SpeedThresholds.DEFAULT.modeFor(speed, speedLimit, mSpeedMode);
+
+    switch (info.isSpeedCamLimitExceeded() ? Mode.Alert : mSpeedMode)
     {
-      if (info.isSpeedCamLimitExceeded())
-        mSpeedValue.setTextColor(ContextCompat.getColor(mActivity, R.color.white_primary));
-      else
-        mSpeedValue.setTextColor(ContextCompat.getColor(mActivity, R.color.base_red));
-    }
-    else
+    case Normal ->
+    {
+      mSpeedViewContainer.setActivated(false);
       mSpeedValue.setTextColor(ThemeUtils.getColor(mActivity, android.R.attr.textColorPrimary));
+    }
+    case Warning ->
+    {
+      mSpeedViewContainer.setActivated(false);
+      mSpeedValue.setTextColor(ContextCompat.getColor(mActivity, R.color.base_yellow));
+    }
+    case Alert ->
+    {
+      mSpeedViewContainer.setActivated(true);
+      mSpeedValue.setTextColor(ContextCompat.getColor(mActivity, R.color.white_primary));
+    }
+    }
 
     mSpeedUnits.setText(speedAndUnits.second);
-    mSpeedViewContainer.setActivated(info.isSpeedCamLimitExceeded());
   }
 
   public void update(@NonNull RoutingInfo info)
@@ -239,5 +287,7 @@ public class NavMenu
     void onStopClicked();
 
     void onSettingsClicked();
+
+    void onTtsVoiceSettingsClicked();
   }
 }

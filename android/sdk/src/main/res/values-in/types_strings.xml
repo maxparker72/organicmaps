@@ -155,6 +155,7 @@
     <string name="type.barrier.border_control">Gerbang perbatasan</string>
     <string name="type.barrier.city_wall">Tembok Kota</string>
     <string name="type.waterway.ditch">Parit saluran air</string>
+    <string name="type.waterway.ditch.intermittent">Parit saluran air sementara</string>
     <string name="type.natural.water.moat">Parit</string>
     <string name="type.natural.water.wastewater">Air limbah</string>
     <string name="type.barrier.entrance">Pintu masuk</string>
@@ -322,45 +323,45 @@
     <string name="type.healthcare.speech_therapist">Logopedik</string>
 
     <!-- SECTION: Types: Roads -->
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Terowongan</string>
     <string name="type.highway.busway">Jalan khusus bus</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Terowongan</string>
     <string name="type.highway.bus_stop">Halte bus</string>
     <string name="type.highway.construction">Jalan sedang dibangun</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Terowongan</string>
     <string name="type.highway.footway">Jalur</string>
     <string name="type.highway.footway.sidewalk">Trotoar</string>
     <string name="type.highway.footway.crossing">Penyeberangan Pejalan Kaki</string>
     <string name="type.highway.footway.area">Jalur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Terowongan</string>
     <string name="type.highway.ford">Menyeberang</string>
     <string name="type.highway.living_street">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Terowongan</string>
     <string name="type.highway.motorway">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Terowongan</string>
     <string name="type.highway.motorway_junction">Keluar</string>
     <string name="type.highway.motorway_link">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Terowongan</string>
     <string name="type.highway.path">Jalur</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -369,100 +370,102 @@
     <string name="type.highway.path.expert">Jejak yang sangat sulit atau tidak dapat dibedakם)</string>
     <string name="type.highway.path.bicycle">Jalur</string>
     <string name="type.highway.footway.bicycle">Jalur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Menjembatani</string>
     <string name="type.highway.path.horse">Jalur</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Terowongan</string>
     <string name="type.highway.pedestrian">Jalan</string>
     <string name="type.highway.pedestrian.area">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Terowongan</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Peron</string>
     <string name="type.highway.primary">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Terowongan</string>
     <string name="type.highway.primary_link">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Terowongan</string>
     <string name="type.highway.raceway">Lintasan balap</string>
     <string name="type.highway.residential">Jalan</string>
     <string name="type.highway.residential.area">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Terowongan</string>
     <string name="type.highway.rest_area">Tempat istirahat</string>
     <string name="type.highway.road">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Menjembatani</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Terowongan</string>
     <string name="type.highway.secondary">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Terowongan</string>
     <string name="type.highway.secondary_link">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Terowongan</string>
     <string name="type.highway.service">Jalan</string>
     <string name="type.highway.service.area">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Menjembatani</string>
     <string name="type.highway.service.driveway">Jalan</string>
     <string name="type.highway.service.parking_aisle">Jalan</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Terowongan</string>
     <string name="type.highway.speed_camera">Kamera Kecepatan</string>
     <string name="type.highway.steps">Jalur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Terowongan</string>
     <string name="type.highway.tertiary">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Terowongan</string>
     <string name="type.highway.tertiary_link">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Terowongan</string>
     <string name="type.highway.track">Jalan</string>
     <string name="type.highway.track.area">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Menjembatani</string>
     <string name="type.highway.track.grade1">Jalan</string>
     <string name="type.highway.track.no.access">Jalan</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Terowongan</string>
     <string name="type.highway.traffic_signals">Lampu lalu lintas</string>
     <string name="type.highway.trunk">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Terowongan</string>
     <string name="type.highway.trunk_link">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Terowongan</string>
     <string name="type.highway.unclassified">Jalan</string>
     <string name="type.highway.unclassified.area">Jalan</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Menjembatani</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Terowongan</string>
     <string name="type.area_highway.footway">Jalur</string>
     <string name="type.area_highway.living_street">Jalan</string>
@@ -499,6 +502,7 @@
     <string name="type.historic.castle.shiro">Istana Jepang</string>
     <string name="type.historic.castle.stately">Kastel</string>
     <string name="type.historic.city_gate">Gerbang kota</string>
+    <string name="type.man_made.ceremonial_gate">Gerbang Upacara</string>
     <string name="type.historic.citywalls">Tembok Kota</string>
     <string name="type.historic.fort">Benteng</string>
     <string name="type.historic.gallows">Tiang gantungan</string>
@@ -524,7 +528,8 @@
     <string name="type.historic.wayside_cross">Salib di pinggir jalan</string>
     <string name="type.historic.wayside_shrine">Kuil di pinggir jalan</string>
     <string name="type.historic.wreck">Kecelakaan kapal</string>
-    <string name="type.landuse.basin">Sebuah baskom air</string>
+    <string name="type.landuse.basin">Kolam tampungan</string>
+    <string name="type.landuse.basin.intermittent">Kolam tampungan sementara</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Pemakaman</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
@@ -540,7 +545,6 @@
     <string name="type.landuse.grass">Lapangan rumput</string>
     <string name="type.landuse.landfill">TPA</string>
     <string name="type.landuse.railway">Stasiun kereta api</string>
-    <string name="type.landuse.reservoir">Air</string>
     <string name="type.leisure.dog_park">Area untuk anjing</string>
     <string name="type.leisure.fitness_centre">Pusat kebugaran</string>
     <string name="type.leisure.fitness_station">Stasiun Kebugaran</string>
@@ -549,6 +553,7 @@
     <string name="type.leisure.garden.residential">Situs arkeologi</string>
     <string name="type.leisure.golf_course">Lapangan golf</string>
     <string name="type.leisure.nature_reserve">Cagar Alam</string>
+    <string name="type.leisure.bird_hide">Tempat pengamatan burung</string>
     <string name="type.leisure.outdoor_seating">Tempat duduk di luar ruangan</string>
     <string name="type.leisure.park">Taman</string>
     <string name="type.leisure.park.no.access">Taman</string>
@@ -569,6 +574,8 @@
     <string name="type.leisure.water_park">Taman air</string>
     <string name="type.man_made.chimney">Cerobong asap pabrik</string>
     <string name="type.man_made.lighthouse">Mercusuar</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Reservoir air tertutup</string>
     <string name="type.man_made.surveillance">Kamera Pengawas</string>
     <string name="type.man_made.tower">Menara</string>
     <!-- A huge telecommunications tower. Often a local monument or a landmark. -->
@@ -584,6 +591,8 @@
     <string name="type.man_made.water_tower">Menara air</string>
     <string name="type.man_made.water_well">Sumur air</string>
     <string name="type.man_made.water_well.drinking_water_no">Sumur air</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Instalasi pengolahan air</string>
     <string name="type.man_made.windmill">Kincir angin</string>
     <string name="type.natural">Alam</string>
     <!-- A rocky land cover. -->
@@ -612,12 +621,15 @@
     <string name="type.natural.water.lock">Ruang Kunci</string>
     <string name="type.natural.water.pond">Kolam</string>
     <string name="type.natural.water.reservoir">Waduk</string>
-    <string name="type.natural.water.basin">Sebuah baskom air</string>
+    <string name="type.natural.water.basin">Kolam tampungan</string>
     <string name="type.natural.water.river">Sungai</string>
+    <string name="type.natural.water.intermittent">Perairan sementara</string>
     <string name="type.natural.land">Daratan</string>
     <string name="type.natural.meadow">Padang rumput</string>
     <string name="type.natural.orchard">Kebun</string>
     <string name="type.natural.peak">Puncak</string>
+    <string name="type.natural.hill">Bukit</string>
+    <string name="type.natural.arch">Lengkungan Batu</string>
     <string name="type.natural.saddle">Pelana Gunung</string>
     <string name="type.natural.rock">Batu</string>
     <string name="type.natural.scrub">Semak</string>
@@ -690,6 +702,8 @@
     <string name="type.power.substation">Stasiun bawah tanah</string>
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">Menara listrik</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Peron</string>
     <string name="type.railway.disused.tunnel">Terowongan kereta api nonaktif</string>
     <string name="type.railway.funicular">Kereta gantung</string>
     <string name="type.railway.halt">Rel kereta api</string>
@@ -1012,6 +1026,8 @@
     <string name="type.shop.greengrocer">Penjual sayuran</string>
     <string name="type.shop.grocery">Kebutuhan sehari-hari</string>
     <string name="type.shop.hairdresser">Penata rambut</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Tukang cukur</string>
     <string name="type.shop.health_food">Toko Makanan Kesehatan</string>
     <string name="type.shop.hearing_aids">Toko alat bantu dengar</string>
     <string name="type.shop.herbalist">Toko jamu</string>
@@ -1132,6 +1148,7 @@
     <string name="type.sport.rugby_union">Rugbi</string>
     <string name="type.sport.running">Lari</string>
     <string name="type.sport.softball">Sofbol</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism.aquarium">Akuarium</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
     <string name="type.tourism.alpine_hut">Penginapan gunung</string>
@@ -1173,18 +1190,23 @@
     <string name="type.tourism.zoo.petting">Kebun Binatang</string>
     <string name="type.waterway.access_point">Titik Akses Jalur Air</string>
     <string name="type.waterway.canal">Kanal</string>
+    <string name="type.waterway.canal.intermittent">Kanal sementara</string>
     <string name="type.waterway.canal.tunnel">Kanal</string>
     <string name="type.waterway.fish_pass">Tangga ikan</string>
+    <string name="type.waterway.fish_pass.intermittent">Tangga ikan sementara</string>
     <string name="type.natural.water.ditch">Parit saluran air</string>
     <string name="type.waterway.ditch.tunnel">Gorong-gorong</string>
+    <string name="type.waterway.drain">Saluran pembuangan</string>
+    <string name="type.waterway.drain.intermittent">Saluran pembuangan sementara</string>
+    <string name="type.natural.water.drain">Saluran pembuangan</string>
     <string name="type.waterway.drain.tunnel">Gorong-gorong</string>
     <string name="type.waterway.lock_gate">Gerbang pengunci</string>
     <string name="type.waterway.river">Sungai</string>
+    <string name="type.waterway.river.intermittent">Sungai sementara</string>
     <string name="type.waterway.river.tunnel">Sungai</string>
-    <string name="type.waterway.stream">Sungai</string>
-    <string name="type.waterway.stream.ephemeral">Sungai</string>
-    <string name="type.waterway.stream.intermittent">Sungai</string>
-    <string name="type.waterway.stream.tunnel">Sungai</string>
+    <string name="type.waterway.stream">Sungai kecil</string>
+    <string name="type.waterway.stream.intermittent">Sungai kecil sementara</string>
+    <string name="type.waterway.stream.tunnel">Sungai kecil</string>
     <string name="type.waterway.waterfall">Air terjun</string>
     <string name="type.wheelchair.limited">Akses kursi roda terbatas</string>
     <string name="type.wheelchair.no">Tidak ada akses kursi roda</string>
@@ -1202,6 +1224,7 @@
     <string name="type.self_service.no">Tidak ada layanan mandiri</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Fasilitas Sosial</string>
+    <string name="type.amenity.stage">Panggung</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Pintu Masuk Bangsal Darurat</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1223,6 +1246,8 @@
     <string name="type.man_made.monitoring_station.weather">Stasiun Pemantauan Cuaca</string>
     <string name="type.amenity.student_accommodation">Akomodasi Mahasiswa</string>
     <string name="type.craft.watchmaker">Pembuat jam tangan</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Pembuatan jendela</string>
     <string name="type.xmas_feature.market">Pasar Natal</string>
     <string name="type.xmas_feature.tree">Pohon Natal</string>
     <string name="type.amenity.hookah_lounge">Kafe Shisha</string>

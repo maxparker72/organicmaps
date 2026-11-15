@@ -102,7 +102,7 @@ struct MultiSelectionInspectorView: View {
   private var colorBreakdown: [String] {
     var counts: [String: Int] = [:]
     for bm in matchedBookmarks() {
-      counts[bm.bookmarkColor.displayName, default: 0] += 1
+      counts[BookmarkColor.closest(to: bm.bookmarkColor).displayName, default: 0] += 1
     }
     // Tracks store an arbitrary dp::Color; snap to the nearest palette entry
     // so the breakdown groups by visual colour rather than by exact RGBA.

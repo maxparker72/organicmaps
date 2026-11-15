@@ -25,10 +25,13 @@
 #include "indexer/drawing_rules.hpp"
 #include "indexer/scales.hpp"
 
+#include "geometry/mercator.hpp"
+
 #include "platform/trace.hpp"
 
 #include "base/assert.hpp"
 #include "base/logging.hpp"
+#include "base/math.hpp"
 #include "base/stl_helpers.hpp"
 #include "base/timer.hpp"
 
@@ -55,6 +58,14 @@ double constexpr kVSyncInterval = 0.06;
 double constexpr kVSyncIntervalMetalVulkan = 0.03;
 
 std::string const kTransitBackgroundColor = "TransitBackground";
+
+m2::RectD GetExtendedClipRect(ScreenBase const & screen, double visualScale)
+{
+  auto rect = screen.ClipRect();
+  double const extension = visualScale * dp::kScreenPixelRectExtension * screen.GetScale();
+  rect.Inflate(extension, extension);
+  return rect;
+}
 
 bool IsTextUserMarkState(dp::RenderState const & state)
 {
@@ -600,6 +611,12 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
     break;
   }
 
+  case Message::Type::RemoveAlternativeSubroutes:
+  {
+    m_routeRenderer->RemoveAlternativeSubroutes();
+    break;
+  }
+
   case Message::Type::FollowRoute:
   {
     ref_ptr<FollowRouteMessage> const msg = message;
@@ -668,7 +685,17 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
 
   case Message::Type::UpdateMapStyle: UpdateAll<SwitchMapStyleMessage>(); break;
 
-  case Message::Type::VisualScaleChanged: UpdateAll<VisualScaleChangedMessage>(); break;
+  case Message::Type::VisualScaleChanged:
+  {
+    double const vs = VisualParams::Instance().GetVisualScale();
+    m_overlayTree->SetVisualScale(vs);
+    m_searchMarkTextOverlayTree->SetVisualScale(vs);
+    // Draw tile zoom depends on the visual scale, but ResolveZoomLevel runs only when the model view
+    // changes, so re-resolve it here before all tiles are re-requested in UpdateAll.
+    ResolveZoomLevel(m_userEventStream.GetCurrentScreen());
+    UpdateAll<VisualScaleChangedMessage>();
+    break;
+  }
 
   case Message::Type::AllowAutoZoom:
   {
@@ -723,6 +750,21 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
     }
     break;
   }
+  case Message::Type::SetTerrainLight:
+  {
+    ref_ptr<SetTerrainLightMessage> const msg = message;
+    double const azimuth = math::DegToRad(msg->AzimuthDeg());
+    double const altitude = math::DegToRad(msg->AltitudeDeg());
+    // Towards the light in the mercator frame, w = the shadow gamma (see
+    // MapProgramParams::m_terrainLightDir). The message wakes the render loop, so the
+    // next frame re-lights the standing terrain geometry.
+    m_frameValues.m_terrainLightDir =
+        glsl::vec4(static_cast<float>(std::sin(azimuth) * std::cos(altitude)),
+                   static_cast<float>(std::cos(azimuth) * std::cos(altitude)), static_cast<float>(std::sin(altitude)),
+                   static_cast<float>(msg->ShadowGamma()));
+    break;
+  }
+
   case Message::Type::FlushCirclesPack:
   {
     ref_ptr<FlushCirclesPackMessage> msg = message;
@@ -784,7 +826,7 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
     ref_ptr<SetAddNewPlaceModeMessage> msg = message;
     m_userEventStream.SetKineticScrollEnabled(msg->IsKineticScrollEnabled());
     m_dragBoundArea = msg->AcceptBoundArea();
-    if (msg->IsEnabled())
+    if (msg->IsEnabled() && msg->ShouldChangeViewport())
     {
       auto const pt = msg->GetOptionalPosition();
       if (pt || m_dragBoundArea.empty())
@@ -964,6 +1006,30 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
     break;
   }
 
+#ifdef SCENARIO_ENABLE
+  case Message::Type::ScenarioViewport:
+  {
+    ref_ptr<ScenarioViewportMessage> msg = message;
+    auto const & request = msg->GetRequest();
+    if (msg->IsFence())
+    {
+      if (m_scenarioViewportRequest == request && msg->GetRevision() == m_scenarioViewportRevision &&
+          m_scenarioViewportStage == ScenarioViewportStage::WaitFence)
+        m_scenarioViewportStage = ScenarioViewportStage::ReadyToPresent;
+    }
+    else if (!request->WaitFor(std::chrono::milliseconds(0)))
+    {
+      CompleteScenarioViewport(false);
+      m_scenarioViewportRequest = request;
+      ++m_scenarioViewportRevision;
+      m_scenarioViewportStage = ScenarioViewportStage::WaitViewport;
+      AddUserEvent(make_unique_dp<SetCenterEvent>(request->m_center, request->m_zoom, false /* isAnim */,
+                                                  false /* trackVisibleViewport */, nullptr));
+    }
+    break;
+  }
+#endif
+
   case Message::Type::FinishTexturesInitialization:
   {
     ref_ptr<FinishTexturesInitializationMessage> msg = message;
@@ -994,26 +1060,35 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
   case Message::Type::SetTileBackgroundMode:
   {
     ref_ptr<SetTileBackgroundModeMessage> msg = message;
-    auto const prevMode = m_tileBackgroundRenderer->GetBackgroundMode();
     m_tileBackgroundRenderer->SetBackgroundMode(m_context, msg->GetMode());
-    if (prevMode != m_tileBackgroundRenderer->GetBackgroundMode())
+    if (msg->NeedInvalidate())
       InvalidateRect(m_userEventStream.GetCurrentScreen().ClipRect());
     break;
   }
 
-  case Message::Type::AssignTileBackgroundTexture:
+  case Message::Type::AssignTileBackgroundImage:
   {
-    ref_ptr<AssignTileBackgroundTextureMessage> msg = message;
-    if (m_context->GetApiVersion() == dp::ApiVersion::OpenGLES3)
+    ref_ptr<AssignTileBackgroundImageMessage> msg = message;
+    // Skip the GL upload for a uid we already hold: AssignTileBackgroundImage below would only dedupe
+    // and release this freshly-acquired texture, so uploading into it is wasted bandwidth. HasImage is
+    // checked after the API test so it runs only on the GL path (non-GL already uploaded in the backend).
+    if (m_context->GetApiVersion() == dp::ApiVersion::OpenGLES3 && !m_tileBackgroundRenderer->HasImage(msg->GetUid()))
     {
       void * data = msg->GetBytes().data();
       msg->GetTexturePool()->UpdateTextureData(m_context, msg->GetTextureId(), 0, 0, msg->GetWidth(), msg->GetHeight(),
                                                make_ref(data));
     }
 
-    m_tileBackgroundRenderer->AssignTileBackgroundTexture(m_context, msg->GetTileKey(), msg->GetTexturePool(),
-                                                          msg->GetTextureId(), msg->GetMode());
+    m_tileBackgroundRenderer->AssignTileBackgroundImage(m_context, msg->GetTileKey(), msg->GetUid(),
+                                                        msg->GetTexturePool(), msg->GetTextureId(), msg->GetMode());
     msg->MarkProcessed();
+    break;
+  }
+
+  case Message::Type::SetTileBackgroundData:
+  {
+    ref_ptr<SetTileBackgroundDataMessage> msg = message;
+    m_tileBackgroundRenderer->SetTileBackgroundData(m_context, msg->GetTileKey(), msg->GetImageUid(), msg->GetRect());
     break;
   }
 
@@ -1144,19 +1219,13 @@ bool FrontendRenderer::CheckRouteRecaching(ref_ptr<BaseSubrouteData> subrouteDat
 void FrontendRenderer::InvalidateRect(m2::RectD const & gRect)
 {
   ScreenBase const screen = m_userEventStream.GetCurrentScreen();
-  m2::RectD rect = gRect;
-  if (rect.Intersect(screen.ClipRect()))
+  // Invalidate over the same margin-inflated rect as ResolveTileKeys: the off-screen
+  // margin tiles are read and kept too, so they must be dropped as well or they come
+  // back stale when panned in.
+  auto const clipRect = GetExtendedClipRect(screen, VisualParams::Instance().GetVisualScale());
+  auto const tiles = CalcTilesToInvalidate(gRect, clipRect, GetCurrentZoom());
+  if (!tiles.empty())
   {
-    // Find tiles to invalidate.
-    TTilesCollection tiles;
-    int const dataZoomLevel = ClipTileZoomByMaxDataZoom(GetCurrentZoom());
-    CalcTilesCoverage(rect, dataZoomLevel, [this, &rect, &tiles](int tileX, int tileY)
-    {
-      TileKey const key(tileX, tileY, GetCurrentZoom());
-      if (rect.IsIntersect(key.GetGlobalRect()))
-        tiles.insert(key);
-    });
-
     // Remove tiles to invalidate from screen.
     auto eraseFunction = [&tiles](drape_ptr<RenderGroup> const & group)
     { return tiles.find(group->GetTileKey()) != tiles.end(); };
@@ -1424,7 +1493,7 @@ void FrontendRenderer::EndUpdateOverlayTree()
   }
 }
 
-void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFrame)
+bool FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFrame)
 {
   TRACE_SECTION("[drape] RenderScene");
   CHECK(m_context != nullptr, ());
@@ -1432,7 +1501,8 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
   DrapeImmediateRenderingMeasurerGuard drapeMeasurerGuard(m_context);
 #endif
 
-  if (m_postprocessRenderer->BeginFrame(m_context, modelView, activeFrame))
+  bool const fullFrame = m_postprocessRenderer->BeginFrame(m_context, modelView, activeFrame);
+  if (fullFrame)
   {
     RefreshBgColor();
 
@@ -1455,7 +1525,9 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
     RenderTileBackgroundLayer(modelView);
 
     Render2dLayer(modelView);
+    RenderUserMarksLayer(modelView, DepthLayer::UserAreaLayer);
     RenderUserMarksLayer(modelView, DepthLayer::UserLineLayer);
+    RenderUserMarksLayer(modelView, DepthLayer::SelectedUserLineLayer);
 
     bool const hasTransitRouteData = HasTransitRouteData();
     if (m_buildingsFramebuffer->IsSupported() && !m_routeRenderer->IsRulerRoute())
@@ -1514,7 +1586,7 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
       RenderUserMarksLayer(modelView, DepthLayer::UserMarkLayer);
       RenderUserMarksLayer(modelView, DepthLayer::RoutingBottomMarkLayer);
       RenderUserMarksLayer(modelView, DepthLayer::RoutingMarkLayer);
-      RenderNonDisplaceableUserMarksLayer(modelView, DepthLayer::SearchMarkLayer);
+      RenderUserMarksLayer(modelView, DepthLayer::SearchMarkLayer);
     }
 
     if (!HasRouteData())
@@ -1527,7 +1599,7 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
   }
 
   if (!m_postprocessRenderer->EndFrame(m_context, make_ref(m_gpuProgramManager), m_viewport))
-    return;
+    return false;
 
   {
     uint32_t clearBits = dp::ClearBits::DepthBit;
@@ -1546,14 +1618,14 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
   if (m_graphicsStage == GraphicsStage::WaitRendering)
     m_graphicsStage = GraphicsStage::Rendered;
 #endif
+  return fullFrame;
 }
 
 void FrontendRenderer::RenderTileBackgroundLayer(ScreenBase const & modelView)
 {
   TRACE_SECTION("[drape] RenderTileBackgroundLayer");
   DEBUG_LABEL(m_context, "Tile Background");
-  m_tileBackgroundRenderer->Render(m_context, make_ref(m_gpuProgramManager), modelView, GetCurrentZoom(),
-                                   m_frameValues);
+  m_tileBackgroundRenderer->Render(m_context, make_ref(m_gpuProgramManager), modelView, m_frameValues);
 }
 
 void FrontendRenderer::Render2dLayer(ScreenBase const & modelView)
@@ -1622,8 +1694,16 @@ void FrontendRenderer::RenderOverlayLayer(ScreenBase const & modelView)
   DEBUG_LABEL(m_context, "Overlay Layer");
   RenderLayer & overlay = m_layers[static_cast<size_t>(DepthLayer::OverlayLayer)];
   BuildOverlayTree(modelView);
+  UpdateSearchMarkTextOverlay(modelView);
+  m_searchMarkOverlayFilter.Collect(m_layers[static_cast<size_t>(DepthLayer::SearchMarkLayer)].m_renderGroups,
+                                    modelView);
   for (drape_ptr<RenderGroup> & group : overlay.m_renderGroups)
+  {
+    // Keep POIs in the displacement tree for their captions while drawing search marks above them.
+    m_searchMarkOverlayFilter.HideOverlappingSymbols(*group, modelView);
     RenderSingleGroup(m_context, modelView, make_ref(group));
+    m_searchMarkOverlayFilter.RestoreHiddenSymbols();
+  }
 }
 
 bool FrontendRenderer::HasTransitRouteData() const
@@ -1717,7 +1797,12 @@ void FrontendRenderer::RenderMwmBorderLayer(ScreenBase const & modelView)
 void FrontendRenderer::RenderUserMarksLayer(ScreenBase const & modelView, DepthLayer layerId)
 {
   TRACE_SECTION("[drape] RenderUserMarksLayer");
-  auto const & renderGroups = m_layers[static_cast<size_t>(layerId)].m_renderGroups;
+  auto & layer = m_layers[static_cast<size_t>(layerId)];
+  // Translucent outlines must be drawn over all fills, while an outline bucket may fill up before the fill one and
+  // outlines of neighbor tiles overlap. Sorting by state puts fills first.
+  if (layerId == DepthLayer::UserAreaLayer)
+    layer.Sort(nullptr);
+  auto const & renderGroups = layer.m_renderGroups;
   if (renderGroups.empty())
     return;
 
@@ -1727,26 +1812,6 @@ void FrontendRenderer::RenderUserMarksLayer(ScreenBase const & modelView, DepthL
 
   for (drape_ptr<RenderGroup> const & group : renderGroups)
     RenderSingleGroup(m_context, modelView, make_ref(group));
-}
-
-void FrontendRenderer::RenderNonDisplaceableUserMarksLayer(ScreenBase const & modelView, DepthLayer layerId)
-{
-  TRACE_SECTION("[drape] RenderNonDisplaceableUserMarksLayer");
-  if (layerId == DepthLayer::SearchMarkLayer)
-  {
-    UpdateSearchMarkTextOverlay(modelView);
-    RenderUserMarksLayer(modelView, layerId);
-    return;
-  }
-
-  auto & layer = m_layers[static_cast<size_t>(layerId)];
-  layer.Sort(nullptr);
-  for (drape_ptr<RenderGroup> & group : layer.m_renderGroups)
-  {
-    group->SetOverlayVisibility(true);
-    group->Update(modelView);
-  }
-  RenderUserMarksLayer(modelView, layerId);
 }
 
 void FrontendRenderer::RenderEmptyFrame()
@@ -1772,6 +1837,9 @@ void FrontendRenderer::RenderEmptyFrame()
 void FrontendRenderer::RenderFrame()
 {
   TRACE_SECTION("[drape] RenderFrame");
+#ifdef DRAPE_QUEUE_TRACE
+  TraceMessageQueue("frontend");
+#endif
   DrapeMeasurerGuard drapeMeasurerGuard;
 
   CHECK(m_context != nullptr, ());
@@ -1790,9 +1858,31 @@ void FrontendRenderer::RenderFrame()
   if (viewportChanged || m_needRestoreSize)
     OnResize(modelView);
 
-  bool const zoomChanged = ResolveZoomLevel(modelView);
-  /// @todo Put ResolveZoomLevel under modelViewChanged after testing.
-  ASSERT(!zoomChanged || modelViewChanged, ());
+  bool const zoomChanged = modelViewChanged && ResolveZoomLevel(modelView);
+
+#ifdef SCENARIO_ENABLE
+  if (m_scenarioViewportRequest)
+  {
+    if (m_scenarioViewportRequest->WaitFor(std::chrono::milliseconds(0)) ||
+        (m_scenarioViewportStage != ScenarioViewportStage::WaitViewport && modelView != m_scenarioViewportScreen))
+      CompleteScenarioViewport(false);
+    else if (m_scenarioViewportStage != ScenarioViewportStage::WaitViewport &&
+             (m_forceUpdateScene || m_forceUpdateUserMarks))
+    {
+      // A normal refresh needs a new fence; replies from the previous read must not complete it.
+      ++m_scenarioViewportRevision;
+      m_scenarioViewportStage = ScenarioViewportStage::WaitTiles;
+    }
+  }
+#endif
+
+  // Skip starting a new GPU frame if rendering is being disabled (e.g. the app is going to the
+  // background). SetRenderingEnabled(false) sets the flag on the UI thread and then blocks until this
+  // render thread reaches CheckRenderingEnabled(); bailing out here (before BeginRendering, so GPU frame
+  // scope stays balanced) lets that handshake complete after at most the already in-flight frame instead
+  // of waiting for a full PrepareScene + RenderScene + present. Prevents ANRs in Framework::DetachSurface.
+  if (!IsRenderingEnabled())
+    return;
 
   if (!m_context->BeginRendering())
     return;
@@ -1822,7 +1912,21 @@ void FrontendRenderer::RenderFrame()
   m_frameData.m_framesFast += static_cast<uint64_t>(!isActiveFrameForScene);
 #endif
 
+#ifdef SCENARIO_ENABLE
+  // Snapshot readiness before drawing: messages handled later cannot complete this frame retroactively.
+  auto const readyRequest = m_scenarioViewportStage == ScenarioViewportStage::ReadyToPresent &&
+                                    m_notFinishedTiles.empty() && !m_forceUpdateScene && !m_forceUpdateUserMarks
+                              ? m_scenarioViewportRequest
+                              : nullptr;
+  if (readyRequest)
+  {
+    m_overlayTree->InvalidateOnNextFrame();
+    m_searchMarkTextOverlayTree->InvalidateOnNextFrame();
+  }
+  bool const sceneRendered = RenderScene(modelView, isActiveFrameForScene || readyRequest != nullptr);
+#else
   RenderScene(modelView, isActiveFrameForScene);
+#endif
 
   if (m_renderInjectionHandler)
     m_renderInjectionHandler(m_context, m_texMng, make_ref(m_gpuProgramManager), false);
@@ -1841,6 +1945,35 @@ void FrontendRenderer::RenderFrame()
       UpdateCanBeDeletedStatus();
     UpdateScene(modelView);
   }
+
+#ifdef SCENARIO_ENABLE
+  if (m_scenarioViewportRequest && m_scenarioViewportStage == ScenarioViewportStage::WaitViewport)
+  {
+    auto const & request = m_scenarioViewportRequest;
+    auto const center = modelView.PtoG(modelView.P3dtoP(m_userEventStream.GetVisibleViewport().Center()));
+    auto expectedCenter = request->m_center;
+    expectedCenter.x = mercator::NearestWrapX(expectedCenter.x, center.x);
+    if (!center.EqualDxDy(expectedCenter, 1e-7) || GetCurrentZoom() != request->m_zoom ||
+        AnimationSystem::Instance().HasMapAnimations())
+    {
+      CompleteScenarioViewport(false);
+    }
+    else
+    {
+      m_scenarioViewportScreen = modelView;
+      m_scenarioViewportStage = ScenarioViewportStage::WaitTiles;
+    }
+  }
+  if (m_scenarioViewportRequest && m_scenarioViewportStage == ScenarioViewportStage::WaitTiles &&
+      m_notFinishedTiles.empty())
+  {
+    m_scenarioViewportStage = ScenarioViewportStage::WaitFence;
+    m_commutator->PostMessage(ThreadsCommutator::ResourceUploadThread,
+                              make_unique_dp<ScenarioViewportMessage>(m_scenarioViewportRequest, true /* fence */,
+                                                                      m_scenarioViewportRevision),
+                              MessagePriority::Normal);
+  }
+#endif
 
   InterpolationHolder::Instance().Advance(m_frameData.m_frameTime);
   AnimationSystem::Instance().Advance(m_frameData.m_frameTime);
@@ -1867,10 +2000,9 @@ void FrontendRenderer::RenderFrame()
 #if defined(OMIM_OS_DESKTOP)
     EmitGraphicsReady();
 #endif
-    // Process a message or wait for a message.
-    // IsRenderingEnabled() can return false in case of rendering disabling and we must prevent
-    // possibility of infinity waiting in ProcessSingleMessage.
-    ProcessSingleMessage(IsRenderingEnabled());
+    // Process a message, or park until one arrives. SetRenderingEnabled(false) and CloseQueue() both
+    // cancel the wait, and the cancellation is sticky, so this cannot block indefinitely.
+    ProcessSingleMessage();
     m_frameData.m_forceFullRedrawNextFrame = true;
     m_frameData.m_timer.Reset();
     m_frameData.m_inactiveFramesCounter = 0;
@@ -1896,6 +2028,12 @@ void FrontendRenderer::RenderFrame()
 
 #ifndef DISABLE_SCREEN_PRESENTATION
   m_context->Present();
+#ifdef SCENARIO_ENABLE
+  if (readyRequest && sceneRendered && m_scenarioViewportRequest == readyRequest && IsRenderingEnabled() &&
+      m_context->Validate() && m_notFinishedTiles.empty() && !m_forceUpdateScene && !m_forceUpdateUserMarks &&
+      modelView == m_scenarioViewportScreen)
+    CompleteScenarioViewport(true);
+#endif
 #endif
 
   // Limit fps in following mode.
@@ -2255,10 +2393,7 @@ bool FrontendRenderer::OnNewVisibleViewport(m2::RectD const & oldViewport, m2::R
     auto r = m_selectionShape->GetSelectionGeometryBoundingBox();
     r.Scale(kBoundingBoxScale);
 
-    m2::RectD pixelRect;
-    pixelRect.Add(screen.PtoP3d(screen.GtoP(r.LeftTop())));
-    pixelRect.Add(screen.PtoP3d(screen.GtoP(r.RightBottom())));
-
+    m2::RectD const pixelRect(screen.PtoP3d(screen.GtoP(r.LeftTop())), screen.PtoP3d(screen.GtoP(r.RightBottom())));
     rect.Inflate(pixelRect.SizeX(), pixelRect.SizeY());
     targetRect.Inflate(pixelRect.SizeX(), pixelRect.SizeY());
   }
@@ -2321,10 +2456,7 @@ bool FrontendRenderer::OnNewVisibleViewport(m2::RectD const & oldViewport, m2::R
 
 TTilesCollection FrontendRenderer::ResolveTileKeys(ScreenBase const & screen)
 {
-  m2::RectD rect = screen.ClipRect();
-  double const vs = VisualParams::Instance().GetVisualScale();
-  double const extension = vs * dp::kScreenPixelRectExtension * screen.GetScale();
-  rect.Inflate(extension, extension);
+  auto const rect = GetExtendedClipRect(screen, VisualParams::Instance().GetVisualScale());
   int const dataZoomLevel = ClipTileZoomByMaxDataZoom(GetCurrentZoom());
 
   m_notFinishedTiles.clear();
@@ -2365,7 +2497,10 @@ TTilesCollection FrontendRenderer::ResolveTileKeys(ScreenBase const & screen)
   { return group->GetTileKey().m_zoomLevel != GetCurrentZoom(); });
 
   m_trafficRenderer->OnUpdateViewport(result, GetCurrentZoom(), tilesToDelete);
-  m_tileBackgroundRenderer->OnUpdateViewport(m_context, result, GetCurrentZoom(), tilesToDelete);
+
+  int const bgZoom = GetTileBackgroundZoom(GetCurrentZoom(), screen.isPerspective());
+  CoverageResult const bgCoverage = CalcTilesCoverage(rect, bgZoom, nullptr /* processTile */);
+  m_tileBackgroundRenderer->OnUpdateViewport(m_context, bgCoverage, base::asserted_cast<uint8_t>(bgZoom));
 
 #if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
   DrapeMeasurer::Instance().StartScenePreparing();
@@ -2377,6 +2512,9 @@ TTilesCollection FrontendRenderer::ResolveTileKeys(ScreenBase const & screen)
 void FrontendRenderer::OnContextDestroy()
 {
   LOG(LINFO, ("On context destroy."));
+#ifdef SCENARIO_ENABLE
+  CompleteScenarioViewport(false);
+#endif
 
   if (m_renderInjectionHandler)
     m_renderInjectionHandler(m_context, m_texMng, make_ref(m_gpuProgramManager), true);
@@ -2455,9 +2593,7 @@ void FrontendRenderer::OnContextCreate()
   m_debugRectRenderer->SetEnabled(m_isDebugRectRenderingEnabled);
 
   m_overlayTree->SetDebugRectRenderer(make_ref(m_debugRectRenderer));
-  m_overlayTree->SetVisualScale(VisualParams::Instance().GetVisualScale());
   m_searchMarkTextOverlayTree->SetDebugRectRenderer(make_ref(m_debugRectRenderer));
-  m_searchMarkTextOverlayTree->SetVisualScale(VisualParams::Instance().GetVisualScale());
 
   // Resources recovering.
   m_screenQuadRenderer = make_unique_dp<ScreenQuadRenderer>(m_context);
@@ -2500,6 +2636,9 @@ void FrontendRenderer::OnRenderingEnabled()
 
 void FrontendRenderer::OnRenderingDisabled()
 {
+#ifdef SCENARIO_ENABLE
+  CompleteScenarioViewport(false);
+#endif
 #ifndef DRAPE_MEASURER_BENCHMARK
   DrapeMeasurer::Instance().Stop();
 #endif
@@ -2583,9 +2722,43 @@ void FrontendRenderer::AddUserEvent(drape_ptr<UserEvent> && event)
     return;
 #endif
   m_userEventStream.AddEvent(std::move(event));
-  if (IsInInfinityWaiting())
-    CancelMessageWaiting();
+  // User events bypass the message queue, so a renderer parked in a blocking PopMessage() after a few
+  // idle frames would not see this one. CancelWait() is sticky, so the wake-up also lands when the event
+  // arrives just before the renderer starts waiting.
+  CancelMessageWaiting();
 }
+
+#ifdef SCENARIO_ENABLE
+void FrontendRenderer::RequestScenarioViewport(std::shared_ptr<ScenarioViewportRequest> const & request)
+{
+  m_commutator->PostMessage(ThreadsCommutator::RenderThread,
+                            make_unique_dp<ScenarioViewportMessage>(request, false /* fence */),
+                            MessagePriority::Normal);
+}
+
+void FrontendRenderer::CompleteScenarioViewport(bool ready)
+{
+  if (m_scenarioViewportRequest)
+  {
+    if (!ready)
+    {
+      constexpr char const * kStages[] = {"viewport", "tiles", "fence", "present"};
+      auto const & screen = m_userEventStream.GetCurrentScreen();
+      auto const center = screen.PtoG(screen.P3dtoP(m_userEventStream.GetVisibleViewport().Center()));
+      LOG(LWARNING,
+          ("Drape viewport incomplete:", "stage", kStages[static_cast<size_t>(m_scenarioViewportStage)], "zoom",
+           GetCurrentZoom(), "expected_zoom", m_scenarioViewportRequest->m_zoom, "center", center, "expected_center",
+           m_scenarioViewportRequest->m_center, "viewport_changed",
+           m_scenarioViewportStage != ScenarioViewportStage::WaitViewport && screen != m_scenarioViewportScreen,
+           "force_scene", m_forceUpdateScene, "force_user_marks", m_forceUpdateUserMarks, "animations",
+           AnimationSystem::Instance().HasMapAnimations(), "unfinished_tiles", m_notFinishedTiles.size(), "enabled",
+           IsRenderingEnabled()));
+    }
+    m_scenarioViewportRequest->Complete(ready);
+    m_scenarioViewportRequest.reset();
+  }
+}
+#endif
 
 void FrontendRenderer::PositionChanged(m2::PointD const & position, bool hasPosition)
 {

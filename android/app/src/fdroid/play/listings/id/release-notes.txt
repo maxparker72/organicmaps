@@ -1,9 +1,9 @@
-• Pilih rute pendakian dan bersepeda untuk melihat grafik ketinggiannya
-• Tampilan peta yang benar di antimeridian (±180° bujur)
-• Mengubah semua warna penanda dan lintasan dalam satu kategori sekaligus
-• Pencarian nomor rumah yang lebih baik, lebih banyak alamat AS yang tercakup
-• Data OSM per tanggal 4 April
-• Mode tampilan terjadwal di Pengaturan
-• Berbagi penanda/trek ke aplikasi lain telah diperbaiki
-• Pengunggahan pengeditan peta ke OSM telah diperbaiki
+• OSM: 28 September; Wikipedia: 21 September
+• Rute alternatif yang lebih baik dan perkiraan waktu tiba
+• Pengaturan baru mengoptimalkan urutan perhentian
+• Tombol-tombol baru memungkinkan penambahan atau penggantian titik perhentian pada rute yang direncanakan
+• Rute alternatif yang dipilih tetap dipertahankan selama navigasi
+• Perekaman trek diperbaiki dan ditingkatkan
+• Masalah impor KMB telah diperbaiki
+• Perbaikan dan peningkatan antarmuka pengguna
 …selengkapnya di omaps.org/id/news

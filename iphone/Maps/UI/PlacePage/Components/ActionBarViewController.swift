@@ -7,13 +7,13 @@ final class ActionBarViewController: UIViewController {
   private(set) var downloadButton: ActionBarButton?
 
   var placePageData: PlacePageData!
-  var isRoutePlanning = false
   var canAddStop = false
   var canReplaceStop = false
-  var canRouteToAndFrom = false
+  var shouldAppendNewPoints = false
 
   private var visibleButtons: [ActionBarButtonType] = []
   private var additionalButtons: [ActionBarButtonType] = []
+  private var canRouteToAndFrom: Bool { !canReplaceStop && !shouldAppendNewPoints }
 
   weak var delegate: ActionBarViewControllerDelegate?
 
@@ -28,13 +28,20 @@ final class ActionBarViewController: UIViewController {
     if placePageData.isRoutePoint {
       visibleButtons.append(.routeRemoveStop)
     } else if placePageData.roadType != .none {
+      let options = RoutingOptions(routerType: MWMRouter.type())
       switch placePageData.roadType {
       case .toll:
-        visibleButtons.append(.avoidToll)
+        if options.supportedOptions.contains(.toll) {
+          visibleButtons.append(.avoidToll)
+        }
       case .ferry:
-        visibleButtons.append(.avoidFerry)
+        if options.supportedOptions.contains(.ferry) {
+          visibleButtons.append(.avoidFerry)
+        }
       case .dirty:
-        visibleButtons.append(.avoidDirty)
+        if options.supportedOptions.contains(.dirty) {
+          visibleButtons.append(.avoidDirty)
+        }
       default:
         fatalError()
       }
@@ -47,7 +54,7 @@ final class ActionBarViewController: UIViewController {
 
   private func configDefaultButtons() {
     if let mapNodeAttributes = placePageData.mapNodeAttributes {
-      switch mapNodeAttributes.nodeStatus {
+      switch mapNodeAttributes.mapStatus {
       case .onDiskOutOfDate, .onDisk, .undefined:
         break
       case .downloading, .applying, .inQueue, .error, .notDownloaded, .partly:
@@ -58,24 +65,15 @@ final class ActionBarViewController: UIViewController {
     }
 
     var buttons: [ActionBarButtonType] = []
+    let routePointButton: ActionBarButtonType = canReplaceStop ? .routeReplaceStop :
+      (shouldAppendNewPoints ? .routeAddDestination : .routeAddStop)
     switch placePageData.objectType {
-    case .POI, .bookmark:
+    case .POI, .bookmark, .track, .relationTrack:
       if canRouteToAndFrom {
         buttons.append(.routeFrom)
       }
-      if canAddStop {
-        buttons.append(canReplaceStop ? .routeReplaceStop : .routeAddStop)
-      }
-      buttons.append(.bookmark)
-      if canRouteToAndFrom {
-        buttons.append(.routeTo)
-      }
-    case .track, .relationTrack:
-      if canRouteToAndFrom {
-        buttons.append(.routeFrom)
-      }
-      if canAddStop {
-        buttons.append(.routeAddStop)
+      if canReplaceStop || shouldAppendNewPoints || canAddStop {
+        buttons.append(routePointButton)
       }
       buttons.append(.bookmark)
       if canRouteToAndFrom {
@@ -103,35 +101,35 @@ final class ActionBarViewController: UIViewController {
   }
 
   private func setupButtonsState() {
+    // Download takes priority over routing actions.
+    let primaryButton: ActionBarButtonType? = [.download, .routeTo, .routeAddDestination, .routeReplaceStop]
+      .first { visibleButtons.contains($0) }
     for buttonType in visibleButtons {
-      let (selected, enabled) = buttonState(buttonType)
+      let selected = isButtonSelected(buttonType)
       let button = ActionBarButton(delegate: self,
                                    buttonType: buttonType,
                                    isSelected: selected,
-                                   isEnabled: enabled)
+                                   isPrimary: buttonType == primaryButton)
       stackView.addArrangedSubview(button)
       switch buttonType {
       case .download:
         downloadButton = button
-        updateDownloadButtonState(placePageData.mapNodeAttributes!.nodeStatus)
+        updateDownloadButton()
       default:
         break
       }
     }
   }
 
-  private func buttonState(_ buttonType: ActionBarButtonType) -> (selected: Bool, enabled: Bool) {
-    var selected = false
-    let enabled = true
+  private func isButtonSelected(_ buttonType: ActionBarButtonType) -> Bool {
     switch buttonType {
     case .bookmark:
-      selected = placePageData.bookmarkData != nil
+      return placePageData.bookmarkData != nil
     case .track:
-      selected = placePageData.trackData != nil
+      return placePageData.trackData != nil
     default:
-      break
+      return false
     }
-    return (selected, enabled)
   }
 
   private func showMore() {
@@ -139,14 +137,13 @@ final class ActionBarViewController: UIViewController {
                                         message: placePageData.previewData.subtitle,
                                         preferredStyle: .actionSheet)
     for button in additionalButtons {
-      let (selected, enabled) = buttonState(button)
+      let selected = isButtonSelected(button)
       let action = UIAlertAction(title: titleForButton(button, selected),
                                  style: .default,
                                  handler: { [weak self] _ in
                                    guard let self = self else { return }
                                    self.delegate?.actionBar(self, didPressButton: button)
                                  })
-      action.isEnabled = enabled
       actionSheet.addAction(action)
     }
     actionSheet.addAction(UIAlertAction(title: L("cancel"), style: .cancel))
@@ -160,6 +157,8 @@ final class ActionBarViewController: UIViewController {
   // MARK: - Public methods
 
   func resetButtons() {
+    // Outlets are not connected before the view loads; viewDidLoad builds the buttons from current data.
+    guard isViewLoaded else { return }
     for arrangedSubview in stackView.arrangedSubviews {
       stackView.removeArrangedSubview(arrangedSubview)
       arrangedSubview.removeFromSuperview()
@@ -170,11 +169,24 @@ final class ActionBarViewController: UIViewController {
     configureButtons()
   }
 
-  func updateDownloadButtonState(_: MapNodeStatus) {
+  /// Every place page layout with this action bar has to follow the node status: the download button
+  /// disappears with the map's own download, and a tap on a stale one has nothing to do.
+  func updateMapNodeStatus() {
+    updateDownloadButton()
+    guard let mapNodeAttributes = placePageData.mapNodeAttributes else { return }
+    switch mapNodeAttributes.mapStatus {
+    case .onDisk, .onDiskOutOfDate, .undefined, .inQueue:
+      resetButtons()
+    default:
+      break
+    }
+  }
+
+  func updateDownloadButton() {
     guard let downloadButton = downloadButton, let mapNodeAttributes = placePageData.mapNodeAttributes else { return }
     switch mapNodeAttributes.nodeStatus {
     case .downloading:
-      downloadButton.mapDownloadProgress?.state = .progress
+      downloadButton.mapDownloadProgress?.progress = CGFloat(AppConstants.maxProgress * mapNodeAttributes.downloadingProgress)
     case .applying, .inQueue:
       downloadButton.mapDownloadProgress?.state = .spinner
     case .error:

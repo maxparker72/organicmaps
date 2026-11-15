@@ -87,14 +87,6 @@
     <string name="unknown_current_position">Su ubicación aún no ha sido determinada</string>
     <!-- Alert message that we can't run Map Storage settings due to some reasons. -->
     <string name="cant_change_this_setting">Lo sentimos, los ajustes de Almacenamiento de Mapas están actualmente desactivados.</string>
-    <!-- Share my position using SMS, %1$@ contains om:// and %2$@ https://omaps.app link WITHOUT NAME. @NOTE non-ascii symbols in the link will result in max 70 characters SMS instead of 140. -->
-    <string name="my_position_share_sms">Consulta mi ubicación actual en Organic Maps %1$s o %2$s ¿No tienes mapas offline? Descárguelos aquí: https://omaps.app/get</string>
-    <!-- Subject for emailed bookmark -->
-    <string name="bookmark_share_email_subject">¡Eh, mira mi pin en Organic Maps!</string>
-    <!-- Subject for emailed position -->
-    <string name="my_position_share_email_subject">Oye, ¡mira mi ubicación actual en el mapa de Organic Maps!</string>
-    <!-- Share my position using EMail, %1$@ is om:// and %2$@ is https://omaps.app link WITHOUT NAME -->
-    <string name="my_position_share_email">Hola, estoy aquí ahora: %1$s. Haz clic en este enlace %2$s o en este otro %3$s para ver el lugar en el mapa.\n\nGracias.</string>
     <!-- Share by email button text, also used in editor and About. -->
     <string name="email">Correo electrónico</string>
     <!-- Text for message when used successfully copied something -->
@@ -109,6 +101,12 @@
     <string name="pref_map_3d_buildings_title">Edificios 3D</string>
     <!-- A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled -->
     <string name="pref_map_3d_buildings_disabled_summary">Los edificios 3D se apagan en el modo de ahorro de energía</string>
+    <!-- Settings: title of the satellite imagery (custom raster tiles) screen -->
+    <string name="pref_bg_tiles_title">Imágenes satelitales</string>
+    <!-- Settings «Satellite Imagery»: title of the tile server URL input field -->
+    <string name="pref_bg_tiles_url_title">URL del servidor</string>
+    <!-- Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) -->
+    <string name="pref_bg_tiles_url_error">Ingresa una URL válida con {z}/{x}/{y}</string>
     <!-- Settings «Route» category: «Tts announce street names» title -->
     <string name="pref_tts_street_names_title">Anunciar los nombres de las calles</string>
     <!-- Settings «Route» category: «Tts announce street names» description -->
@@ -154,16 +152,6 @@
     <string name="routing_not_enough_space">Espacio insuficiente</string>
     <!-- location service disabled -->
     <string name="enable_location_services">Activa los servicios de localización</string>
-    <!-- deep purple color -->
-    <string name="deep_purple">Púrpura profundo</string>
-    <!-- light blue color -->
-    <string name="light_blue">Celeste</string>
-    <!-- lime color -->
-    <string name="lime">Cal</string>
-    <!-- deep orange color -->
-    <string name="deep_orange">Naranja intenso</string>
-    <!-- blue gray color -->
-    <string name="blue_gray">Azul Gris</string>
     <!-- Settings «Map» category: «Appearance» title -->
     <string name="pref_appearance_title">Apariencia</string>
     <!-- Settings "Appearance" category: "Light" title, should be consistent with the pref_appearance_title translation. -->
@@ -185,6 +173,10 @@
     <!-- The message when user did not find anything in the search. -->
     <string name="search_not_found_query">Descargue la región en la que está buscando o pruebe a añadir el nombre de una ciudad o pueblo cercano.</string>
     <string name="search_history_title">Historial de búsqueda</string>
+    <!-- Tracks are recorded or imported GPS paths. -->
+    <string name="bookmarks_backup_title">Respaldo de marcadores y pistas</string>
+    <!-- Tracks are recorded or imported GPS paths. -->
+    <string name="bookmarks_backup_description">Los marcadores y pistas pueden incluirse en los respaldos del sistema Android si el respaldo está activado en este dispositivo y no superan su límite de tamaño.</string>
     <string name="search_history_text">Ver tus búsquedas recientes.</string>
     <string name="clear_search">Eliminar el historial de búsqueda</string>
     <string name="p2p_your_location">Tu ubicación</string>
@@ -200,11 +192,6 @@
     <string name="editor_hours_closed">Horario no comercial</string>
     <string name="editor_example_values">Ejemplos de valores</string>
     <string name="editor_add_select_location">Seleccione el lugar</string>
-    <string name="editor_report_problem_desription_1">Por favor, describa el problema detalladamente para que la comunidad OpenStreetMap pueda solucionarlo.</string>
-    <string name="editor_report_problem_desription_2">O hazlo tú mismo en https://www.openstreetmap.org/</string>
-    <string name="editor_report_problem_title">Edición</string>
-    <string name="editor_report_problem_no_place_title">Este lugar no existe</string>
-    <string name="editor_report_problem_duplicate_place_title">Duplicar lugar</string>
     <string name="autodownload">Descarga automática de mapas</string>
     <string name="edit_opening_hours">Editar el horario comercial</string>
     <string name="no_osm_account">¿No tienes cuenta en OpenStreetMap?</string>
@@ -229,7 +216,6 @@
     <string name="editor_edit_place_title">Edición de</string>
     <!-- The second part of the editor_edit_place_name_hint to explain that name should be entered in a local language, see https://wiki.openstreetmap.org/wiki/Key:name -->
     <string name="editor_default_language_hint">Como está escrito en el idioma local</string>
-    <string name="editor_report_problem_other_title">Problema diferente</string>
     <string name="placepage_add_business_button">Añadir empresa</string>
     <string name="message_invalid_feature_position">Ningún objeto puede ser localizado aquí</string>
     <!-- Text in About and OSM Login screens. First %@ is replaced by a local, human readable date. -->
@@ -276,7 +262,7 @@
     <!-- Dialog before publishing the modifications to the public map. -->
     <string name="editor_share_to_all_dialog_message_1">Asegúrate de que no has introducido ningún dato personal.</string>
     <string name="editor_share_to_all_dialog_message_2">Los editores de OpenStreetMap comprobarán los cambios y se pondrán en contacto contigo si tienen alguna duda.</string>
-    <!-- Shown as toast when starting the recent track recording -->
+    <!-- Shown while a track is being recorded: the start toast, the notification title and the home screen widget status. -->
     <string name="track_recording">Grabación de la pista</string>
     <!-- For the first routing -->
     <string name="accept">Acepte</string>
@@ -289,11 +275,7 @@
     <!-- NOTE to translators: please synchronize your translation with the English one. -->
     <string name="mobile_data_description">Se necesita Internet móvil para las notificaciones de actualización de mapas y para cargar ediciones.</string>
     <string name="mobile_data_option_ask">Pregunte siempre</string>
-    <string name="traffic_update_maps_text">Para mostrar los datos de tráfico, los mapas deben estar actualizados.</string>
     <string name="big_font">Aumentar el tamaño de las etiquetas de los mapas</string>
-    <string name="traffic_update_app">Por favor, actualice Organic Maps</string>
-    <!-- "traffic" as in "road congestion" -->
-    <string name="traffic_data_unavailable">No se dispone de datos de tráfico</string>
     <string name="enable_logging">Activar el registro</string>
     <!-- Settings: "Send general feedback" button -->
     <string name="feedback_general">Comentarios generales</string>
@@ -302,13 +284,12 @@
     <string name="prefs_languages_information_off_link">Para más información, consulte esta guía.</string>
     <string name="transliteration_title">Transliterar al alfabeto latino</string>
     <string name="learn_more">Más información</string>
-    <!-- User selected the destination by pressing Route To, but the current position is unknown. User needs to select a starting point of a route using search or by tapping on the map and then pressing "Route From". -->
-    <string name="routing_add_start_point">Utilice la búsqueda, seleccione un marcador o pulse en el mapa para añadir un punto de partida de la ruta</string>
-    <!-- User selected the start of a route by pressing Route From. Now the destination of a route should be selected using search or by tapping on the map and then pressing "Route To". -->
-    <string name="routing_add_finish_point">Utilice la búsqueda, seleccione un marcador o pulse en el mapa para añadir un punto de destino.</string>
-    <string name="planning_route_manage_route">Administrar ruta</string>
     <string name="placepage_remove_stop">Quitar Stop</string>
-    <string name="placepage_add_stop">Añadir tope</string>
+    <!-- Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. -->
+    <string name="route_add_destination">Agregar destino</string>
+    <!-- Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. -->
+    <string name="placepage_add_stop">Agregar parada</string>
+    <string name="drag_to_reorder">Reordenar</string>
     <!-- Alert to ask user relogin to OpenStreetMap with OAuth2 flow after OAuth1 authentication is deprecated. -->
     <string name="alert_reauth_message">Inicie sesión en OpenStreetMap para cargar automáticamente todas las ediciones de su mapa. Obtenga más información <a href="https://github.com/organicmaps/organicmaps/issues/6144">aquí</a>.</string>
     <string name="dialog_error_storage_message">El almacenamiento externo no está disponible. Es posible que se haya quitado o dañado la tarjeta SD, o que el sistema de archivos solo permita la lectura. Revíselo y escríbanos a support\@organicmaps.app</string>
@@ -340,6 +321,8 @@
     </plurals>
     <string name="privacy_policy">Política de Privacidad</string>
     <string name="terms_of_use">Términos de uso</string>
+    <!-- Map layers menu: toggle button for the satellite imagery layer -->
+    <string name="button_layer_satellite">Satélite</string>
     <string name="layers_title">Estilos de mapa y capas</string>
     <string name="bookmarks_empty_list_message">Para añadir un marcador, toque un lugar en el mapa y después toque el ícono de estrella</string>
     <string name="delete_list">Borrar lista</string>
@@ -357,8 +340,11 @@
     <string name="power_managment_setting_auto">Automático</string>
     <!-- Settings/Bookmark Text Placement -->
     <string name="bookmarks_text_placement_title">Nombres de favoritos en el mapa</string>
-    <string name="show_at_the_bottom">Mostrar en la parte inferior</string>
     <string name="enable_logging_warning_message">Activa esta opción temporalmente para grabar y enviarnos manualmente registros de diagnóstico detallados sobre tu problema mediante \"Informar de un error\" en el cuadro de diálogo Ayuda. Los registros pueden incluir información de ubicación.</string>
+    <!-- Routing setting that automatically reorders intermediate stops -->
+    <string name="route_optimization">Optimización de la ruta</string>
+    <!-- Explains that route optimization automatically reorders intermediate stops -->
+    <string name="route_optimization_description">Reordena automáticamente las paradas intermedias para crear una ruta más eficiente.</string>
     <!-- Recommended length for CarPlay and Android Auto is around 25-27 characters -->
     <string name="avoid_tolls">Evite los peajes</string>
     <!-- Recommended length for CarPlay and Android Auto is around 25-27 characters -->
@@ -368,10 +354,11 @@
     <string name="avoid_motorways">Evite las autopistas</string>
     <string name="unable_to_calc_alert_title">No se puede construir una ruta</string>
     <string name="unable_to_calc_alert_subtitle">No se ha podido encontrar una ruta. Esto puede deberse a sus opciones de ruta o a datos incompletos de OpenStreetMap. Cambia tus opciones de ruta y vuelve a intentarlo.</string>
-    <string name="define_to_avoid_btn">Definir las carreteras que deben evitarse</string>
     <string name="toll_road">Autopista de peaje</string>
     <string name="unpaved_road">Carretera sin asfaltar</string>
     <string name="ferry_crossing">Travesía en transbordador</string>
+    <!-- Route warning shown on the map for this obstacle type. -->
+    <string name="road_warning_lift_gate">Pluma de acceso</string>
     <string name="trip_finished">¡Ya llegó!</string>
     <string name="ok">Ok</string>
     <!-- Android, title, max 20-22 symbols -->
@@ -392,13 +379,10 @@
     <string name="parkings">Aparcamientos</string>
     <string name="fuel_places">Gasolinería</string>
     <string name="religious_places">Sitios religiosos</string>
-    <string name="button_layer_isolines">Líneas de contorno</string>
-    <string name="isolines_activation_error_dialog">Para usar la altitud de relieve, actualice o descargue el mapa del área deseada</string>
-    <string name="isolines_location_error_dialog">La altitud de relieve no está aún disponible en esta región</string>
+    <!-- Layers menu: label of the 3D terrain layer button -->
+    <string name="button_layer_terrain">Relieve 3D</string>
     <string name="elevation_profile_min_elevation">Elevación mínima</string>
     <string name="elevation_profile_max_elevation">Elevación máxima</string>
-    <string name="elevation_profile_distance">Distancia:</string>
-    <string name="elevation_profile_time">Lapso:</string>
     <string name="isolines_toast_zooms_1_10">Zoom para explorar isolíneas</string>
     <string name="downloader_loading_ios">Cargando</string>
     <string name="download_map_title">Descargar el mapamundi</string>
@@ -455,7 +439,10 @@
     <string name="pref_tts_no_system_tts">No se ha encontrado la configuración de la síntesis de voz, ¿estás seguro de que tu dispositivo la admite?</string>
     <string name="drive_through">Servicio al auto</string>
     <string name="clear_the_search">Borrar la búsqueda</string>
+    <!-- Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. -->
     <string name="zoom_in">Ampliar</string>
+    <!-- Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. -->
+    <string name="zoom_out">Reducir</string>
     <!-- Restaurant or other food place's menu URL field in the Editor -->
     <string name="website_menu">Menú Enlace</string>
     <!-- Button in the Place Page which opens a restaurant or other food place's menu in a browser -->
@@ -463,16 +450,12 @@
     <string name="select_option">Seleccionar opción</string>
     <!-- Disclaimer summary shown when Power Saving Mode is enabled -->
     <string name="power_save_dialog_summary">Para una navegación más precisa, recomendamos desactivar el modo de ahorro de energía en los ajustes de la batería del teléfono.</string>
+    <!-- One-time warning when starting track recording on Android. "Never sleeping apps" is a Samsung setting. The Settings button opens Samsung's list when available, with fallbacks to Android battery optimization settings or general settings. -->
+    <string name="background_recording_warning_message">Para evitar que la grabación del trayecto se detenga cuando la pantalla esté apagada, excluye Organic Maps de la optimización de la batería. En los dispositivos Samsung, agrega la aplicación a la lista “Aplicaciones sin autosuspensión”.</string>
     <!-- Prompt for stopping a track recording. -->
     <string name="stop_track_recording">Detener grabación de pista</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
+    <!-- Subtitle of the place page of the track being recorded, and the name and title of the home screen widget. -->
     <string name="track_recording_title">Grabación de pistas</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
-    <string name="stop_without_saving">Parar sin ahorrar</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
-    <string name="continue_recording">Seguir grabando</string>
-    <!-- Title for the alert when saving a track recording. -->
-    <string name="track_recording_alert_title">¿Guardar en marcadores y pistas?</string>
     <!-- Message for the toast when saving the track recording is finished but nothing to save. -->
     <string name="track_recording_toast_nothing_to_save">La pista está vacía - no hay nada que guardar</string>
     <!-- Error message when there are no File Manager apps installed to select a folder when importing Bookmarks and Tracks -->
@@ -482,10 +465,6 @@
     <string name="share_track">Compartir pista</string>
 
     <!-- SECTION: gps strings -->
-    <!-- Login to OSM button text -->
-    <string name="login_osm_credentials">Iniciar sesión con contraseña</string>
-    <!-- Login to OSM button text -->
-    <string name="login_osm_browser">Iniciar sesión utilizando el navegador</string>
     <!-- Label for the hex color input field in the color picker -->
     <string name="color_picker_hex_label">Color hexadecimal sRGB #</string>
 </resources>

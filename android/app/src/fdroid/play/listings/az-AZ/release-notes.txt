@@ -1,8 +1,9 @@
-• Yüksəklik qrafiklərini görmək üçün yürüş və velosiped marşrutlarını seçin
-• Antimeridian (±180° uzunluq) üzrə xəritənin düzgün bükülməsi
-• Bir kateqoriyada bütün nişan və iz rənglərini eyni anda dəyişdirin
-• Ev nömrələri üçün daha yaxşı axtarış, daha çox ABŞ ünvanı əhatə olunur
-• 4 aprel tarixli OSM məlumatları
-• Parametrlərdə planlaşdırılmış görünüş rejimi
-• Nişan/izlərin digər tətbiqlərlə paylaşılmasında problem aradan qaldırıldı
-…omaps.org/news saytında daha çox
+• OSM: 28 sentyabr; Wikipedia: 21 sentyabr
+• Daha yaxşı alternativ marşrutlar və gəliş təxminləri
+• Yeni parametr dayanacaqların sırasını optimallaşdırır
+• Yeni düymələr planlaşdırılmış marşrutlardakı dayanacaqları əlavə edir və ya əvəz edir
+• Seçilmiş alternativ marşrut naviqasiya zamanı saxlanılır
+• Trek yazılmasında düzəlişlər və təkmilləşdirmələr
+• KMB idxalı düzəldildi
+• UI düzəlişləri və təkmilləşdirmələri
+…daha çox omaps.org/news

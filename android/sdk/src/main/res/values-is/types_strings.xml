@@ -202,6 +202,7 @@
     <string name="type.barrier.city_wall">Borgarmúr</string>
     <string name="type.barrier.cycle_barrier">Hjólahindrun</string>
     <string name="type.waterway.ditch">Drenskurður</string>
+    <string name="type.waterway.ditch.intermittent">Tímabundinn drenskurður</string>
     <string name="type.natural.water.moat">Síki</string>
     <string name="type.natural.water.wastewater">Óhreinsað vatn</string>
     <string name="type.barrier.entrance">Inngangur</string>
@@ -386,49 +387,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Þjóðvegur</string>
     <string name="type.highway.bridleway">Reiðstígur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Brú</string>
     <string name="type.highway.bridleway.permissive">Reiðstígur</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Göng</string>
     <string name="type.highway.busway">Sérstakur strætisvagnavegur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Göng</string>
     <string name="type.highway.bus_stop">Strætisvagnabiðstöð</string>
     <string name="type.highway.construction">Vegur í byggingu</string>
     <string name="type.highway.cycleway">Hjólastígur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Brú</string>
     <string name="type.highway.cycleway.permissive">Hjólastígur</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Göng</string>
     <string name="type.highway.elevator">Lyfta</string>
     <string name="type.highway.footway">Gangstígur</string>
     <string name="type.highway.footway.sidewalk">Gangstétt</string>
     <string name="type.highway.footway.crossing">Gangbraut</string>
     <string name="type.highway.footway.area">Svæði fyrir fótgangandi</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Göngubrú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Göng fyrir fótgangandi</string>
     <string name="type.highway.ford">Vað</string>
     <string name="type.highway.living_street">Vistgata</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Göng</string>
     <string name="type.highway.motorway">Hraðbraut</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Hraðbrautarbrú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Hraðbrautargöng</string>
     <string name="type.highway.motorway_junction">Útkeyrsla</string>
     <string name="type.highway.motorway_link">Hraðbrautarrampur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Göng</string>
     <string name="type.highway.path">Stígur</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -437,103 +438,104 @@
     <string name="type.highway.path.expert">Mjög erfiður eða illgreinilegur stígur</string>
     <string name="type.highway.path.bicycle">Hjóla og göngustígur</string>
     <string name="type.highway.footway.bicycle">Hjóla og göngustígur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Brú</string>
     <string name="type.highway.path.horse">Reiðstígur</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Göng</string>
     <string name="type.highway.pedestrian">Göngugata</string>
     <string name="type.highway.pedestrian.area">Svæði fyrir fótgangandi</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Göngubrú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Göng fyrir fótgangandi</string>
-    <string name="type.highway.platform">Pallur</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Biðsvæði</string>
     <string name="type.highway.primary">Stofnvegur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Göng</string>
     <string name="type.highway.primary_link">Stofnvegarrampur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Göng</string>
     <string name="type.highway.raceway">Kappakstursbraut</string>
     <string name="type.highway.residential">Íbúðagata</string>
     <string name="type.highway.residential.area">Íbúðagata</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Göng</string>
     <string name="type.highway.rest_area">Hvíldarsvæði</string>
     <string name="type.highway.road">Vegur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Brú</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Göng</string>
     <string name="type.highway.secondary">Tengivegur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Göng</string>
     <string name="type.highway.secondary_link">Tengivegarrampur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Göng</string>
     <string name="type.highway.service">Þjónustuvegur</string>
     <string name="type.highway.service.area">Þjónustuvegur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Brú</string>
     <string name="type.highway.service.driveway">Innkeyrsla</string>
     <string name="type.highway.service.parking_aisle">Bílastæðavegur</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Göng</string>
     <string name="type.highway.services">Þjónustusvæði</string>
     <string name="type.highway.speed_camera">Hraðamyndavél</string>
     <string name="type.highway.steps">Stigar</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Göng</string>
     <string name="type.highway.ladder">Stigi</string>
     <string name="type.highway.tertiary">Safnbraut</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Göng</string>
     <string name="type.highway.tertiary_link">Safnbrautarrampur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Göng</string>
     <string name="type.highway.track">Slóði</string>
     <string name="type.highway.track.area">Slóði</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Brú</string>
     <string name="type.highway.track.grade1">Slóði</string>
     <string name="type.highway.track.no.access">Slóði</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Göng</string>
     <string name="type.highway.traffic_signals">Umferðarljós</string>
     <string name="type.highway.trunk">Stofnbraut</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Göng</string>
     <string name="type.highway.trunk_link">Stofnbrautarrampur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Göng</string>
     <string name="type.highway.unclassified">Aukavegur</string>
     <string name="type.highway.unclassified.area">Aukavegur</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Brú</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Göng</string>
     <string name="type.area_highway.cycleway">Hjólastígur</string>
     <string name="type.area_highway.footway">Gangstígur</string>
@@ -571,6 +573,7 @@
     <string name="type.historic.castle.shiro">Japanskur kastali</string>
     <string name="type.historic.castle.stately">Kastalasetur</string>
     <string name="type.historic.city_gate">Borgarhlið</string>
+    <string name="type.man_made.ceremonial_gate">Hátíðleg hlið</string>
     <string name="type.historic.citywalls">Borgarmúr</string>
     <string name="type.historic.fort">Virki</string>
     <string name="type.historic.gallows">Gálgar</string>
@@ -604,6 +607,7 @@
     <string name="type.landuse">Landnotkun</string>
     <string name="type.landuse.allotments">Úthlutuð svæði</string>
     <string name="type.landuse.basin">Lægð</string>
+    <string name="type.landuse.basin.intermittent">Tímabundin lægð</string>
     <string name="type.landuse.brownfield">Órækt</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Grafreitur</string>
@@ -634,7 +638,6 @@
     <string name="type.landuse.quarry">Grjótnáma</string>
     <string name="type.landuse.railway">Járnbrautasvæði</string>
     <string name="type.landuse.recreation_ground">Leikvöllur</string>
-    <string name="type.landuse.reservoir">Uppistöðulón</string>
     <string name="type.landuse.residential">Íbúðasvæði</string>
     <string name="type.landuse.retail">Smásölusvæði</string>
     <string name="type.landuse.salt_pond">Salttjörn</string>
@@ -656,6 +659,7 @@
     <string name="type.leisure.ice_rink">Skautahöll</string>
     <string name="type.leisure.marina">Bátalægi</string>
     <string name="type.leisure.nature_reserve">Náttúruverndarsvæði</string>
+    <string name="type.leisure.bird_hide">Fuglaskoðunarbyrgi</string>
     <string name="type.leisure.outdoor_seating">Sæti utandyra</string>
     <string name="type.leisure.firepit">Eldgryfja</string>
     <string name="type.leisure.park">Almenningsgarður</string>
@@ -690,6 +694,8 @@
     <string name="type.man_made.pier">Bryggja</string>
     <string name="type.man_made.pipeline">Leiðsla</string>
     <string name="type.man_made.pipeline.overground">Leiðsla ofanjarðar</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Yfirbyggður vatnsgeymir</string>
     <string name="type.man_made.silo">Síló</string>
     <string name="type.man_made.storage_tank">Geymslutankur</string>
     <string name="type.man_made.surveillance">Eftirlitsmyndavél</string>
@@ -708,6 +714,8 @@
     <string name="type.man_made.water_tower">Vatnsturn</string>
     <string name="type.man_made.water_well">Vatnsbrunnur</string>
     <string name="type.man_made.water_well.drinking_water_no">Vatnsbrunnur</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Vatnsveita</string>
     <string name="type.man_made.windmill">Vindmylla</string>
     <string name="type.man_made.works">Iðnaðarsvæði</string>
     <string name="type.military">Hernaðar</string>
@@ -742,10 +750,13 @@
     <string name="type.natural.water.reservoir">Uppistöðulón</string>
     <string name="type.natural.water.basin">Lægð</string>
     <string name="type.natural.water.river">Á</string>
+    <string name="type.natural.water.intermittent">Tímabundið vatn</string>
     <string name="type.natural.land">Land</string>
     <string name="type.natural.meadow">Skógarlundur</string>
     <string name="type.natural.orchard">Trjágarður</string>
     <string name="type.natural.peak">Tindur</string>
+    <string name="type.natural.hill">Hóll</string>
+    <string name="type.natural.arch">Steinbogagöng</string>
     <string name="type.natural.saddle">Fjallsröðull</string>
     <string name="type.natural.rock">Klettar</string>
     <string name="type.natural.scrub">Runnar</string>
@@ -837,7 +848,8 @@
     <string name="type.psurface.unpaved_bad">psurface-unpaved_bad</string>
     <string name="type.psurface.unpaved_good">psurface-unpaved_good</string>
     <string name="type.public_transport">Almenningssamgöngur</string>
-    <string name="type.public_transport.platform">Pallur</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Biðsvæði</string>
     <string name="type.railway">Járnbraut</string>
     <string name="type.railway.abandoned">Aflögð járnbraut</string>
     <string name="type.railway.abandoned.bridge">Aflögð járnbrautarbrú</string>
@@ -1194,6 +1206,8 @@
     <string name="type.shop.greengrocer">Grænmetissala</string>
     <string name="type.shop.grocery">Matvöruverslun</string>
     <string name="type.shop.hairdresser">Hársnyrting</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Rakarastofa</string>
     <string name="type.shop.hardware">Verkfærabúð</string>
     <string name="type.shop.health_food">Heilsufæðisverslun</string>
     <string name="type.shop.hearing_aids">Heyrnartækjaverslun</string>
@@ -1317,6 +1331,7 @@
     <string name="type.sport.rugby_union">Ruðningur</string>
     <string name="type.sport.running">Hlaup</string>
     <string name="type.sport.softball">Softbolti</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Ferðamennska</string>
     <string name="type.tourism.aquarium">Fiskabúr</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1369,23 +1384,26 @@
     <string name="type.traffic_calming.hump">Hraðahindrun</string>
     <string name="type.waterway">Siglingaleið</string>
     <string name="type.waterway.access_point">Aðgengispunktur vatnaleiðar</string>
-    <string name="type.waterway.canal">Skipaskurður</string>
+    <string name="type.waterway.canal">Skurður</string>
+    <string name="type.waterway.canal.intermittent">Tímabundinn skurður</string>
     <string name="type.waterway.canal.tunnel">Skipaskurðsgöng</string>
     <string name="type.waterway.fish_pass">Fiskastigi</string>
+    <string name="type.waterway.fish_pass.intermittent">Tímabundinn fiskastigi</string>
     <string name="type.waterway.dam">Vatnsaflsvirkjunin</string>
     <string name="type.barrier.ditch">Skurður</string>
     <string name="type.natural.water.ditch">Drenskurður</string>
     <string name="type.waterway.ditch.tunnel">Ræsi</string>
     <string name="type.waterway.dock">Bakki á siglingaleið</string>
     <string name="type.waterway.drain">Dren</string>
+    <string name="type.waterway.drain.intermittent">Tímabundið dren</string>
     <string name="type.natural.water.drain">Dren</string>
     <string name="type.waterway.drain.tunnel">Ræsi</string>
     <string name="type.waterway.lock_gate">Hlið í skipastiga</string>
     <string name="type.waterway.river">Á</string>
+    <string name="type.waterway.river.intermittent">Tímabundin á</string>
     <string name="type.waterway.river.tunnel">Á</string>
     <string name="type.waterway.stream">Lækur</string>
-    <string name="type.waterway.stream.ephemeral">Lækur eftir úrkomu</string>
-    <string name="type.waterway.stream.intermittent">Árstíðabundinn lækur</string>
+    <string name="type.waterway.stream.intermittent">Tímabundinn lækur</string>
     <string name="type.waterway.stream.tunnel">Lækur</string>
     <string name="type.waterway.waterfall">Foss</string>
     <string name="type.waterway.weir">Stíflugarður</string>
@@ -1427,6 +1445,7 @@
     <string name="type.self_service.no">Ekki sjálfsafgreiðsla</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Félagsþjónusta</string>
+    <string name="type.amenity.stage">Svið</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Inngangur á bráðamóttöku</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1456,6 +1475,8 @@
     <string name="type.man_made.monitoring_station.weather">Veðurstöð</string>
     <string name="type.amenity.student_accommodation">Stúdentagarðar</string>
     <string name="type.craft.watchmaker">Úrsmiður</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Gluggasmíði</string>
     <string name="type.xmas_feature.market">Jólamarkaður</string>
     <string name="type.xmas_feature.tree">Jólatré</string>
     <string name="type.amenity.hookah_lounge">Vatnspípubar</string>

@@ -177,6 +177,8 @@
     <string name="type.barrier.chain">Ketting</string>
     <string name="type.barrier.city_wall">Stadsmuur</string>
     <string name="type.barrier.cycle_barrier">Fietsversperring</string>
+    <string name="type.waterway.ditch">Dreineringsloot</string>
+    <string name="type.waterway.ditch.intermittent">Tydelike dreineringsloot</string>
     <string name="type.natural.water.moat">Grag</string>
     <string name="type.barrier.entrance">Ingang</string>
     <string name="type.barrier.fence">Heining</string>
@@ -354,49 +356,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Snelweg</string>
     <string name="type.highway.bridleway">Ruiterpad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Brug</string>
     <string name="type.highway.bridleway.permissive">Ruiterpad</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Tonnel</string>
     <string name="type.highway.busway">Toegewyde buspad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Tonnel</string>
     <string name="type.highway.bus_stop">Bushalte</string>
     <string name="type.highway.construction">Pad in aanbou</string>
     <string name="type.highway.cycleway">Fietspad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Brug</string>
     <string name="type.highway.cycleway.permissive">Fietspad</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Tonnel</string>
     <string name="type.highway.elevator">Hysbak</string>
     <string name="type.highway.footway">Voetpad</string>
     <string name="type.highway.footway.sidewalk">Sypaadjie</string>
     <string name="type.highway.footway.crossing">Voetgangersoorgang</string>
     <string name="type.highway.footway.area">Voetgangergebied</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Voetgangerbrug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Voetgangertonnel</string>
     <string name="type.highway.ford">Deurkomplek</string>
     <string name="type.highway.living_street">Lewende straat</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Tonnel</string>
     <string name="type.highway.motorway">Snelweg</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Snelwegbrug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Snelwegtonnel</string>
     <string name="type.highway.motorway_junction">Afrit</string>
     <string name="type.highway.motorway_link">Snelwegoprit</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Tonnel</string>
     <string name="type.highway.path">Pad</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -405,102 +407,103 @@
     <string name="type.highway.path.expert">Baie moeilike of ononderskeibare roete</string>
     <string name="type.highway.path.bicycle">Fiets- en voetpad</string>
     <string name="type.highway.footway.bicycle">Fiets- en voetpad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Brug</string>
     <string name="type.highway.path.horse">Ruiterpad</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Tonnel</string>
     <string name="type.highway.pedestrian">Voetgangerstraat</string>
     <string name="type.highway.pedestrian.area">Voetgangergebied</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Voetgangerbrug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Voetgangertonnel</string>
-    <string name="type.highway.platform">Platform</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Instapplek</string>
     <string name="type.highway.primary">Primêre pad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Tonnel</string>
     <string name="type.highway.primary_link">Primêrepadoprit</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Tonnel</string>
     <string name="type.highway.raceway">Renbaan</string>
     <string name="type.highway.residential">Residensiële straat</string>
     <string name="type.highway.residential.area">Residensiële straat</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Tonnel</string>
     <string name="type.highway.rest_area">Rusplek</string>
     <string name="type.highway.road">Pad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Brug</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Tonnel</string>
     <string name="type.highway.secondary">Sekondêre pad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Tonnel</string>
     <string name="type.highway.secondary_link">Sekondêrepadoprit</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Tonnel</string>
     <string name="type.highway.service">Dienspad</string>
     <string name="type.highway.service.area">Dienspad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Brug</string>
     <string name="type.highway.service.driveway">Oprit</string>
     <string name="type.highway.service.parking_aisle">Parkeergang</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Tonnel</string>
     <string name="type.highway.services">Diensgebied</string>
     <string name="type.highway.speed_camera">Spoedlokval</string>
     <string name="type.highway.steps">Trap</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Tonnel</string>
     <string name="type.highway.tertiary">Tersiêre pad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Tonnel</string>
     <string name="type.highway.tertiary_link">Tersiêrepadoprit</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Tonnel</string>
     <string name="type.highway.track">Pad</string>
     <string name="type.highway.track.area">Pad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Brug</string>
     <string name="type.highway.track.grade1">Pad</string>
     <string name="type.highway.track.no.access">Pad</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Tonnel</string>
     <string name="type.highway.traffic_signals">Verkeersligte</string>
     <string name="type.highway.trunk">Hoofpad</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Tonnel</string>
     <string name="type.highway.trunk_link">Hoofpadoprit</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Tonnel</string>
     <string name="type.highway.unclassified">Straat</string>
     <string name="type.highway.unclassified.area">Straat</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Brug</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Tonnel</string>
     <string name="type.area_highway.cycleway">Fietspad</string>
     <string name="type.area_highway.footway">Voetpad</string>
@@ -535,6 +538,7 @@
     <string name="type.historic.castle.shiro">Japanse kasteel</string>
     <string name="type.historic.castle.stately">Landhuis</string>
     <string name="type.historic.city_gate">Stadspoort</string>
+    <string name="type.man_made.ceremonial_gate">Seremoniepoort</string>
     <string name="type.historic.citywalls">Stadsmuur</string>
     <string name="type.historic.fort">Fort</string>
     <string name="type.historic.gallows">Galg</string>
@@ -563,6 +567,7 @@
     <string name="type.landuse">Grondgebruik</string>
     <string name="type.landuse.allotments">Tuinplotte</string>
     <string name="type.landuse.basin">Vanggebied</string>
+    <string name="type.landuse.basin.intermittent">Tydelike vanggebied</string>
     <string name="type.landuse.brownfield">Natuurlike bruin</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Begraafplaas</string>
@@ -592,7 +597,6 @@
     <string name="type.landuse.quarry">Steengroef</string>
     <string name="type.landuse.railway">Spoorwegfasiliteite</string>
     <string name="type.landuse.recreation_ground">Ontspanningsone</string>
-    <string name="type.landuse.reservoir">Reservoir</string>
     <string name="type.landuse.residential">Woongebied</string>
     <string name="type.landuse.retail">Handelsgebied</string>
     <string name="type.landuse.salt_pond">Soutpoel</string>
@@ -611,6 +615,7 @@
     <string name="type.leisure.ice_rink">Ysskaatsbaan</string>
     <string name="type.leisure.marina">Jaghawe</string>
     <string name="type.leisure.nature_reserve">Natuurreservaat</string>
+    <string name="type.leisure.bird_hide">Voëlskuiling</string>
     <string name="type.leisure.park">Park</string>
     <string name="type.leisure.park.no.access">Park</string>
     <string name="type.leisure.park.permissive">Park</string>
@@ -642,6 +647,8 @@
     <string name="type.man_made.pier">Pier</string>
     <string name="type.man_made.pipeline">Pypleiding</string>
     <string name="type.man_made.pipeline.overground">Bogrondse pypleiding</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Bedekte reservoir</string>
     <string name="type.man_made.silo">Silo</string>
     <string name="type.man_made.storage_tank">Opgaartenk</string>
     <string name="type.man_made.surveillance">Bewakingskamera</string>
@@ -660,6 +667,8 @@
     <string name="type.man_made.water_tower">Watertoring</string>
     <string name="type.man_made.water_well">Waterput</string>
     <string name="type.man_made.water_well.drinking_water_no">Waterput</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Waterwerke</string>
     <string name="type.man_made.windmill">Windmeule</string>
     <string name="type.man_made.works">Fabriek</string>
     <string name="type.military">Militêr</string>
@@ -692,10 +701,13 @@
     <string name="type.natural.water.reservoir">Reservoir</string>
     <string name="type.natural.water.basin">Vanggebied</string>
     <string name="type.natural.water.river">Rivier</string>
+    <string name="type.natural.water.intermittent">Tydelike water</string>
     <string name="type.natural.land">Land</string>
     <string name="type.natural.meadow">Weiland</string>
     <string name="type.natural.orchard">Boord</string>
     <string name="type.natural.peak">Piek</string>
+    <string name="type.natural.hill">Heuwel</string>
+    <string name="type.natural.arch">Rotsboog</string>
     <string name="type.natural.saddle">Bergsaal</string>
     <string name="type.natural.rock">Klip</string>
     <string name="type.natural.scrub">Ruigte</string>
@@ -783,7 +795,8 @@
     <string name="type.psurface.unpaved_bad">Ongeteer</string>
     <string name="type.psurface.unpaved_good">Ongeteer</string>
     <string name="type.public_transport">Openbare vervoer</string>
-    <string name="type.public_transport.platform">Platform</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Instapplek</string>
     <string name="type.railway">Spoorweg</string>
     <string name="type.railway.abandoned">Verlate treinspoor</string>
     <string name="type.railway.abandoned.bridge">Verlate treintonnel</string>
@@ -1128,6 +1141,8 @@
     <string name="type.shop.greengrocer">Groentewinkel</string>
     <string name="type.shop.grocery">Kruidenier</string>
     <string name="type.shop.hairdresser">Haarkapper</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Barbier</string>
     <string name="type.shop.hardware">Ysterware</string>
     <string name="type.shop.health_food">Gesondheidsvoedsel</string>
     <string name="type.shop.hearing_aids">Gehoorapparaatwinkel</string>
@@ -1248,6 +1263,7 @@
     <string name="type.sport.rugby_union">Rugbyunie</string>
     <string name="type.sport.running">Hardloop</string>
     <string name="type.sport.softball">Sagtebal</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Toerisme</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
     <string name="type.tourism.alpine_hut">Berg lodge</string>
@@ -1296,19 +1312,23 @@
     <string name="type.waterway">Waterweg</string>
     <string name="type.waterway.access_point">Toegangspunt tot waterweg</string>
     <string name="type.waterway.canal">Kanaal</string>
+    <string name="type.waterway.canal.intermittent">Tydelike kanaal</string>
     <string name="type.waterway.canal.tunnel">Kanaal</string>
     <string name="type.waterway.fish_pass">Vistrap</string>
+    <string name="type.waterway.fish_pass.intermittent">Tydelike vistrap</string>
     <string name="type.waterway.dam">Dam</string>
     <string name="type.barrier.ditch">Sloot</string>
+    <string name="type.natural.water.ditch">Dreineringsloot</string>
     <string name="type.waterway.dock">Dok</string>
     <string name="type.waterway.drain">Afvoer</string>
+    <string name="type.waterway.drain.intermittent">Tydelike afvoer</string>
     <string name="type.natural.water.drain">Afvoer</string>
     <string name="type.waterway.lock_gate">Sluisdeur</string>
     <string name="type.waterway.river">Rivier</string>
+    <string name="type.waterway.river.intermittent">Tydelike rivier</string>
     <string name="type.waterway.river.tunnel">Rivier</string>
     <string name="type.waterway.stream">Beek</string>
-    <string name="type.waterway.stream.ephemeral">Rivier</string>
-    <string name="type.waterway.stream.intermittent">Beek</string>
+    <string name="type.waterway.stream.intermittent">Tydelike beek</string>
     <string name="type.waterway.stream.tunnel">Beek</string>
     <string name="type.waterway.waterfall">Waterval</string>
     <string name="type.waterway.weir">Studam</string>
@@ -1350,6 +1370,7 @@
     <string name="type.self_service.no">Geen selfbediening nie</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Sosiale fasiliteit</string>
+    <string name="type.amenity.stage">Toneel</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Noodsaal-ingang</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1359,6 +1380,8 @@
     <string name="type.railway.miniature">Miniatuur Spoorweg</string>
     <string name="type.amenity.kneipp_water_cure">Kneipp Water Cure</string>
     <string name="type.area_highway.traffic_island">Verkeerseiland</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Venstervervaardiging</string>
     <string name="type.xmas_feature.market">Kersmark</string>
     <string name="type.xmas_feature.tree">Kersboom</string>
 </resources>

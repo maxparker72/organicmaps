@@ -19,19 +19,11 @@ class Track : public df::UserLineMark
 public:
   Track(kml::TrackData && data);
 
+  // Rendering owner; temporary relation tracks use a runtime user-mark group, not a bookmark category.
   kml::MarkGroupId GetGroupId() const override { return m_groupID; }
 
   bool IsDirty() const override { return m_isDirty; }
   void ResetChanges() const override { m_isDirty = false; }
-
-  bool IsVisible() const override { return m_data.m_visible; }
-  void SetIsVisible(bool visible)
-  {
-    if (m_data.m_visible == visible)
-      return;
-    m_data.m_visible = visible;
-    m_isDirty = true;
-  }
 
   kml::TrackData const & GetData() const { return m_data; }
   void SetData(kml::TrackData const & data);
@@ -74,9 +66,17 @@ public:
     /// @return true  Data is initialized and correct (after UpdateSelectionInfo call).
     /// Can be false if input m_squareDist filtered all track's segments.
     bool IsValid() const { return m_trackId != kml::kInvalidTrackId; }
+    /// @return true if the relation metadata to (re)build the temporary track is here. Stronger than
+    /// "this selection is the temporary relation track": a selection restored from a
+    /// TrackSelectionMark keeps m_trackId only (see BookmarkManager::GetTrackSelectionInfo).
+    bool IsRelation() const { return m_trackId == kml::kTempRelationTrackId && m_relationId.IsValid(); }
 
     kml::TrackId m_trackId = kml::kInvalidTrackId;
     m2::PointD m_trackPoint;
+    RelationID m_relationId;  // Relation only.
+    std::string m_title;
+    dp::Color m_color = dp::Color::Transparent();
+
     // Distance in meters from the beginning to m_trackPoint.
     double m_distFromBegM;
     // Mercator square distance, used to select nearest track.
@@ -95,6 +95,14 @@ public:
   float GetWidth(size_t layerIndex) const override;
   float GetDepth(size_t layerIndex) const override;
   void ForEachGeometry(GeometryFnT && fn) const override;
+  bool IsVisible() const override;
+  // Relation tracks are assembled from OSM ways without a reliable direction.
+  bool HasDirection() const override { return GetId() != kml::kTempRelationTrackId; }
+  void SetVisibility(bool visible);
+
+  // Runtime-only; BookmarkManager sends the rendering notification without saving the track.
+  bool IsSelected() const { return m_isSelected; }
+  void SetSelected(bool selected) { m_isSelected = selected; }
 
   void Attach(kml::MarkGroupId groupId);
   void Detach();
@@ -124,4 +132,5 @@ private:
   mutable std::optional<InteractionData> m_interactionData;
 
   mutable bool m_isDirty = true;
+  bool m_isSelected = false;
 };

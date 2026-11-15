@@ -17,7 +17,6 @@ struct ContentView: View {
   @StateObject private var projectsModel = ProjectModel()
   @StateObject private var routingModel = RoutingModel()
   @StateObject private var searchModel = SearchModel()
-  @StateObject private var importNormalizer = ImportNormalizer()
   @StateObject private var navSelection = NavigatorSelectionModel()
   @StateObject private var tagStore = TagStore()
   @ObservedObject private var importCoordinator = ImportCoordinator.shared

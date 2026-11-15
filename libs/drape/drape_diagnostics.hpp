@@ -1,6 +1,7 @@
 #pragma once
 
 // #define DRAW_TILE_NET
+// #define TERRAIN_DEBUG_MESH
 // #define DEBUG_OVERLAYS_OUTPUT
 
 // #define CHECK_VBO_BOUNDS
@@ -12,7 +13,7 @@
 // #define RENDER_DEBUG_INFO_LABELS
 
 // #define DRAPE_MEASURER_BENCHMARK
-// #define SCENARIO_ENABLE
+// Enable SCENARIO_ENABLE with the CMake option DRAPE_SCENARIO=ON.
 // #define SHOW_FRAMES_STATS
 
 #ifdef DRAPE_MEASURER_BENCHMARK

@@ -1,8 +1,10 @@
 #include "testing/testing.hpp"
 
 #include "platform/get_text_by_id.hpp"
+#include "platform/languages.hpp"
 
 #include <string>
+#include <string_view>
 
 UNIT_TEST(GetTextByIdEnglishTest)
 {
@@ -21,7 +23,6 @@ UNIT_TEST(GetTextByIdEnglishTest)
   TEST_EQUAL((*getEnglish)("then"), "Then.", ());
   TEST_EQUAL((*getEnglish)("in_1_mile"), "In one mile.", ());
 
-  TEST_EQUAL((*getEnglish)("some_nonexistent_key"), "", ());
   TEST_EQUAL((*getEnglish)("some_nonexistent_key"), "", ());
   TEST_EQUAL((*getEnglish)(""), "", ());
   TEST_EQUAL((*getEnglish)(" "), "", ());
@@ -45,7 +46,6 @@ UNIT_TEST(GetTextByIdRussianTest)
   TEST_EQUAL((*getRussian)("in_1_mile"), "Через одну милю.", ());
 
   TEST_EQUAL((*getRussian)("some_nonexistent_key"), "", ());
-  TEST_EQUAL((*getRussian)("some_nonexistent_key"), "", ());
   TEST_EQUAL((*getRussian)(""), "", ());
   TEST_EQUAL((*getRussian)(" "), "", ());
 }
@@ -67,7 +67,6 @@ UNIT_TEST(GetTextByIdKoreanTest)
   TEST_EQUAL((*getKorean)("take_the_5_exit"), "다섯 번째 출구입니다.", ());
   TEST_EQUAL((*getKorean)("in_5000_feet"), "5000피트 앞", ());
 
-  TEST_EQUAL((*getKorean)("some_nonexistent_key"), "", ());
   TEST_EQUAL((*getKorean)("some_nonexistent_key"), "", ());
   TEST_EQUAL((*getKorean)(""), "", ());
   TEST_EQUAL((*getKorean)(" "), "", ());
@@ -91,7 +90,6 @@ UNIT_TEST(GetTextByIdArabicTest)
   TEST_EQUAL((*getArabic)("in_4000_feet"), "بعد 4000 قدم", ());
 
   TEST_EQUAL((*getArabic)("some_nonexistent_key"), "", ());
-  TEST_EQUAL((*getArabic)("some_nonexistent_key"), "", ());
   TEST_EQUAL((*getArabic)(""), "", ());
   TEST_EQUAL((*getArabic)(" "), "", ());
 }
@@ -114,7 +112,20 @@ UNIT_TEST(GetTextByIdFrenchTest)
   TEST_EQUAL((*getFrench)("in_3500_feet"), "Dans trois mille cinq cents pieds.", ());
 
   TEST_EQUAL((*getFrench)("some_nonexistent_key"), "", ());
-  TEST_EQUAL((*getFrench)("some_nonexistent_key"), "", ());
   TEST_EQUAL((*getFrench)(""), "", ());
   TEST_EQUAL((*getFrench)(" "), "", ());
+}
+
+// Every language offered in the TTS picker must ship a sound-strings folder: GetTextByIdFactory
+// silently falls back to English when it is missing, so a wrong code yields English voice guidance.
+UNIT_TEST(TtsLanguageListHasSoundStrings)
+{
+  std::string jsonBuffer;
+  for (auto const & [code, name] : routing::turns::sound::kLanguageList)
+  {
+    // Only the non-Android branch of the list is compiled here. Its entries carry no colon, but
+    // keep the "bcp47:internal" split anyway: the internal code is what names the folder.
+    std::string const locale{code.substr(code.find(':') + 1)};
+    TEST(platform::GetJsonBuffer(platform::TextSource::TtsSound, locale, jsonBuffer), (locale, name));
+  }
 }

@@ -3,6 +3,8 @@
 #include "routing/index_graph.hpp"
 #include "routing/transit_graph.hpp"
 
+#include "geometry/distance_on_sphere.hpp"
+
 #include <memory>
 #include <utility>
 
@@ -30,17 +32,42 @@ void TransitWorldGraph::GetEdgeList(astar::VertexData<Segment, RouteWeight> cons
 
   if (TransitGraph::IsTransitSegment(segment))
   {
-    transitGraph.GetTransitEdges(segment, isOutgoing, edges);
+    for (auto const & s : transitGraph.GetFakeEdges(segment, isOutgoing))
+    {
+      auto const & from = isOutgoing ? segment : s;
+      auto const & to = isOutgoing ? s : segment;
+      edges.emplace_back(s, CalcSegmentWeight(to, EdgeEstimator::Purpose::Weight) +
+                                transitGraph.GetTransferPenalty(transitGraph.GetRideLineId(from), to));
+    }
 
     Segment real;
     if (transitGraph.FindReal(segment, real))
     {
       bool const haveSameFront = GetJunction(segment, true /* front */) == GetJunction(real, true);
       bool const haveSameBack = GetJunction(segment, false /* front */) == GetJunction(real, false);
-      if ((isOutgoing && haveSameFront) || (!isOutgoing && haveSameBack))
+      astar::VertexData const data(real, vertexData.m_realDistance);
+      if (isOutgoing && haveSameFront)
       {
-        astar::VertexData const data(real, vertexData.m_realDistance);
         AddRealEdges(data, isOutgoing, useRoutingOptions, edges);
+      }
+      else if (!isOutgoing && haveSameBack)
+      {
+        // Ingoing real edges are priced by the segment they enter, the whole |real|, while this
+        // vertex is only a part of it: rebase them to the part, keeping the crossing penalties.
+        // The outgoing counterpart of this edge is priced the same way in the loop below.
+        SegmentEdgeListT realEdges;
+        GetIndexGraph(real.GetMwmId()).GetEdgeList(data, isOutgoing, useRoutingOptions, realEdges);
+        RouteWeight const partDiff = CalcSegmentWeight(segment, EdgeEstimator::Purpose::Weight) -
+                                     CalcSegmentWeight(real, EdgeEstimator::Purpose::Weight);
+        for (auto const & edge : realEdges)
+        {
+          RouteWeight const weight = edge.GetWeight() + partDiff;
+          ASSERT_GREATER_OR_EQUAL(weight.GetWeight(), 0.0, (segment, real));
+          edges.emplace_back(edge.GetTarget(), weight);
+        }
+        // Twin edges are priced by the twin in its own mwm, so the rebase could go negative there;
+        // keep the whole-segment price instead (a rare over-pricing on a transition segment).
+        GetTwins(real, isOutgoing, useRoutingOptions, edges);
       }
     }
 
@@ -59,8 +86,18 @@ void TransitWorldGraph::GetEdgeList(astar::VertexData<Segment, RouteWeight> cons
     {
       bool const haveSameFront = GetJunction(edgeSegment, true /* front */) == GetJunction(s, true);
       bool const haveSameBack = GetJunction(edgeSegment, false /* front */) == GetJunction(s, false);
-      if ((isOutgoing && haveSameBack) || (!isOutgoing && haveSameFront))
+      // An edge is priced by the segment it enters plus the crossing penalties. Outgoing: |edge|
+      // prices the whole |edgeSegment|, but only its part of real |s| is entered. Ingoing: |segment|
+      // is entered and is already priced in |edge|.
+      if (isOutgoing && haveSameBack)
+      {
+        fakeFromReal.emplace_back(s, edge.GetWeight() - CalcSegmentWeight(edgeSegment, EdgeEstimator::Purpose::Weight) +
+                                         CalcSegmentWeight(s, EdgeEstimator::Purpose::Weight));
+      }
+      else if (!isOutgoing && haveSameFront)
+      {
         fakeFromReal.emplace_back(s, edge.GetWeight());
+      }
     }
   }
   edges.append(fakeFromReal.begin(), fakeFromReal.end());
@@ -93,13 +130,6 @@ bool TransitWorldGraph::IsOneWay(NumMwmId mwmId, uint32_t featureId)
   return GetRealRoadGeometry(mwmId, featureId).IsOneWay();
 }
 
-bool TransitWorldGraph::IsPassThroughAllowed(NumMwmId mwmId, uint32_t featureId)
-{
-  if (TransitGraph::IsTransitFeature(featureId))
-    return true;
-  return GetRealRoadGeometry(mwmId, featureId).IsPassThroughAllowed();
-}
-
 void TransitWorldGraph::ClearCachedGraphs()
 {
   m_indexLoader->Clear();
@@ -116,6 +146,20 @@ RouteWeight TransitWorldGraph::CalcSegmentWeight(Segment const & segment, EdgeEs
   if (TransitGraph::IsTransitSegment(segment))
   {
     TransitGraph & transitGraph = GetTransitGraph(segment.GetMwmId());
+
+    Segment real;
+    if (transitGraph.FindReal(segment, real))
+    {
+      // Part of a real road between a gate projection and the segment end. Price it as a fraction
+      // of the real segment weight, like IndexGraphStarter does for start/finish endings; the
+      // offroad speed would make a few metres of sidewalk cost minutes.
+      double const partLen = ms::DistanceOnEarth(transitGraph.GetJunction(segment, false /* front */).GetLatLon(),
+                                                 transitGraph.GetJunction(segment, true /* front */).GetLatLon());
+      double const fullLen = ms::DistanceOnEarth(GetPoint(real, false /* front */), GetPoint(real, true /* front */));
+      RouteWeight const weight = CalcSegmentWeight(real, purpose);
+      return (fullLen == 0.0 ? 0.0 : partLen / fullLen) * weight;
+    }
+
     return transitGraph.CalcSegmentWeight(segment, purpose);
   }
 
@@ -136,11 +180,19 @@ RouteWeight TransitWorldGraph::CalcOffroadWeight(ms::LatLon const & from, ms::La
 
 double TransitWorldGraph::CalculateETA(Segment const & from, Segment const & to, time_t arrivalTime)
 {
-  if (TransitGraph::IsTransitSegment(from))
-    return CalcSegmentWeight(to, EdgeEstimator::Purpose::ETA).GetWeight();
-
-  if (TransitGraph::IsTransitSegment(to))
-    return CalcSegmentWeight(to, EdgeEstimator::Purpose::ETA).GetWeight();
+  if (TransitGraph::IsTransitSegment(from) || TransitGraph::IsTransitSegment(to))
+  {
+    double eta = CalcSegmentWeight(to, EdgeEstimator::Purpose::ETA).GetWeight();
+    if (TransitGraph::IsTransitSegment(to))
+    {
+      auto const fromLineId = TransitGraph::IsTransitSegment(from)
+                                ? GetTransitGraph(from.GetMwmId()).GetRideLineId(from)
+                                : transit::kInvalidLineId;
+      // Only physical waiting time belongs in ETA; the alternative boarding bias does not.
+      eta += GetTransitGraph(to.GetMwmId()).GetTransferPenalty(fromLineId, to).GetTransitTime();
+    }
+    return eta;
+  }
 
   if (from.GetMwmId() != to.GetMwmId())
   {
@@ -169,30 +221,20 @@ std::unique_ptr<TransitInfo> TransitWorldGraph::GetTransitInfo(Segment const & s
     return {};
 
   auto & transitGraph = GetTransitGraph(segment.GetMwmId());
-  if (transitGraph.GetTransitVersion() == ::transit::TransitVersion::OnlySubway)
-  {
-    if (transitGraph.IsGate(segment))
-      return std::make_unique<TransitInfo>(transitGraph.GetGate(segment));
+  if (auto const * gate = transitGraph.FindGate(segment))
+    return std::make_unique<TransitInfo>(gate->m_gate, gate->m_isEntrance);
 
-    if (transitGraph.IsEdge(segment))
-      return std::make_unique<TransitInfo>(transitGraph.GetEdge(segment));
-  }
-  else if (transitGraph.GetTransitVersion() == ::transit::TransitVersion::AllPublicTransport)
-  {
-    if (transitGraph.IsGate(segment))
-      return std::make_unique<TransitInfo>(transitGraph.GetGatePT(segment));
-
-    if (transitGraph.IsEdge(segment))
-      return std::make_unique<TransitInfo>(transitGraph.GetEdgePT(segment));
-  }
-  else
-  {
-    CHECK(false, (transitGraph.GetTransitVersion()));
-    UNREACHABLE();
-  }
+  if (auto const * edge = transitGraph.FindEdge(segment))
+    return std::make_unique<TransitInfo>(*edge);
 
   // Fake segment between pedestrian feature and gate.
   return {};
+}
+
+void TransitWorldGraph::GetGatesNear(NumMwmId mwmId, m2::PointD const & point, double radiusM, bool isEnter,
+                                     GateAccessesT & out)
+{
+  GetTransitGraph(mwmId).GetGatesNear(point, radiusM, isEnter, out);
 }
 
 void TransitWorldGraph::GetTwinsInner(Segment const & segment, bool isOutgoing, TwinSegmentsListT & twins)

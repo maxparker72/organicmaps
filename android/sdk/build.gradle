@@ -3,42 +3,49 @@ plugins {
 }
 
 apply from: "${rootProject.rootDir}/groovy/common-config.gradle"
+apply from: "${rootProject.rootDir}/groovy/publishing.gradle"
+apply from: "${rootProject.rootDir}/groovy/vulkan-validation-layers.gradle"
+
+def onOffProperty = { String name ->
+  def value = project.findProperty(name) ?: 'OFF'
+  if (value != 'ON' && value != 'OFF')
+    throw new GradleException("Property $name must be ON or OFF, but is '$value'.")
+  return value
+}
+
+def enableVulkanDiagnostics = onOffProperty('app.organicmaps.enableVulkanDiagnostics')
 
 android {
   namespace = 'app.organicmaps.sdk'
-  // enableKotlin = true  // see app/build.gradle
+  enableKotlin = true  // see app/build.gradle
 
   buildFeatures {
     buildConfig = true
   }
 
   defaultConfig {
+    consumerProguardFiles 'consumer-rules.pro'
+
     externalNativeBuild {
-      def pchFlag = 'OFF'
-      if (project.hasProperty('pch')) pchFlag = 'ON'
-
-      def njobs = ''
-      if (project.hasProperty('njobs')) njobs = project.getProperty('njobs')
-
-      def enableVulkanDiagnostics = 'OFF'
-      if (project.hasProperty('enableVulkanDiagnostics')) {
-        enableVulkanDiagnostics = project.getProperty('enableVulkanDiagnostics')
-      }
-
-      def enableTrace = 'OFF'
-      if (project.hasProperty('enableTrace')) {
-        enableTrace = project.getProperty('enableTrace')
-      }
+      def pchFlag = project.hasProperty('pch') ? 'ON' : 'OFF'
+      def njobs = project.findProperty('njobs') ?: ''
+      def enableTrace = onOffProperty('app.organicmaps.enableTrace')
+      def drapeBenchmark = onOffProperty('app.organicmaps.drapeBenchmark')
+      def cmakeUnityBuild = project.findProperty('app.organicmaps.cmakeUnityBuild')
+      def cmakeUnityBatchSize = project.findProperty('app.organicmaps.cmakeUnityBatchSize')
 
       cmake {
         cppFlags '-fexceptions', '-frtti'
-        // There is no sense to enable sections without gcc's --gc-sections flag.
-        cFlags '-fno-function-sections', '-fno-data-sections',
-            '-Wno-extern-c-compat'
+        cFlags '-Wno-extern-c-compat'
         arguments '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static',
             '-DBUILD_TESTING=OFF', '-DSKIP_TOOLS=ON', "-DUSE_PCH=$pchFlag",
             "-DNJOBS=$njobs", "-DENABLE_VULKAN_DIAGNOSTICS=$enableVulkanDiagnostics",
-            "-DENABLE_TRACE=$enableTrace"
+            "-DENABLE_TRACE=$enableTrace", "-DDRAPE_QUEUE_TRACE=$drapeBenchmark", "-DDRAPE_SCENARIO=$drapeBenchmark"
+        // Passed through only when set, so CMake keeps owning the defaults.
+        if (cmakeUnityBuild)
+          arguments "-DCMAKE_UNITY_BUILD=$cmakeUnityBuild"
+        if (cmakeUnityBatchSize)
+          arguments "-DCMAKE_UNITY_BUILD_BATCH_SIZE=$cmakeUnityBatchSize"
         targets 'organicmaps'
       }
     }
@@ -79,6 +86,12 @@ android {
     }
   }
 
+  testOptions.unitTests.all { unitTest ->
+    def geoidModel = file('src/main/assets/geoid_model.bin')
+    unitTest.inputs.file(geoidModel)
+    unitTest.systemProperty 'geoidModelPath', geoidModel.absolutePath
+  }
+
   compileOptions {
     coreLibraryDesugaringEnabled = true
   }
@@ -86,20 +99,26 @@ android {
 
 dependencies {
   api project(':sdk:location:core')
+  api libs.androidx.lifecycle
+  api libs.androidx.recyclerview
+  api libs.androidx.fragment
 
   coreLibraryDesugaring libs.android.tools.desugaring
 
   implementation libs.androidx.annotation
   implementation libs.androidx.core
-  implementation libs.androidx.recyclerview
-  implementation libs.androidx.fragment
-  implementation libs.androidx.lifecycle
   implementation libs.androidx.media
   implementation libs.okhttp
 
   testImplementation libs.androidx.junit
+  testImplementation libs.mockito.core
+  testImplementation libs.robolectric
   androidTestImplementation libs.androidx.junit
   androidTestImplementation libs.androidx.test.runner
+}
+
+if (enableVulkanDiagnostics == 'ON') {
+  EnableVulkanDiagnostics(project)
 }
 
 // TODO: Running lint task triggers native build. Find a better solution.
@@ -116,3 +135,8 @@ project.afterEvaluate {
     }
   }
 }
+
+Publish(project, [
+    'name'       : 'Organic Maps SDK',
+    'description': 'An open-source Android library for building fully offline, privacy-respecting map and navigation applications powered by OpenStreetMap data and Organic Maps'
+])

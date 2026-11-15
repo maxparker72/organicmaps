@@ -27,8 +27,12 @@ extension NavigationDashboard {
       case .updateState(let state):
         viewModel.dashboardState = state
         viewModel.navigationInfo.state = state.navigationInfo
-        if state == .error {
+        if state == .planning {
+          viewModel.progress = 0
+        }
+        if state == .prepare || state == .error {
           viewModel.routeElevationPreviewData = nil
+          viewModel.routeElevationActivePointDistance = nil
         }
 
       case .close:
@@ -63,6 +67,7 @@ extension NavigationDashboard {
 
       case .updateRouteBuildingProgress(let progress, routerType: let routerType):
         viewModel.routerType = routerType
+        viewModel.routingOptions = RoutingOptions(routerType: routerType)
         viewModel.progress = progress
 
       case .updateNavigationInfo(let entity):
@@ -74,14 +79,15 @@ extension NavigationDashboard {
       case .updateTrackRecordingState(let state):
         viewModel.trackRecordingState = state
 
-      case .updateElevationInfo(let elevationInfo):
+      case .updateElevationInfo(let elevationInfo, let activePointDistance):
         viewModel.routeElevationPreviewData = elevationInfo
+        viewModel.routeElevationActivePointDistance = activePointDistance
 
       case .updateNavigationInfoAvailableArea(let rect):
         viewModel.navigationInfo.availableArea = rect
 
       case .updateSearchState(let state):
-        isSearchOpened = state == .searching
+        isSearchOpened = state == .searching || state == .mapPointPicker
         switch state {
         case .closed:
           viewModel = resolve(action: .setHidden(false), with: viewModel)
@@ -89,7 +95,7 @@ extension NavigationDashboard {
         case .hidden:
           viewModel = resolve(action: .setHidden(PlacePageData.hasData), with: viewModel)
           viewModel.navigationSearchState = .minimizedNormal
-        case .searching:
+        case .mapPointPicker, .searching:
           viewModel = resolve(action: .setHidden(true), with: viewModel)
           viewModel.navigationSearchState = .minimizedNormal
         @unknown default:
@@ -106,6 +112,7 @@ extension NavigationDashboard {
         }
         viewModel.routePoints = RoutePoints(points: points)
         viewModel.routerType = routerType
+        viewModel.routingOptions = RoutingOptions(routerType: routerType)
         viewModel.canSaveRouteAsTrack = canSaveRouteAsTrack
         if !isSearchOpened, viewModel.presentationStep == .hidden {
           let step = viewModel.latestVisiblePresentationStep.forNavigationState(viewModel.dashboardState)

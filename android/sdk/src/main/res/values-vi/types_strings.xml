@@ -161,6 +161,7 @@
     <string name="type.barrier.border_control">Biên Phòng</string>
     <string name="type.barrier.city_wall">Tường thành</string>
     <string name="type.waterway.ditch">Mương thoát nước</string>
+    <string name="type.waterway.ditch.intermittent">Mương thoát nước tạm thời</string>
     <string name="type.natural.water.moat">Hào nước</string>
     <string name="type.natural.water.wastewater">Nước thải</string>
     <string name="type.barrier.entrance">Lối vào</string>
@@ -327,45 +328,45 @@
     <string name="type.healthcare.speech_therapist">Ngôn ngữ trị liệu</string>
 
     <!-- SECTION: Types: Roads -->
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Đường hầm</string>
     <string name="type.highway.busway">Đường dành riêng cho xe buýt</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Đường hầm</string>
     <string name="type.highway.bus_stop">Bến xe buýt</string>
     <string name="type.highway.construction">Đường đang thi công</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Đường hầm</string>
     <string name="type.highway.footway">Đường</string>
     <string name="type.highway.footway.sidewalk">Đường đi bộ</string>
     <string name="type.highway.footway.crossing">Vạch qua đường</string>
     <string name="type.highway.footway.area">Đường</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Đường hầm</string>
     <string name="type.highway.ford">Đập tràn</string>
     <string name="type.highway.living_street">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Đường hầm</string>
     <string name="type.highway.motorway">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Đường hầm</string>
     <string name="type.highway.motorway_junction">Lối ra</string>
     <string name="type.highway.motorway_link">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Đường hầm</string>
     <string name="type.highway.path">Đường</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -374,100 +375,102 @@
     <string name="type.highway.path.expert">Đường đi rất khó khăn hoặc không thể phân biệt được</string>
     <string name="type.highway.path.bicycle">Đường</string>
     <string name="type.highway.footway.bicycle">Đường</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Cầu</string>
     <string name="type.highway.path.horse">Đường</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Đường hầm</string>
     <string name="type.highway.pedestrian">Phố</string>
     <string name="type.highway.pedestrian.area">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Đường hầm</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Điểm đón trả khách</string>
     <string name="type.highway.primary">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Đường hầm</string>
     <string name="type.highway.primary_link">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Đường hầm</string>
     <string name="type.highway.raceway">Đường đua</string>
     <string name="type.highway.residential">Phố</string>
     <string name="type.highway.residential.area">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Đường hầm</string>
     <string name="type.highway.rest_area">Khu Vực Thụt Vào Để Đỗ Xe</string>
     <string name="type.highway.road">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Cầu</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Đường hầm</string>
     <string name="type.highway.secondary">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Đường hầm</string>
     <string name="type.highway.secondary_link">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Đường hầm</string>
     <string name="type.highway.service">Phố</string>
     <string name="type.highway.service.area">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Cầu</string>
     <string name="type.highway.service.driveway">Phố</string>
     <string name="type.highway.service.parking_aisle">Phố</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Đường hầm</string>
     <string name="type.highway.speed_camera">Camera bắn tốc độ</string>
     <string name="type.highway.steps">Đường</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Đường hầm</string>
     <string name="type.highway.tertiary">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Đường hầm</string>
     <string name="type.highway.tertiary_link">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Đường hầm</string>
     <string name="type.highway.track">Phố</string>
     <string name="type.highway.track.area">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Cầu</string>
     <string name="type.highway.track.grade1">Phố</string>
     <string name="type.highway.track.no.access">Phố</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Đường hầm</string>
     <string name="type.highway.traffic_signals">Đèn Giao Thông</string>
     <string name="type.highway.trunk">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Đường hầm</string>
     <string name="type.highway.trunk_link">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Đường hầm</string>
     <string name="type.highway.unclassified">Phố</string>
     <string name="type.highway.unclassified.area">Phố</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Cầu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Đường hầm</string>
     <string name="type.area_highway.footway">Đường</string>
     <string name="type.area_highway.living_street">Phố</string>
@@ -504,6 +507,7 @@
     <string name="type.historic.castle.shiro">Lâu đài nhật bản</string>
     <string name="type.historic.castle.stately">Pháo đài</string>
     <string name="type.historic.city_gate">Cổng thành</string>
+    <string name="type.man_made.ceremonial_gate">Cổng lễ nghi</string>
     <string name="type.historic.citywalls">Tường thành</string>
     <string name="type.historic.fort">Pháo đài</string>
     <string name="type.historic.gallows">Giá treo cổ</string>
@@ -529,7 +533,8 @@
     <string name="type.historic.wayside_cross">Đường chéo</string>
     <string name="type.historic.wayside_shrine">Đền thờ</string>
     <string name="type.historic.wreck">Sự chìm tàu</string>
-    <string name="type.landuse.basin">Một chậu nước</string>
+    <string name="type.landuse.basin">Hồ điều hòa</string>
+    <string name="type.landuse.basin.intermittent">Hồ điều hòa tạm thời</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Bãi tha ma</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
@@ -545,7 +550,6 @@
     <string name="type.landuse.grass">Thảm cỏ</string>
     <string name="type.landuse.landfill">Bãi rác</string>
     <string name="type.landuse.railway">Cơ sở đường sắt</string>
-    <string name="type.landuse.reservoir">Nước</string>
     <string name="type.leisure.dog_park">Nơi cho chó đi dạo</string>
     <string name="type.leisure.fitness_centre">Trung tâm thể hình</string>
     <string name="type.leisure.fitness_station">Trạm tập thể hình</string>
@@ -555,6 +559,7 @@
     <string name="type.leisure.golf_course">Sân gôn</string>
     <string name="type.leisure.hackerspace">Không gian tin tặc</string>
     <string name="type.leisure.nature_reserve">Giữ chỗ</string>
+    <string name="type.leisure.bird_hide">Chòi quan sát chim</string>
     <string name="type.leisure.outdoor_seating">Chỗ ngồi ngoài trời</string>
     <string name="type.leisure.park">Công viên</string>
     <string name="type.leisure.park.no.access">Công viên</string>
@@ -575,6 +580,8 @@
     <string name="type.leisure.water_park">Công viên nước</string>
     <string name="type.man_made.chimney">Ống khói nhà máy</string>
     <string name="type.man_made.lighthouse">Hải đăng</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Bể chứa nước có mái che</string>
     <string name="type.man_made.surveillance">Camera giám sát</string>
     <string name="type.man_made.tower">Tháp</string>
     <!-- A huge telecommunications tower. Often a local monument or a landmark. -->
@@ -590,6 +597,8 @@
     <string name="type.man_made.water_tower">Tháp Nước</string>
     <string name="type.man_made.water_well">Giếng Nước</string>
     <string name="type.man_made.water_well.drinking_water_no">Giếng Nước</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Nhà máy nước</string>
     <string name="type.man_made.windmill">Cối xay gió</string>
     <string name="type.military.bunker">Boongke</string>
     <string name="type.natural">Tự nhiên</string>
@@ -618,12 +627,15 @@
     <string name="type.natural.water.lock">Khoang khóa</string>
     <string name="type.natural.water.pond">Ao</string>
     <string name="type.natural.water.reservoir">Hồ chứa</string>
-    <string name="type.natural.water.basin">Một chậu nước</string>
+    <string name="type.natural.water.basin">Hồ điều hòa</string>
     <string name="type.natural.water.river">Sông</string>
+    <string name="type.natural.water.intermittent">Thủy vực tạm thời</string>
     <string name="type.natural.land">Đất liền</string>
     <string name="type.natural.meadow">Thảo điền</string>
     <string name="type.natural.orchard">Vườn cây ăn trái</string>
     <string name="type.natural.peak">Đỉnh</string>
+    <string name="type.natural.hill">Ngọn đồi</string>
+    <string name="type.natural.arch">Cổng đá</string>
     <string name="type.natural.saddle">Col</string>
     <string name="type.natural.rock">Đá</string>
     <string name="type.natural.scrub">Bụi rậm</string>
@@ -696,6 +708,8 @@
     <string name="type.power.substation">Trạm biến áp</string>
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">Trụ Điện</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Điểm đón trả khách</string>
     <string name="type.railway.disused.tunnel">Hầm đường sắt ngưng sử dụng</string>
     <string name="type.railway.funicular">Đường sắt leo núi</string>
     <string name="type.railway.halt">Đường tàu hỏa</string>
@@ -1018,6 +1032,8 @@
     <string name="type.shop.greengrocer">Cửa hàng rau củ</string>
     <string name="type.shop.grocery">Cửa hàng tạp hóa</string>
     <string name="type.shop.hairdresser">Tiệm làm tóc</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Tiệm cắt tóc nam</string>
     <string name="type.shop.health_food">Cửa hàng thực phẩm sức khỏe</string>
     <string name="type.shop.hearing_aids">Cửa hàng máy trợ thính</string>
     <string name="type.shop.herbalist">Cửa hàng thảo mộc</string>
@@ -1139,6 +1155,7 @@
     <string name="type.sport.rugby_union">Rugby</string>
     <string name="type.sport.running">Chạy bộ</string>
     <string name="type.sport.softball">Bóng mềm</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism.aquarium">Bể nuôi cá</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
     <string name="type.tourism.alpine_hut">Nhà nghỉ trên núi</string>
@@ -1184,18 +1201,23 @@
     <string name="type.tourism.zoo.petting">Vườn thú cưng</string>
     <string name="type.waterway.access_point">Điểm tiếp cận đường thủy</string>
     <string name="type.waterway.canal">Kênh</string>
+    <string name="type.waterway.canal.intermittent">Kênh tạm thời</string>
     <string name="type.waterway.canal.tunnel">Kênh</string>
     <string name="type.waterway.fish_pass">Thang cá</string>
+    <string name="type.waterway.fish_pass.intermittent">Thang cá tạm thời</string>
     <string name="type.natural.water.ditch">Mương thoát nước</string>
     <string name="type.waterway.ditch.tunnel">Cống</string>
+    <string name="type.waterway.drain">Rãnh thoát nước</string>
+    <string name="type.waterway.drain.intermittent">Rãnh thoát nước tạm thời</string>
+    <string name="type.natural.water.drain">Rãnh thoát nước</string>
     <string name="type.waterway.drain.tunnel">Cống</string>
     <string name="type.waterway.lock_gate">Cổng Khóa</string>
     <string name="type.waterway.river">Sông</string>
+    <string name="type.waterway.river.intermittent">Sông tạm thời</string>
     <string name="type.waterway.river.tunnel">Sông</string>
-    <string name="type.waterway.stream">Sông</string>
-    <string name="type.waterway.stream.ephemeral">Sông</string>
-    <string name="type.waterway.stream.intermittent">Sông</string>
-    <string name="type.waterway.stream.tunnel">Sông</string>
+    <string name="type.waterway.stream">Suối</string>
+    <string name="type.waterway.stream.intermittent">Suối tạm thời</string>
+    <string name="type.waterway.stream.tunnel">Suối</string>
     <string name="type.waterway.waterfall">Thác nước</string>
     <string name="type.wheelchair.limited">Được trang bị một phần cho người khuyết tật</string>
     <string name="type.wheelchair.no">Không trang bị cho người khuyết tật</string>
@@ -1213,6 +1235,7 @@
     <string name="type.self_service.no">Không tự phục vụ</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Cơ sở xã hội</string>
+    <string name="type.amenity.stage">Sân khấu</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Lối vào khu cấp cứu</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1234,6 +1257,8 @@
     <string name="type.man_made.monitoring_station.weather">Trạm quan trắc thời tiết</string>
     <string name="type.amenity.student_accommodation">Chỗ ở cho sinh viên</string>
     <string name="type.craft.watchmaker">Thợ đồng hồ</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Sản xuất cửa sổ</string>
     <string name="type.xmas_feature.market">Chợ Giáng sinh</string>
     <string name="type.xmas_feature.tree">Cây Giáng sinh</string>
     <string name="type.amenity.hookah_lounge">Quán shisha</string>

@@ -9,10 +9,9 @@ extension UIButton {
 
 class UIButtonRenderer {
   class func render(_ control: UIButton, style: Style) {
-    if let titleLabel = control.titleLabel {
-      if let font = style.font {
-        titleLabel.font = font
-      }
+    if let titleLabel = control.titleLabel, let fontStyle = style.fontStyle {
+      titleLabel.font = fontStyle.font
+      titleLabel.adjustsFontForContentSizeCategory = fontStyle.isDynamic
     }
 
     if let fontColor = style.fontColor {

@@ -38,6 +38,8 @@ enum class TransitType : uint32_t
 
 extern std::map<TransitType, std::string> const kTransitSymbols;
 
+std::string DebugPrint(TransitType type);
+
 struct TransitStepInfo
 {
   TransitStepInfo() = default;
@@ -60,15 +62,26 @@ struct TransitStepInfo
 
   // Is valid for TransitType::IntermediatePoint
   int m_intermediateIndex = 0;
+
+  // Are valid for transit-line steps only (not TransitType::IntermediatePoint or Pedestrian)
+  // The line the route was built on: the stops below belong to it, while m_number may also list parallel lines.
+  std::string m_lineNumber;
+  std::string m_startStopName;
+  std::string m_endStopName;
+  std::vector<std::string> m_intermediateStopNames;
+  int m_stopCount = 0;
 };
+
+std::string DebugPrint(TransitStepInfo const & info);
 
 struct TransitRouteInfo
 {
-  void AddStep(TransitStepInfo const & step);
+  void AddStep(TransitStepInfo const & step, bool allowMerge = true);
   void UpdateDistanceStrings();
 
   double m_totalDistInMeters = 0.0;
   double m_totalPedestrianDistInMeters = 0.0;
+  /// Total route time truncated to seconds, so the summary rounds the same way as the route balloons.
   int m_totalTimeInSec = 0;
   int m_totalPedestrianTimeInSec = 0;
 
@@ -110,22 +123,25 @@ struct SubrouteParams
 {
   std::string m_lastColor;
   m2::PointD m_lastDir;
-  ::transit::TransitId m_lastLineId = ::transit::kInvalidTransitId;
+  routing::transit::LineId m_lastLineId = routing::transit::kInvalidLineId;
   df::SubrouteMarker m_marker;
   TransitMarkInfo m_transitMarkInfo;
   TransitType m_transitType = TransitType::Pedestrian;
   double m_prevDistance = 0.0;
   double m_prevTime = 0.0;
-  bool m_pendingEntrance = false;
 };
 
 struct SubrouteSegmentParams
 {
-  SubrouteSegmentParams(routing::TransitInfo const & transitInfo) : m_transitInfo(transitInfo) {}
+  SubrouteSegmentParams(routing::TransitInfo const & transitInfo, TransitDisplayInfo const & displayInfo)
+    : m_transitInfo(transitInfo)
+    , m_displayInfo(displayInfo)
+  {}
   int m_time = 0;
   double m_distance = 0.0;
-  routing::TransitInfo m_transitInfo;
-  TransitDisplayInfo m_displayInfo;
+  double m_startDistanceMerc = 0.0;
+  routing::TransitInfo const & m_transitInfo;
+  TransitDisplayInfo const & m_displayInfo;
   MwmSet::MwmId m_mwmId;
 };
 
@@ -139,26 +155,25 @@ public:
                       GetStringsBundleFn const & getStringsBundleFn, BookmarkManager * bmManager,
                       std::map<std::string, m2::PointF> const & transitSymbolSizes);
 
+  // The caller seeds the polyline with the subroute start and sets m_baseDistance to its
+  // route-relative Mercator distance. Process subroutes in route order.
   bool ProcessSubroute(std::vector<routing::RouteSegment> const & segments, df::Subroute & subroute);
   void CreateTransitMarks();
 
   TransitRouteInfo const & GetRouteInfo();
 
 private:
+  using StopId = routing::transit::StopId;
   void AddEdgeSubwayForSubroute(routing::RouteSegment const & segment, df::Subroute & subroute, SubrouteParams & sp,
-                                SubrouteSegmentParams & ssp);
-  void AddEdgePTForSubroute(routing::RouteSegment const & segment, df::Subroute & subroute, SubrouteParams & sp,
-                            SubrouteSegmentParams & ssp);
+                                SubrouteSegmentParams & ssp, StopId legBoardId, StopId legAlightId);
 
   void AddGateSubwayForSubroute(routing::RouteSegment const & segment, df::Subroute & subroute, SubrouteParams & sp,
                                 SubrouteSegmentParams & ssp);
 
-  void AddGatePTForSubroute(routing::RouteSegment const & segment, df::Subroute & subroute, SubrouteParams & sp,
-                            SubrouteSegmentParams & ssp);
-
   void CollectTransitDisplayInfo(std::vector<routing::RouteSegment> const & segments,
                                  TransitDisplayInfos & transitDisplayInfos);
   TransitMark * CreateMark(m2::PointD const & pt, FeatureID const & fid);
+  void AddStopMark(TransitMarkInfo const & mark);
 
   TransitReadManager & m_transitReadManager;
   GetMwmIdFn m_getMwmIdFn;
@@ -167,8 +182,13 @@ private:
   std::map<std::string, m2::PointF> const & m_symbolSizes;
 
   TransitRouteInfo m_routeInfo;
+  double m_totalTimeSec = 0.0;
   std::vector<TransitMarkInfo> m_transitMarks;
 
   int m_subrouteIndex = 0;
   float m_maxSubrouteWidth = -1.0f;
+  // The entrance and boarding stop can be in different subroutes.
+  bool m_pendingEntrance = false;
+  // A stop at a subroute boundary may also be the next subroute's boarding stop.
+  int m_pendingStopIndex = -1;
 };

@@ -14,15 +14,17 @@ TÄRKEÄT OMINAISUUDET
 
 TUTKI PAIKKOJA: Hae osoitteen, nimen tai kategorian mukaan, löydä miljoonia POI-pisteitä ja katso yksityiskohtaista tietoa, kuten aukioloajat, Wikipedia-artikkelit, pyörätuolilla saavutettavuus ja muuta hyödyllistä. Kaikki saatavilla offline.
 
-GPS-NAVIGOINTI: Nauti puheohjatuista käännös käännökseltä -ohjeista. Luo kävely-, vaellus-, pyöräily- tai ajo-reittejä — mukaan lukien reitit kaupunkien, maiden ja useiden pisteiden välillä. Löydä parhaat reitit metro- ja työmatkoillesi. CarPlay tuettu.
+GPS-NAVIGOINTI: Nauti puheohjatuista käännös käännökseltä -ohjeista. Luo kävely-, vaellus-, pyöräily- tai ajoreittejä — mukaan lukien reitit kaupunkien, maiden ja useiden pisteiden välillä. Löydä parhaat reitit metro- ja työmatkoillesi. CarPlay tuettu.
 
-VAELLUS- JA PYÖRÄILYTIIET MAAILMANLAAJUISESTI: Ota käyttöön erityiset karttatasot löytääksesi suosittuja vaellus- ja pyöräilyreittejä maailmanlaajuisesti, kaikki OpenStreetMapista. Vaihda tasojen välillä nähdäksesi värilliset pyörä- ja MTB-reitit sekä viralliset vaellusreitit.
+VAELLUS- JA PYÖRÄILYTIET MAAILMANLAAJUISESTI: Ota käyttöön erityiset karttatasot löytääksesi suosittuja vaellus- ja pyöräilyreittejä maailmanlaajuisesti, kaikki OpenStreetMapista. Vaihda tasojen välillä nähdäksesi värilliset pyörä- ja MTB-reitit sekä viralliset vaellusreitit.
 
-JULKINEN LIIKENNE: Näe julkisen liikenteen reittinumerot pysäkeillä. Live-liikenneaikataulut ja reittisuunnittelu ovat kehitteillä.
+3D-MAASTO JA SYVYYDET: Katso vuorten korkeuksia, merien syvyyksiä ja korkeuskäyriä. Näet korkeuden napauttamalla mitä tahansa kohtaa kartalla.
+
+JULKINEN LIIKENNE: Suunnittele joukkoliikenteen reitit. Reaaliaikaiset aikataulut ovat kehitteillä.
 
 KARTTATYYLIT: Valitse karttatasot, jotka sopivat aktiviteettiisi — Ulkoilu, Korkeuskäyrät, Vaellus, Pyöräily tai Metro.
 
-REITTINÄYTTÄJÄ: Tallenna, tuo, vie ja jaa reittejäsi ja suosikkipaikkojasi. Tukee KML-, KMZ-, GPX- ja GeoJSON-muotoja.
+REITTITALLENNIN: Tallenna, tuo, vie ja jaa reittejäsi ja suosikkipaikkojasi. Tukee KML-, KMZ-, GPX- ja GeoJSON-muotoja.
 
 WIKIPEDIA-ARTIKKELIT: Tutki Wikipedia-artikkeleita paikoista, jotka löydät kartalta. Kirjoita “?wiki” hakuun löytääksesi kaikki paikat, joissa on Wikipedia-artikkeleita.
 
@@ -32,8 +34,10 @@ TUMMA TILA: Vaihda tummaan teemaan mukavaa katselua varten yöllä.
 
 iCLOUD-SYNK: Varmuuskopioi ja synkronoi helposti kaikki kirjanmerkkisi ja reittisi iCloudin kautta.
 
-Kokeile sovellusta — se on 100% ilmainen, ilman mainoksia, nopea ja täysin offline. Nauti nopeasta, luotettavasta ja yksityisestä karttakokemuksesta ja jaa se muiden kanssa!
-Organic Maps on indie-, yhteisövetoinen ja avoimen lähdekoodin projekti, jossa satoja avustajia auttaa kehittämään uusia ominaisuuksia, korjaamaan virheitä, kääntämään ja viemään projektia eteenpäin.
+Kokeile sovellusta — se on 100% ilmainen, ilman mainoksia, nopea ja täysin offline.
+Organic Maps on indie-, yhteisövetoinen ja avoimen lähdekoodin projekti, jossa sadat avustajat kehittävät ominaisuuksia, korjaavat virheitä ja kääntävät.
 
-Liity yhteisöön Telegramissa: @OrganicMapsApp
 Tai tutustu muihin tapoihin tukea projektia: https://organicmaps.app/contribute/
+
+Instagram: @organicmaps.app
+Telegram: @OrganicMapsApp

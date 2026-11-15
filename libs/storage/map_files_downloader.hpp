@@ -12,10 +12,14 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace storage
 {
+inline constexpr std::string_view kDebugMapDownloadServer = "DebugMapDownloadServer";
+
+bool NormalizeDebugMapDownloadServer(std::string const & rawUrl, std::string & normalizedUrl);
 
 // This interface encapsulates HTTP routines for receiving servers
 // URLs and downloading a single map file.
@@ -49,14 +53,20 @@ public:
    * @brief Async file download as string buffer (for small files only).
    * Request can be skipped if current servers list is empty.
    * Callback will be skipped on download error.
-   * @param[in]  url        Final url part like "index.json" or "maps/210415/countries.txt".
+   * @param[in]  url        Final url part like "index.json" or "maps/210415/countries.json".
    * @param[in]  forceReset True - force reset current request, if any.
    */
   void DownloadAsString(std::string url, std::function<bool(std::string const &)> && callback, bool forceReset = false);
 
+  // Replaces both map and terrain server lists (sorted best-to-worst). Cancels any in-flight DownloadAsString
+  // and supersedes any in-flight meta-config fetch; a non-empty list resumes queued downloads
+  // immediately, an empty list falls back to fetching the list from the meta server.
   void SetServersList(ServersList const & serversList);
+  void ResetServersList();
   void SetDownloadingPolicy(DownloadingPolicy * policy);
   void SetDataVersion(int64_t version) { m_dataVersion = version; }
+  // The grid release version, whose mirrors retain every block revision referenced by the grid.
+  void SetTerrainDataVersion(int64_t version) { m_terrainDataVersion = version; }
 
   /// @name Legacy functions for Android resourses downloading routine.
   /// @{
@@ -81,14 +91,17 @@ private:
   /// Asynchronously downloads the file and saves result to provided directory.
   virtual void Download(QueuedCountry && queuedCountry) = 0;
 
-  /// Starts the meta-config network fetch. On completion, drains all m_metaConfigWaiters on the GUI thread.
+  /// Starts the meta-config network fetch. On completion, drains all m_metaConfigWaiters on the GUI
+  /// thread, unless a newer server list (see m_metaConfigGeneration) has superseded this fetch.
   void RunMetaConfigAsync();
 
   /// Current file downloading handle for DownloadAsString.
   std::optional<platform::HttpClient::RequestHandle> m_downloadHandle;
 
   ServersList m_serversList;
+  ServersList m_terrainServersList;
   int64_t m_dataVersion = 0;
+  int64_t m_terrainDataVersion = 0;
 
   /// Used as guard for m_serversList assign.
   std::atomic_bool m_isMetaConfigRequested = false;
@@ -106,6 +119,9 @@ private:
   // Incremented before starting new DownloadAsString requests (GUI-thread only).
   // Captured by GUI-thread lambdas to detect superseded requests.
   uint64_t m_generation = 0;
+
+  // Incremented when a cached/custom server list supersedes an in-flight meta-config fetch.
+  uint64_t m_metaConfigGeneration = 0;
 
   // Continuations waiting for meta-config to become ready (GUI-thread only).
   // Drained by RunMetaConfigAsync after m_serversList is assigned.

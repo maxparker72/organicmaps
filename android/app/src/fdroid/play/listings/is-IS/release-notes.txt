@@ -1,9 +1,9 @@
-• Veldu göngu- og hjólaleiðir til að sjá hæðargröfur þeirra
-• Rétt kortavindling við hnitaskeiðlínuna (±180° lengdarbaug)
-• Breyttu litum allra bókamerkja og slóða í flokki í einu
-• Betri leit að húsnúmerum, fleiri bandarískar heimilisföng innifalin
-• OSM-gögn gildandi frá 4. apríl
-• Áætlaður birtingarmáti í Stillingum
-• Leyst vandamál með deilingu bókamerkja/slóða með öðrum forritum
-• Leyst vandamál með upphleðslu kortabreytinga á OSM
-…meira á omaps.org/news
+• OSM-gögn frá 28. september; Wikipedia frá 21. september
+• Betri varaleiðir og áætlaður komutími
+• Ný stilling fínstillir röð viðkomustaða
+• Nýir hnappar bæta við eða skipta út viðkomustað á fyrirhugaðri leið
+• Valin varaleið helst valin meðan á leiðsögn stendur
+• Villur í skráningu ferla lagaðar og skráningin bætt
+• Innflutningur KMB-skráa lagfærður
+• Lagfæringar og umbætur á notendaviðmóti
+…nánar á omaps.org/news

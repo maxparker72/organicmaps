@@ -12,7 +12,9 @@ extension UISearchBar {
   }
 
   @objc override func sw_didMoveToWindow() {
-    guard MapsAppDelegate.theApp().window === window else {
+    // A nil app window (a CarPlay-first launch, or a disconnected phone scene) must not match a
+    // view that is leaving the hierarchy: nil === nil is true.
+    guard let appWindow = MapsAppDelegate.theApp().window, appWindow === window else {
       sw_didMoveToWindow()
       return
     }
@@ -47,8 +49,9 @@ class UISearchBarRenderer: UIViewRenderer {
     if let backgroundColor = style.backgroundColor {
       searchTextField.backgroundColor = backgroundColor
     }
-    if let font = style.font {
-      searchTextField.font = font
+    if let fontStyle = style.fontStyle {
+      searchTextField.font = fontStyle.font
+      searchTextField.adjustsFontForContentSizeCategory = fontStyle.isDynamic
     }
     if let fontColor = style.fontColor {
       searchTextField.textColor = fontColor

@@ -209,7 +209,8 @@
 "type.barrier.chain" = "Chain";
 "type.barrier.city_wall" = "도시의 벽";
 "type.barrier.cycle_barrier" = "Cycle Barrier";
-"type.waterway.ditch" = "배수구";
+"type.waterway.ditch" = "배수 도랑";
+"type.waterway.ditch.intermittent" = "간헐적 배수 도랑";
 "type.natural.water.moat" = "해자";
 "type.natural.water.wastewater" = "폐수";
 "type.barrier.entrance" = "입구";
@@ -407,28 +408,28 @@
 "type.highway" = "Highway";
 "type.highway.bridleway" = "Bridle Path";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "다리";
 "type.highway.bridleway.permissive" = "Bridle Path";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "터널";
 "type.highway.busway" = "버스전용도로";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "터널";
 "type.highway.bus_stop" = "버스 정류장";
 "type.highway.construction" = "공사 중 도로";
 "type.highway.cycleway" = "Cycle Path";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "다리";
 "type.highway.cycleway.permissive" = "Cycle Path";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "터널";
 "type.highway.elevator" = "Elevator";
 "type.highway.footway" = "길";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "횡단보도";
 "type.highway.footway.area" = "길";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "터널";
 "type.highway.ford" = "여울";
 "type.highway.living_street" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "터널";
 "type.highway.motorway" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "터널";
 "type.highway.motorway_junction" = "Road Exit";
 "type.highway.motorway_link" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "터널";
 "type.highway.path" = "길";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "길";
 "type.highway.footway.bicycle" = "길";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "다리";
 "type.highway.path.horse" = "길";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "터널";
 "type.highway.pedestrian" = "거리";
 "type.highway.pedestrian.area" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "터널";
-"type.highway.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "승강장";
 "type.highway.primary" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "터널";
 "type.highway.primary_link" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "터널";
 "type.highway.raceway" = "경마장";
 "type.highway.residential" = "거리";
 "type.highway.residential.area" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "터널";
 "type.highway.rest_area" = "휴게소";
 "type.highway.road" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "다리";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "터널";
 "type.highway.secondary" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "터널";
 "type.highway.secondary_link" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "터널";
 "type.highway.service" = "거리";
 "type.highway.service.area" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "다리";
 "type.highway.service.driveway" = "거리";
 "type.highway.service.parking_aisle" = "거리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "터널";
 "type.highway.services" = "Service Area";
 "type.highway.speed_camera" = "스피드 카메라";
 "type.highway.steps" = "길";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "터널";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "터널";
 "type.highway.tertiary_link" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "터널";
 "type.highway.track" = "거리";
 "type.highway.track.area" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "다리";
 "type.highway.track.grade1" = "거리";
 "type.highway.track.no.access" = "거리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "터널";
 "type.highway.traffic_signals" = "신호등";
 "type.highway.trunk" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "터널";
 "type.highway.trunk_link" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "터널";
 "type.highway.unclassified" = "거리";
 "type.highway.unclassified.area" = "거리";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "다리";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "터널";
 "type.area_highway.cycleway" = "Cycle Path";
 "type.area_highway.footway" = "길";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "일본의 성";
 "type.historic.castle.stately" = "성";
 "type.historic.city_gate" = "성문";
+"type.man_made.ceremonial_gate" = "의식의 문";
 "type.historic.citywalls" = "도시의 벽";
 "type.historic.fort" = "요새";
 "type.historic.gallows" = "교수대";
@@ -717,7 +721,8 @@
 "type.junction.roundabout" = "Roundabout";
 "type.landuse" = "Landuse";
 "type.landuse.allotments" = "Allotments";
-"type.landuse.basin" = "저수지";
+"type.landuse.basin" = "유수지";
+"type.landuse.basin.intermittent" = "간헐적 유수지";
 "type.landuse.brownfield" = "Brownfield";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Quarry";
 "type.landuse.railway" = "차량 기지";
 "type.landuse.recreation_ground" = "Recreation Ground";
-"type.landuse.reservoir" = "저수지";
 "type.landuse.residential" = "Residential Area";
 "type.landuse.retail" = "Retail Area";
 "type.landuse.salt_pond" = "Salt Pond";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Ice Rink";
 "type.leisure.marina" = "Marina";
 "type.leisure.nature_reserve" = "천연보호구역";
+"type.leisure.bird_hide" = "조류 관찰 은신처";
 "type.leisure.outdoor_seating" = "야외 좌석";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "공원";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Pier";
 "type.man_made.pipeline" = "Pipeline";
 "type.man_made.pipeline.overground" = "Overground Pipeline";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "배수지";
 "type.man_made.silo" = "Silo";
 "type.man_made.storage_tank" = "Storage Tank";
 "type.man_made.surveillance" = "감시 카메라";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "급수탑";
 "type.man_made.water_well" = "우물";
 "type.man_made.water_well.drinking_water_no" = "우물";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "정수장";
 "type.man_made.windmill" = "풍차";
 "type.man_made.works" = "Industrial Works";
 
@@ -867,14 +878,17 @@
 "type.natural.hot_spring" = "온천";
 "type.natural.water.lake" = "호수";
 "type.natural.water.lock" = "잠금 챔버";
-"type.natural.water.pond" = "연못이";
+"type.natural.water.pond" = "연못";
 "type.natural.water.reservoir" = "저수지";
-"type.natural.water.basin" = "저수지";
+"type.natural.water.basin" = "유수지";
 "type.natural.water.river" = "강";
+"type.natural.water.intermittent" = "간헐적 수역";
 "type.natural.land" = "땅";
 "type.natural.meadow" = "초지";
 "type.natural.orchard" = "과수원";
 "type.natural.peak" = "산";
+"type.natural.hill" = "언덕";
+"type.natural.arch" = "바위 아치";
 "type.natural.saddle" = "산 안장";
 "type.natural.rock" = "암석";
 "type.natural.scrub" = "관목지";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "Public Transport";
-"type.public_transport.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "승강장";
 "type.railway" = "Railway";
 "type.railway.abandoned" = "Abandoned Railway";
 "type.railway.abandoned.bridge" = "Abandoned Railway Bridge";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "청과상";
 "type.shop.grocery" = "\"식료품점\"";
 "type.shop.hairdresser" = "이발사";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "이발소";
 "type.shop.hardware" = "Hardware Store";
 "type.shop.health_food" = "\"건강식품 가게\"";
 "type.shop.hearing_aids" = "보청기 스토어";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "럭비 유니언";
 "type.sport.running" = "달리기";
 "type.sport.softball" = "소프트볼";
+"type.sport.pilates" = "필라테스";
 "type.tourism" = "Tourism";
 "type.tourism.aquarium" = "수족관";
 
@@ -1514,23 +1534,26 @@
 "type.waterway" = "Waterway";
 "type.waterway.access_point" = "수로 액세스 포인트";
 "type.waterway.canal" = "운하";
+"type.waterway.canal.intermittent" = "간헐적 운하";
 "type.waterway.canal.tunnel" = "운하";
 "type.waterway.fish_pass" = "물고기 사다리";
+"type.waterway.fish_pass.intermittent" = "간헐적 물고기 사다리";
 "type.waterway.dam" = "Dam";
 "type.barrier.ditch" = "Ditch";
-"type.natural.water.ditch" = "배수구";
+"type.natural.water.ditch" = "배수 도랑";
 "type.waterway.ditch.tunnel" = "암거";
 "type.waterway.dock" = "Waterway Dock";
-"type.waterway.drain" = "Drain";
-"type.natural.water.drain" = "Drain";
+"type.waterway.drain" = "배수로";
+"type.waterway.drain.intermittent" = "간헐적 배수로";
+"type.natural.water.drain" = "배수로";
 "type.waterway.drain.tunnel" = "암거";
 "type.waterway.lock_gate" = "수문";
 "type.waterway.river" = "강";
+"type.waterway.river.intermittent" = "간헐적 강";
 "type.waterway.river.tunnel" = "강";
-"type.waterway.stream" = "강";
-"type.waterway.stream.ephemeral" = "강";
-"type.waterway.stream.intermittent" = "강";
-"type.waterway.stream.tunnel" = "강";
+"type.waterway.stream" = "개울";
+"type.waterway.stream.intermittent" = "간헐적 개울";
+"type.waterway.stream.tunnel" = "개울";
 "type.waterway.waterfall" = "폭포";
 "type.waterway.weir" = "Weir";
 "type.wheelchair" = "Wheelchair";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "사회 시설";
+"type.amenity.stage" = "무대";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "응급 병동 입구";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "날씨 모니터링 스테이션";
 "type.amenity.student_accommodation" = "학생 숙소";
 "type.craft.watchmaker" = "워치메이커";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "창호 제작";
 "type.xmas_feature.market" = "크리스마스 마켓";
 "type.xmas_feature.tree" = "크리스마스 트리";
 "type.amenity.hookah_lounge" = "후카 라운지";

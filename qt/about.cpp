@@ -1,5 +1,6 @@
 #include "qt/about.hpp"
 #include "qt/html_processor.hpp"
+#include "qt/qt_common/translations.hpp"
 
 #include "platform/platform.hpp"
 #include "platform/preferred_languages.hpp"
@@ -22,7 +23,7 @@ AboutDialog::AboutDialog(QWidget * parent)
 {
   QIcon icon(":/ui/logo.png");
   setWindowIcon(icon);
-  setWindowTitle(QMenuBar::tr("About"));
+  setWindowTitle(qt::Tr("about_menu_title"));
 
   QLabel * labelIcon = new QLabel();
   labelIcon->setPixmap(icon.pixmap(128));
@@ -31,9 +32,20 @@ AboutDialog::AboutDialog(QWidget * parent)
 
   QVBoxLayout * versionBox = new QVBoxLayout();
   versionBox->addWidget(new QLabel(QCoreApplication::applicationName()));
-  QLabel * versionLabel = new QLabel("Version: " + QString::fromStdString(platform.Version()));
+  QLabel * versionLabel = new QLabel(qt::Tr("version").arg(QString::fromStdString(platform.Version())));
   versionLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
   versionBox->addWidget(versionLabel);
+#ifdef OMIM_OS_WINDOWS
+  auto const licenseDir = QCoreApplication::applicationDirPath() + "/licenses/LICENSES/Windows/";
+  if (QFile::exists(licenseDir + "LGPL-3.0-only.txt"))
+  {
+    auto * qtNotice = new QLabel(
+        qt::Tr("qt_license_notice")
+            .arg("licenses/LICENSES/Windows/LGPL-3.0-only.txt", "licenses/LICENSES/Windows/GPL-3.0-only.txt"));
+    qtNotice->setWordWrap(true);
+    versionBox->addWidget(qtNotice);
+  }
+#endif
   // TODO: insert maps data version.
   // versionBox->addWidget(new QLabel(QString("Data: ") + DESIGNER_DATA_VERSION));
 

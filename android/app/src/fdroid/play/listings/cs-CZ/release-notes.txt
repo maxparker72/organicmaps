@@ -1,9 +1,9 @@
-• Výběrem pěších a cyklistických tras zobrazíte jejich výškové profily.
-• Správné zabalení mapy na antimeridiánu (±180° zeměpisné délky)
-• Změna všech barev záložek a tras v kategorii najednou
-• Lepší vyhledávání čísel domů, pokryto více adres v USA
-• Data OSM ke dni 4. dubna
-• Režim plánovaného vzhledu v Nastavení
-• Opraveno sdílení záložek/stop do jiných aplikací
-• Opraveno nahrávání úprav mapy do OSM
-…více na omaps.org/cs/news
+• Údaje OSM k 28. září, Wikipedie k 21. září
+• Vylepšené alternativní trasy a jejich odhadované časy příjezdu
+• Bylo přidáno nastavení pro optimalizaci pořadí mezilehlých zastávek na trase
+• Přidána tlačítka pro přidání nebo nahrazení zastávky v naplánované trase
+• Vybraná alternativní trasa se nyní během navigace zachovává
+• Opraveno a vylepšeno zaznamenávání tras
+• Opraven import souborů KMB
+• Vylepšení a opravy uživatelského rozhraní
+…více podrobností na omaps.org/cs/news

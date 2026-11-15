@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "Mur miejski";
 "type.barrier.cycle_barrier" = "Bariera rowerowa";
 "type.waterway.ditch" = "Rów melioracyjny";
+"type.waterway.ditch.intermittent" = "Rów melioracyjny okresowy";
 "type.natural.water.moat" = "Rów";
 "type.natural.water.wastewater" = "Ścieki";
 "type.barrier.entrance" = "Wejście";
@@ -407,28 +408,28 @@
 "type.highway" = "Droga";
 "type.highway.bridleway" = "Droga dla koni";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Most drogowy dla koni";
 "type.highway.bridleway.permissive" = "Droga dla koni ograniczona";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Tunel drogowy dla koni";
 "type.highway.busway" = "Dedykowana droga autobusowa";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Tunel";
 "type.highway.bus_stop" = "Przystanek autobusowy";
 "type.highway.construction" = "Droga w trakcie budowy";
 "type.highway.cycleway" = "Droga rowerowa";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Most drogowy dla rowerów";
 "type.highway.cycleway.permissive" = "Droga rowerowa ograniczona";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Tunel drogowy dla rowerów";
 "type.highway.elevator" = "Winda";
 "type.highway.footway" = "Droga piesza";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Przejście dla pieszych";
 "type.highway.footway.area" = "Obszar drogi pieszej";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Most dla pieszych";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Tunel dla pieszych";
 "type.highway.ford" = "Bród";
 "type.highway.living_street" = "Ulica w strefie zamieszkania";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Tunel ulicy";
 "type.highway.motorway" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Most drogowy";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Tunel drogowy";
 "type.highway.motorway_junction" = "Wyjazd";
 "type.highway.motorway_link" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Tunel";
 "type.highway.path" = "Ścieżka";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Ścieżka dla rowerów";
 "type.highway.footway.bicycle" = "Ścieżka dla rowerów";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Most";
 "type.highway.path.horse" = "Ścieżka";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Tunel";
 "type.highway.pedestrian" = "Deptak";
 "type.highway.pedestrian.area" = "Obszar deptaka";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Most dla pieszych";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Tunel dla pieszych";
-"type.highway.platform" = "Przystanek transportu publicznego";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "Peron";
 "type.highway.primary" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Tunel drogowy";
 "type.highway.primary_link" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Tunel";
 "type.highway.raceway" = "Tor wyścigowy";
 "type.highway.residential" = "Droga lokalna";
 "type.highway.residential.area" = "Droga lokalna";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Tunel";
 "type.highway.rest_area" = "Miejsce wypoczynku";
 "type.highway.road" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Most";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Tunel";
 "type.highway.secondary" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Tunel drogowy";
 "type.highway.secondary_link" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Tunel drogowy";
 "type.highway.service" = "Droga dojazdowa";
 "type.highway.service.area" = "Droga dojazdowa";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Most drogowy";
 "type.highway.service.driveway" = "Droga podjazdowa";
 "type.highway.service.parking_aisle" = "Miejsca parkingowe";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Tunel drogowy";
 "type.highway.services" = "Miejsce obsługi podróżnych";
 "type.highway.speed_camera" = "Fotoradar";
 "type.highway.steps" = "Schody";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Tunel";
 "type.highway.ladder" = "Drabina";
 "type.highway.tertiary" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Tunel drogowy";
 "type.highway.tertiary_link" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Tunel drogowy";
 "type.highway.track" = "Droga na pola lub do lasu";
 "type.highway.track.area" = "Droga na pola lub do lasu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Most";
 "type.highway.track.grade1" = "Droga na pola lub do lasu";
 "type.highway.track.no.access" = "Droga na pola lub do lasu";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Tunel drogowy";
 "type.highway.traffic_signals" = "Sygnalizacja świetlna";
 "type.highway.trunk" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Tunel";
 "type.highway.trunk_link" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Tunel";
 "type.highway.unclassified" = "Ulica";
 "type.highway.unclassified.area" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Tunel";
 "type.area_highway.cycleway" = "Droga rowerowa";
 "type.area_highway.footway" = "Droga piesza";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Japoński zamek";
 "type.historic.castle.stately" = "Zamek";
 "type.historic.city_gate" = "Brama miejska";
+"type.man_made.ceremonial_gate" = "Brama ceremonialna";
 "type.historic.citywalls" = "Mur miejski";
 "type.historic.fort" = "Historyczny fort";
 "type.historic.gallows" = "Szubienica";
@@ -718,6 +722,7 @@
 "type.landuse" = "Zagospodarowanie ziemi";
 "type.landuse.allotments" = "Działki";
 "type.landuse.basin" = "Zbiornik";
+"type.landuse.basin.intermittent" = "Zbiornik okresowy";
 "type.landuse.brownfield" = "Teren do zabudowy";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Kamieniołom";
 "type.landuse.railway" = "Obiekty kolejowe";
 "type.landuse.recreation_ground" = "Teren rekreacyjny";
-"type.landuse.reservoir" = "Woda";
 "type.landuse.residential" = "Tereny zamieszkania";
 "type.landuse.retail" = "Obszar handlu";
 "type.landuse.salt_pond" = "Słone jezioro";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Lodowisko";
 "type.leisure.marina" = "Przystań";
 "type.leisure.nature_reserve" = "Rezerwat przyrody";
+"type.leisure.bird_hide" = "Kryjówka do obserwacji ptaków";
 "type.leisure.outdoor_seating" = "Siedzenia zewnętrzne";
 "type.leisure.firepit" = "Ognisko";
 "type.leisure.park" = "Park";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Molo";
 "type.man_made.pipeline" = "Rurociąg";
 "type.man_made.pipeline.overground" = "Rurociąg nad ziemią";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Zakryty zbiornik wody";
 "type.man_made.silo" = "Silos";
 "type.man_made.storage_tank" = "Zbiornik";
 "type.man_made.surveillance" = "Kamera monitoringu";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Wieża wodna";
 "type.man_made.water_well" = "Studnia";
 "type.man_made.water_well.drinking_water_no" = "Studnia";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Stacja uzdatniania wody";
 "type.man_made.windmill" = "Młyn wiatrowy";
 "type.man_made.works" = "Fabryka";
 
@@ -868,13 +879,16 @@
 "type.natural.water.lake" = "Jezioro";
 "type.natural.water.lock" = "Komora zamka";
 "type.natural.water.pond" = "Staw";
-"type.natural.water.reservoir" = "Zbiornik";
+"type.natural.water.reservoir" = "Zbiornik wodny";
 "type.natural.water.basin" = "Zbiornik";
 "type.natural.water.river" = "Rzeka";
+"type.natural.water.intermittent" = "Akwen okresowy";
 "type.natural.land" = "Grunt";
 "type.natural.meadow" = "Łąka";
 "type.natural.orchard" = "Sad";
 "type.natural.peak" = "Szczyt";
+"type.natural.hill" = "Wzgórze";
+"type.natural.arch" = "Skalny łuk";
 "type.natural.saddle" = "Siodło";
 "type.natural.rock" = "Skała";
 "type.natural.scrub" = "Zarośla";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "Transport publiczny";
-"type.public_transport.platform" = "Przystanek transportu publicznego";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "Peron";
 "type.railway" = "Kolej";
 "type.railway.abandoned" = "Opuszczona kolej";
 "type.railway.abandoned.bridge" = "Opuszczony most kolejowy";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Warzywniak";
 "type.shop.grocery" = "Sklep spożywczy";
 "type.shop.hairdresser" = "Fryzjer";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Fryzjer męski";
 "type.shop.hardware" = "Sklep z narzędziami";
 "type.shop.health_food" = "Sklep ze zdrową żywnością";
 "type.shop.hearing_aids" = "Sklep z aparatami słuchowymi";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Rugby union";
 "type.sport.running" = "Bieganie";
 "type.sport.softball" = "Softball";
+"type.sport.pilates" = "Pilates";
 "type.tourism" = "Turystyka";
 "type.tourism.aquarium" = "Akwarium";
 
@@ -1514,21 +1534,24 @@
 "type.waterway" = "Droga wodna";
 "type.waterway.access_point" = "Punkt dostępu do drogi wodnej";
 "type.waterway.canal" = "Kanał";
+"type.waterway.canal.intermittent" = "Kanał okresowy";
 "type.waterway.canal.tunnel" = "Kanał";
 "type.waterway.fish_pass" = "Przepławka";
+"type.waterway.fish_pass.intermittent" = "Przepławka okresowa";
 "type.waterway.dam" = "Tama";
 "type.barrier.ditch" = "Rów";
 "type.natural.water.ditch" = "Rów melioracyjny";
 "type.waterway.ditch.tunnel" = "Przepust";
 "type.waterway.dock" = "Dok";
-"type.waterway.drain" = "Kanał";
-"type.natural.water.drain" = "Kanał";
+"type.waterway.drain" = "Kanał odwadniający";
+"type.waterway.drain.intermittent" = "Kanał odwadniający okresowy";
+"type.natural.water.drain" = "Kanał odwadniający";
 "type.waterway.drain.tunnel" = "Przepust";
 "type.waterway.lock_gate" = "Wrota śluzy";
 "type.waterway.river" = "Rzeka";
+"type.waterway.river.intermittent" = "Rzeka okresowa";
 "type.waterway.river.tunnel" = "Rzeka";
 "type.waterway.stream" = "Strumień";
-"type.waterway.stream.ephemeral" = "Strumień epizodyczny";
 "type.waterway.stream.intermittent" = "Strumień okresowy";
 "type.waterway.stream.tunnel" = "Strumień";
 "type.waterway.waterfall" = "Wodospad";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Obiekt socjalny";
+"type.amenity.stage" = "Scena";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Wejście na oddział ratunkowy";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Stacja monitorowania pogody";
 "type.amenity.student_accommodation" = "Zakwaterowanie dla studentów";
 "type.craft.watchmaker" = "Zegarmistrz";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Produkcja okien";
 "type.xmas_feature.market" = "Jarmark bożonarodzeniowy";
 "type.xmas_feature.tree" = "Choinka";
 "type.amenity.hookah_lounge" = "Shisha bar";

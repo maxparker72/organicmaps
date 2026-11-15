@@ -23,13 +23,17 @@
 #include "routing/transit_world_graph.hpp"
 #include "routing/vehicle_mask.hpp"
 
-#include "transit/transit_entities.hpp"
-
 #include "routing_common/bicycle_model.hpp"
 #include "routing_common/car_model.hpp"
+#include "routing_common/num_mwm_tree.hpp"
 #include "routing_common/pedestrian_model.hpp"
 
+#include "indexer/classificator.hpp"
 #include "indexer/data_source.hpp"
+#include "indexer/feature.hpp"
+#include "indexer/feature_covering.hpp"
+#include "indexer/feature_data.hpp"
+#include "indexer/scales.hpp"
 
 #include "platform/settings.hpp"
 
@@ -57,12 +61,44 @@ namespace routing
 namespace
 {
 size_t constexpr kMaxRoadCandidates = 10;
+// Minimum number of start/finish snapping candidates to feed A* before it picks the best one. If the
+// closest search radius yields fewer, the radius is widened. More valid projections never make the
+// route worse (A* still minimizes the total cost); it only trades a bit of search time for the chance
+// to snap onto a better segment than the single nearest road.
+size_t constexpr kMinRoadCandidates = 2;
 uint32_t constexpr kVisitPeriodForLeaps = 10;
 uint32_t constexpr kVisitPeriod = 40;
 
 double constexpr kLeapsStageContribution = 0.15;
 double constexpr kCandidatesStageContribution = 0.55;
 double constexpr kAlmostZeroContribution = 1e-7;
+// A* heuristic speed bound for transit; deliberately ignores high-speed rail.
+double constexpr kTransitMaxSpeedKMpH = 60.0;
+
+// Distance-biased alternatives must not trade a small distance saving for an excessive ETA.
+// Transit alternatives are exempt because they intentionally trade time for less walking.
+double constexpr kMaxAltEtaRatio = 1.5;
+
+// Transit has no distance-biased road model: its alternative biases walking legs and boardings
+// instead (e.g. a direct bus instead of subway + walk). The boarding penalty is a fixed amount per
+// boarding rather than a multiple of the line's expected wait: scaling the wait penalises
+// low-frequency lines (900 s default bus interval) instead of the number of transfers and hides a
+// direct bus behind a subway + bus combination.
+double constexpr kTransitAltWalkFactor = 3.0;
+double constexpr kTransitAltBoardingPenaltyS = 5 * 60.0;
+
+bool IsAlternativeEtaAcceptable(VehicleType vehicleType, double activeEtaSec, double alternativeEtaSec)
+{
+  return vehicleType == VehicleType::Transit || alternativeEtaSec <= kMaxAltEtaRatio * activeEtaSec;
+}
+
+// The route to follow is built with one strategy and its alternative with the other one. More
+// alternatives would need a list of strategies here and an adjust-cache per route in IndexRouter.
+EdgeEstimator::Strategy OtherStrategy(EdgeEstimator::Strategy strategy)
+{
+  return strategy == EdgeEstimator::Strategy::Normal ? EdgeEstimator::Strategy::DistanceBiased
+                                                     : EdgeEstimator::Strategy::Normal;
+}
 
 // If user left the route within this range(meters), adjust the route. Else full rebuild.
 double constexpr kAdjustRangeM = 5000.0;
@@ -180,6 +216,71 @@ bool IsDeadEndCached(Segment const & segment, bool isOutgoing, bool useRoutingOp
 
   return false;
 }
+
+// Finds point-like barrier features (barrier=gate / barrier=lift_gate / ...) sitting exactly on a
+// route vertex and returns them as RouteWarning-s. Runs on the routing worker thread (once per route),
+// so the feature reads don't block the GUI thread. The UI layer decides which barrier types to show.
+std::vector<RouteWarning> CollectRouteWarnings(std::vector<Segment> const & segments, RouteJunctions const & junctions,
+                                               MwmDataSource & dataSource)
+{
+  ASSERT_EQUAL(junctions.size(), segments.size() + 1, ());
+
+  // Group route vertices by the MWM they belong to, so each MWM is scanned once.
+  // Fake segments have no real MWM id, so they are skipped.
+  std::map<MwmSet::MwmId, std::vector<m2::PointD>> verticesByMwm;
+  for (size_t i = 0; i < segments.size(); ++i)
+  {
+    if (!segments[i].IsRealSegment())
+      continue;
+    auto const mwmId = dataSource.GetMwmId(segments[i].GetMwmId());
+    if (!mwmId.IsAlive())
+      continue;
+    auto & vertices = verticesByMwm[mwmId];
+    vertices.push_back(junctions[i].GetPoint());
+    vertices.push_back(junctions[i + 1].GetPoint());
+  }
+
+  if (verticesByMwm.empty())
+    return {};
+
+  uint32_t const barrierRoot = classif().GetTypeByPath({"barrier"});
+
+  std::vector<RouteWarning> warnings;
+  for (auto const & [mwmId, vertices] : verticesByMwm)
+  {
+    covering::AggCovering covering(scales::GetUpperScale());
+    for (auto const & v : vertices)
+      covering.Add(m2::RectD(v, mercator::kPointEqualityEps, mercator::kPointEqualityEps));
+
+    dataSource.ForEachInCovering([&](FeatureType & ft)
+    {
+      if (ft.GetGeomType() != feature::GeomType::Point)
+        return;
+
+      // Keep only barrier nodes; the UI layer maps the concrete type (gate/lift_gate/...) to an icon.
+      uint32_t barrierType = 0;
+      for (uint32_t const t : feature::TypesHolder(ft))
+        if (ftype::Trunc(t, 1) == barrierRoot)
+        {
+          barrierType = t;
+          break;
+        }
+
+      if (barrierType == 0)
+        return;
+
+      // The barrier feature must sit exactly on one of the route vertices.
+      auto const center = ft.GetCenter();
+      if (!base::AnyOf(vertices,
+                       [&center](m2::PointD const & v) { return center.EqualDxDy(v, mercator::kPointEqualityEps); }))
+        return;
+
+      warnings.emplace_back(center, ft.GetID(), barrierType);
+    }, covering, mwmId);
+  }
+
+  return warnings;
+}
 }  // namespace
 
 // IndexRouter::BestEdgeComparator ----------------------------------------------------------------
@@ -267,11 +368,36 @@ std::unique_ptr<WorldGraph> IndexRouter::MakeSingleMwmWorldGraph()
   return worldGraph;
 }
 
-void IndexRouter::ClearState()
+void IndexRouter::ClearRouteCalculationState()
 {
   m_roadGraph.ClearState();
   m_directionsEngine->Clear();
   m_dataSource.FreeHandles();
+}
+
+void IndexRouter::ClearState()
+{
+  ClearRouteCalculationState();
+
+  // Drop the adjust-cache for both the active and the alternative route so a later (re)build
+  // can't accidentally AdjustRoute against state from a cancelled session.
+  m_lastRoute.reset();
+  m_lastFakeEdges.reset();
+  m_lastAltRoute.reset();
+  m_lastAltFakeEdges.reset();
+  // A new route starts from the default variant again.
+  m_activeStrategy = EdgeEstimator::Strategy::Normal;
+}
+
+void IndexRouter::SwapAltRouteToActive()
+{
+  std::swap(m_lastRoute, m_lastAltRoute);
+  std::swap(m_lastFakeEdges, m_lastAltFakeEdges);
+  // Keep rebuilding the variant the user follows instead of the fastest one (issue #13205). Transit
+  // keeps the default weights: its alternative also scales the walking weights that
+  // TransitWorldGraph::CheckLength budgets, so a rebuild with them could find no route at all.
+  if (m_vehicleType != VehicleType::Transit)
+    m_activeStrategy = OtherStrategy(m_activeStrategy);
 }
 
 bool IndexRouter::FindClosestProjectionToRoad(m2::PointD const & point, m2::PointD const & direction, double radius,
@@ -318,31 +444,102 @@ void IndexRouter::SetGuides(GuidesTracks && guides)
 }
 
 RouterResultCode IndexRouter::CalculateRoute(Checkpoints const & checkpoints, m2::PointD const & startDirection,
-                                             bool adjustToPrevRoute, RouterDelegate const & delegate, Route & route)
+                                             bool adjustToPrevRoute, bool needAlternatives,
+                                             RouterDelegate const & delegate, RoutesResult & result)
 {
   auto const & startPoint = checkpoints.GetStart();
   auto const & finalPoint = checkpoints.GetFinish();
 
+  Route route;
+  Route altRoute;
+  RouterResultCode code;
+  RouterResultCode altCode = RouterResultCode::RouteNotFound;
+
   try
   {
-    SCOPE_GUARD(featureRoadGraphClear, [this] { ClearState(); });
+    m_requestRoutingOptions = RoutingOptions::LoadFromSettings(m_vehicleType);
+    if (m_previousRoutingOptions != m_requestRoutingOptions->GetOptions())
+    {
+      m_lastRoute.reset();
+      m_lastFakeEdges.reset();
+      m_lastAltRoute.reset();
+      m_lastAltFakeEdges.reset();
+    }
+    m_previousRoutingOptions = m_requestRoutingOptions->GetOptions();
+    SCOPE_GUARD(featureRoadGraphClear, [this]
+    {
+      ClearRouteCalculationState();
+      m_requestRoutingOptions.reset();
+    });
 
+    // Both the adjustment and the full build below keep the strategy of the route the user follows.
+    // Guides edges are priced at max speed (see SetGuidesGraphParams), above the DistanceBiased cap,
+    // so the tighter heuristic is only valid without them. They are not attached to the graph yet,
+    // hence IsActive() and not IsAttached().
+    m_estimator->SetStrategy(m_activeStrategy, !m_guides.IsActive() /* tightHeuristicAllowed */);
+
+    bool doCalculate = true;
     if (adjustToPrevRoute && m_lastRoute && m_lastFakeEdges && finalPoint == m_lastRoute->GetFinish())
     {
       double const distanceToRoute = m_lastRoute->CalcDistance(startPoint);
       double const distanceToFinish = mercator::DistanceOnEarth(startPoint, finalPoint);
       if (distanceToRoute <= kAdjustRangeM && distanceToFinish >= kMinDistanceToFinishM)
       {
-        auto const code = AdjustRoute(checkpoints, startDirection, delegate, route);
+        // AdjustLengthChecker limits routing weight, not ETA. DistanceBiased weights cover less
+        // distance on fast roads within that budget, so adjustments can need a full rebuild sooner.
+        code = AdjustRoute(checkpoints, startDirection, delegate, route);
         if (code != RouterResultCode::RouteNotFound)
-          return code;
-
-        LOG(LWARNING, ("Can't adjust route, do full rebuild, prev start:", mercator::ToLatLon(m_lastRoute->GetStart()),
-                       "start:", mercator::ToLatLon(startPoint), "finish:", mercator::ToLatLon(finalPoint)));
+          doCalculate = false;
+        else
+          LOG(LWARNING,
+              ("Can't adjust route, do full rebuild, prev start:", mercator::ToLatLon(m_lastRoute->GetStart()),
+               "start:", mercator::ToLatLon(startPoint), "finish:", mercator::ToLatLon(finalPoint)));
       }
     }
 
-    return DoCalculateRoute(checkpoints, startDirection, delegate, route);
+    if (doCalculate)
+    {
+      code = DoCalculateRoute(checkpoints, startDirection, delegate, route);
+
+      // Compute an alternative alongside the active route. Only on a full (non-adjust) build and only
+      // within a reasonable distance budget — the alternative search costs about 0.5-1x of the
+      // normal one (measured; the tight DistanceBiased heuristic keeps it cheap, see
+      // EdgeEstimator::CalcHeuristic). Non-transit profiles get the route of the other strategy;
+      // transit gets a less-walking / fewer-transfers alternative (e.g. a direct bus instead of
+      // subway + walk).
+      double const altMaxDistanceM = m_vehicleType == VehicleType::Car ? 300'000.0 : 100'000.0;
+      if (needAlternatives && (code == RouterResultCode::NoError || code == RouterResultCode::HasWarnings) &&
+          !delegate.IsCancelled() && mercator::DistanceOnEarth(startPoint, finalPoint) <= altMaxDistanceM)
+      {
+        // Save the active route's adjust-cache; the alternative computation would overwrite it.
+        auto savedLastRoute = std::move(m_lastRoute);
+        auto savedLastFakeEdges = std::move(m_lastFakeEdges);
+        SCOPE_GUARD(restoreActive, [&]
+        {
+          m_estimator->SetStrategy(EdgeEstimator::Strategy::Normal);
+          m_estimator->SetTransitAltFactors(1.0, 0.0);
+          // Save the alternative route's adjust-cache.
+          m_lastAltRoute = std::move(m_lastRoute);
+          m_lastAltFakeEdges = std::move(m_lastFakeEdges);
+          // Restore the active one.
+          m_lastRoute = std::move(savedLastRoute);
+          m_lastFakeEdges = std::move(savedLastFakeEdges);
+        });
+
+        if (m_vehicleType == VehicleType::Transit)
+        {
+          // Rewrite walking weights and add a boarding penalty for the alternative route.
+          m_estimator->SetTransitAltFactors(kTransitAltWalkFactor, kTransitAltBoardingPenaltyS);
+        }
+        else
+        {
+          // Guides edges are priced at max speed (see SetGuidesGraphParams call below), above the
+          // DistanceBiased cap, so the tighter heuristic is only valid without attached guides.
+          m_estimator->SetStrategy(OtherStrategy(m_activeStrategy), !m_guides.IsAttached() /* tightHeuristicAllowed */);
+        }
+        altCode = DoCalculateRoute(checkpoints, startDirection, delegate, altRoute);
+      }
+    }
   }
   catch (RootException const & e)
   {
@@ -350,6 +547,46 @@ RouterResultCode IndexRouter::CalculateRoute(Checkpoints const & checkpoints, m2
                  e.what()));
     return RouterResultCode::InternalError;
   }
+
+  if (code == RouterResultCode::NoError || code == RouterResultCode::HasWarnings)
+  {
+    // Calculate middle point of the longest length-diff part. nullopt if routes are equal.
+    // Transit is distinguished by fake transit (subway/bus) segments, so compare by geometry;
+    // road vehicles compare by real-road feature identity.
+    std::optional<m2::PointD> diffMidpoint;
+    if ((altCode == RouterResultCode::NoError || altCode == RouterResultCode::HasWarnings) && altRoute.IsValid() &&
+        IsAlternativeEtaAcceptable(m_vehicleType, route.GetTotalTimeSec(), altRoute.GetTotalTimeSec()))
+    {
+      diffMidpoint = m_vehicleType == VehicleType::Transit
+                       ? altRoute.FindMaxDiffMidpointByGeometry(route.GetRouteSegments())
+                       : altRoute.FindMaxDiffMidpoint(route.GetRouteSegments());
+    }
+
+    result.MakeFrom(GetName(), std::move(route));
+    if (diffMidpoint)
+    {
+      // Set mid-points for both routes.
+      altRoute.SetDiffMidpoint(*diffMidpoint);
+
+      auto & active = result.GetActive();
+      diffMidpoint = m_vehicleType == VehicleType::Transit
+                       ? active.FindMaxDiffMidpointByGeometry(altRoute.GetRouteSegments())
+                       : active.FindMaxDiffMidpoint(altRoute.GetRouteSegments());
+      if (diffMidpoint)
+        active.SetDiffMidpoint(*diffMidpoint);
+
+      result.m_routes.emplace_back(std::move(static_cast<RouteBase &>(altRoute)));
+    }
+    else
+    {
+      // Alt isn't surfaced to the user — drop its adjust-cache so a stale state can't be
+      // promoted by a stray SwapAltRouteToActive.
+      m_lastAltRoute.reset();
+      m_lastAltFakeEdges.reset();
+    }
+  }
+
+  return code;
 }
 
 std::vector<Segment> IndexRouter::GetBestOutgoingSegments(m2::PointD const & checkpoint, WorldGraph & graph)
@@ -546,6 +783,34 @@ RouterResultCode IndexRouter::DoCalculateRoute(Checkpoints const & checkpoints, 
         isStartSegmentStrictForward = startIsCodirectional;
     }
 
+    GateAccessesT startGateAccesses;
+    GateAccessesT finishGateAccesses;
+    if (m_vehicleType == VehicleType::Transit)
+    {
+      if (auto * transitGraph = dynamic_cast<TransitWorldGraph *>(graph.get()))
+      {
+        double constexpr kGateConnectRadiusM = 150.0;
+        auto const collect =
+            [&](FakeEnding & ending, m2::PointD const & checkpoint, bool isStart, GateAccessesT & gates)
+        {
+          if (ending.m_projections.empty())
+            return;
+          auto const mwmId = ending.m_projections.front().m_segment.GetMwmId();
+          transitGraph->GetGatesNear(mwmId, checkpoint, kGateConnectRadiusM, isStart /* isEnter */, gates);
+          for (auto const & gate : gates)
+          {
+            auto const & projection = gate.m_projection;
+            if (!base::IsExist(ending.m_projections, projection))
+              ending.m_projections.push_back(projection);
+          }
+        };
+        collect(startFakeEnding, startCheckpoint, true /* isStart / entrance gates */, startGateAccesses);
+        collect(finishFakeEnding, finishCheckpoint, false /* finish / exit gates */, finishGateAccesses);
+      }
+    }
+
+    SetServiceEndings(startFakeEnding, &finishFakeEnding, *graph);
+
     uint32_t const fakeNumerationStart = starter ? starter->GetNumFakeSegments() + startIdx : startIdx;
     IndexGraphStarter subrouteStarter(startFakeEnding, finishFakeEnding, fakeNumerationStart,
                                       isStartSegmentStrictForward, *graph);
@@ -555,6 +820,11 @@ RouterResultCode IndexRouter::DoCalculateRoute(Checkpoints const & checkpoints, 
       subrouteStarter.SetGuides(m_guides.GetGuidesGraph());
       AddGuidesOsmConnectionsToGraphStarter(i, i + 1, subrouteStarter);
     }
+
+    // Nearby gates are normal start/finish snapping candidates now; connect those candidate
+    // projections to their transit board/alight segments.
+    subrouteStarter.ConnectGateAccessesToTransit(startGateAccesses, true /* isStart */);
+    subrouteStarter.ConnectGateAccessesToTransit(finishGateAccesses, false /* isStart */);
 
     std::vector<Segment> subroute;
     double contributionCoef = kAlmostZeroContribution;
@@ -594,8 +864,7 @@ RouterResultCode IndexRouter::DoCalculateRoute(Checkpoints const & checkpoints, 
       starter->Append(FakeEdgesContainer(std::move(subrouteStarter)));
   }
 
-  route.SetCurrentSubrouteIdx(checkpoints.GetPassedIdx());
-  route.SetSubroteAttrs(std::move(subroutes));
+  route.SetSubroutes(std::move(subroutes), checkpoints.GetPassedIdx());
 
   IndexGraphStarter::CheckValidRoute(segments);
 
@@ -947,6 +1216,30 @@ RouterResultCode IndexRouter::CalculateSubrouteLeapsOnlyMode(Checkpoints const &
   return RouterResultCode::NoError;
 }
 
+void IndexRouter::SetServiceEndings(FakeEnding const & start, FakeEnding const * finish, WorldGraph & graph)
+{
+  // Only the car routing has the turn penalty, see EdgeEstimator::GetTurnPenaltyFactor().
+  if (m_vehicleType != VehicleType::Car)
+    return;
+
+  auto const getServiceEnding = [&graph](FakeEnding const * ending) -> std::optional<ms::LatLon>
+  {
+    if (!ending || ending->m_projections.empty())
+      return {};
+
+    // The projections are sorted by the distance to the ending.
+    auto const & segment = ending->m_projections.front().m_segment;
+    if (IndexGraphStarter::IsGuidesSegment(segment))
+      return {};
+
+    auto const type = graph.GetIndexGraph(segment.GetMwmId()).GetRoadGeometry(segment.GetFeatureId()).GetHighwayType();
+    if (!type || !IsServiceOrLivingStreet(*type))
+      return {};
+    return ending->m_originJunction.GetLatLon();
+  };
+  m_estimator->SetServiceEndings({getServiceEnding(&start), getServiceEnding(finish)});
+}
+
 RouterResultCode IndexRouter::AdjustRoute(Checkpoints const & checkpoints, m2::PointD const & startDirection,
                                           RouterDelegate const & delegate, Route & route)
 {
@@ -967,24 +1260,31 @@ RouterResultCode IndexRouter::AdjustRoute(Checkpoints const & checkpoints, m2::P
 
   auto const & lastSubroutes = m_lastRoute->GetSubroutes();
   CHECK(!lastSubroutes.empty(), ());
-  auto const & lastSubroute = m_lastRoute->GetSubroute(checkpoints.GetPassedIdx());
+  auto const & rebuiltSubroute = m_lastRoute->GetSubroute(checkpoints.GetPassedIdx());
 
   auto const & steps = m_lastRoute->GetSteps();
   CHECK(!steps.empty(), ());
 
   FakeEnding dummy{};
-  IndexGraphStarter starter(MakeFakeEnding(startSegments, pointFrom, *graph), dummy, m_lastFakeEdges->GetNumFakeEdges(),
-                            bestSegmentIsAlmostCodirectional, *graph);
+  auto const startEnding = MakeFakeEnding(startSegments, pointFrom, *graph);
+  SetServiceEndings(startEnding, nullptr /* finish */, *graph);
+  IndexGraphStarter starter(startEnding, dummy, m_lastFakeEdges->GetNumFakeEdges(), bestSegmentIsAlmostCodirectional,
+                            *graph);
 
   starter.Append(*m_lastFakeEdges);
 
+  // The wave looks for a way to the previous route near the new start, and its edges have the transition
+  // penalties. So the previous route edges get them too, but only in the mwm of the start: the wave doesn't
+  // go far, and the edges of the other mwms would load their graphs.
+  NumMwmId const startMwmId = startSegments.front().GetMwmId();
   std::vector<SegmentEdge> prevEdges;
-  CHECK_LESS_OR_EQUAL(lastSubroute.GetEndSegmentIdx(), steps.size(), ());
-  for (size_t i = lastSubroute.GetBeginSegmentIdx(); i < lastSubroute.GetEndSegmentIdx(); ++i)
+  CHECK_LESS_OR_EQUAL(rebuiltSubroute.GetEndSegmentIdx(), steps.size(), ());
+  for (size_t i = rebuiltSubroute.GetBeginSegmentIdx(); i < rebuiltSubroute.GetEndSegmentIdx(); ++i)
   {
-    auto const & step = steps[i];
-    prevEdges.emplace_back(step.GetSegment(),
-                           starter.CalcSegmentWeight(step.GetSegment(), EdgeEstimator::Purpose::Weight));
+    auto const & segment = steps[i].GetSegment();
+    bool const withPenalties = i > rebuiltSubroute.GetBeginSegmentIdx() && segment.GetMwmId() == startMwmId;
+    prevEdges.emplace_back(segment, withPenalties ? starter.CalcRouteEdgeWeight(steps[i - 1].GetSegment(), segment)
+                                                  : starter.CalcSegmentWeight(segment, EdgeEstimator::Purpose::Weight));
   }
 
   using Visitor = JunctionVisitor<IndexGraphStarter>;
@@ -1012,8 +1312,10 @@ RouterResultCode IndexRouter::AdjustRoute(Checkpoints const & checkpoints, m2::P
   PushPassedSubroutes(checkpoints, subroutes);
 
   size_t subrouteOffset = result.m_path.size();
-  subroutes.emplace_back(starter.GetStartJunction().ToPointWithAltitude(),
-                         starter.GetFinishJunction().ToPointWithAltitude(), 0 /* beginSegmentIdx */, subrouteOffset);
+  // Append() above copied starter's finish ending from m_lastFakeEdges: it is the whole route's final
+  // destination, which differs from this leg's finish while an intermediate checkpoint is pending.
+  subroutes.emplace_back(starter.GetStartJunction().ToPointWithAltitude(), rebuiltSubroute.GetFinish(),
+                         0 /* beginSegmentIdx */, subrouteOffset);
 
   for (size_t i = checkpoints.GetPassedIdx() + 1; i < lastSubroutes.size(); ++i)
   {
@@ -1028,8 +1330,7 @@ RouterResultCode IndexRouter::AdjustRoute(Checkpoints const & checkpoints, m2::P
 
   CHECK_EQUAL(result.m_path.size(), subrouteOffset, ());
 
-  route.SetCurrentSubrouteIdx(checkpoints.GetPassedIdx());
-  route.SetSubroteAttrs(std::move(subroutes));
+  route.SetSubroutes(std::move(subroutes), checkpoints.GetPassedIdx());
 
   auto const redressResult = RedressRoute(result.m_path, delegate.GetCancellable(), starter, route);
   if (redressResult != RouterResultCode::NoError)
@@ -1043,8 +1344,8 @@ RouterResultCode IndexRouter::AdjustRoute(Checkpoints const & checkpoints, m2::P
 
 std::unique_ptr<WorldGraph> IndexRouter::MakeWorldGraph()
 {
-  // Use saved routing options for all types (car, bicycle, pedestrian).
-  RoutingOptions const routingOptions = RoutingOptions::LoadCarOptionsFromSettings();
+  RoutingOptions const routingOptions =
+      m_requestRoutingOptions ? *m_requestRoutingOptions : RoutingOptions::LoadFromSettings(m_vehicleType);
   /// @DebugNote
   // Add avoid roads here for debug purpose.
   // routingOptions.Add(RoutingOptions::Road::Motorway);
@@ -1083,6 +1384,13 @@ int IndexRouter::PointsOnEdgesSnapping::Snap(m2::PointD const & start, m2::Point
     if (!FindBestSegments(start, direction, true /* isOutgoing */, m_startSegments, startIsCodirectional))
       return 1;
   }
+
+  // Re-fill the dead-ends cache for the finish neighbourhood: FindBestSegments(start) above leaves
+  // m_deadEnds describing the *start* surroundings, but the finish snapping must vouch its own
+  // dead-end candidates. Otherwise the finish snapping silently depends on where the start is
+  // and may drop the closest segment.
+  /// @see France_RueDeLaTreille_FinishSnap test
+  FillDeadEndsCache(finish);
 
   std::vector<Segment> finishSegments;
   bool dummy;
@@ -1233,20 +1541,21 @@ bool IndexRouter::PointsOnEdgesSnapping::FindBestSegments(m2::PointD const & che
                                                           bool & bestSegmentIsAlmostCodirectional)
 {
   std::vector<Edge> bestEdges;
-  if (!FindBestEdges(checkpoint, direction, isOutgoing, kFirstSearchDistanceM /* closestEdgesRadiusM */, bestEdges,
-                     bestSegmentIsAlmostCodirectional))
+
+  // Snap to the closest segments first, but keep widening the search radius while we have too few
+  // candidates, so A* can choose the best start/finish segment among several alternatives instead of
+  // being locked onto the first (often not the best) nearby road. The intentional single codirectional
+  // pick (a car starting in a known direction) short-circuits and is never widened.
+  for (double const radiusM : {double(kFirstSearchDistanceM), 500.0, 2000.0})
   {
-    if (!FindBestEdges(checkpoint, direction, isOutgoing, 500.0 /* closestEdgesRadiusM */, bestEdges,
-                       bestSegmentIsAlmostCodirectional) &&
-        bestEdges.size() < kMaxRoadCandidates)
-    {
-      if (!FindBestEdges(checkpoint, direction, isOutgoing, 2000.0 /* closestEdgesRadiusM */, bestEdges,
-                         bestSegmentIsAlmostCodirectional))
-      {
-        return false;
-      }
-    }
+    if (!FindBestEdges(checkpoint, direction, isOutgoing, radiusM, bestEdges, bestSegmentIsAlmostCodirectional))
+      continue;
+    if (bestSegmentIsAlmostCodirectional || bestEdges.size() >= kMinRoadCandidates)
+      break;
   }
+
+  if (bestEdges.empty())
+    return false;
 
   bestSegments.clear();
   for (auto const & edge : bestEdges)
@@ -1635,24 +1944,11 @@ RouterResultCode IndexRouter::RedressRoute(std::vector<Segment> const & segments
 #ifdef DEBUG
   if (!m_guides.IsActive())
   {
-    auto const isPassThroughAllowed = [&worldGraph](Segment const & s)
-    { return worldGraph.IsPassThroughAllowed(s.GetMwmId(), s.GetFeatureId()); };
-
     auto const & rSegments = route.GetRouteSegments();
     ASSERT_EQUAL(segsCount, rSegments.size(), ());
     for (size_t i = 0; i < segsCount; ++i)
-    {
       if (segments[i].IsRealSegment())
-      {
         ASSERT_EQUAL(segments[i], rSegments[i].GetSegment(), ());
-
-        if (i > 0 && segments[i - 1].IsRealSegment() &&
-            isPassThroughAllowed(segments[i - 1]) != isPassThroughAllowed(segments[i]))
-        {
-          LOG(LDEBUG, ("Change pass-through point:", mercator::ToLatLon(rSegments[i - 1].GetJunction().GetPoint())));
-        }
-      }
-    }
   }
 #endif
 
@@ -1689,6 +1985,8 @@ RouterResultCode IndexRouter::RedressRoute(std::vector<Segment> const & segments
   FillSpeedCamProhibitedMwms(segments, speedCamProhibited);
   route.SetMwmsPartlyProhibitedForSpeedCams(std::move(speedCamProhibited));
 
+  route.SetWarnings(CollectRouteWarnings(segments, junctions, m_dataSource));
+
   return RouterResultCode::NoError;
 }
 
@@ -1712,13 +2010,7 @@ bool IndexRouter::AreMwmsNear(IndexGraphStarter const & starter) const
   for (auto const startMwmId : startMwmIds)
   {
     m2::RectD const & rect = m_countryRectFn(m_numMwmIds->GetFile(startMwmId).GetName());
-    bool found = false;
-    m_numMwmTree->ForEachInRect(rect, [&finishMwmIds, &found](NumMwmId id)
-    {
-      if (!found && finishMwmIds.count(id) > 0)
-        found = true;
-    });
-    if (found)
+    if (ForAnyNumMwmInRect(*m_numMwmTree, rect, [&finishMwmIds](NumMwmId id) { return finishMwmIds.contains(id); }))
       return true;
   }
 

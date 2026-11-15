@@ -86,7 +86,7 @@ FT_Error CheckFreetype(FT_Error error, char const * expression)
 
 #define FREETYPE_CHECK(x) CheckFreetype((x), #x)
 
-namespace
+namespace dp::detail
 {
 // RAII owner for an FT_Face. Releases via FT_Done_Face on destruction, including the
 // stack-unwind path when a Font constructor throws after FT_Open_Face has succeeded but
@@ -112,7 +112,7 @@ struct HbFontDeleter
   }
 };
 using HbFontPtr = std::unique_ptr<hb_font_t, HbFontDeleter>;
-}  // namespace
+}  // namespace dp::detail
 
 namespace dp
 {
@@ -121,7 +121,7 @@ int constexpr kInvalidFont = -1;
 // Sentinel value used in font white/black-list entries to apply a rule to every unicode block.
 constexpr std::string_view kAllBlocks = "*";
 
-namespace
+namespace detail
 {
 void HashCombine(size_t & seed, size_t value)
 {
@@ -245,8 +245,6 @@ public:
     return inserted->m_value;
   }
 
-  size_t Size() const { return m_index.size(); }
-
 private:
   struct Node
   {
@@ -264,7 +262,10 @@ private:
                             TextMetricsCacheKeyEqual>
       m_index;
 };
+}  // namespace detail
 
+namespace
+{
 using CJKVariant = languages::CJKResolver::Variant;
 
 FT_Long PickCJKFaceIndex(std::string const & path, FT_Library lib, CJKVariant want)
@@ -561,7 +562,7 @@ private:
 
   ReaderPtr<Reader> m_fontReader;
   FT_StreamRec_ m_stream;
-  FtFacePtr m_fontFace;
+  detail::FtFacePtr m_fontFace;
 
   // Glyph IDs are uint16_t (truncated from FT_UInt at the hb_shape boundary above), so the
   // bitset is sized to the full uint16_t value domain. Replaces a std::set<uint16_t> that
@@ -574,7 +575,7 @@ private:
 
   // Declared after m_fontFace so HbFontDeleter runs first: hb_font_destroy releases its FT_Face
   // reference before FtFaceDeleter calls FT_Done_Face.
-  HbFontPtr m_harfbuzzFont;
+  detail::HbFontPtr m_harfbuzzFont;
 };
 
 // Information about single unicode block.
@@ -646,24 +647,26 @@ struct GlyphManager::Impl
   // hb_language_from_string (a string-keyed lookup in HB's global language table) on the
   // common path. HB language pointers are stable singletons so a value cached today is valid
   // forever. ShapeText is the only caller and is single-threaded by contract.
+  //
+  // Negative codes (e.g. kUnsupportedLanguageCode == -1) mean "no language hint" -- return
+  // HB_LANGUAGE_INVALID. We deliberately avoid hb_language_get_default() because it calls
+  // setlocale(LC_CTYPE, nullptr) on first use, which is not thread-safe and would pick up
+  // the OS locale (unrelated to map data).
   hb_language_t ToHarfbuzzLanguage(int8_t lang)
   {
-    auto const resolve = [](int8_t code) -> hb_language_t
-    {
-      auto const svLang = StringUtf8Multilang::GetLangByCode(code);
-      auto const hb = hb_language_from_string(svLang.data(), static_cast<int>(svLang.size()));
-      return hb == HB_LANGUAGE_INVALID ? hb_language_get_default() : hb;
-    };
-
-    // Out-of-range codes (e.g. kUnsupportedLanguageCode == -1) bypass the cache.
     if (lang < 0 || static_cast<size_t>(lang) >= m_languageCache.size())
-      return resolve(lang);
+      return HB_LANGUAGE_INVALID;
 
     auto const idx = static_cast<size_t>(lang);
     if (auto const cached = m_languageCache[idx]; cached != HB_LANGUAGE_INVALID)
       return cached;
 
-    auto const hb = resolve(lang);
+    auto const svLang = StringUtf8Multilang::GetLangByCode(lang);
+    auto const hb = hb_language_from_string(svLang.data(), static_cast<int>(svLang.size()));
+    // Reserved-slot codes return an empty svLang and hb_language_from_string yields
+    // HB_LANGUAGE_INVALID for them. The cache uses HB_LANGUAGE_INVALID as the "unset" sentinel
+    // (see the hit check above), so those rare codes re-resolve on every call -- acceptable
+    // because reserved slots are never produced by the name selectors that drive this path.
     m_languageCache[idx] = hb;
     return hb;
   }
@@ -673,7 +676,7 @@ struct GlyphManager::Impl
   TUniBlockIter m_lastUsedBlock;
   std::vector<std::unique_ptr<Font>> m_fonts;
 
-  TextMetricsCache m_textMetricsCache;
+  detail::TextMetricsCache m_textMetricsCache;
   // Codepoints already reported as having no font — avoids per-character LOG spam on every render.
   std::unordered_set<strings::UniChar> m_loggedMissingChars;
   hb_buffer_t * m_harfbuzzBuffer = nullptr;
@@ -897,7 +900,7 @@ GlyphImage GlyphManager::GetGlyphImage(GlyphFontAndId key, bool sdf)
 text::TextMetrics GlyphManager::ShapeText(std::string_view utf8, int8_t lang)
 {
   // The cache greatly speeds up text metrics calculation; observed 80+% hit ratio.
-  TextMetricsCacheKeyView const cacheKey{utf8, lang};
+  detail::TextMetricsCacheKeyView const cacheKey{utf8, lang};
   if (auto const * cached = m_impl->m_textMetricsCache.Find(cacheKey))
     return *cached;
 
@@ -923,7 +926,7 @@ text::TextMetrics GlyphManager::ShapeText(std::string_view utf8, int8_t lang)
     ASSERT(substring.m_direction == HB_DIRECTION_LTR || substring.m_direction == HB_DIRECTION_RTL,
            ("ShapeText assumes per-segment uni-directional runs", substring.m_direction));
 
-    buffer_vector<FontRun, 4> fontRuns;
+    buffer_vector<detail::FontRun, 4> fontRuns;
     int currentFontIndex = kInvalidFont;
     int32_t runStart = substring.m_start;
     int32_t runEnd = substring.m_start;
@@ -973,7 +976,7 @@ text::TextMetrics GlyphManager::ShapeText(std::string_view utf8, int8_t lang)
       fontRuns.push_back({runStart, runEnd - runStart, 0});
     }
 
-    auto const shapeFontRun = [this, &text, hbLanguage, &substring, &allGlyphs](FontRun const & run)
+    auto const shapeFontRun = [this, &text, hbLanguage, &substring, &allGlyphs](detail::FontRun const & run)
     {
       hb_buffer_clear_contents(m_impl->m_harfbuzzBuffer);
       hb_buffer_add_utf16(m_impl->m_harfbuzzBuffer, reinterpret_cast<uint16_t const *>(text.data()),
@@ -998,7 +1001,7 @@ text::TextMetrics GlyphManager::ShapeText(std::string_view utf8, int8_t lang)
   if (allGlyphs.m_glyphs.empty())
     LOG(LWARNING, ("No glyphs were found in all fonts for string with characters in warnings above" /*, utf8*/));
 
-  return m_impl->m_textMetricsCache.Insert(TextMetricsCacheKey{std::string(utf8), lang}, std::move(allGlyphs));
+  return m_impl->m_textMetricsCache.Insert(detail::TextMetricsCacheKey{std::string(utf8), lang}, std::move(allGlyphs));
 }
 
 text::TextMetrics GlyphManager::ShapeText(std::string_view utf8, char const * lang)

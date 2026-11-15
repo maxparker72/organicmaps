@@ -1,8 +1,10 @@
 #include "drape_frontend/user_mark_shapes.hpp"
 
+#include "drape_frontend/area_shape.hpp"
 #include "drape_frontend/colored_symbol_shape.hpp"
 #include "drape_frontend/line_shape.hpp"
 #include "drape_frontend/map_shape.hpp"
+#include "drape_frontend/path_symbol_shape.hpp"
 #include "drape_frontend/poi_symbol_shape.hpp"
 #include "drape_frontend/shape_view_params.hpp"
 #include "drape_frontend/text_layout.hpp"
@@ -13,23 +15,172 @@
 
 #include "drape/attribute_provider.hpp"
 #include "drape/batcher.hpp"
+#include "drape/font_constants.hpp"
+#include "drape/utils/projection.hpp"
 #include "drape/utils/vertex_decl.hpp"
 
 #include "indexer/feature_decl.hpp"
 #include "indexer/scales.hpp"
 
-#include "geometry/clipping.hpp"
+#include "kml/area_data.hpp"
 
+#include "geometry/clipping.hpp"
+#include "geometry/mercator.hpp"
+#include "geometry/robust_orientation.hpp"
+
+#include "base/logging.hpp"
+
+#include "3party/earcut/earcut.hpp"
+#include "3party/libtess2/Include/tesselator.h"
+
+#include <algorithm>
 #include <array>
+#include <cmath>
+#include <memory>
+#include <utility>
 #include <vector>
+
+#include <boost/geometry/algorithms/correct.hpp>
+#include <boost/geometry/algorithms/is_valid.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+
+namespace mapbox::util
+{
+template <>
+struct nth<0, m2::PointD>
+{
+  static double get(m2::PointD const & p) { return p.x; }
+};
+
+template <>
+struct nth<1, m2::PointD>
+{
+  static double get(m2::PointD const & p) { return p.y; }
+};
+}  // namespace mapbox::util
 
 namespace df
 {
+void UserLineRenderParams::AddSpline(std::vector<m2::PointD> const & points)
+{
+  if (points.size() < 2)
+    return;
+
+  auto spline = std::make_unique<m2::Spline>(points.size());
+  for (auto const & point : points)
+    spline->AddPoint(point);
+  if (spline->IsValid())
+    m_splines.emplace_back(std::move(spline));
+}
+
 namespace
 {
 std::array<double, 20> constexpr kLineWidthZoomFactor = {
     // 1   2    3    4    5    6    7    8    9    10   11   12   13   14   15   16   17   18   19   20
     0.3, 0.3, 0.3, 0.4, 0.5, 0.6, 0.7, 0.7, 0.7, 0.7, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+
+int constexpr kTrackDirectionMinZoom = 11;
+int constexpr kTrackEndpointMinZoom = 8;
+float constexpr kTrackArrowOffset = 48.0f;
+float constexpr kTrackArrowStep = 96.0f;
+// Chevron size in dp, as in track-direction-arrow-*.svg; atlas regions add 2 px of padding per side.
+float constexpr kTrackArrowLength = 7.0f;
+float constexpr kTrackArrowHeight = 4.0f;
+float constexpr kTrackArrowMaxHeight = 8.0f;
+float constexpr kTrackArrowInset = 0.25f;
+float constexpr kTrackArrowMinScale = 0.75f;
+float constexpr kTrackArrowSearchRadius = 24.0f;
+float constexpr kTrackEndpointRadius = 5.0f;
+float constexpr kTrackEndpointOutlineWidth = 1.5f;
+float constexpr kTrackCombinedEndpointDistance = 12.0f;
+float constexpr kTrackShapeDepthOffset = 1.0f;
+float constexpr kSelectedTrackInnerBorderWidth = 2.0f;  // dp on each side.
+float constexpr kSelectedTrackOuterBorderWidth = 1.0f;
+char const kTrackDirectionBlackSymbol[] = "track-direction-arrow-black";
+char const kTrackDirectionWhiteSymbol[] = "track-direction-arrow-white";
+
+enum class TrackEndpoint
+{
+  Start,
+  Finish,
+  StartAndFinish
+};
+
+float LinearizeColorComponent(float component)
+{
+  return component <= 0.04045f ? component / 12.92f : std::pow((component + 0.055f) / 1.055f, 2.4f);
+}
+
+dp::Color GetContrastingColor(dp::Color const & color)
+{
+  float const luminance = 0.2126f * LinearizeColorComponent(color.GetRedF()) +
+                          0.7152f * LinearizeColorComponent(color.GetGreenF()) +
+                          0.0722f * LinearizeColorComponent(color.GetBlueF());
+  // Thin frames visually sink into saturated mid-dark colors before the equal-contrast threshold is reached.
+  // Prefer white up to this point; it still has at least 3.5:1 contrast, while looking clearer on pure red.
+  return luminance > 0.25f ? dp::Color::Black() : dp::Color::White();
+}
+
+dp::Color MakeOpaque(dp::Color const & color)
+{
+  return {color.GetRed(), color.GetGreen(), color.GetBlue(), 255};
+}
+
+float GetNextArrowOffset(double sourceOffset, double pixelToGlobalScale, float firstOffset, float step)
+{
+  ASSERT_GREATER(pixelToGlobalScale, 0.0, ());
+  ASSERT_GREATER(step, 0.0f, ());
+
+  double const sourceOffsetInPixels = sourceOffset / pixelToGlobalScale;
+  if (sourceOffsetInPixels <= firstOffset)
+    return static_cast<float>(firstOffset - sourceOffsetInPixels);
+
+  double const phase = std::fmod(sourceOffsetInPixels - firstOffset, step);
+  double constexpr kEps = 1e-6;
+  return phase < kEps || step - phase < kEps ? 0.0f : static_cast<float>(step - phase);
+}
+
+void DrawTrackEndpoint(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKey,
+                       ref_ptr<dp::TextureManager> textures, m2::PointD const & point, TrackEndpoint endpoint,
+                       dp::Color const & trackColor, float depth, DepthLayer depthLayer, float visualScale,
+                       dp::Batcher & batcher)
+{
+  ColoredSymbolViewParams params;
+  params.m_tileCenter = tileKey.GetWrappedDataRect().Center();
+  params.m_depth = depth;
+  params.m_depthLayer = depthLayer;
+  params.m_color = MakeOpaque(trackColor);
+  params.m_outlineColor = GetContrastingColor(trackColor);
+  params.m_outlineWidth = kTrackEndpointOutlineWidth * visualScale;
+
+  if (endpoint == TrackEndpoint::Start)
+  {
+    params.m_shape = ColoredSymbolViewParams::Shape::Circle;
+    params.m_radiusInPixels = kTrackEndpointRadius * visualScale;
+  }
+  else
+  {
+    params.m_shape = ColoredSymbolViewParams::Shape::Rectangle;
+    float const size = 2.0f * kTrackEndpointRadius * visualScale;
+    params.m_sizeInPixels = {size, size};
+  }
+
+  ColoredSymbolShape(point, params, tileKey, 0 /* textIndex */, false /* needOverlay */)
+      .Draw(context, make_ref(&batcher), textures);
+
+  if (endpoint != TrackEndpoint::StartAndFinish)
+    return;
+
+  // A dot inside the finish square keeps co-located loop endpoints distinguishable without stacking two full marks.
+  params.m_shape = ColoredSymbolViewParams::Shape::Circle;
+  params.m_radiusInPixels = 1.75f * visualScale;
+  params.m_color = params.m_outlineColor;
+  params.m_outlineWidth = 0.0f;
+  params.m_depth += kTrackShapeDepthOffset;
+  ColoredSymbolShape(point, params, tileKey, 1 /* textIndex */, false /* needOverlay */)
+      .Draw(context, make_ref(&batcher), textures);
+}
 
 template <typename TCreateVector>
 void AlignFormingNormals(TCreateVector const & fn, dp::Anchor anchor, dp::Anchor first, dp::Anchor second,
@@ -131,7 +282,7 @@ void GenerateColoredSymbolShapes(ref_ptr<dp::GraphicsContext> context, ref_ptr<d
   {
     CHECK(renderInfo.m_titleDecl, ());
     auto const & titleDecl = renderInfo.m_titleDecl->operator[](0);
-    auto const textMetrics = textures->ShapeSingleTextLine(titleDecl.m_primaryText, nullptr);
+    auto const textMetrics = textures->ShapeSingleTextLine(titleDecl.m_primaryText, titleDecl.m_primaryLang, nullptr);
     auto const & vparams = VisualParams::Instance();
     auto const fontScale = static_cast<float>(vparams.GetFontScale() * vparams.GetVisualScale());
     float const textRatio = titleDecl.m_primaryTextFont.m_size * fontScale / dp::kBaseFontSizePixels;
@@ -318,6 +469,30 @@ m2::SharedSpline SimplifySpline(m2::SharedSpline const & in, double minSqrLength
   return spline;
 }
 
+// SimplifySpline collapses a closed ring smaller than its step into a point or a back-and-forth segment, while
+// the ring's stroke is visible.
+m2::SharedSpline SimplifyRing(m2::SharedSpline const & ring, double minSqrLength)
+{
+  if (auto simplified = SimplifySpline(ring, minSqrLength); simplified->GetSize() > 3)
+    return simplified;
+
+  // A few vertices keep the ring drawable.
+  size_t constexpr kMaxPoints = 8;
+  auto const & path = ring->GetPath();
+  size_t const step = std::max<size_t>(1, path.size() / kMaxPoints);
+  auto spline = std::make_unique<m2::Spline>(path.size() / step + 2);
+  for (size_t i = 0; i < path.size(); i += step)
+    spline->AddPoint(path[i]);
+  spline->AddPoint(path.back());
+  return m2::SharedSpline(std::move(spline));
+}
+
+LineLayer const & GetTopLayer(UserLineRenderParams const & renderInfo)
+{
+  ASSERT(!renderInfo.m_layers.empty(), ());
+  return *std::ranges::max_element(renderInfo.m_layers, {}, &LineLayer::m_depth);
+}
+
 std::string GetBackgroundSymbolName(std::string const & symbolName)
 {
   char const * kDelimiter = "-";
@@ -332,8 +507,168 @@ std::string GetBackgroundSymbolName(std::string const & symbolName)
   return res;
 }
 
-drape_ptr<dp::OverlayHandle> CreateSymbolOverlayHandle(UserMarkRenderParams const & renderInfo, TileKey const & tileKey,
-                                                       m2::PointF const & symbolOffset, m2::RectD const & pixelRect)
+using Rings = std::vector<std::vector<m2::PointD>>;
+
+// Removes exactly collinear vertices. Earcut can't clip them as ears and filters them only after a pass without
+// ears or when bridging holes, so long runs of them, e.g. in a densified rectangle, make it quadratic. In Mercator,
+// only runs along meridians and parallels stay exactly collinear, so real-life rings rarely lose a vertex here.
+void RemoveCollinearPoints(std::vector<m2::PointD> & ring)
+{
+  size_t size = 0;
+  for (auto const & point : ring)
+  {
+    while (size > 1 && m2::robust::OrientedS(ring[size - 2], ring[size - 1], point) == 0)
+      --size;
+    ring[size++] = point;
+  }
+
+  // The same across the start of the ring.
+  size_t first = 0;
+  while (size - first > 2)
+    if (m2::robust::OrientedS(ring[size - 2], ring[size - 1], ring[first]) == 0)
+      --size;
+    else if (m2::robust::OrientedS(ring[size - 1], ring[first], ring[first + 1]) == 0)
+      ++first;
+    else
+      break;
+  ring.resize(size);
+  ring.erase(ring.begin(), ring.begin() + first);
+}
+
+// Returns the doubled area.
+double RingArea(std::vector<m2::PointD> const & ring)
+{
+  auto const & origin = ring.front();
+  double area = 0;
+  for (size_t i = 2; i < ring.size(); ++i)
+    area += m2::CrossProduct(ring[i - 1] - origin, ring[i] - origin);
+  return std::fabs(area);
+}
+
+// Earcut fills only valid polygons by the even-odd rule, while the import retains invalid ones,
+// and the projection may make others touch or cross.
+bool IsValidPolygon(Rings const & rings)
+{
+  namespace bg = boost::geometry;
+  // The type of geometry/intersection_score.hpp, so that the apps share the is_valid code with the editor.
+  bg::model::polygon<bg::model::d2::point_xy<double>> polygon;
+  auto const copy = [](std::vector<m2::PointD> const & from, auto & to)
+  {
+    to.reserve(from.size());
+    for (auto const & p : from)
+      to.emplace_back(p.x, p.y);
+  };
+  copy(rings.front(), polygon.outer());
+  for (size_t i = 1; i < rings.size(); ++i)
+    copy(rings[i], polygon.inners().emplace_back());
+  // Orients and closes the rings for the type, while the even-odd rule doesn't depend on their winding.
+  bg::correct(polygon);
+  return bg::is_valid(polygon);
+}
+
+// Returns the doubled area of the triangle.
+double AddClockwiseTriangle(std::vector<m2::PointD> & triangles, m2::PointD const & a, m2::PointD const & b,
+                            m2::PointD const & c)
+{
+  // ClipTriangleByRect takes clockwise triangles, while tessellators may emit others and zero-area ones.
+  double const s = m2::robust::OrientedS(a, b, c);
+  if (s < 0)
+    triangles.insert(triangles.end(), {a, b, c});
+  else if (s > 0)
+    triangles.insert(triangles.end(), {a, c, b});
+  return std::fabs(s);
+}
+
+// Fans out a triangle, a convex quadrilateral or a ring that is star-shaped around its bounding box center, as
+// many simple shapes are. Earcut is slow on some of the latter, e.g. 0.6 s vs 1 ms for a jagged 100k-vertex circle.
+bool TryFan(std::vector<m2::PointD> const & ring, std::vector<m2::PointD> & triangles)
+{
+  size_t const n = ring.size();
+  // All turns of a convex quadrilateral are of the same direction, while RemoveCollinearPoints leaves no straight ones.
+  auto const turnsLeft = [&](size_t i)
+  { return m2::robust::OrientedS(ring[i], ring[(i + 1) % n], ring[(i + 2) % n]) > 0; };
+  if (n == 3 ||
+      (n == 4 && turnsLeft(0) == turnsLeft(1) && turnsLeft(1) == turnsLeft(2) && turnsLeft(2) == turnsLeft(3)))
+  {
+    triangles.reserve(3 * (n - 2));
+    for (size_t i = 2; i < n; ++i)
+      AddClockwiseTriangle(triangles, ring[0], ring[i - 1], ring[i]);
+    return true;
+  }
+
+  m2::RectD rect;
+  for (auto const & p : ring)
+    rect.Add(p);
+  auto const center = rect.Center();
+  // Every edge must go around the center in the same direction, by less than pi, and the ring must pass between
+  // the half-planes above and below the center twice, so that it winds once. Otherwise, e.g. for a pentagram or
+  // a ring traced twice, the fan triangles overlap.
+  auto const isUpper = [&center](m2::PointD const & p)
+  { return p.y > center.y || (p.y == center.y && p.x >= center.x); };
+  bool const isLeft = m2::robust::OrientedS(center, ring.back(), ring.front()) > 0;
+  size_t crossings = 0;
+  for (size_t i = 0, j = n - 1; i < n; j = i++)
+  {
+    double const s = m2::robust::OrientedS(center, ring[j], ring[i]);
+    if (s == 0 || (s > 0) != isLeft)
+      return false;
+    crossings += isUpper(ring[j]) != isUpper(ring[i]);
+  }
+  if (crossings != 2)
+    return false;
+
+  triangles.reserve(3 * n);
+  for (size_t i = 0, j = n - 1; i < n; j = i++)
+    AddClockwiseTriangle(triangles, center, ring[j], ring[i]);
+  return true;
+}
+
+void TessellateByLibtess(Rings const & rings, std::vector<m2::PointD> & triangles)
+{
+  std::unique_ptr<TESStesselator, decltype(&tessDeleteTess)> const tess(tessNewTess(nullptr), &tessDeleteTess);
+  for (auto const & ring : rings)
+    tessAddContour(tess.get(), 2, ring.data(), sizeof(m2::PointD), static_cast<int>(ring.size()));
+  // The contours are planar, so libtess2 needn't find their plane and orientation.
+  TESSreal constexpr kNormal[] = {0, 0, 1};
+  // Fails only when out of memory.
+  VERIFY(tessTesselate(tess.get(), TESS_WINDING_ODD, TESS_POLYGONS, 3, 2, kNormal), ());
+
+  auto const * vertices = reinterpret_cast<m2::PointD const *>(tessGetVertices(tess.get()));
+  auto const * indices = tessGetElements(tess.get());
+  int const count = tessGetElementCount(tess.get());
+  triangles.reserve(3 * static_cast<size_t>(count));
+  for (int i = 0; i < count; ++i, indices += 3)
+    AddClockwiseTriangle(triangles, vertices[indices[0]], vertices[indices[1]], vertices[indices[2]]);
+}
+
+// A thinner quad without antialiasing misses pixel centers and breaks up.
+float GetOutlineWidth(UserAreaRenderParams const & area, double vs)
+{
+  ASSERT_GREATER(area.m_outlineWidth, 0, ());
+  return std::max(1.0f, static_cast<float>(area.m_outlineWidth * vs));
+}
+
+// By the even-odd rule, as polygons are filled.
+bool IsInside(std::vector<m2::SharedSpline> const & rings, m2::PointD const & p)
+{
+  bool inside = false;
+  for (auto const & ring : rings)
+  {
+    auto const & path = ring->GetPath();
+    for (size_t i = 0, j = path.size() - 1; i < path.size(); j = i++)
+    {
+      auto const & a = path[j];
+      auto const & b = path[i];
+      if ((a.y > p.y) != (b.y > p.y) && p.x < a.x + (p.y - a.y) * (b.x - a.x) / (b.y - a.y))
+        inside = !inside;
+    }
+  }
+  return inside;
+}
+}  // namespace
+
+drape_ptr<dp::OverlayHandle> CreateUserMarkOverlayHandle(UserMarkRenderParams const & renderInfo,
+                                                         TileKey const & tileKey, m2::RectD const & pixelRect)
 {
   if (!renderInfo.m_isSymbolSelectable)
     return nullptr;
@@ -342,11 +677,10 @@ drape_ptr<dp::OverlayHandle> CreateSymbolOverlayHandle(UserMarkRenderParams cons
                           kStartUserMarkOverlayIndex + renderInfo.m_index);
   m2::PointD const pivot(renderInfo.m_pivot.x + tileKey.GetTileXOffset(), renderInfo.m_pivot.y);
   drape_ptr<dp::OverlayHandle> handle = make_unique_dp<dp::SquareHandle>(
-      overlayId, renderInfo.m_anchor, pivot, pixelRect.RightTop() - pixelRect.LeftBottom(), m2::PointD(symbolOffset),
+      overlayId, renderInfo.m_anchor, pivot, pixelRect.RightTop() - pixelRect.LeftBottom(), renderInfo.m_pixelOffset,
       0 /*priority*/, true /* isBound */, renderInfo.m_minZoom, true /* isBillboard */);
   return handle;
 }
-}  // namespace
 
 void CacheUserMarks(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKey, ref_ptr<dp::TextureManager> textures,
                     MarksSource const & source, UserMarksRenderCollection const & renderParams, dp::Batcher & batcher)
@@ -410,7 +744,9 @@ void CacheUserMarks(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKe
         glsl::vec2 const offset(pixelOffset.x, pixelOffset.y);
 
         dp::Color color = dp::Color::White();
-        if (!renderInfo.m_color.empty())
+        if (renderInfo.m_customColor)  // explicit custom color
+          color = *renderInfo.m_customColor;
+        else if (!renderInfo.m_color.empty())  // preset, theme-aware
           color = df::GetColorConstant(renderInfo.m_color);
 
         glsl::vec4 maskColor(color.GetRedF(), color.GetGreenF(), color.GetBlueF(), renderInfo.m_symbolOpacity);
@@ -433,7 +769,7 @@ void CacheUserMarks(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKe
         for (auto const & vertex : buffer)
           rect.Add(glsl::FromVec2(glsl::vec2(vertex.m_normalAndAnimateOrZ)));
 
-        drape_ptr<dp::OverlayHandle> overlayHandle = CreateSymbolOverlayHandle(renderInfo, tileKey, symbolOffset, rect);
+        drape_ptr<dp::OverlayHandle> overlayHandle = CreateUserMarkOverlayHandle(renderInfo, tileKey, rect);
 
         gpu::Program program;
         gpu::Program program3d;
@@ -484,11 +820,94 @@ void CacheUserLines(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKe
     minSegmentSqrLength = math::Pow2(4.0 * vs * GetScreenScale(tileKey.m_zoomLevel));
 
   m2::RectD const tileRect = tileKey.GetWrappedDataRect();
+  bool const showDirection = tileKey.m_zoomLevel >= kTrackDirectionMinZoom;
+  double const pixelToGlobalScale = GetScreenScale(tileKey.m_zoomLevel);
+  float const arrowOffset = kTrackArrowOffset * static_cast<float>(vs);
+  float const arrowStep = kTrackArrowStep * static_cast<float>(vs);
+
+  auto endpointSearchRect = tileRect;
+  if (showDirection)
+  {
+    dp::TextureManager::SymbolRegion region;
+    textures->GetSymbolRegion(kTrackDirectionBlackSymbol, region);
+    // Include neighboring markers that can overlap even the largest padded, rotated arrow quad.
+    double const maxArrowExtent =
+        0.5 * region.GetPixelSize().Length() * (kTrackArrowMaxHeight / kTrackArrowHeight) * pixelToGlobalScale;
+    endpointSearchRect.Inflate(maxArrowExtent, maxArrowExtent);
+  }
+
+  // Arrows render after all endpoint markers, so every track must keep clear of every marker.
+  std::vector<m2::RectD> endpointRects;
+  if (tileKey.m_zoomLevel >= kTrackEndpointMinZoom)
+  {
+    double const radius = (kTrackEndpointRadius + kTrackEndpointOutlineWidth) * vs * pixelToGlobalScale;
+    source.ForEachUniqueTrack(tileKey.m_zoomLevel, renderParams, [&](UserLineRenderParams const & renderInfo)
+    {
+      if (!renderInfo.m_hasDirection || renderInfo.m_layers.empty() || renderInfo.m_splines.empty())
+        return;
+
+      auto const & topLayer = GetTopLayer(renderInfo);
+      float const depth = topLayer.m_depth + 2.0f * kTrackShapeDepthOffset;
+      auto const & start = renderInfo.m_splines.front()->GetPath().front();
+      auto const & finish = renderInfo.m_splines.back()->GetPath().back();
+      bool const combined =
+          start.SquaredLength(finish) <= math::Pow2(kTrackCombinedEndpointDistance * vs * pixelToGlobalScale);
+      auto const cacheEndpoint = [&](m2::PointD const & point, TrackEndpoint endpoint)
+      {
+        m2::RectD const rect(point, radius, radius);
+        if (showDirection && endpointSearchRect.IsIntersect(rect))
+          endpointRects.push_back(rect);
+        if (tileRect.IsPointInside(point))
+          DrawTrackEndpoint(context, tileKey, textures, point, endpoint, topLayer.m_color, depth,
+                            renderInfo.m_depthLayer, static_cast<float>(vs), batcher);
+      };
+      cacheEndpoint(start, combined ? TrackEndpoint::StartAndFinish : TrackEndpoint::Start);
+      if (!combined)
+        cacheEndpoint(finish, TrackEndpoint::Finish);
+    });
+  }
 
   source.ForEachUniqueTrack(tileKey.m_zoomLevel, renderParams, [&](UserLineRenderParams const & renderInfo)
   {
-    if (!renderInfo.m_isVisible)
+    if (renderInfo.m_layers.empty() || renderInfo.m_splines.empty())
       return;
+
+    auto const & topLayer = GetTopLayer(renderInfo);
+    // All stroke layers share the spline; selection borders surround the widest layer, below every stroke.
+    std::vector<LineLayer> selectedLayers;
+    if (renderInfo.m_depthLayer == DepthLayer::SelectedUserLineLayer)
+    {
+      // Borders stay the same width in dp, while stroke widths scale with zoom.
+      auto const zoomFactor = static_cast<float>(kLineWidthZoomFactor[tileKey.m_zoomLevel - 1]);
+      float const width = std::ranges::max(renderInfo.m_layers, {}, &LineLayer::m_width).m_width;
+      float const depth = std::ranges::min(renderInfo.m_layers, {}, &LineLayer::m_depth).m_depth;
+      auto const innerColor = GetContrastingColor(topLayer.m_color);
+      selectedLayers.reserve(renderInfo.m_layers.size() + 2);
+      selectedLayers.emplace_back(
+          GetContrastingColor(innerColor),
+          width + 2.0f * (kSelectedTrackInnerBorderWidth + kSelectedTrackOuterBorderWidth) / zoomFactor,
+          depth - 2.0f * kTrackShapeDepthOffset);
+      selectedLayers.emplace_back(innerColor, width + 2.0f * kSelectedTrackInnerBorderWidth / zoomFactor,
+                                  depth - kTrackShapeDepthOffset);
+      // Opaque strokes keep the borders underneath from tinting translucent tracks.
+      for (auto const & layer : renderInfo.m_layers)
+        selectedLayers.emplace_back(MakeOpaque(layer.m_color), layer.m_width, layer.m_depth);
+    }
+    auto const & lineLayers = selectedLayers.empty() ? renderInfo.m_layers : selectedLayers;
+    float const shapesDepth = topLayer.m_depth + kTrackShapeDepthOffset;
+    float const trackWidth =
+        topLayer.m_width * static_cast<float>(vs) * static_cast<float>(kLineWidthZoomFactor[tileKey.m_zoomLevel - 1]);
+    float const maxArrowHeight = std::min(trackWidth - 2.0f * kTrackArrowInset * static_cast<float>(vs),
+                                          kTrackArrowMaxHeight * static_cast<float>(vs));
+    float const arrowScale = std::max(0.0f, maxArrowHeight / (kTrackArrowHeight * static_cast<float>(vs)));
+    bool const drawDirection = showDirection && renderInfo.m_hasDirection && arrowScale >= kTrackArrowMinScale;
+    float const arrowHeight = kTrackArrowHeight * static_cast<float>(vs) * arrowScale;
+    // The size calculation already reserves the inset on both sides. That reserved space is the curvature budget.
+    float const maxPathDeviation = std::max(0.0f, 0.5f * (trackWidth - arrowHeight));
+    char const * directionSymbol = nullptr;
+    if (drawDirection)
+      directionSymbol = GetContrastingColor(topLayer.m_color) == dp::Color::Black() ? kTrackDirectionBlackSymbol
+                                                                                    : kTrackDirectionWhiteSymbol;
 
     // Spline is a shared_ptr here, can reassign later.
     for (auto spline : renderInfo.m_splines)
@@ -499,9 +918,13 @@ void CacheUserLines(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKe
       if (spline->GetSize() < 2)
         continue;
 
-      for (auto const & clippedSpline : m2::ClipSplineByRect(tileRect, spline))
+      std::vector<double> sourceOffsets;
+      auto const clippedSplines = drawDirection ? m2::ClipSplineByRect(tileRect, spline, sourceOffsets)
+                                                : m2::ClipSplineByRect(tileRect, spline);
+      for (size_t clippedIndex = 0; clippedIndex < clippedSplines.size(); ++clippedIndex)
       {
-        for (auto const & layer : renderInfo.m_layers)
+        auto const & clippedSpline = clippedSplines[clippedIndex];
+        for (auto const & layer : lineLayers)
         {
           LineViewParams params;
           params.m_tileCenter = tileRect.Center();
@@ -518,8 +941,278 @@ void CacheUserLines(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKe
 
           LineShape(clippedSpline, params).Draw(context, make_ref(&batcher), textures);
         }
+
+        if (drawDirection)
+        {
+          PathSymbolViewParams params;
+          params.m_tileCenter = tileRect.Center();
+          params.m_depthTestEnabled = false;
+          params.m_depth = shapesDepth;
+          params.m_depthLayer = renderInfo.m_depthLayer;
+          params.m_symbolName = directionSymbol;
+          params.m_offset = GetNextArrowOffset(sourceOffsets[clippedIndex], pixelToGlobalScale, arrowOffset, arrowStep);
+          params.m_step = arrowStep;
+          params.m_symbolScale = arrowScale;
+          params.m_placementLength = kTrackArrowLength * static_cast<float>(vs) * arrowScale;
+          params.m_maxPathDeviation = maxPathDeviation;
+          params.m_searchRadius = kTrackArrowSearchRadius * static_cast<float>(vs);
+          params.m_exclusionRects = endpointRects;
+          params.m_baseGtoPScale = 1.0 / pixelToGlobalScale;
+          PathSymbolShape(clippedSpline, params).Draw(context, make_ref(&batcher), textures);
+        }
       }
     }
   });
+}
+
+drape_ptr<UserAreaRenderParams> GenerateAreaRenderInfo(kml::AreaData const & area)
+{
+  auto renderInfo = make_unique_dp<UserAreaRenderParams>();
+  if (!area.m_visible)
+    return renderInfo;
+
+  auto const & style = area.m_style;
+  if (style.m_fill)
+    renderInfo->m_fillColor = dp::Color(style.m_fillColor);
+  renderInfo->m_outlineColor = dp::Color(style.m_outlineColor);
+  if (style.m_outline && style.m_outlineWidth > 0 && renderInfo->m_outlineColor.GetAlpha() > 0)
+    renderInfo->m_outlineWidth = static_cast<float>(style.m_outlineWidth);
+  if (renderInfo->m_fillColor.GetAlpha() == 0 && renderInfo->m_outlineWidth == 0)
+    return renderInfo;
+
+  auto const toMercator = [](kml::AreaRing const & ring)
+  {
+    ASSERT_GREATER_OR_EQUAL(ring.size(), 3, ());
+    std::vector<m2::PointD> points;
+    points.reserve(ring.size());
+    // Without repeats of vertices that differ only in height, also across the start of the ring.
+    for (auto const & point : ring)
+      if (auto const p = mercator::FromLatLon(point.m_latLon); points.empty() || p != points.back())
+        points.push_back(p);
+    if (points.size() > 1 && points.back() == points.front())
+      points.pop_back();
+    return points;
+  };
+  auto const makeSpline = [](std::vector<m2::PointD> const & ring)
+  {
+    auto spline = std::make_unique<m2::Spline>(ring.size() + 1);
+    // Skips segments shorter than the spline's minimum, so a tiny ring collapses into a point.
+    for (auto const & point : ring)
+      spline->AddPoint(point);
+    spline->AddPoint(ring.front());
+    // The closing point too close to the last vertex is skipped, while ClipUserAreaRing recognizes rings by it.
+    if (spline->GetSize() > 1 && spline->GetPath().back() != ring.front())
+      spline->ReplacePoint(ring.front());
+    return m2::SharedSpline(std::move(spline));
+  };
+
+  // Global and polar footprints need a separate wrapping/clipping implementation.
+  double const maxLat = mercator::YToLat(mercator::Bounds::kMaxY);
+  for (auto const & polygon : area.m_polygons)
+  {
+    // Holes may lie outside their shell, and the even-odd rule fills them.
+    std::vector<kml::AreaRing const *> rings = {&polygon.m_outer};
+    for (auto const & hole : polygon.m_holes)
+      rings.push_back(&hole);
+
+    m2::RectD geoRect;
+    for (auto const * ring : rings)
+      for (auto const & point : *ring)
+        geoRect.Add({point.m_latLon.m_lon, point.m_latLon.m_lat});
+    if (geoRect.SizeX() > 180 || geoRect.minY() < -maxLat || geoRect.maxY() > maxLat)
+    {
+      LOG(LWARNING, ("Area polygon lies outside the supported display extent", area.m_id));
+      continue;
+    }
+
+    auto & splines = renderInfo->m_polygons.emplace_back();
+    auto & rect = renderInfo->m_polygonRects.emplace_back();
+    std::vector<std::vector<m2::PointD>> fillRings;
+    for (auto const * ring : rings)
+    {
+      auto const & points = fillRings.emplace_back(toMercator(*ring));
+      splines.push_back(makeSpline(points));
+      for (auto const & point : points)
+        rect.Add(point);
+    }
+    renderInfo->m_limitRect.Add(rect);
+    if (renderInfo->m_fillColor.GetAlpha() > 0)
+    {
+      renderInfo->m_fillRings.push_back(std::move(fillRings));
+      renderInfo->m_triangles.emplace_back();
+    }
+  }
+  return renderInfo;
+}
+
+void TessellateUserArea(UserAreaRenderParams & area, size_t polygon)
+{
+  ASSERT_LESS(polygon, area.m_fillRings.size(), ());
+  auto rings = std::exchange(area.m_fillRings[polygon], {});
+  // Tessellated already.
+  if (rings.empty())
+    return;
+
+  auto & triangles = area.m_triangles[polygon];
+  for (auto & ring : rings)
+    RemoveCollinearPoints(ring);
+  // Degenerate rings, even the outer one, change no coverage by the even-odd rule, which tiles without rings use too.
+  std::erase_if(rings, [](auto const & ring) { return ring.size() < 3; });
+  if (rings.empty())
+    return;
+  if (rings.size() == 1 && TryFan(rings.front(), triangles))
+    return;
+
+  // Even with the validity check, earcut is 1.4-11 times faster than libtess2 on real-life areas, e.g. 0.13 s vs
+  // 1.5 s for the Natural England national parks (10 polygons, 490k vertices, arm64 -O2). But it is slower at
+  // bridging many holes, e.g. 18 ms vs 1.5 ms for 1024 ones.
+  size_t constexpr kMaxEarcutRings = 128;
+  if (rings.size() <= kMaxEarcutRings && IsValidPolygon(rings))
+  {
+    std::vector<m2::PointD> points;
+    double expectedArea = 0;
+    for (size_t i = 0; i < rings.size(); ++i)
+    {
+      points.insert(points.end(), rings[i].begin(), rings[i].end());
+      expectedArea += i == 0 ? RingArea(rings[i]) : -RingArea(rings[i]);
+    }
+
+    double earcutArea = 0;
+    auto const indices = mapbox::earcut<uint32_t>(rings);
+    triangles.reserve(indices.size());
+    for (size_t i = 0; i < indices.size(); i += 3)
+      earcutArea += AddClockwiseTriangle(triangles, points[indices[i]], points[indices[i + 1]], points[indices[i + 2]]);
+    // Guards against earcut failures on valid polygons, like its -ffast-math miscompilation of infinity.
+    if (std::fabs(earcutArea - expectedArea) <= 1e-6 * expectedArea)
+      return;
+    triangles.clear();
+  }
+  // libtess2 fills any polygon by the even-odd rule, which the import keeps for invalid ones.
+  TessellateByLibtess(rings, triangles);
+}
+
+std::vector<m2::SharedSpline> ClipUserAreaRing(m2::SharedSpline const & ring, m2::RectD const & rect,
+                                               double minSqrLength)
+{
+  // A tiny ring collapses into a point.
+  if (ring->GetSize() < 2)
+    return {};
+
+  auto pieces = m2::ClipSplineByRect(rect, ring);
+  auto const & start = ring->GetPath().front();
+  if (pieces.size() > 1 && pieces.front()->GetPath().front() == start && pieces.back()->GetPath().back() == start)
+  {
+    auto joined = std::make_unique<m2::Spline>(*pieces.back());
+    auto const & first = pieces.front()->GetPath();
+    for (size_t i = 1; i < first.size(); ++i)
+      joined->AddPoint(first[i]);
+    pieces.front() = m2::SharedSpline(std::move(joined));
+    pieces.pop_back();
+  }
+
+  for (auto & piece : pieces)
+  {
+    bool const isClosed = piece->GetPath().front() == piece->GetPath().back();
+    if (minSqrLength > 0)
+    {
+      // Unless it collapses a visible piece, e.g. a spike or a ring traced several times, into a point.
+      auto simplified = isClosed ? SimplifyRing(piece, minSqrLength) : SimplifySpline(piece, minSqrLength);
+      if (simplified->GetSize() > 1)
+        piece = std::move(simplified);
+    }
+    if (isClosed)
+    {
+      auto repeated = std::make_unique<m2::Spline>(*piece);
+      repeated->AddPoint(piece->GetPath()[1]);
+      piece = m2::SharedSpline(std::move(repeated));
+    }
+  }
+  return pieces;
+}
+
+m2::RectD GetUserAreaOutlineRect(UserAreaRenderParams const & area, TileKey const & tileKey, double vs)
+{
+  auto rect = tileKey.GetWrappedDataRect();
+  if (area.m_outlineWidth > 0)
+  {
+    double const padding = GetOutlineWidth(area, vs) * GetScreenScale(tileKey.m_zoomLevel);
+    rect.Inflate(padding, padding);
+  }
+  return rect;
+}
+
+void CacheUserAreas(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKey, ref_ptr<dp::TextureManager> textures,
+                    UserAreasToCache const & areas, dp::Batcher & batcher)
+{
+  double const vs = VisualParams::Instance().GetVisualScale();
+  double const minSegmentSqrLength =
+      tileKey.m_zoomLevel <= 15 ? math::Pow2(4.0 * vs * GetScreenScale(tileKey.m_zoomLevel)) : 0;
+  m2::RectD const tileRect = tileKey.GetWrappedDataRect();
+
+  for (auto const & [area, depth] : areas)
+  {
+    ASSERT_EQUAL(area->m_triangles.size(), area->m_fillColor.GetAlpha() > 0 ? area->m_polygons.size() : 0, ());
+    auto const inTile = [&](size_t polygon) { return area->m_polygonRects[polygon].IsIntersect(tileRect); };
+
+    std::vector<m2::PointD> triangles;
+    for (size_t p = 0; p < area->m_triangles.size(); ++p)
+    {
+      if (!inTile(p))
+        continue;
+      // A tile without rings is all inside the polygon or all outside, so it needs no triangles, which may split
+      // the tile into many pieces, e.g. around the center of a fan.
+      auto const & rings = area->m_polygons[p];
+      if (std::ranges::none_of(rings, [&tileRect](auto const & ring) { return m2::IsRealIntersect(tileRect, *ring); }))
+      {
+        if (IsInside(rings, tileRect.Center()))
+        {
+          triangles.insert(triangles.end(), {tileRect.LeftBottom(), tileRect.LeftTop(), tileRect.RightTop(),
+                                             tileRect.LeftBottom(), tileRect.RightTop(), tileRect.RightBottom()});
+        }
+        continue;
+      }
+      TessellateUserArea(*area, p);
+      auto const & t = area->m_triangles[p];
+      for (size_t i = 0; i < t.size(); i += 3)
+      {
+        m2::ClipTriangleByRect(tileRect, t[i], t[i + 1], t[i + 2],
+                               [&triangles](auto const & a, auto const & b, auto const & c)
+        { triangles.insert(triangles.end(), {a, b, c}); });
+      }
+    }
+    if (!triangles.empty())
+    {
+      // Below all outlines, in the same order.
+      AreaViewParams params;
+      params.m_tileCenter = tileRect.Center();
+      params.m_depthLayer = DepthLayer::UserAreaLayer;
+      params.m_depth = depth + dp::kMinDepth;
+      params.m_color = area->m_fillColor;
+      params.m_blendInPaintOrder = true;
+      AreaShape(std::move(triangles), {}, params).Draw(context, make_ref(&batcher), textures);
+    }
+
+    if (area->m_outlineWidth == 0)
+      continue;
+
+    LineViewParams params;
+    params.m_tileCenter = tileRect.Center();
+    params.m_depthLayer = DepthLayer::UserAreaLayer;
+    params.m_depth = depth;
+    params.m_blendInPaintOrder = true;
+    params.m_width = GetOutlineWidth(*area, vs);
+    params.m_color = area->m_outlineColor;
+    params.m_cap = dp::ButtCap;
+    params.m_join = dp::RoundJoin;
+    auto const outlineRect = GetUserAreaOutlineRect(*area, tileKey, vs);
+    for (size_t p = 0; p < area->m_polygons.size(); ++p)
+    {
+      if (!area->m_polygonRects[p].IsIntersect(outlineRect))
+        continue;
+      for (auto const & ring : area->m_polygons[p])
+        for (auto const & piece : ClipUserAreaRing(ring, outlineRect, minSegmentSqrLength))
+          LineShape(piece, params).Draw(context, make_ref(&batcher), textures);
+    }
+  }
 }
 }  // namespace df

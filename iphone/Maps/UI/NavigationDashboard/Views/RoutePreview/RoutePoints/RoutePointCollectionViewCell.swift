@@ -4,9 +4,16 @@ final class RoutePointCollectionViewCell: UICollectionViewCell {
     case addPoint
   }
 
+  enum ConnectorStyle {
+    case none
+    case solid
+    case threeDots
+  }
+
   struct PointViewModel {
     let title: String
     let image: UIImage
+    let usesCurrentPositionIcon: Bool
     let showCloseButton: Bool
     let maskedCorners: CACornerMask
     let isPlaceholder: Bool
@@ -15,12 +22,19 @@ final class RoutePointCollectionViewCell: UICollectionViewCell {
   }
 
   private enum Constants {
+    static let fontStyle = FontStyleSheet.semibold14
+    static let minimumHeight: CGFloat = 46
+    static let titleNumberOfLines: Int = 2
+    static let verticalInset: CGFloat = 8
     static let logoSize: CGFloat = 28
     static let logoImageLeadingInset: CGFloat = 12
     static let reorderButtonSize: CGFloat = 24
     static let closeButtonSize: CGFloat = 24
     static let horizontalSpacing: CGFloat = 12
     static let horizontalSpacingSmall: CGFloat = 5
+    static let connectorWidth: CGFloat = 2.5
+    static let connectorIconInset: CGFloat = 3
+    static let dotDiameter: CGFloat = 3.5
   }
 
   private let logoImageView = UIImageView()
@@ -29,12 +43,15 @@ final class RoutePointCollectionViewCell: UICollectionViewCell {
   private let textStackView = UIStackView()
   private let reorderButton = UIButton(type: .system)
   private let closeButton = UIButton(type: .system)
+  private let connectorLayer = CAShapeLayer()
   private lazy var separatorView: UIView = {
     let separatorInsets = UIEdgeInsets(top: 0, left: Constants.logoImageLeadingInset + Constants.logoSize + Constants.horizontalSpacing, bottom: 0, right: 0)
     return contentBackgroundView.addSeparator(.bottom, insets: separatorInsets)
   }()
 
   private var didTapClose: (() -> Void)?
+  private var topConnector: ConnectorStyle = .none
+  private var bottomConnector: ConnectorStyle = .none
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -44,8 +61,33 @@ final class RoutePointCollectionViewCell: UICollectionViewCell {
 
   override var isHighlighted: Bool {
     didSet {
-      contentBackgroundView.backgroundColor = isHighlighted ? .lightGray : .pressBackground
+      contentBackgroundView.backgroundColor = isHighlighted ? .routePointHighlightedBackground : .pressBackground
     }
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    let leadingX = Constants.logoImageLeadingInset + Constants.logoSize / 2
+    let x = effectiveUserInterfaceLayoutDirection == .rightToLeft ? bounds.width - leadingX : leadingX
+    let iconTop = (bounds.height - Constants.logoSize) / 2
+    let iconBottom = iconTop + Constants.logoSize
+    let connectorGap = iconTop - Constants.connectorIconInset
+    // Both rows draw the same dotted segment; clipping keeps each half inside its own row.
+    let topStart = topConnector == .threeDots ? -connectorGap : 0
+    let bottomEnd = bottomConnector == .threeDots ? bounds.height + connectorGap : bounds.height
+    let path = UIBezierPath()
+    appendConnector(to: path, style: topConnector, x: x,
+                    from: topStart, to: connectorGap, roundAtStart: false)
+    appendConnector(to: path, style: bottomConnector, x: x,
+                    from: iconBottom + Constants.connectorIconInset, to: bottomEnd, roundAtStart: true)
+    connectorLayer.frame = bounds
+    connectorLayer.path = path.cgPath
+    connectorLayer.fillColor = UIColor.blackSecondaryText.cgColor
+  }
+
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    setNeedsLayout()
   }
 
   @available(*, unavailable)
@@ -54,14 +96,20 @@ final class RoutePointCollectionViewCell: UICollectionViewCell {
   }
 
   private func setupView() {
+    clipsToBounds = false
     contentView.clipsToBounds = false
 
-    contentBackgroundView.setStyle(.pressBackground)
-    contentBackgroundView.layer.setCornerRadius(.buttonDefault)
+    // Assign the dynamic background directly to preserve the highlight when themes are reapplied.
+    contentBackgroundView.backgroundColor = .pressBackground
+    contentBackgroundView.layer.setCornerRadius(.buttonDefaultBig)
     contentBackgroundView.clipsToBounds = false
+    connectorLayer.masksToBounds = true
+    contentBackgroundView.layer.addSublayer(connectorLayer)
 
     logoImageView.contentMode = .scaleAspectFill
     logoImageView.clipsToBounds = true
+
+    titleLabel.numberOfLines = Constants.titleNumberOfLines
 
     textStackView.axis = .vertical
     textStackView.alignment = .leading
@@ -71,6 +119,7 @@ final class RoutePointCollectionViewCell: UICollectionViewCell {
 
     closeButton.setImage(UIImage(resource: .icSearchClear), for: .normal)
     closeButton.setStyle(.gray)
+    closeButton.accessibilityLabel = L("placepage_remove_stop")
     closeButton.addTarget(self, action: #selector(didTapCloseButton), for: .touchUpInside)
   }
 
@@ -115,23 +164,26 @@ final class RoutePointCollectionViewCell: UICollectionViewCell {
     ])
   }
 
-  func configure(with viewModel: CellType) {
+  func configure(with viewModel: CellType, topConnector: ConnectorStyle, bottomConnector: ConnectorStyle) {
+    self.topConnector = topConnector
+    self.bottomConnector = bottomConnector
+    setNeedsLayout()
     switch viewModel {
     case .point(let viewModel):
       titleLabel.text = viewModel.title
       logoImageView.image = viewModel.image
-      logoImageView.setStyleAndApply(.black)
+      logoImageView.setStyleAndApply(viewModel.usesCurrentPositionIcon ? .blue : .black)
       didTapClose = viewModel.onCloseHandler
-      titleLabel.setFontStyleAndApply(.semibold14, color: viewModel.isPlaceholder ? .blackSecondary : .blackPrimary)
+      titleLabel.setFontStyleAndApply(Constants.fontStyle, color: viewModel.isPlaceholder ? .blackSecondary : .blackPrimary)
       closeButton.isHidden = !viewModel.showCloseButton
       reorderButton.isHidden = false
       contentBackgroundView.layer.maskedCorners = viewModel.maskedCorners
       separatorView.isHidden = !viewModel.showSeparator
     case .addPoint:
-      titleLabel.text = L("placepage_add_stop")
+      titleLabel.text = L("route_add_destination")
       logoImageView.image = UIImage(resource: .icAddButton)
       logoImageView.setStyleAndApply(.blue)
-      titleLabel.setFontStyleAndApply(.semibold14, color: .linkBlue)
+      titleLabel.setFontStyleAndApply(Constants.fontStyle, color: .linkBlue)
       closeButton.isHidden = true
       reorderButton.isHidden = true
       contentBackgroundView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -139,8 +191,36 @@ final class RoutePointCollectionViewCell: UICollectionViewCell {
     }
   }
 
+  private func appendConnector(to path: UIBezierPath, style: ConnectorStyle, x: CGFloat,
+                               from startY: CGFloat, to endY: CGFloat, roundAtStart: Bool) {
+    switch style {
+    case .none:
+      break
+    case .solid:
+      let radius = Constants.connectorWidth / 2
+      let rect = CGRect(x: x - radius, y: startY, width: Constants.connectorWidth, height: endY - startY)
+      let corners: UIRectCorner = roundAtStart ? [.topLeft, .topRight] : [.bottomLeft, .bottomRight]
+      path.append(UIBezierPath(roundedRect: rect, byRoundingCorners: corners,
+                               cornerRadii: CGSize(width: radius, height: radius)))
+    case .threeDots:
+      let radius = Constants.dotDiameter / 2
+      let centerSpacing = (endY - startY - Constants.dotDiameter) / 2
+      for index in 0 ..< 3 {
+        let y = startY + radius + CGFloat(index) * centerSpacing
+        let dotRect = CGRect(x: x - radius, y: y - radius,
+                             width: Constants.dotDiameter, height: Constants.dotDiameter)
+        path.append(UIBezierPath(ovalIn: dotRect))
+      }
+    }
+  }
+
   @objc
   private func didTapCloseButton() {
     didTapClose?()
+  }
+
+  static func height() -> CGFloat {
+    let titleHeight = Constants.fontStyle.font.dynamic.lineHeight * CGFloat(Constants.titleNumberOfLines)
+    return max(Constants.minimumHeight, ceil(titleHeight + Constants.verticalInset * 2))
   }
 }

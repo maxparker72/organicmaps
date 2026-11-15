@@ -18,10 +18,7 @@ namespace storage
 // CountryInfoGetterBase ---------------------------------------------------------------------------
 CountryId CountryInfoGetterBase::GetRegionCountryId(m2::PointD const & pt) const
 {
-  // Wrap X to [-180, 180] so extended coordinates (past the antimeridian) map to
-  // the correct country. Country boundaries and polygons are in canonical coordinates.
-  m2::PointD const wrapped(mercator::WrapX(pt.x), pt.y);
-  RegionId const id = FindFirstCountry(wrapped);
+  RegionId const id = FindFirstCountry(pt);
   return id == kInvalidId ? kInvalidCountryId : m_countries[id].m_countryId;
 }
 
@@ -52,8 +49,9 @@ CountryInfoGetterBase::RegionId CountryInfoGetterBase::GetRegionId(CountryId con
 
 CountryInfoGetterBase::RegionId CountryInfoGetterBase::FindFirstCountry(m2::PointD const & pt) const
 {
+  m2::PointD const wrapped(mercator::WrapX(pt.x), pt.y);
   for (size_t id = 0; id < m_countries.size(); ++id)
-    if (BelongsToRegion(pt, id))
+    if (BelongsToRegion(wrapped, id))
       return id;
 
   return kInvalidId;
@@ -62,20 +60,18 @@ CountryInfoGetterBase::RegionId CountryInfoGetterBase::FindFirstCountry(m2::Poin
 // CountryInfoGetter -------------------------------------------------------------------------------
 std::vector<CountryId> CountryInfoGetter::GetRegionsCountryIdByRect(m2::RectD rect, bool rough) const
 {
-  // Normalize extended rect X into canonical range. IsRectOverlap already handles +-360 shifts,
-  // but exact polygon checks (IsIntersectedByRegion) require canonical coordinates.
-  if (rect.minX() >= mercator::Bounds::kMaxX || rect.maxX() <= mercator::Bounds::kMinX)
-  {
-    double const startX = mercator::WrapX(rect.minX());
-    rect = m2::RectD(startX, rect.minY(), startX + rect.SizeX(), rect.maxY());
-  }
+  // Wrap input rect into canonical range for further IsIntersectOrInside and IsIntersectedByRegion calls
+  // (which handle rects crossing the antimeridian).
+  rect = mercator::WrapRectX(rect);
 
   std::vector<CountryId> result;
   for (size_t id = 0; id < m_countries.size(); ++id)
   {
-    if (!m_countries[id].IsRectOverlap(rect))
+    auto const res = CountryDef::IsIntersectOrInside(rect, m_countries[id].m_rect);
+    if (res == CountryDef::Overlap::NONE)
       continue;
-    if (rect.IsRectInside(m_countries[id].m_rect) || rough || IsIntersectedByRegion(rect, id))
+
+    if (res == CountryDef::Overlap::INSIDE || rough || IsIntersectedByRegion(rect, id))
       result.push_back(m_countries[id].m_countryId);
   }
   return result;
@@ -96,8 +92,7 @@ void CountryInfoGetter::GetRegionsCountryId(m2::PointD const & pt, CountriesVec 
 
 void CountryInfoGetter::GetRegionInfo(m2::PointD const & pt, CountryInfo & info) const
 {
-  m2::PointD const wrapped(mercator::WrapX(pt.x), pt.y);
-  RegionId const id = FindFirstCountry(wrapped);
+  RegionId const id = FindFirstCountry(pt);
   if (id != kInvalidId)
     GetRegionInfo(m_countries[id].m_countryId, info);
 }
@@ -106,21 +101,6 @@ void CountryInfoGetter::GetRegionInfo(CountryId const & countryId, CountryInfo &
 {
   info.m_name = countryId;
   CountryInfo::FileName2FullName(info.m_name);
-}
-
-void CountryInfoGetter::CalcUSALimitRect(m2::RectD rects[3]) const
-{
-  auto fn = [&](CountryDef const & c)
-  {
-    if (c.m_countryId == "USA_Alaska")
-      rects[1] = c.m_rect;
-    else if (c.m_countryId == "USA_Hawaii")
-      rects[2] = c.m_rect;
-    else
-      rects[0].Add(c.m_rect);
-  };
-
-  ForEachCountry("USA_", fn);
 }
 
 m2::RectD CountryInfoGetter::CalcLimitRect(std::string const & prefix) const
@@ -132,20 +112,14 @@ m2::RectD CountryInfoGetter::CalcLimitRect(std::string const & prefix) const
 
 m2::RectD CountryInfoGetter::GetLimitRectForLeaf(CountryId const & leafCountryId) const
 {
-  /// @todo Check use-cases. Take into account that this function returns FullRect for the obsolete MWMs.
-  /// And we are going to split MWMs a lot for now.
-
   auto const it = m_countryIndex.find(leafCountryId);
-  if (it != m_countryIndex.end())
+  if (it == m_countryIndex.end())
   {
-    ASSERT_LESS(it->second, m_countries.size(), ());
-    return m_countries[it->second].m_rect;
-  }
-  else
-  {
-    // Full rect for World files.
+    // World files and obsolete country names may be absent from the current border index.
     return mercator::Bounds::FullRect();
   }
+  ASSERT_LESS(it->second, m_countries.size(), ());
+  return m_countries[it->second].m_rect;
 }
 
 void CountryInfoGetter::GetMatchedRegions(std::string const & affiliation, RegionIdVec & regions) const
@@ -265,6 +239,7 @@ void CountryInfoReader::GetTriangles(RegionId id, FeatureType & ft) const
   if (!isFound)
   {
     ReaderSource<ModelReaderPtr> src(m_reader.GetReader("t" + std::to_string(id)));
+    trgs.clear();
     serial::LoadOuterTriangles(src, serial::GeometryCodingParams(), trgs);
   }
 
@@ -289,28 +264,34 @@ bool CountryInfoReader::BelongsToRegion(m2::PointD const & pt, RegionId id) cons
 
 bool CountryInfoReader::IsIntersectedByRegion(m2::RectD const & rect, RegionId id) const
 {
-  auto contains = [&rect](std::vector<m2::RegionD> const & regions)
+  return WithRegion(id, [&rect](std::vector<m2::RegionD> const & regions)
   {
-    for (auto const & region : regions)
+    bool intersects = false;
+    mercator::ForEachRectWrapped(rect, [&](m2::RectD const & part)
     {
-      bool isIntersect = false;
-      rect.ForEachSide([&](m2::PointD const & p1, m2::PointD const & p2)
+      for (auto const & region : regions)
       {
-        if (isIntersect)
+        if (intersects)
           return;
-        m2::PointD result;
-        isIntersect = region.FindIntersection(p1, p2, result);
-      });
-      if (isIntersect)
-        return true;
-    }
-    return false;
-  };
-
-  if (WithRegion(id, contains))
-    return true;
-
-  return BelongsToRegion(rect.Center(), id);
+        ASSERT(region.IsValid(), ());
+        // Containment in either direction can have no boundary intersections.
+        if (part.IsPointInside(region.Data().front()) || region.Contains(part.Center()))
+        {
+          intersects = true;
+          return;
+        }
+        part.ForEachSide([&](m2::PointD const & p1, m2::PointD const & p2)
+        {
+          if (!intersects)
+          {
+            m2::PointD result;
+            intersects = region.FindIntersection(p1, p2, result);
+          }
+        });
+      }
+    });
+    return intersects;
+  });
 }
 
 bool CountryInfoReader::IsCloseEnough(RegionId id, m2::PointD const & pt, double distance) const
@@ -336,6 +317,7 @@ CountryInfoGetterForTesting::CountryInfoGetterForTesting(std::vector<CountryDef>
 
 void CountryInfoGetterForTesting::AddCountry(CountryDef const & country)
 {
+  m_countryIndex[country.m_countryId] = m_countries.size();
   m_countries.push_back(country);
 }
 

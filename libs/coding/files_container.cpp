@@ -1,5 +1,6 @@
 #include "coding/files_container.hpp"
 
+#include "coding/file_reader.hpp"
 #include "coding/internal/file_data.hpp"
 #include "coding/read_write_utils.hpp"
 #include "coding/varint.hpp"
@@ -166,7 +167,7 @@ void FilesContainerW::DeleteSection(Tag const & tag)
   }
 
   // swap files
-  if (!base::DeleteFileX(m_name) || !base::RenameFileX(m_name + ".tmp", m_name))
+  if (!base::RenameFileX(m_name + ".tmp", m_name))
     MYTHROW(RootException, ("Can't rename file", m_name, "Sharing violation or disk error!"));
 
   // do open to update m_info

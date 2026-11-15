@@ -1,8 +1,9 @@
-• Pasirinkite pėsčiųjų ir dviračių maršrutus, kad pamatytumėte jų aukščio diagramas
-• Tinkamas žemėlapio apvedimas ties antimeridianu (±180° ilgumos)
-• Vienu metu pakeiskite visas žymeklių ir trasų spalvas kategorijoje
-• Geresnė namų numerių paieška, aprėpiama daugiau JAV adresų
-• OSM duomenys nuo balandžio 4 d.
-• Suplanuotos išvaizdos režimas nustatymuose
-• Ištaisytas žymeklių ir takelių bendrinimas su kitomis programomis
-…daugiau adresu omaps.org/lt/news
+• OSM: rugsėjo 28 d.; „Wikipedia“: rugsėjo 21 d.
+• Geresni alternatyvūs maršrutai ir numatomas atvykimo laikas
+• Naujas nustatymas optimizuoja tarpinių taškų tvarką
+• Nauji mygtukai leidžia pridėti arba pakeisti taškus planuojamuose maršrutuose
+• Naviguojant išlaikomas pasirinktas alternatyvus maršrutas
+• Trasų įrašymo pataisymai ir patobulinimai
+• Ištaisyta KMB importo klaida
+• Naudotojo sąsajos pataisymai ir patobulinimai
+…daugiau informacijos rasite omaps.org/lt/news

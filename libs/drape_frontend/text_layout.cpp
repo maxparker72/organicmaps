@@ -1,5 +1,6 @@
 #include "drape_frontend/text_layout.hpp"
 #include "drape_frontend/map_shape.hpp"
+#include "drape_frontend/shape_view_params.hpp"
 #include "drape_frontend/visual_params.hpp"
 
 #include "drape/font_constants.hpp"
@@ -279,7 +280,7 @@ dp::TGlyphs TextLayout::GetGlyphs() const
 }
 
 StraightTextLayout::StraightTextLayout(std::string_view text, float fontSize, ref_ptr<dp::TextureManager> textures,
-                                       dp::Anchor anchor, bool forceNoWrap)
+                                       dp::Anchor anchor, bool forceNoWrap, int8_t lang)
 {
   /// @todo Support multiline texts (e.g. in Bookmarks).
   auto iBreak = text.find_first_of("\r\n");
@@ -287,7 +288,7 @@ StraightTextLayout::StraightTextLayout(std::string_view text, float fontSize, re
     text = text.substr(0, iBreak);
 
   m_textSizeRatio = fontSize * static_cast<float>(VisualParams::Instance().GetFontScale()) / dp::kBaseFontSizePixels;
-  m_shapedGlyphs = textures->ShapeSingleTextLine(text, &m_glyphRegions);
+  m_shapedGlyphs = textures->ShapeSingleTextLine(text, lang, &m_glyphRegions);
 
   // TODO(AB): Use ICU's BreakIterator to split text properly in different languages without spaces.
   // TODO(AB): Implement SplitText for RTL languages.
@@ -378,7 +379,7 @@ void StraightTextLayout::CacheDynamicGeometry(glsl::vec2 const & pixelOffset,
 }
 
 PathTextLayout::PathTextLayout(m2::PointD const & tileCenter, std::string const & text, float fontSize,
-                               ref_ptr<dp::TextureManager> textureManager)
+                               ref_ptr<dp::TextureManager> textureManager, int8_t lang)
   : m_tileCenter(tileCenter)
 {
   ASSERT_EQUAL(std::string::npos, text.find('\n'), ("Multiline text is not expected", text));
@@ -387,7 +388,7 @@ PathTextLayout::PathTextLayout(m2::PointD const & tileCenter, std::string const 
   m_textSizeRatio = fontSize * fontScale / dp::kBaseFontSizePixels;
 
   // TODO(AB): StraightTextLayout used a logic to split a longer string into two strings.
-  m_shapedGlyphs = textureManager->ShapeSingleTextLine(text, &m_glyphRegions);
+  m_shapedGlyphs = textureManager->ShapeSingleTextLine(text, lang, &m_glyphRegions);
 }
 
 void PathTextLayout::CacheStaticGeometry(dp::TextureManager::ColorRegion const & colorRegion,
@@ -431,27 +432,34 @@ bool PathTextLayout::CacheDynamicGeometry(m2::Spline::iterator const & iter, flo
   }
 
   m2::PointD const pxPivot = iter.m_pos;
+  ASSERT_EQUAL(m_glyphRegions.size(), m_shapedGlyphs.m_glyphs.size(), ());
+  ASSERT(!m_glyphRegions.empty(), ());
   buffer.resize(4 * m_glyphRegions.size());
 
   glsl::vec4 const pivot(glsl::ToVec2(MapShape::ConvertToLocal(globalPivot, m_tileCenter, kShapeCoordScalar)), depth,
                          0.0f);
 
-  ASSERT_EQUAL(m_glyphRegions.size(), m_shapedGlyphs.m_glyphs.size(), ());
+  // Seed leading zero-advance marks from the local spline tangent.
+  m2::PointD direction = penIter.m_dir * advanceSign;
   for (size_t i = 0; i < m_glyphRegions.size(); ++i)
   {
     auto const & glyph = m_shapedGlyphs.m_glyphs[i];
-    m2::PointF const pxSize = m_glyphRegions[i].GetPixelSize() * m_textSizeRatio;
-    float const xAdvance = glyph.m_xAdvance * m_textSizeRatio;
-
     m2::PointD const baseVector = penIter.m_pos - pxPivot;
-    m2::PointD const currentTangent = penIter.m_avrDir.Normalize();
-
+    float const xAdvance = glyph.m_xAdvance * m_textSizeRatio;
     constexpr float kEps = 1e-5f;
     if (fabs(xAdvance) > kEps)
+    {
       penIter.Advance(advanceSign * xAdvance);
-    m2::PointD const newTangent = penIter.m_avrDir.Normalize();
+      auto const nextDirection = penIter.m_avrDir.Normalize();
+      if (nextDirection == m2::PointD::Zero())
+        return false;
+      if (i > 0 && static_cast<float>(m2::DotProduct(direction, nextDirection)) < kValidSplineTurn)
+        return false;
+      direction = nextDirection;
+    }
 
-    glsl::vec2 const tangent = glsl::ToVec2(newTangent);
+    m2::PointF const pxSize = m_glyphRegions[i].GetPixelSize() * m_textSizeRatio;
+    glsl::vec2 const tangent = glsl::ToVec2(direction);
     glsl::vec2 const normal = glsl::vec2(-tangent.y, tangent.x);
     glsl::vec2 const formingVector = glsl::ToVec2(baseVector) + halfFontSize * normal;
 
@@ -467,13 +475,6 @@ bool PathTextLayout::CacheDynamicGeometry(m2::Spline::iterator const & iter, flo
     buffer[baseIndex + 1] = {pivot, formingVector + normal * upVector + tangent * xOffset};
     buffer[baseIndex + 2] = {pivot, formingVector + normal * bottomVector + tangent * (pxSize.x + xOffset)};
     buffer[baseIndex + 3] = {pivot, formingVector + normal * upVector + tangent * (pxSize.x + xOffset)};
-
-    if (i > 0)
-    {
-      auto const dotProduct = static_cast<float>(m2::DotProduct(currentTangent, newTangent));
-      if (dotProduct < kValidSplineTurn)
-        return false;
-    }
   }
   return true;
 }

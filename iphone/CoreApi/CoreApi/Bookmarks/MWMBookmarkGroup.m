@@ -56,6 +56,11 @@
   return [self.manager getCategoryTracksCount:self.categoryId];
 }
 
+- (NSInteger)areaCount
+{
+  return [self.manager getCategoryAreasCount:self.categoryId];
+}
+
 - (BOOL)isVisible
 {
   return [self.manager isCategoryVisible:self.categoryId];
@@ -84,21 +89,6 @@
 - (NSArray<MWMTrack *> *)tracks
 {
   return [self.manager tracksForGroup:self.categoryId];
-}
-
-- (NSArray<MWMBookmarkGroup *> *)collections
-{
-  return [self.manager collectionsForGroup:self.categoryId];
-}
-
-- (NSArray<MWMBookmarkGroup *> *)categories
-{
-  return [self.manager categoriesForGroup:self.categoryId];
-}
-
-- (MWMBookmarkGroupType)type
-{
-  return [self.manager getCategoryGroupType:self.categoryId];
 }
 
 - (BOOL)isHtmlDescription

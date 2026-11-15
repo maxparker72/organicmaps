@@ -27,25 +27,35 @@ struct CountryDef
            m_rect.IsPointInside({pt.x - 360.0, pt.y});
   }
 
-  /// Rect overlap (contains or intersects) accounting for wrapped coordinates.
-  /// Always checks +-360 so that extended query rects (from wrapped viewports)
-  /// match canonical country rects, and vice versa.
-  bool IsRectOverlap(m2::RectD const & r) const
+  /// @param[in] testRect is wrapped.
+  /// @param[in] countryRect Country bound rect, non-wrapped, can cross antimeridian (CountryDef::m_rect).
+  /// @return If testRect intersects countryRect or countryRect is inside testRect.
+  enum class Overlap
   {
-    if (r.IsRectInside(m_rect) || r.IsIntersect(m_rect))
-      return true;
-    m2::RectD const east(r.minX() + 360.0, r.minY(), r.maxX() + 360.0, r.maxY());
-    if (east.IsRectInside(m_rect) || east.IsIntersect(m_rect))
-      return true;
-    m2::RectD const west(r.minX() - 360.0, r.minY(), r.maxX() - 360.0, r.maxY());
-    return west.IsRectInside(m_rect) || west.IsIntersect(m_rect);
-  }
+    NONE,
+    INTERSECT,
+    INSIDE
+  };
+  static Overlap IsIntersectOrInside(m2::RectD const & testRect, m2::RectD const & countryRect);
+
+  bool IsRectOverlap(m2::RectD const & r) const { return IsIntersectOrInside(r, m_rect) != Overlap::NONE; }
 
   static m2::RectD SaveBoundRect() { return m2::RectD(-360, -180, 360, 180); }
 
   CountryId m_countryId;
   m2::RectD m_rect;
 };
+
+inline std::string DebugPrint(CountryDef::Overlap o)
+{
+  switch (o)
+  {
+  case CountryDef::Overlap::NONE: return "NONE";
+  case CountryDef::Overlap::INTERSECT: return "INTERSECT";
+  case CountryDef::Overlap::INSIDE: return "INSIDE";
+  }
+  UNREACHABLE();
+}
 
 struct CountryInfo
 {

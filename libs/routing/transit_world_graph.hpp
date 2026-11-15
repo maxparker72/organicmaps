@@ -43,14 +43,13 @@ public:
 
   bool CheckLength(RouteWeight const & weight, double startToFinishDistanceM) const override
   {
+    // Limit walking cost and boarding bias. Physical rides and mean boarding waits are excluded.
     return weight.GetWeight() - weight.GetTransitTime() <= MaxPedestrianTimeSec(startToFinishDistanceM);
   }
   LatLonWithAltitude const & GetJunction(Segment const & segment, bool front) override;
   ms::LatLon const & GetPoint(Segment const & segment, bool front) override;
   // All transit features are oneway.
   bool IsOneWay(NumMwmId mwmId, uint32_t featureId) override;
-  // All transit features are allowed for through passage.
-  bool IsPassThroughAllowed(NumMwmId mwmId, uint32_t featureId) override;
   void ClearCachedGraphs() override;
   void SetMode(WorldGraphMode mode) override { m_mode = mode; }
   WorldGraphMode GetMode() const override { return m_mode; }
@@ -67,6 +66,10 @@ public:
   std::unique_ptr<TransitInfo> GetTransitInfo(Segment const & segment) override;
 
   IndexGraph & GetIndexGraph(NumMwmId numMwmId) override { return m_indexLoader->GetIndexGraph(numMwmId); }
+
+  // Gate pedestrian-access points within |radiusM| of |point| in |mwmId|, for connecting a route
+  // checkpoint straight to transit boarding. |isEnter| picks entrance (start) vs exit (finish).
+  void GetGatesNear(NumMwmId mwmId, m2::PointD const & point, double radiusM, bool isEnter, GateAccessesT & out);
 
 private:
   // WorldGraph overrides:

@@ -7,6 +7,8 @@
 
 #include "drape/pointers.hpp"
 
+#include "base/cancellable.hpp"
+
 namespace dp
 {
 class TextureManager;
@@ -23,7 +25,7 @@ public:
   EngineContext(TileKey tileKey, ref_ptr<ThreadsCommutator> commutator, ref_ptr<dp::TextureManager> texMng,
                 ref_ptr<MetalineManager> metalineMng, CustomFeaturesContextWeakPtr customFeaturesContext,
                 bool is3dBuildingsEnabled, bool isTrafficEnabled, bool isolinesEnabled, int8_t mapLangIndex,
-                dp::BackgroundMode backgroundMode);
+                dp::BackgroundMode backgroundMode, float areaOpacity);
 
   TileKey const & GetTileKey() const { return m_tileKey; }
   bool Is3dBuildingsEnabled() const { return m_3dBuildingsEnabled; }
@@ -31,9 +33,15 @@ public:
   bool IsolinesEnabled() const { return m_isolinesEnabled; }
   int8_t GetMapLangIndex() const { return m_mapLangIndex; }
   dp::BackgroundMode GetBackgroundMode() const { return m_backgroundMode; }
+  // Area-fill opacity used in Satellite mode (0..1). Only consulted when GetBackgroundMode() == Satellite.
+  float GetAreaOpacity() const { return m_areaOpacity; }
   CustomFeaturesContextWeakPtr GetCustomFeaturesContext() const { return m_customFeaturesContext; }
   ref_ptr<dp::TextureManager> GetTextureManager() const;
   ref_ptr<MetalineManager> GetMetalineManager() const;
+
+  void Cancel() { m_readCancelled.Cancel(); }
+  bool IsCancelled() const { return m_readCancelled.IsCancelled(); }
+  base::SharedCancellable const & GetCancellable() const { return m_readCancelled; }
 
   void BeginReadTile();
   void Flush(TMapShapes && shapes);
@@ -42,9 +50,13 @@ public:
   void EndReadTile();
 
 private:
+  void FlushGeometry();
   void PostMessage(drape_ptr<Message> && message);
 
   TileKey m_tileKey;
+  // Queued shapes outlive the read, including when the same tile is requested again.
+  base::SharedCancellable m_readCancelled;
+  TMapShapes m_geometry;
   ref_ptr<ThreadsCommutator> m_commutator;
   ref_ptr<dp::TextureManager> m_texMng;
   ref_ptr<MetalineManager> m_metalineMng;
@@ -54,5 +66,6 @@ private:
   bool m_isolinesEnabled;
   int8_t m_mapLangIndex;
   dp::BackgroundMode m_backgroundMode;
+  float m_areaOpacity;
 };
 }  // namespace df

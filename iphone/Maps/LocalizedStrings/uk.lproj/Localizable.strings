@@ -16,7 +16,7 @@
 /* Choose measurement on first launch alert - choose metric system button */
 "kilometres" = "Кілометри";
 
-/* Choose measurement on first launch alert - choose imperial system button */
+/* Imperial measurement option: 1 mile = 1609.344 m; Swedish/Norwegian "mil" = 10 km */
 "miles" = "Милі";
 
 /* Update maps later button text */
@@ -115,7 +115,7 @@
 /* Search category sight seeings and touristic attractions; any changes should be duplicated in categories.txt @category_tourism! */
 "category_tourism" = "Пам’ятні місця";
 
-/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! */
+/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! Also a bookmarks list group header when sorting by type. */
 "category_entertainment" = "Розваги";
 
 /* Search category for ATMs; any changes should be duplicated in categories.txt @category_atm! */
@@ -148,7 +148,7 @@
 /* Search category for recycling; any changes should be duplicated in categories.txt @category_recycling! */
 "category_recycling" = "Переробка відходів";
 
-/* Search category for water; any changes should be duplicated in categories.txt @category_water! also used to sort bookmarks by type */
+/* Search category for water; any changes should be duplicated in categories.txt @category_water! Also a bookmarks list group header when sorting by type. */
 "category_water" = "Вода";
 
 /* Search category for RV facilities; any changes should be duplicated in categories.txt @category_rv! */
@@ -174,11 +174,23 @@
 /* Warning message when doing search around current position */
 "unknown_current_position" = "Ваше місце розташування не визначено";
 
-/* Subject for emailed bookmark */
-"bookmark_share_email_subject" = "Поглянь на мою мітку на мапі Organic Maps!";
+/* Text shown before a shared "my position" link, and the email subject when sharing the current location. */
+"share_my_position" = "Я тут на мапі Organic Maps";
 
-/* Subject for emailed position */
-"my_position_share_email_subject" = "Поглянь на моє поточне розташування на мапі Organic Maps!";
+/* Email subject when sharing a place. %1$@ is the place name or address. */
+"share_place_subject" = "%1$@ в Organic Maps";
+
+/* Email subject when sharing a place that has no name or address. */
+"share_place_subject_default" = "Місце в Organic Maps";
+
+/* Shared email link text; opens the shared place in Organic Maps or in a web browser. */
+"share_open_in_om_or_browser" = "Відкрити в Organic Maps або браузері";
+
+/* Shared email link text; leads to the Organic Maps download page. */
+"share_get_om" = "Завантажити Organic Maps";
+
+/* Title for the "Open in Another App" button on the PlacePage; also shared email link text: opens the shared place in another (geo:) maps app. */
+"open_in_app" = "Відкрити в іншому застосунку";
 
 /* Share by email button text, also used in editor and About. */
 "email" = "Ел. пошта";
@@ -195,6 +207,7 @@
 /* Length of track in cell that describes route */
 "length" = "Довжина";
 "share_my_location" = "Поділитися моїм місцезнаходженням";
+"prefs_group_network" = "Мережа";
 "prefs_group_route" = "Навігація";
 
 /* Setting name which enables or disables zoom buttons on the map screen. */
@@ -218,6 +231,24 @@
 /* A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled */
 "pref_map_3d_buildings_disabled_summary" = "3D будівлі вимкнені в режимі енергозбереження";
 
+/* Settings: title of the satellite imagery (custom raster tiles) screen */
+"pref_bg_tiles_title" = "Супутникові знімки";
+
+/* Settings «Satellite Imagery»: title of the tile server URL input field */
+"pref_bg_tiles_url_title" = "URL сервера";
+
+/* Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) */
+"pref_bg_tiles_url_error" = "Введіть коректний URL з {z}/{x}/{y}";
+
+/* Settings «Satellite Imagery»: title of the on-disk tile cache size limit (in megabytes) */
+"pref_bg_tiles_size_title" = "Розмір кешу (МБ)";
+
+/* Settings «Satellite Imagery»: opacity of vector area objects drawn over the imagery (0% hides them) */
+"pref_bg_tiles_opacity_title" = "Непрозорість об'єктів";
+
+/* Settings «Satellite Imagery»: legal note that the user is responsible for the custom tile source they configure */
+"pref_bg_tiles_disclaimer" = "Ви самі додаєте джерела супутникових знімків (тайлів). Використовуйте лише ті сервіси, до яких у вас є доступ. Ви несете відповідальність за дотримання авторських прав, умов ліцензії, використання ключів API, квот та обмежень.";
+
 /* Settings «Route» category: «Tts enabled» title */
 "pref_tts_enable_title" = "Голосові інструкції";
 
@@ -233,8 +264,14 @@
 /* Settings «Navigation» category: «Voice language» footer */
 "pref_tts_download_voices_description" = "Щоб завантажити голос вищої якості, відкрийте програму Параметри та перейдіть у Доступність → VoiceOver → Мовлення → Голос.";
 
-/* Settings «Route» category: «Test Voice Directions» title */
-"pref_tts_test_voice_title" = "Тестування голосових підказок (TTS, Text-To-Speech)";
+/* Header above Apple's group of novelty text-to-speech voices (Bells, Bubbles, Zarvox...), shown after the regional voice sections and Eloquence group. Use Apple's term for this group from Settings > Accessibility > VoiceOver > Speech. */
+"pref_tts_voice_group_novelty" = "Novelty";
+
+/* Accessibility label of the button that plays a sample of a text-to-speech voice. */
+"pref_tts_voice_preview_play" = "Play sample";
+
+/* Accessibility label of the button that stops the sample of a text-to-speech voice being played. */
+"pref_tts_voice_preview_stop" = "Stop sample";
 "pref_map_auto_zoom" = "Автозум";
 "placepage_distance" = "Відстань";
 "search_show_on_map" = "Подивитись на мапі";
@@ -355,9 +392,6 @@
 /* blue gray color */
 "blue_gray" = "Сіро-блакитний";
 
-/* place preview title */
-"info" = "Інфо";
-
 /* Prints version number in About dialog */
 "version" = "Версія Organic Maps: %@";
 
@@ -369,9 +403,6 @@
 
 /* Settings "Appearance" category: "Dark" title, should be consistent with the pref_appearance_title translation. */
 "pref_appearance_dark" = "Темний";
-
-/* Title for "Other" section in TTS settings. */
-"pref_tts_other_section_title" = "Інша";
 
 /* Tex label above the Donate button */
 "donate_description" = "Подаруйте мільйонам користувачів безкоштовні мапи без реклами!";
@@ -390,9 +421,6 @@
 
 /* Alert title */
 "email_error_title" = "Помилка при відправленні листа";
-
-/* Settings item title */
-"pref_calibration_title" = "Калібрування компаса";
 
 /* Downloaded maps category */
 "downloader_available_maps" = "Доступні";
@@ -491,6 +519,8 @@
 "twentyfour_seven" = "Цілодобово";
 "day_off_today" = "Сьогодні не працює";
 "day_off" = "Зачинено";
+"midnight" = "Північ";
+"noon" = "Полудень";
 "today" = "Сьогодні";
 "opens_in" = "Відкривається через %@";
 "closes_in" = "Зачиняється через %@";
@@ -568,15 +598,22 @@
 
 /* abbreviation for kilometers per hour */
 "kilometers_per_hour" = "км/год";
+
+/* Short label for miles per hour (1 mile = 1609.344 m), placed after a number; e.g. mph or mi/h */
 "miles_per_hour" = "ми/год";
+
+/* Short label for hours (time unit), placed after a number */
 "hour" = "год";
+
+/* Short label for minutes (time unit), placed after a number */
 "minute" = "хв";
+
+/* Short label for days (time unit), placed after a number */
 "day" = "д";
+
+/* Short label for seconds (time unit), placed after a number */
 "second" = "с";
 "placepage_more_button" = "Ще";
-
-/* A disable button text in the explanation dialog that opens hotel details page on Kayak website. */
-"placepage_edit_bookmark_button" = "Редагувати мітку";
 "placepage_personal_notes_hint" = "Примітка (текст чи html)";
 "editor_comment_hint" = "Коментар…";
 "editor_reset_edits_message" = "Скинути всі локальні виправлення?";
@@ -621,11 +658,13 @@
 "traffic_data_unavailable" = "Дані про трафік недоступні";
 "enable_logging" = "Включити логіювання";
 "transliteration_title" = "Транслітерувати латиницею";
-"planning_route_manage_route" = "Редагування маршруту";
-"button_plan" = "Маршрут";
 "placepage_remove_stop" = "Видалити зупинку";
+
+/* Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. */
+"route_add_destination" = "Додати пункт призначення";
+
+/* Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. */
 "placepage_add_stop" = "Додати зупинку";
-"saved" = "Збережено";
 "error_enter_correct_name" = "Будь ласка, введіть коректне ім'я";
 "bookmark_lists" = "Списки";
 
@@ -643,6 +682,9 @@
 "bookmarks_error_title_list_name_already_taken" = "Це ім'я вже зайнято";
 "profile" = "Профіль OpenStreetMap";
 "restore" = "Відновити";
+
+/* Settings privacy group in settings screen */
+"privacy" = "Приватність";
 "privacy_policy" = "Політика конфіденційності";
 "terms_of_use" = "Умови використання";
 
@@ -651,6 +693,11 @@
 
 /* Cycling routes layer name in the Styles and Layers dialog */
 "button_layer_cycling" = "Велоспорт";
+
+/* Map layers menu: toggle button for the satellite imagery layer */
+"button_layer_satellite" = "Супутник";
+
+/* Subway map layer button; also the spoken name of the subway (metro, underground) transport type, read by screen readers before a line number on transit line badges. */
 "button_layer_subway" = "Метрополітен";
 "layers_title" = "Стилі та шари мапи";
 
@@ -681,7 +728,7 @@
 /* Speed camera settings menu option - Never warn (about speedcams) */
 "pref_tts_speedcams_never" = "Ніколи не попереджати";
 "power_managment_title" = "Режим енергозбереження";
-"power_managment_description" = "Спроба зменшити енергоспоживання коштом деяких функцій.";
+"power_managment_description" = "Зменшити споживання енергії за рахунок обмеження деяких функцій.";
 "power_managment_setting_never" = "Ніколи";
 "power_managment_setting_auto" = "Автоматично";
 "power_managment_setting_manual_max" = "Максимальне енергозбереження";
@@ -691,8 +738,26 @@
 "bookmarks_text_placement_description" = "Якщо міток забагато, відображення їхніх назв на мапі може уповільнити роботу програми.";
 "show_to_the_right" = "Показати праворуч";
 "show_at_the_bottom" = "Показати внизу";
-"enable_logging_warning_message" = "Дана опція вмикається для логування дій з метою діагностики. Це допомагає команді виявити проблеми з додатком. Тимчасово включайте цю настройку тільки для відправки детальної інформації про знайдену вами проблему в додатку через кнопку \"Сповістити про помилку\".";
+"enable_logging_warning_message" = "Тимчасово увімкніть цю опцію, щоб записати й вручну надіслати нам детальні діагностичні дані про проблему через пункт «Повідомити про помилку» в розділі «Довідка». Журнали можуть містити інформацію про розташування.";
+
+/* Driving profile in routing options settings. */
+"routing_options_driving" = "Автомобілем";
+
+/* Cycling profile in routing options settings. */
+"routing_options_cycling" = "Велосипедом";
+
+/* Walking profile in routing options settings; also the label of a walking leg in transit route details. */
+"routing_options_walking" = "Пішки";
+
+/* Section heading for routing settings shared by every routing mode. */
+"routing_options_all_modes" = "Для всіх способів пересування";
 "driving_options_title" = "Налаштування об’їзду";
+
+/* Routing setting that automatically reorders intermediate stops */
+"route_optimization" = "Оптимізація маршруту";
+
+/* Explains that route optimization automatically reorders intermediate stops */
+"route_optimization_description" = "Автоматично змінює порядок проміжних зупинок для побудови ефективнішого маршруту.";
 
 /* Recommended length for CarPlay and Android Auto is around 25-27 characters */
 "avoid_tolls" = "Уникати платних доріг";
@@ -705,11 +770,18 @@
 "avoid_motorways" = "Уникати автострад";
 "unable_to_calc_alert_title" = "Неможливо побудувати маршрут";
 "unable_to_calc_alert_subtitle" = "Не вдалося знайти маршрут. Це може бути пов'язано з вашими параметрами прокладання маршруту або неповними даними OpenStreetMap. Змініть параметри і спробуйте ще раз.";
-"define_to_avoid_btn" = "Налаштувати шляхи об’їзду";
-"change_driving_options_btn" = "Увімкнено налаштування об’їзду";
 "toll_road" = "Платна дорога";
 "unpaved_road" = "Ґрунтова дорога";
 "ferry_crossing" = "Поромна переправа";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_steps" = "Сходи";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_gate" = "Ворота";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_lift_gate" = "Шлагбаум";
 
 /* A generic "Yes" button in dialogs */
 "yes" = "Так";
@@ -743,9 +815,6 @@
 /* Failed planning route message in navigation view */
 "routing_planning_error" = "Збій планування маршруту";
 
-/* Arrive routing message in navigation view */
-"routing_arrive" = "Прибуття в %@";
-
 /* Text for routing::RouterResultCode::FileTooOld dialog. */
 "dialog_routing_download_and_update_maps" = "Щоб прокласти маршрут, завантажте або оновіть усі потрібні мапи.";
 "editor_done_dialog_1" = "Ви змінили мапу світу на краще! Поділіться цим із друзями та редагуйте разом.";
@@ -756,7 +825,7 @@
 "opens_tomorrow_at" = "Відкриття завтра о %@";
 "opens_dayoftheweek_at" = "Відчиняється в %1$@ о %2$@";
 "opens_at" = "Відкриття о %@";
-"closes_at" = "Закривається о %@";
+"closes_at" = "Зачиняється о %@";
 "add_opening_hours" = "Додати графік роботи";
 "password_8_chars_min" = "Пароль (мінімум 8 символів)";
 "invalid_username_or_password" = "Невірне ім'я користувача або пароль.";
@@ -770,7 +839,6 @@
 "please_note" = "Будь ласка, зверніть увагу";
 "migration_download_error_dialog" = "Помилка завантаження";
 "editor_add_select_category" = "Оберіть категорію";
-"editor_add_select_category_popular_subtitle" = "Популярні";
 "editor_add_select_category_all_subtitle" = "Усі категорії";
 "whatsnew_editor_message_1" = "Додавайте нові місця на мапу та редагуйте існуючі просто в застосунку.";
 "dialog_incorrect_feature_position" = "Змініть розташування";
@@ -792,7 +860,6 @@
 "location_services_disabled_on_device_3" = "3. Виберіть Служби визначення місцезнаходження";
 "location_services_disabled_on_device_4" = "4. Увімкніть служби визначення місцезнаходження";
 "location_services_disabled_on_device_additional_message" = "Або продовжуйте використовувати Organic Maps без відстеження місцезнаходження";
-"book_button" = "Забронювати";
 "placepage_call_button" = "Виклик";
 "placepage_bookmark_name_hint" = "Назва мітки";
 "placepage_delete_bookmark_button" = "Видалити мітку";
@@ -803,18 +870,13 @@
 /* iOS dialog for the case when recent track recording is on and the app comes back from background */
 "recent_track_background_dialog_title" = "Вимкнути запис нещодавно пройденого шляху?";
 "off_recent_track_background_button" = "Вимкнути";
-
-/* For sharing via SMS and so on */
-"sharing_call_action_look" = "Подивись,";
 "recent_track_background_dialog_message" = "Organic Maps використовує вашу геопозицію у фоновому режимі для запису нещодавно пройденого шляху.";
 "general_settings" = "Загальні налаштування";
 
 /* "traffic" as in road congestion */
 "traffic_update_app_message" = "Оновіть застосунок, щоб бачити дані про трафік.";
 "log_file_size" = "Розмір файлу журналу: %@";
-"planning_route_remove_title" = "Перетягніть сюди, щоб видалити";
 "placepage_replace_stop" = "Замінити зупинку";
-"start_from_my_position" = "Почати з";
 
 /* For iOS message 'alert_reauth_message' should be splitted in two parts: message + link. Here's first part */
 "alert_reauth_message_ios" = "Будь ласка, увійдіть до акаунта OpenStreetMap.org, щоб автоматично публікувати зміни на мапі. Подробиці за";
@@ -834,15 +896,8 @@
 "popular_place" = "Популярні";
 "hide_from_map" = "Приховати на мапі";
 "tags_loading_error_subtitle" = "Під час завантаження теґів сталася помилка, будь ласка, спробуйте ще раз";
-
-/* Position of the name label on the map relative to the bookmark pin (on the right) */
-"right" = "Праворуч";
-
-/* Position of the name label on the map relative to the bookmark pin (at the bottom) */
-"bottom" = "Вниз";
 "trip_start" = "Поїхали";
 "pick_destination" = "Ціль";
-"follow_my_position" = "Відцентрувати";
 "search_results" = "Результати пошуку";
 "then_turn" = "Далі";
 "redirect_route_alert" = "Бажаєте перебудувати маршрут?";
@@ -888,21 +943,34 @@
 "medicine" = "Медицина";
 "search_in_the_list" = "Пошук у списку";
 "religious_places" = "Святі місця";
+
+/* Button that starts multi-selection in a bookmark list. */
+"select" = "Вибрати";
+
+/* Action that selects every bookmark and track in a bookmark list. */
+"select_all" = "Вибрати все";
+
+/* Action that clears the multi-selection in a bookmark list. */
+"deselect_all" = "Скасувати вибір";
 "transit_not_found" = "Навігація на метро ще недоступна в цьому регіоні";
 "dialog_pedestrian_route_is_long_header" = "Жодного маршруту метро не знайдено";
 "dialog_pedestrian_route_is_long_message" = "Виберіть початкову чи кінцеву точку маршруту ближче до станції метро";
-"button_layer_isolines" = "Висоти";
-"isolines_activation_error_dialog" = "Щоб скористатися лініями висот, оновіть чи завантажте мапу потрібної місцевості";
-"isolines_location_error_dialog" = "Лінії висот ще недоступні в цьому регіоні";
+
+/* Layers menu: label of the 3D terrain layer button */
+"button_layer_terrain" = "3D-рельєф";
+"isolines_location_error_dialog" = "Оновіть цей регіон, щоб побачити лінії висот";
 "elevation_profile_ascent" = "Підйом";
 "elevation_profile_descent" = "Спуск";
 "elevation_profile_min_elevation" = "Мін. висота";
 "elevation_profile_max_elevation" = "Макс. висота";
+
+/* Displayed in the elevation profile chart while track recording has fewer than two points. */
+"elevation_profile_placeholder" = "Почніть рухатися, щоб побачити профіль висоти";
 "isolines_toast_zooms_1_10" = "Збільште мапу, щоб побачити ізолінії";
 "downloader_loading_ios" = "Завантаження";
 
 /* Telegram group url for the "?" About page */
-"telegram_url" = "https://t.me/OrganicMapsApp";
+"telegram_url" = "https://t.me/OrganicMapsUA";
 
 /* Instagram account url for the "?" About page */
 "instagram_url" = "https://www.instagram.com/organicmaps.app";
@@ -962,11 +1030,14 @@
 "bookmarks_export" = "Експортувати всі мітки та треки";
 "drive_through" = "З віконцем для водіїв";
 
+/* Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_in" = "Збільшити";
+
+/* Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_out" = "Зменшити";
+
 /* Restaurant or other food place's menu URL field in the Editor */
 "website_menu" = "Посилання на меню";
-
-/* Title for the "Open in Another App" button on the PlacePage. */
-"open_in_app" = "Відкрити в іншому застосунку";
 
 /* To indicate if the place proposed self service… */
 "self_service" = "Самообслуговування";
@@ -982,11 +1053,6 @@
 
 /* Message for the toast when saving the track recording is finished but nothing to save. */
 "track_recording_toast_nothing_to_save" = "Трек порожній - нічого зберігати";
-"edit_track" = "Редагувати трек";
-"elevation_profile_diff_level" = "Рівень складності";
-"elevation_profile_diff_level_easy" = "Простий";
-"elevation_profile_diff_level_moderate" = "Помірний";
-"elevation_profile_diff_level_hard" = "Складний";
 "downloader_updating_ios" = "Оновлення";
 
 /* Autoupdate dialog on start */
@@ -1019,6 +1085,12 @@
 /* Text for the editing the Track's color button. */
 "change_color" = "Змінити колір";
 
+/* Text for the hiding track. */
+"hide_track" = "Приховати трек";
+
+/* Text for the showing track. */
+"show_track" = "Показати трек";
+
 /* Main screen title "Map" displayed in the navigation back button's menu. */
 "map" = "Мапа";
 
@@ -1037,7 +1109,7 @@
 /* Message for the "iCloud is Disabled" alert. */
 "icloud_disabled_message" = "Щоб скористатися цією функцією, увімкніть iCloud у налаштуваннях вашого пристрою.";
 
-/* Title for the "Enable iCloud Syncronization" alert's "Enable" action button. */
+/* Action button that enables a disabled feature, such as iCloud synchronization or location services. */
 "enable" = "Увімкнути";
 
 /* Title for the "Enable iCloud Syncronization" alert's "Backup" action button. */
@@ -1099,10 +1171,10 @@
 /* abbreviation for kilometers */
 "km" = "км";
 
-/* abbreviation for mile(s) */
+/* Short label for miles (length unit, 1 mi = 1609.344 m), placed after a number */
 "mi" = "ми";
 
-/* A unit of measure */
+/* Short label for feet (1 ft = 0.3048 m), after numbers; local abbreviations and uninflected unit names are allowed */
 "ft" = "фут";
 
 /* Toast text when the maps version should be updated to display the OSM hiking and cycling routes */
@@ -1134,3 +1206,30 @@
 
 /* Toast message shown when track colors are changed in category settings */
 "toast_tracks_color_changed" = "Колір треків змінено";
+
+/* Accessibility label of the icon-only button beside the search field, shown while choosing or replacing a route point; it opens a full-screen map picker with a crosshair */
+"choose_on_map" = "Вибрати на мапі";
+
+/* Search field hint and full-screen map point picker title shown while choosing the starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_start_location" = "Звідки";
+
+/* Search field hint and full-screen map point picker title shown while choosing the destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_destination" = "Куди";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_start_location" = "Змінити початок";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_destination" = "Змінити пункт призначення";
+
+/* Search field hint and full-screen map point picker title shown while replacing an already added intermediate stop of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_stop_along_route" = "Змінити зупинку";
+
+/* Toast shown when the user tries to add one more intermediate stop to a route that already holds the maximum allowed number */
+"routing_max_stops_reached" = "Досягнуто максимальної кількості зупинок";
+
+/* Hint under the title of the full-screen route point picker: a crosshair stays fixed in the centre of the screen while the user moves the map under it */
+"choose_point_on_map_hint" = "Переміщайте та масштабуйте мапу, щоб розмістити хрестик";
+
+/* Accessibility label for the button that reverses the complete planned route, including intermediate stops. */
+"reverse_route" = "Розвернути маршрут";

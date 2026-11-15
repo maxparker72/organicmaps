@@ -65,37 +65,37 @@ SpeedKMpH constexpr kSpeedOffroadKMpH = {0.5 /* weight */, 3.0 /* eta */};
 
 // Default, no bridleway and cycleway
 VehicleModel::LimitsInitList const kDefaultOptions = {
-    // {HighwayType, passThroughAllowed}
-    {HighwayType::HighwayTrunk, true},
-    {HighwayType::HighwayTrunkLink, true},
-    {HighwayType::HighwayPrimary, true},
-    {HighwayType::HighwayPrimaryLink, true},
-    {HighwayType::HighwaySecondary, true},
-    {HighwayType::HighwaySecondaryLink, true},
-    {HighwayType::HighwayTertiary, true},
-    {HighwayType::HighwayTertiaryLink, true},
-    {HighwayType::HighwayService, true},
-    {HighwayType::HighwayUnclassified, true},
-    {HighwayType::HighwayRoad, true},
-    {HighwayType::HighwayTrack, true},
-    {HighwayType::HighwayPath, true},
+    HighwayType::HighwayTrunk,
+    HighwayType::HighwayTrunkLink,
+    HighwayType::HighwayPrimary,
+    HighwayType::HighwayPrimaryLink,
+    HighwayType::HighwaySecondary,
+    HighwayType::HighwaySecondaryLink,
+    HighwayType::HighwayTertiary,
+    HighwayType::HighwayTertiaryLink,
+    HighwayType::HighwayService,
+    HighwayType::HighwayUnclassified,
+    HighwayType::HighwayRoad,
+    HighwayType::HighwayTrack,
+    HighwayType::HighwayPath,
     // HighwayBridleway, HighwayCycleway are missing
-    {HighwayType::HighwayResidential, true},
-    {HighwayType::HighwayLivingStreet, true},
-    {HighwayType::HighwayLadder, true},
-    {HighwayType::HighwaySteps, true},
-    {HighwayType::HighwayPedestrian, true},
-    {HighwayType::HighwayPlatform, true},
-    {HighwayType::HighwayFootway, true},
-    {HighwayType::ManMadePier, true},
-    {HighwayType::RouteFerry, true}};
+    HighwayType::HighwayResidential,
+    HighwayType::HighwayLivingStreet,
+    HighwayType::HighwayLadder,
+    HighwayType::HighwaySteps,
+    HighwayType::HighwayPedestrian,
+    HighwayType::HighwayPlatform,
+    HighwayType::HighwayFootway,
+    HighwayType::ManMadePier,
+    HighwayType::RouteFerry,
+};
 
 // Same as defaults except bridleway and cycleway are allowed.
 VehicleModel::LimitsInitList AllAllowed()
 {
   auto res = kDefaultOptions;
-  res.push_back({HighwayType::HighwayBridleway, true});
-  res.push_back({HighwayType::HighwayCycleway, true});
+  res.push_back(HighwayType::HighwayBridleway);
+  res.push_back(HighwayType::HighwayCycleway);
   return res;
 }
 
@@ -105,20 +105,20 @@ VehicleModel::LimitsInitList NoTrunk()
   VehicleModel::LimitsInitList res;
   res.reserve(kDefaultOptions.size() - 2);
   for (auto const & e : kDefaultOptions)
-    if (e.m_type != HighwayType::HighwayTrunk && e.m_type != HighwayType::HighwayTrunkLink)
+    if (e != HighwayType::HighwayTrunk && e != HighwayType::HighwayTrunkLink)
       res.push_back(e);
   return res;
 }
 
 VehicleModel::LimitsInitList YesCycleway(VehicleModel::LimitsInitList res = kDefaultOptions)
 {
-  res.push_back({HighwayType::HighwayCycleway, true});
+  res.push_back(HighwayType::HighwayCycleway);
   return res;
 }
 
 VehicleModel::LimitsInitList YesBridleway(VehicleModel::LimitsInitList res = kDefaultOptions)
 {
-  res.push_back({HighwayType::HighwayBridleway, true});
+  res.push_back(HighwayType::HighwayBridleway);
   return res;
 }
 
@@ -198,7 +198,7 @@ PedestrianModelFactory::PedestrianModelFactory(CountryParentNameGetterFn const &
   using namespace pedestrian_model;
   using std::make_shared;
 
-  // Names must be the same with country names from countries.txt
+  // Names must be the same with country names from countries.json
   m_models[""] = make_shared<PedestrianModel>(kDefaultOptions);
 
   m_models["Australia"] = make_shared<PedestrianModel>(AllAllowed());

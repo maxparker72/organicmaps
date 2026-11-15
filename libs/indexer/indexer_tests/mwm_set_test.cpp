@@ -37,17 +37,53 @@ void TestFilesPresence(MwmsInfo const & mwmsInfo, initializer_list<string> const
     TEST_EQUAL(1, mwmsInfo.count(countryFileName), (countryFileName));
 }
 
+UNIT_TEST(MwmSet_DeregisterClearsAllCachedValuesWhileLocked)
+{
+  class CountingMwmSet : public TestMwmSet
+  {
+  public:
+    mutable size_t m_createdValues = 0;
+
+  private:
+    std::unique_ptr<MwmValue> CreateValue(MwmInfo & info) const override
+    {
+      ++m_createdValues;
+      return TestMwmSet::CreateValue(info);
+    }
+  };
+
+  ScopedMwm file("0.mwm");
+  CountingMwmSet set;
+  auto const id = set.Register(LocalCountryFile::MakeForTesting("0")).first;
+  auto held = set.GetMwmHandleById(id);
+  {
+    auto spare1 = set.GetMwmHandleById(id);
+    auto spare2 = set.GetMwmHandleById(id);
+    TEST(spare1.IsAlive() && spare2.IsAlive(), ());
+  }
+  TEST_EQUAL(set.m_createdValues, 3, ());
+  TEST(!set.Deregister(CountryFile("0")), ());
+  TEST(held.IsAlive(), ());
+
+  // Both cached readers must be closed even though the held reader delays deregistration.
+  auto reopened1 = set.GetMwmHandleById(id);
+  auto reopened2 = set.GetMwmHandleById(id);
+  TEST(reopened1.IsAlive() && reopened2.IsAlive(), ());
+  TEST_EQUAL(set.m_createdValues, 5, ());
+}
+
 UNIT_TEST(MwmSetSmokeTest)
 {
-  TestMwmSet mwmSet;
-  MwmsInfo mwmsInfo;
-
   ScopedMwm mwm0("0.mwm");
   ScopedMwm mwm1("1.mwm");
   ScopedMwm mwm2("2.mwm");
   ScopedMwm mwm3("3.mwm");
   ScopedMwm mwm4("4.mwm");
   ScopedMwm mwm5("5.mwm");
+
+  // Destroyed before the files: Windows cannot delete maps that are still open.
+  TestMwmSet mwmSet;
+  MwmsInfo mwmsInfo;
 
   UNUSED_VALUE(mwmSet.Register(LocalCountryFile::MakeForTesting("0")));
   UNUSED_VALUE(mwmSet.Register(LocalCountryFile::MakeForTesting("1")));

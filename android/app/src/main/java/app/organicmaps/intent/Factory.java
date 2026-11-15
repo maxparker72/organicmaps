@@ -22,7 +22,6 @@ import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.search.SearchEngine;
 import app.organicmaps.sdk.util.StorageUtils;
 import app.organicmaps.sdk.util.concurrency.ThreadPool;
-import app.organicmaps.search.SearchActivity;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -31,9 +30,8 @@ public class Factory
 {
   public static boolean isStartedForApiResult(@NonNull Intent intent)
   {
-    // Previously, we relied on the implicit FORWARD_RESULT_FLAG to detect if the caller was
-    // waiting for a result. However, this approach proved to be less reliable than using
-    // the explicit EXTRA_PICK_POINT flag.
+    // FLAG_ACTIVITY_FORWARD_RESULT can be absent even when the caller awaits a result,
+    // so use the explicit pick-point marker.
     // https://github.com/organicmaps/organicmaps/pull/8910
     return intent.getBooleanExtra(EXTRA_PICK_POINT, false);
   }
@@ -43,24 +41,34 @@ public class Factory
     @Override
     public boolean process(@NonNull Intent intent, @NonNull MwmActivity activity)
     {
-      // See KML/KMZ/KMB intent filters in manifest.
       final List<Uri> uris;
       if (Intent.ACTION_VIEW.equals(intent.getAction()))
         uris = Collections.singletonList(intent.getData());
       else if (Intent.ACTION_SEND.equals(intent.getAction()))
         uris = Collections.singletonList(IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri.class));
       else if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction()))
-        uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+        uris = IntentCompat.getParcelableArrayListExtra(intent, Intent.EXTRA_STREAM, Uri.class);
       else
-        uris = null;
-      if (uris == null)
         return false;
+      if (uris == null || uris.isEmpty())
+        return false;
+
+      // Other deep links reach this fallback, and filters do not constrain shared streams or explicit intents.
+      // IntentCompat does not check list element types on Android 13 and earlier.
+      for (Object stream : uris)
+      {
+        if (!(stream instanceof Uri uri))
+          return false;
+        final String scheme = uri.getScheme();
+        if (!ContentResolver.SCHEME_CONTENT.equals(scheme) && !ContentResolver.SCHEME_FILE.equals(scheme))
+          return false;
+      }
 
       MwmApplication app = MwmApplication.from(activity);
       final File tempDir = new File(StorageUtils.getTempPath(app));
       final ContentResolver resolver = activity.getContentResolver();
       ThreadPool.getStorage().execute(() -> BookmarkManager.INSTANCE.importBookmarksFiles(resolver, uris, tempDir));
-      return false;
+      return true;
     }
   }
 
@@ -81,18 +89,19 @@ public class Factory
 
       case RequestType.MAP:
         SearchEngine.INSTANCE.cancelInteractiveSearch();
+        target.forceCloseSearchFragment();
         Map.executeMapApiRequest();
         return true;
 
       case RequestType.ROUTE:
         SearchEngine.INSTANCE.cancelInteractiveSearch();
+        target.forceCloseSearchFragment();
         final ParsedRoutingData data = Framework.nativeGetParsedRoutingData();
-        RoutingController.get().setRouterType(data.mRouterType);
         final RoutePoint from = data.mPoints[0];
         final RoutePoint to = data.mPoints[1];
         RoutingController.get().prepare(
             MapObject.createMapObject(MapObject.API_POINT, from.mName, "", from.mLat, from.mLon),
-            MapObject.createMapObject(MapObject.API_POINT, to.mName, "", to.mLat, to.mLon));
+            MapObject.createMapObject(MapObject.API_POINT, to.mName, "", to.mLat, to.mLon), data.mRouterType);
         return true;
       case RequestType.SEARCH:
       {
@@ -104,16 +113,17 @@ public class Factory
           Framework.nativeStopLocationFollow();
           Framework.nativeSetViewportCenter(latlon[0], latlon[1], SEARCH_IN_VIEWPORT_ZOOM);
           // We need to update viewport for search api manually because of drape engine
-          // will not notify subscribers when search activity is shown.
+          // will not notify subscribers when search is shown.
           if (!request.mIsSearchOnMap)
             Framework.nativeSetSearchViewport(latlon[0], latlon[1], SEARCH_IN_VIEWPORT_ZOOM);
         }
-        SearchActivity.start(target, request.mQuery, request.mLocale, request.mIsSearchOnMap);
+        target.showSearch(request.mQuery, request.mLocale, request.mIsSearchOnMap);
         return true;
       }
       case RequestType.CROSSHAIR:
       {
         SearchEngine.INSTANCE.cancelInteractiveSearch();
+        target.forceCloseSearchFragment();
         target.showPositionChooserForAPI(Framework.nativeGetParsedAppName());
 
         final double[] latlon = Framework.nativeGetParsedCenterLatLon();
@@ -128,6 +138,7 @@ public class Factory
       case RequestType.OAUTH2:
       {
         SearchEngine.INSTANCE.cancelInteractiveSearch();
+        target.forceCloseSearchFragment();
 
         final String oauth2code = Framework.nativeGetParsedOAuth2Code();
         OsmLoginActivity.OAuth2Callback(target, oauth2code);
@@ -149,8 +160,7 @@ public class Factory
     @Override
     public boolean process(@NonNull Intent intent, @NonNull MwmActivity activity)
     {
-      return handleIntent(intent,
-                          (query, searchOnMap) -> { SearchActivity.start(activity, query, null, searchOnMap); });
+      return handleIntent(intent, (query, searchOnMap) -> activity.showSearch(query, null, searchOnMap));
     }
   }
 }

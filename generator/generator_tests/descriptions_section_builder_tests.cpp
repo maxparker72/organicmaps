@@ -12,6 +12,7 @@
 #include "coding/files_container.hpp"
 
 #include "base/assert.hpp"
+#include "base/checked_cast.hpp"
 #include "base/file_name_utils.hpp"
 #include "base/stl_helpers.hpp"
 
@@ -78,19 +79,13 @@ public:
 
   void MakePath() const
   {
-    std::string trueAnswer = "/wikiDir/en.wikipedia.org/wiki/Helsinki_Olympic_Stadium";
-    {
-      std::string const wikiDir = "/wikiDir/";
-      std::string const wikiUrl = "http://en.wikipedia.org/wiki/Helsinki_Olympic_Stadium/";
-      auto const answer = DescriptionsCollector::MakePathForWikipedia(wikiDir, wikiUrl);
-      TEST_EQUAL(trueAnswer, answer, ());
-    }
-    {
-      std::string const wikiDir = "/wikiDir";
-      std::string const wikiUrl = "https://en.wikipedia.org/wiki/Helsinki_Olympic_Stadium";
-      auto const answer = DescriptionsCollector::MakePathForWikipedia(wikiDir, wikiUrl);
-      TEST_EQUAL(trueAnswer, answer, ());
-    }
+    // Only the scheme and trailing slash stripping is under test; the directory is joined with the
+    // native separator.
+    std::string const page = "en.wikipedia.org/wiki/Helsinki_Olympic_Stadium";
+    TEST_EQUAL(DescriptionsCollector::MakePathForWikipedia("/wikiDir/", "http://" + page + "/"),
+               base::JoinPath("/wikiDir/", page), ());
+    TEST_EQUAL(DescriptionsCollector::MakePathForWikipedia("/wikiDir", "https://" + page),
+               base::JoinPath("/wikiDir", page), ());
   }
 
   void FindPageAndFill() const
@@ -230,8 +225,9 @@ private:
 
   static int SumPageSizes(std::vector<PageT> const & p)
   {
-    return std::accumulate(std::begin(p), std::end(p), 0,
-                           [](int acc, PageT const & p) { return acc + p.second.size(); });
+    auto const size = std::accumulate(std::begin(p), std::end(p), size_t{0},
+                                      [](size_t acc, PageT const & p) { return acc + p.second.size(); });
+    return base::checked_cast<int>(size);
   }
 
   static bool CheckLangs(DescriptionsCollectionBuilderStat::LangStatistics const & stat)

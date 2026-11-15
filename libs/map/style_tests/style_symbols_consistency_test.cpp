@@ -3,7 +3,6 @@
 #include "map/style_tests/helpers.hpp"
 
 #include "indexer/drawing_rules.hpp"
-#include "indexer/drules_include.hpp"
 #include "indexer/map_style_reader.hpp"
 
 #include "base/logging.hpp"
@@ -20,10 +19,10 @@ namespace style_symbols_consistency_tests
 {
 typedef std::set<std::string> StringSet;
 
-class SdfParsingDispatcher
+class SymbolsXmlParsingDispatcher
 {
 public:
-  explicit SdfParsingDispatcher(StringSet & symbols) : m_symbols(symbols) {}
+  explicit SymbolsXmlParsingDispatcher(StringSet & symbols) : m_symbols(symbols) {}
 
   bool Push(char const *) { return true; }
   void Pop(char const *) {}
@@ -43,9 +42,9 @@ StringSet GetSymbolsSetFromDrawingRule()
   StringSet symbols;
   drule::GetCurrentRules().ForEachRule([&symbols](drule::BaseRule const * rule)
   {
-    SymbolRuleProto const * symbol = rule->GetSymbol();
-    if (symbol && !symbol->name().empty())
-      symbols.insert(symbol->name());
+    drule::SymbolRule const * symbol = rule->GetSymbol();
+    if (symbol && !symbol->name.empty())
+      symbols.insert(symbol->name);
   });
   return symbols;
 }
@@ -53,8 +52,8 @@ StringSet GetSymbolsSetFromDrawingRule()
 StringSet GetSymbolsSetFromResourcesFile(std::string_view density)
 {
   StringSet symbols;
-  SdfParsingDispatcher dispatcher(symbols);
-  ReaderPtr<Reader> reader = GetStyleReader().GetResourceReader("symbols.sdf", density);
+  SymbolsXmlParsingDispatcher dispatcher(symbols);
+  ReaderPtr<Reader> reader = GetStyleReader().GetResourceReader("symbols.xml", density);
   ReaderSource<ReaderPtr<Reader>> source(reader);
   ParseXML(source, dispatcher);
   return symbols;
@@ -90,5 +89,38 @@ UNIT_TEST(Test_SymbolsConsistency)
   });
 
   TEST(res, ());
+}
+
+// The code requests named colors by name and a missing one aborts in Debug, so all styles must define the
+// same names. The merged style is skipped: it is a tools-only mix of the others.
+UNIT_TEST(Test_NamedColorsConsistency)
+{
+  // The vehicle styles draw no isolines (see terrain::IsolinesStyle).
+  StringSet const kIsolineColors = {"IsolineDepth", "IsolineDepthText"};
+
+  auto const getNames = [](MapStyle mapStyle)
+  {
+    StringSet names;
+    for (auto const & color : drule::DecodeRules(mapStyle).namedColors)
+      names.insert(color.name);
+    return names;
+  };
+
+  StringSet const expected = getNames(kDefaultMapStyle);
+  TEST(!expected.empty(), ());
+  for (size_t s = 0; s < MapStyleCount; ++s)
+  {
+    MapStyle const mapStyle = static_cast<MapStyle>(s);
+    if (mapStyle == MapStyleMerged)
+      continue;
+
+    // Report just the differing names: every style defines about a hundred of them.
+    StringSet names = getNames(mapStyle);
+    if (mapStyle == MapStyleVehicleLight || mapStyle == MapStyleVehicleDark)
+      names.insert(kIsolineColors.begin(), kIsolineColors.end());
+    std::vector<std::string> diff;
+    std::set_symmetric_difference(names.begin(), names.end(), expected.begin(), expected.end(), back_inserter(diff));
+    TEST(diff.empty(), (mapStyle, "named colors differ:", diff));
+  }
 }
 }  // namespace style_symbols_consistency_tests

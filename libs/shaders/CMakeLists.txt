@@ -24,7 +24,11 @@ set(shader_files
     GL/dashed_line.vsh.glsl
     GL/debug_rect.fsh.glsl
     GL/debug_rect.vsh.glsl
+    GL/area_grid.fsh.glsl
+    GL/area_speckle.fsh.glsl
+    GL/area_stipple.fsh.glsl
     GL/hatching_area.fsh.glsl
+    GL/hatching_area_dash.fsh.glsl
     GL/hatching_area.vsh.glsl
     GL/imgui.fsh.glsl
     GL/imgui.vsh.glsl
@@ -57,6 +61,8 @@ set(shader_files
     GL/smaa_final.fsh.glsl
     GL/smaa_final.vsh.glsl
     GL/solid_color.fsh.glsl
+    GL/terrain_shade.fsh.glsl
+    GL/terrain_shade.vsh.glsl
     GL/text.fsh.glsl
     GL/text.vsh.glsl
     GL/text_billboard.vsh.glsl

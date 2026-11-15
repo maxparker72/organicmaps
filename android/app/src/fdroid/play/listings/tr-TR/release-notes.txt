@@ -1,9 +1,9 @@
-• Yükseklik grafiklerini görmek için yürüyüş ve bisiklet rotalarını seçin
-• Antimeridyende haritanın doğru sarılması (±180° boylam)
-• Bir kategorideki tüm yer imi ve iz renklerini aynı anda değiştirin
-• Ev numaraları için daha iyi arama, daha fazla ABD adresi kapsandı
-• OSM verileri 4 Nisan itibariyle
-• Ayarlar'da zamanlanmış görünüm modu
-• Diğer uygulamalarla yer imi/iz paylaşımı düzeltildi
-• Harita düzenlemelerinin OSM'ye yüklenmesi düzeltildi
-…daha fazlası omaps.org/tr/news adresinde
+• OSM verileri: 28 Eylül; Wikipedia verileri: 21 Eylül
+• Alternatif rotalar ve tahmini varış süreleri iyileştirildi
+• Yeni ayar, ara durak sırasını optimize eder
+• Yeni düğmeler, planlanan bir rotaya durak ekler veya mevcut durakları değiştirir
+• Seçilen alternatif rota, navigasyon sırasında seçili kalır
+• İz kaydı düzeltildi ve iyileştirildi
+• KMB dosyası içe aktarma sorunu düzeltildi
+• Kullanıcı arayüzü iyileştirmeleri ve düzeltmeler
+…daha fazla ayrıntı için omaps.org/tr/news

@@ -4,7 +4,6 @@
 #include "indexer/feature_decl.hpp"
 
 #include "coding/files_container.hpp"
-#include "coding/reader_wrapper.hpp"
 #include "coding/varint.hpp"
 
 #include "defines.hpp"
@@ -29,8 +28,7 @@ std::vector<MetalineData> ReadMetalinesFromFile(MwmSet::MwmId const & mwmId)
   try
   {
     FilesContainerR cont(mwmId.GetInfo()->GetLocalFile().GetPath(MapFileType::Map));
-    ModelReaderPtr reader = cont.GetReader(METALINES_FILE_TAG);
-    ReaderSrc src(reader.GetPtr());
+    ReaderSource src(cont.GetReader(METALINES_FILE_TAG));
 
     std::vector<MetalineData> model;
     auto const version = ReadPrimitiveFromSource<uint8_t>(src);
@@ -152,7 +150,15 @@ void ReadMetalineTask::Run()
     if (failed)
       continue;
 
-    auto mergedPoints = MergePoints(ReadPoints(m_model, metaline), metaline.m_features);
+    auto points = ReadPoints(m_model, metaline);
+    // Nothing is read if the mwm was deregistered (updated or deleted) in the meantime.
+    if (points.empty())
+    {
+      m_metalines.clear();
+      return;
+    }
+
+    auto mergedPoints = MergePoints(std::move(points), metaline.m_features);
     if (mergedPoints.size() < 2)
       continue;
 

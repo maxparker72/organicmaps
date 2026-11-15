@@ -5,6 +5,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
+import androidx.annotation.UiThread;
 import app.organicmaps.sdk.api.ParsedRoutingData;
 import app.organicmaps.sdk.api.ParsedSearchRequest;
 import app.organicmaps.sdk.api.RequestType;
@@ -16,12 +17,11 @@ import app.organicmaps.sdk.routing.RouteMarkData;
 import app.organicmaps.sdk.routing.RouteMarkType;
 import app.organicmaps.sdk.routing.RoutingInfo;
 import app.organicmaps.sdk.routing.RoutingListener;
-import app.organicmaps.sdk.routing.RoutingLoadPointsListener;
 import app.organicmaps.sdk.routing.RoutingProgressListener;
 import app.organicmaps.sdk.routing.RoutingRecommendationListener;
 import app.organicmaps.sdk.routing.TransitRouteInfo;
 import app.organicmaps.sdk.settings.SpeedCameraMode;
-import app.organicmaps.sdk.util.Constants;
+import app.organicmaps.sdk.widget.placepage.CoordinatesFormatEntry;
 import app.organicmaps.sdk.widget.placepage.RouteInfo;
 import dalvik.annotation.optimization.FastNative;
 import java.lang.annotation.Retention;
@@ -32,8 +32,10 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * This class wraps android::Framework.cpp class
- * via static methods
+ * Low-level JNI access to the process-wide native framework.
+ * Call on the main thread after {@link OrganicMaps#init} reports map-loading completion, unless a method states
+ * otherwise. Prefer feature managers such as {@link app.organicmaps.sdk.routing.RoutingController} and
+ * {@link app.organicmaps.sdk.search.SearchEngine}, which also keep their Java state synchronized with the core.
  */
 public class Framework
 {
@@ -47,6 +49,15 @@ public class Framework
   public static final int DAY_TIME_TYPE_POLAR_DAY = 2;
   public static final int DAY_TIME_TYPE_POLAR_NIGHT = 3;
 
+  @Retention(RetentionPolicy.SOURCE)
+  @IntDef({SpeedLimitSignType.VIENNA, SpeedLimitSignType.MUTCD})
+  public @interface SpeedLimitSignType
+  {
+    // Keep in sync with feature::RegionData::SpeedLimitSignType.
+    int VIENNA = 0;
+    int MUTCD = 1;
+  }
+
   // Used by JNI.
   @Keep
   @SuppressWarnings("unused")
@@ -59,10 +70,27 @@ public class Framework
   // this class is just bridge between Java and C++ worlds, we must not create it
   private Framework() {}
 
-  public static String getHttpGe0Url(double lat, double lon, double zoomLevel, String name)
+  // The plain body, HTML body and subject basis produced by the core share::Build. Used by JNI.
+  @Keep
+  @SuppressWarnings("unused")
+  public static final class ShareData
   {
-    return nativeGetGe0Url(lat, lon, zoomLevel, name)
-        .replaceFirst(Constants.Url.SHORT_SHARE_PREFIX, Constants.Url.HTTP_SHARE_PREFIX);
+    @NonNull
+    public final String mText;
+    @NonNull
+    public final String mHtml;
+    /// Place name, else address, else empty. Platforms build the localized email subject from it.
+    @NonNull
+    public final String mSubjectBasis;
+    public final boolean mIsMyPosition;
+
+    private ShareData(@NonNull String text, @NonNull String html, @NonNull String subjectBasis, boolean isMyPosition)
+    {
+      mText = text;
+      mHtml = html;
+      mSubjectBasis = subjectBasis;
+      mIsMyPosition = isMyPosition;
+    }
   }
 
   public static void setSpeedCamerasMode(@NonNull SpeedCameraMode mode)
@@ -88,19 +116,42 @@ public class Framework
                                                                                double srcLat, double srcLon,
                                                                                double north);
 
-  public static native String nativeFormatLatLon(double lat, double lon, int coordFormat);
+  // Stable id of place_page::CoordinatesFormat::LatLonDecimal - the always-available default format.
+  // Keep in sync with the C++ enum in libs/map/place_page_info.hpp.
+  public static final int COORDINATES_FORMAT_DECIMAL = 1;
+
+  // Bare coordinate value ("SW 7400 4210") for the given stable format id (see place_page::CoordinatesFormat).
+  // Returns null if the format is unavailable at this location; used for the route point titles (decimal).
+  public static native String nativeFormatLatLon(double lat, double lon, int formatId);
+
+  // The formats available at this location, in display order, each with its labelled display string and
+  // bare value. Resolves the region once, so the place page renders, cycles and copies from a single
+  // call. Never empty: the decimal formats apply everywhere.
+  @NonNull
+  @Size(min = 1)
+  public static native CoordinatesFormatEntry[] nativeGetCoordinateFormats(double lat, double lon);
 
   public static native String nativeFormatAltitude(double alt);
 
   public static native String nativeFormatSpeed(double speed);
 
-  public static native String nativeGetGe0Url(double lat, double lon, double zoomLevel, String name);
   public static native String nativeGetGeoUri(double lat, double lon, double zoomLevel, String name);
 
+  // Built by the core share::Build. Requires an open place page.
+  @NonNull
+  public static native ShareData nativeGetShareData();
+  @NonNull
+  public static native ShareData nativeGetShareDataForMyPosition(double lat, double lon);
+  @NonNull
+  public static native ShareData nativeGetShareDataForBookmark(long bookmarkId);
+
+  /** Returns the best available offline address at a WGS84 latitude and longitude in degrees. */
   public static native String nativeGetAddress(double lat, double lon);
 
+  /** Replaces the process-wide map-selection listener; remove it when its host ends. */
   public static native void nativePlacePageActivationListener(@NonNull PlacePageActivationListener listener);
 
+  /** Removes the supplied map-selection listener. */
   public static native void nativeRemovePlacePageActivationListener(@NonNull PlacePageActivationListener listener);
 
   //  @UiThread
@@ -139,6 +190,19 @@ public class Framework
   @NonNull
   public static native @RequestType int nativeParseAndSetApiUrl(String url);
   public static native ParsedRoutingData nativeGetParsedRoutingData();
+
+  // Custom raster background tiles (Settings -> Background Map tiles).
+  public static native void nativeSetBackgroundTiles(boolean enabled, @NonNull String url, int cacheSizeMB,
+                                                     int areaOpacityPct);
+  // Flips only the on/off flag, keeping the configured URL / cache size / area opacity.
+  public static native void nativeSetBackgroundTilesEnabled(boolean enabled);
+  @NonNull
+  public static native String nativeGetBackgroundTilesUrl();
+  // Basic check: http(s):// scheme + host + literal {z}/{x}/{y} placeholders.
+  public static native boolean nativeIsWellFormedBackgroundTilesUrl(@NonNull String url);
+  public static native int nativeGetBackgroundTilesCacheSizeMB();
+  public static native boolean nativeIsBackgroundTilesEnabled();
+  public static native int nativeGetBackgroundTilesAreaOpacity();
   public static native ParsedSearchRequest nativeGetParsedSearchRequest();
   public static native @Nullable String nativeGetParsedAppName();
   public static native @Nullable String nativeGetParsedOAuth2Code();
@@ -147,7 +211,10 @@ public class Framework
   public static native double[] nativeGetParsedCenterLatLon();
   public static native @Nullable String nativeGetParsedBackUrl();
 
-  /// @return true if a transit route selection was recovered.
+  /**
+   * Clears the current map selection. Returns {@code true} only when restoring a previous transit-route selection;
+   * ordinary deactivation returns {@code false}.
+   */
   public static native boolean nativeDeactivatePopup();
   public static native void nativeDeactivateMapSelectionCircle(boolean restoreViewport);
 
@@ -176,15 +243,17 @@ public class Framework
 
   public static native void nativeBuildRoute();
 
-  public static native void nativeRemoveRoute();
-
   public static native void nativeFollowRoute();
 
   public static native void nativeDisableFollowing();
 
+  /** Returns a JNI-created snapshot of current route guidance, or {@code null} when unavailable. */
   @FastNative
   @Nullable
   public static native RoutingInfo nativeGetRouteFollowingInfo();
+
+  /// Returns Vienna when the region's map or its sign-type metadata is unavailable.
+  public static native @SpeedLimitSignType int nativeGetSpeedLimitSignType(double lat, double lon);
 
   @Nullable
   /// @param[in] maxDistM Max distance between points in meters.
@@ -214,24 +283,30 @@ public class Framework
 
   public static native void nativeSetRoutingRecommendationListener(@NonNull RoutingRecommendationListener listener);
 
-  public static native void nativeSetRoutingLoadPointsListener(@NonNull RoutingLoadPointsListener listener);
-
   public static native void nativeShowCountry(String countryId, boolean zoomToDownloadButton);
 
-  public static void addRoutePoint(RouteMarkData point)
+  public static boolean addRoutePoint(RouteMarkData point, boolean allowOptimization)
   {
-    addRoutePoint(point, true);
+    return Framework.nativeAddRoutePoint(point.mTitle, point.mSubtitle, point.mPointType, point.mIsMyPosition,
+                                         point.mLat, point.mLon, allowOptimization);
   }
 
-  public static void addRoutePoint(RouteMarkData point, boolean reorderIntermediatePoints)
-  {
-    Framework.nativeAddRoutePoint(point.mTitle, point.mSubtitle, point.mPointType, point.mIntermediateIndex,
-                                  point.mIsMyPosition, point.mLat, point.mLon, reorderIntermediatePoints);
-  }
+  public static native boolean nativeAddRoutePoint(String title, String subtitle, @NonNull RouteMarkType markType,
+                                                   boolean isMyPosition, double lat, double lon,
+                                                   boolean allowOptimization);
 
-  public static native void nativeAddRoutePoint(String title, String subtitle, @NonNull RouteMarkType markType,
-                                                int intermediateIndex, boolean isMyPosition, double lat, double lon,
-                                                boolean reorderIntermediatePoints);
+  public static native void nativeReplaceRoutePoint(String title, String subtitle, @NonNull RouteMarkType markType,
+                                                    int intermediateIndex, boolean isMyPosition, double lat,
+                                                    double lon);
+
+  /**
+   * Appends the point to the end of the route: the current finish becomes the last intermediate point and
+   * the given point becomes the new finish.
+   *
+   * @return {@code false} if the route has no finish point or the route points limit is reached.
+   */
+  public static native boolean nativeContinueRouteToPoint(String title, String subtitle, boolean isMyPosition,
+                                                          double lat, double lon);
 
   public static native void nativeRemoveRoutePoints();
 
@@ -239,11 +314,24 @@ public class Framework
 
   public static native void nativeRemoveIntermediateRoutePoints();
 
+  public static native boolean nativeOptimizeRoutePoints();
+
   public static native boolean nativeCouldAddIntermediatePoint();
+
+  /** Checks the mark limit even when a route build has failed and routing is inactive. */
+  public static native boolean nativeIsRoutePointsLimitReached();
+
   @NonNull
   public static native RouteMarkData[] nativeGetRoutePoints();
 
   public static native void nativeMoveRoutePoint(int currentIndex, int targetIndex);
+
+  /**
+   * Reverses the complete route, including intermediate points.
+   *
+   * @return {@code false} without changing points if either endpoint is missing.
+   */
+  public static native boolean nativeReverseRoutePoints();
 
   @NonNull
   public static native TransitRouteInfo nativeGetTransitRouteInfo();
@@ -319,6 +407,8 @@ public class Framework
 
   public static native void nativeShowRouteTransit(int relId);
 
+  public static native void nativeSelectTrackCandidate(int candidateIndex);
+
   @Nullable
   public static native String nativeGetActiveTransitRouteRef();
 
@@ -329,14 +419,12 @@ public class Framework
 
   public static native void nativeRunFirstLaunchAnimation();
 
-  public static native int nativeOpenRoutePointsTransaction();
-  public static native void nativeApplyRoutePointsTransaction(int transactionId);
-  public static native void nativeCancelRoutePointsTransaction(int transactionId);
-  public static native int nativeInvalidRoutePointsTransactionId();
-
   public static native boolean nativeHasSavedRoutePoints();
-  public static native void nativeLoadRoutePoints();
+  @UiThread
+  public static native boolean nativeLoadRoutePoints();
+  @UiThread
   public static native void nativeSaveRoutePoints();
+  @UiThread
   public static native void nativeDeleteSavedRoutePoints();
   public static native void nativeMakeCrash();
 

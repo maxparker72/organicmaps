@@ -25,17 +25,19 @@
 
 #include "geometry/mercator.hpp"
 
-// If you have a "missing header error" here, then please run configure.sh script in the root repo
-// folder.
 #import "../../../private.h"
 
 extern NSString * const kMap2FBLoginSegue = @"Map2FBLogin";
 extern NSString * const kMap2GoogleLoginSegue = @"Map2GoogleLogin";
 
 static CGFloat kPlacePageCompactWidth = 350;
-static CGFloat kPlacePageLeadingOffset = IPAD ? 20 : 0;
+static CGFloat const kPlacePageLeadingOffset = 20;
 
-typedef NS_ENUM(NSUInteger, UserTouchesAction) { UserTouchesActionNone, UserTouchesActionDrag, UserTouchesActionScale };
+typedef NS_ENUM(NSUInteger, UserTouchesAction) {
+  UserTouchesActionNone,
+  UserTouchesActionDrag,
+  UserTouchesActionScale
+};
 
 namespace
 {
@@ -43,7 +45,6 @@ NSString * const kDownloaderSegue = @"Map2MapDownloaderSegue";
 NSString * const kEditorSegue = @"Map2EditorSegue";
 NSString * const kUDViralAlertWasShown = @"ViralAlertWasShown";
 NSString * const kPP2BookmarkEditingSegue = @"PP2BookmarkEditing";
-NSString * const kSettingsSegue = @"Map2Settings";
 // Mirrors kMapToCategorySelectorSegue in MWMMapViewControlsManager.mm.
 NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 }  // namespace
@@ -136,6 +137,9 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 
 - (void)showOrUpdatePlacePage:(PlacePageData *)data
 {
+  // Map API requests deselect and select in one call: remove the closing page before showing the new one.
+  [self.placePageVC finishClosingIfNeeded];
+
   if (self.searchManager.isSearching)
     [self.searchManager setPlaceOnMapSelected:YES];
 
@@ -175,7 +179,7 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 
   self.placePageLeadingConstraint =
       [self.placePageContainer.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor
-                                                            constant:kPlacePageLeadingOffset];
+                                                            constant:IPAD ? kPlacePageLeadingOffset : 0];
   if (IPAD)
     self.placePageLeadingConstraint.priority = UILayoutPriorityDefaultLow;
 
@@ -265,8 +269,8 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 {
   [self stopObservingTrackRecordingUpdates];
   [self.placePageVC closeWithCompletion:^{
-    [self.placePageVC.view removeFromSuperview];
     [self.placePageVC willMoveToParentViewController:nil];
+    [self.placePageVC.view removeFromSuperview];
     [self.placePageVC removeFromParentViewController];
     self.placePageVC = nil;
     self.placePageContainer.hidden = YES;
@@ -432,11 +436,22 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
   [self.controlsManager viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
+- (void)updateMapFontScaleFactor
+{
+  double const scaleFactor =
+      [MapFontScaleFactor valueForContentSizeCategory:self.traitCollection.preferredContentSizeCategory];
+  [MWMFrameworkHelper setMapFontScaleFactor:scaleFactor];
+}
+
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
   [super traitCollectionDidChange:previousTraitCollection];
   if (self.traitCollection.verticalSizeClass != previousTraitCollection.verticalSizeClass)
     [self updatePlacePageContainerConstraints];
+
+  if (previousTraitCollection == nil || ![previousTraitCollection.preferredContentSizeCategory
+                                            isEqualToString:self.traitCollection.preferredContentSizeCategory])
+    [self updateMapFontScaleFactor];
 }
 
 - (void)didReceiveMemoryWarning
@@ -460,6 +475,8 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
+
+  [self updateMapFontScaleFactor];
 
   if (self.navigationDashboardManager.state == MWMNavigationDashboardStateClosed)
     self.controlsManager.menuState = self.controlsManager.menuRestoreState;
@@ -518,7 +535,7 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 
   /// @todo: Uncomment update dialog when will be ready to handle big traffic bursts.
   /*
-  if (!DeepLinkHandler.shared.isLaunchedByDeeplink)
+  if (!DeepLinkHandler.shared.hasPendingColdLaunchDeepLink)
   {
     auto const todo = GetFramework().ToDoAfterUpdate();
     switch (todo) {
@@ -539,8 +556,8 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
   [super viewDidAppear:animated];
   // Cold start deep links should be handled when the map is initialized.
   // Otherwise PP container view is nil, or there is no animation/selection of the point.
-  if (DeepLinkHandler.shared.isLaunchedByDeeplink)
-    (void)[DeepLinkHandler.shared handleDeepLinkAndReset];
+  if (DeepLinkHandler.shared.hasPendingColdLaunchDeepLink)
+    (void)[DeepLinkHandler.shared handlePendingDeepLink];
 }
 
 - (void)viewDidLayoutSubviews
@@ -613,7 +630,9 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 
   if (self.navigationDashboardManager.state == MWMNavigationDashboardStateClosed)
     self.controlsManager.menuRestoreState = self.controlsManager.menuState;
-  GetFramework().SetRenderingDisabled(false);
+  // The shared EAGLView may already be hosted by CarPlay while the phone controller disappears.
+  if (![MWMCarPlayService shared].isCarplayActivated)
+    GetFramework().SetRenderingDisabled(false);
   self.isMapVisible = NO;
 }
 
@@ -696,12 +715,35 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 #pragma mark - Open controllers
 - (void)openMenu
 {
-  [self.controlsManager.tabBarController onMenuButtonPressed:self];
+  // The menu belongs to the map, so a link that arrives over another screen returns to the map first.
+  // Open it after the pop: viewWillAppear restores the menu state saved when the map was covered.
+  UINavigationController * navigationController = self.navigationController;
+  [navigationController popToRootViewControllerAnimated:YES];
+  id<UIViewControllerTransitionCoordinator> coordinator = navigationController.transitionCoordinator;
+  if (!coordinator)
+  {
+    [self.controlsManager openMenuFromDeepLink];
+    return;
+  }
+  // A link handled during the pop replaces this one, so the menu must not cover its destination.
+  NSURL * url = DeepLinkHandler.shared.url;
+  [coordinator animateAlongsideTransition:nil
+                               completion:^(id<UIViewControllerTransitionCoordinatorContext>) {
+                                 if ([DeepLinkHandler.shared.url isEqual:url])
+                                   [self.controlsManager openMenuFromDeepLink];
+                               }];
 }
 
 - (void)openSettings
 {
-  [self performSegueWithIdentifier:kSettingsSegue sender:nil];
+  // Opening Settings from a link or the menu also closes the menu or layers sheet covering the map.
+  MWMMapViewControlsManager * controlsManager = self.controlsManager;
+  MWMBottomMenuState const menuState = controlsManager.menuState;
+  if (menuState == MWMBottomMenuStateActive || menuState == MWMBottomMenuStateLayers)
+    controlsManager.menuState = controlsManager.menuRestoreState;
+  // Switching apps to open a link outlasts the short menu/Layers animations,
+  // so normal cross-app links need no modal-transition queue.
+  [SettingsBuilder showRootIn:self.navigationController];
 }
 
 - (void)openMapsDownloader:(MWMMapDownloaderMode)mode
@@ -731,9 +773,8 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 
 - (void)openDrivingOptions
 {
-  UIStoryboard * sb = [UIStoryboard instance:MWMStoryboardDrivingOptions];
-  UIViewController * vc = [sb instantiateInitialViewController];
-  [self.navigationController pushViewController:vc animated:YES];
+  [self.navigationController pushViewController:[SettingsBuilder buildRoutingOptionsWithRouterType:MWMRouter.type]
+                                       animated:YES];
 }
 
 - (void)processMyPositionStateModeEvent:(MWMMyPositionMode)mode
@@ -992,6 +1033,7 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
 
 - (void)enableCarPlayRepresentation
 {
+  [_searchManager close];
   UIViewController * presentedController = self.presentedViewController;
   if (presentedController != nil)
     [presentedController dismissViewControllerAnimated:NO completion:nil];
@@ -1119,7 +1161,7 @@ NSString * const kCategorySelectorSegue = @"MapToCategorySelectorSegue";
   __weak __typeof(self) weakSelf = self;
   [self.trackRecordingManager addObserver:self
         recordingIsActiveDidChangeHandler:^(TrackRecordingState state, TrackInfo * _Nonnull trackInfo,
-                                            ElevationProfileData * _Nonnull (^_Nullable elevationData)()) {
+                                            ElevationProfileData * _Nullable (^elevationData)()) {
           __strong __typeof(weakSelf) self = weakSelf;
           if (!self)
             return;

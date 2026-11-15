@@ -1,7 +1,9 @@
-• Khetha izindlela zokuhamba ngezinyawo nezokugibela ibhayisikili ukuze ubone amashadi abo wokuphakama
-• Ukugoqwa kwemephu okufanele e-antimeridian (±180° ubude)
-• Shintsha yonke imibala yamabookmark nemizila esigabeni ngasikhathi sinye
-• Ukusesha okungcono kwezinombolo zezindlu, kuhlanganiswe amakheli amaningi ase-US
-• Idatha ye-OSM kusukela mhla zingama-4 ku-Ephreli
-• Imodi yokubonakala ehleliwe kuzilungiselelo
+• OSM: 28 Septhemba; Wikipedia: 21 Septhemba
+• Izindlela ezingcono ezingaba khona kanye nezilinganiso zokufika
+• Isilungiselelo esisha silungisa kahle ukuhleleka kwezindawo zokumisa
+• Izinkinobho ezintsha zengeza noma zishintshe izindawo zokumisa ezindleleni ezihleliwe
+• Indlela enye ekhethiwe igcinwa ngesikhathi sokuhamba
+• Ukurekhoda imikhondo kulungisiwe futhi kwathuthukiswa
+• Ukungenisa kwe-KMB kulungisiwe
+• Izilungiso nokuthuthukiswa kwe-UI
 …okuningi ku-omaps.org/news

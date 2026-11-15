@@ -16,7 +16,7 @@
 /* Choose measurement on first launch alert - choose metric system button */
 "kilometres" = "Kilometra";
 
-/* Choose measurement on first launch alert - choose imperial system button */
+/* Imperial measurement option: 1 mile = 1609.344 m; Swedish/Norwegian "mil" = 10 km */
 "miles" = "Milje";
 
 /* Update maps later button text */
@@ -115,7 +115,7 @@
 /* Search category sight seeings and touristic attractions; any changes should be duplicated in categories.txt @category_tourism! */
 "category_tourism" = "Vende turistike";
 
-/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! */
+/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! Also a bookmarks list group header when sorting by type. */
 "category_entertainment" = "Argëtim";
 
 /* Search category for ATMs; any changes should be duplicated in categories.txt @category_atm! */
@@ -148,7 +148,7 @@
 /* Search category for recycling; any changes should be duplicated in categories.txt @category_recycling! */
 "category_recycling" = "Riciklimi";
 
-/* Search category for water; any changes should be duplicated in categories.txt @category_water! also used to sort bookmarks by type */
+/* Search category for water; any changes should be duplicated in categories.txt @category_water! Also a bookmarks list group header when sorting by type. */
 "category_water" = "Ujë";
 
 /* Search category for RV facilities; any changes should be duplicated in categories.txt @category_rv! */
@@ -174,11 +174,23 @@
 /* Warning message when doing search around current position */
 "unknown_current_position" = "Vendndodhja juaj nuk është përcaktuar ende";
 
-/* Subject for emailed bookmark */
-"bookmark_share_email_subject" = "Hej, shiko vendosjen time në Organic Maps!";
+/* Text shown before a shared "my position" link, and the email subject when sharing the current location. */
+"share_my_position" = "Jam këtu në Organic Maps";
 
-/* Subject for emailed position */
-"my_position_share_email_subject" = "Hej, shiko vendndodhjen time aktuale në hartën e Organic Maps!";
+/* Email subject when sharing a place. %1$@ is the place name or address. */
+"share_place_subject" = "%1$@ në Organic Maps";
+
+/* Email subject when sharing a place that has no name or address. */
+"share_place_subject_default" = "Një vend në Organic Maps";
+
+/* Shared email link text; opens the shared place in Organic Maps or in a web browser. */
+"share_open_in_om_or_browser" = "Hape në Organic Maps ose në shfletues";
+
+/* Shared email link text; leads to the Organic Maps download page. */
+"share_get_om" = "Merr Organic Maps";
+
+/* Title for the "Open in Another App" button on the PlacePage; also shared email link text: opens the shared place in another (geo:) maps app. */
+"open_in_app" = "Hape në Një Aplikacion Tjetër";
 
 /* Share by email button text, also used in editor and About. */
 "email" = "Email";
@@ -195,6 +207,7 @@
 /* Length of track in cell that describes route */
 "length" = "Gjatësia";
 "share_my_location" = "Ndaj Vendndodhjen Time";
+"prefs_group_network" = "Rrjeti";
 "prefs_group_route" = "Lundrimi";
 
 /* Setting name which enables or disables zoom buttons on the map screen. */
@@ -218,6 +231,24 @@
 /* A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled */
 "pref_map_3d_buildings_disabled_summary" = "Ndërtesat 3D janë të çaktivizuara në modalitetin e kursimit të energjisë";
 
+/* Settings: title of the satellite imagery (custom raster tiles) screen */
+"pref_bg_tiles_title" = "Imazhe satelitore";
+
+/* Settings «Satellite Imagery»: title of the tile server URL input field */
+"pref_bg_tiles_url_title" = "URL-ja e serverit";
+
+/* Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) */
+"pref_bg_tiles_url_error" = "Vendosni një URL të vlefshme me {z}/{x}/{y}";
+
+/* Settings «Satellite Imagery»: title of the on-disk tile cache size limit (in megabytes) */
+"pref_bg_tiles_size_title" = "Madhësia e cache-it (MB)";
+
+/* Settings «Satellite Imagery»: opacity of vector area objects drawn over the imagery (0% hides them) */
+"pref_bg_tiles_opacity_title" = "Errësimi i objekteve sipërfaqësore";
+
+/* Settings «Satellite Imagery»: legal note that the user is responsible for the custom tile source they configure */
+"pref_bg_tiles_disclaimer" = "Burimet e pllakave të personalizuara i jepni ju. Përdorni vetëm shërbime për të cilat keni leje qasjeje. Ju jeni përgjegjës për atribuimin, kushtet e licencës, çelësat API, kuotat dhe kufijtë e përdorimit.";
+
 /* Settings «Route» category: «Tts enabled» title */
 "pref_tts_enable_title" = "Udhëzimet Zanore";
 
@@ -233,8 +264,14 @@
 /* Settings «Navigation» category: «Voice language» footer */
 "pref_tts_download_voices_description" = "Për të shkarkuar një zë me cilësi më të lartë, hapni aplikacionin Cilësimet dhe shkoni te Aksesueshmëria → VoiceOver → Të folurit → Zëri.";
 
-/* Settings «Route» category: «Test Voice Directions» title */
-"pref_tts_test_voice_title" = "Testoni Udhëzimet me Zë (TTS, Tekst-në-Fjalë)";
+/* Header above Apple's group of novelty text-to-speech voices (Bells, Bubbles, Zarvox...), shown after the regional voice sections and Eloquence group. Use Apple's term for this group from Settings > Accessibility > VoiceOver > Speech. */
+"pref_tts_voice_group_novelty" = "Novelty";
+
+/* Accessibility label of the button that plays a sample of a text-to-speech voice. */
+"pref_tts_voice_preview_play" = "Play sample";
+
+/* Accessibility label of the button that stops the sample of a text-to-speech voice being played. */
+"pref_tts_voice_preview_stop" = "Stop sample";
 "pref_map_auto_zoom" = "Zmadhim automatik";
 "placepage_distance" = "Distanca";
 "search_show_on_map" = "Shiko në hartë";
@@ -355,9 +392,6 @@
 /* blue gray color */
 "blue_gray" = "Gri Blu";
 
-/* place preview title */
-"info" = "Info";
-
 /* Prints version number in About dialog */
 "version" = "Versioni Organic Maps: %@";
 
@@ -369,9 +403,6 @@
 
 /* Settings "Appearance" category: "Dark" title, should be consistent with the pref_appearance_title translation. */
 "pref_appearance_dark" = "Errësirë";
-
-/* Title for "Other" section in TTS settings. */
-"pref_tts_other_section_title" = "Tjetër";
 
 /* Tex label above the Donate button */
 "donate_description" = "Dhuroni harta falas pa reklama për miliona përdorues!";
@@ -390,9 +421,6 @@
 
 /* Alert title */
 "email_error_title" = "Gabim gjatë dërgimit të emailit";
-
-/* Settings item title */
-"pref_calibration_title" = "Kalibrimi i busullës";
 
 /* Downloaded maps category */
 "downloader_available_maps" = "Në dispozicion";
@@ -491,6 +519,8 @@
 "twentyfour_seven" = "24/7";
 "day_off_today" = "Mbyllur sot";
 "day_off" = "Mbyllur";
+"midnight" = "Mesnatë";
+"noon" = "Mesditë";
 "today" = "Sot";
 "opens_in" = "Hapet në %@";
 "closes_in" = "Mbyllet në %@";
@@ -568,15 +598,22 @@
 
 /* abbreviation for kilometers per hour */
 "kilometers_per_hour" = "km/h";
+
+/* Short label for miles per hour (1 mile = 1609.344 m), placed after a number; e.g. mph or mi/h */
 "miles_per_hour" = "mph";
-"hour" = "o";
+
+/* Short label for hours (time unit), placed after a number */
+"hour" = "orë";
+
+/* Short label for minutes (time unit), placed after a number */
 "minute" = "min";
+
+/* Short label for days (time unit), placed after a number */
 "day" = "d";
+
+/* Short label for seconds (time unit), placed after a number */
 "second" = "s";
 "placepage_more_button" = "Më shumë";
-
-/* A disable button text in the explanation dialog that opens hotel details page on Kayak website. */
-"placepage_edit_bookmark_button" = "Ndrysho Faqeshënuesin";
 "placepage_personal_notes_hint" = "Shënime personale (tekst ose html)";
 "editor_comment_hint" = "Komento…";
 "editor_reset_edits_message" = "Të hiqen të gjitha ndryshimet vendase?";
@@ -621,11 +658,13 @@
 "traffic_data_unavailable" = "Të dhënat e trafikut nuk janë të disponueshme";
 "enable_logging" = "Aktivizo regjistrimin";
 "transliteration_title" = "Translitero në alfabetin latin";
-"planning_route_manage_route" = "Menaxho Rrugën";
-"button_plan" = "Planifiko";
 "placepage_remove_stop" = "Hiq Ndalesën";
-"placepage_add_stop" = "Shto Ndalesë";
-"saved" = "Ruajtur";
+
+/* Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. */
+"route_add_destination" = "Shto destinacion";
+
+/* Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. */
+"placepage_add_stop" = "Shto ndalesë";
 "error_enter_correct_name" = "Ju lutemi vendosni një emër të saktë";
 "bookmark_lists" = "Listat";
 
@@ -643,6 +682,9 @@
 "bookmarks_error_title_list_name_already_taken" = "Ky emër është tashmë i zënë";
 "profile" = "Profili OpenStreetMap";
 "restore" = "Restauro";
+
+/* Settings privacy group in settings screen */
+"privacy" = "Privatësia";
 "privacy_policy" = "Politika e privatësisë";
 "terms_of_use" = "Kushtet e përdorimit";
 
@@ -651,6 +693,11 @@
 
 /* Cycling routes layer name in the Styles and Layers dialog */
 "button_layer_cycling" = "Çiklizëm";
+
+/* Map layers menu: toggle button for the satellite imagery layer */
+"button_layer_satellite" = "Satelit";
+
+/* Subway map layer button; also the spoken name of the subway (metro, underground) transport type, read by screen readers before a line number on transit line badges. */
 "button_layer_subway" = "Metro";
 "layers_title" = "Stilet e Hartave dhe Shtresat";
 
@@ -692,7 +739,25 @@
 "show_to_the_right" = "Shfaq në të djathtë";
 "show_at_the_bottom" = "Shfaq në fund";
 "enable_logging_warning_message" = "Aktivizoni këtë opsion përkohësisht për të regjistruar dhe dërguar manualisht logje diagnostike të detajuara për problemin tuaj duke përdorur \"Raporto një problem\" në dialogun Ndihmë. Logjet mund të përfshijnë informacione vendndodhjeje.";
+
+/* Driving profile in routing options settings. */
+"routing_options_driving" = "Me makinë";
+
+/* Cycling profile in routing options settings. */
+"routing_options_cycling" = "Me biçikletë";
+
+/* Walking profile in routing options settings; also the label of a walking leg in transit route details. */
+"routing_options_walking" = "Në këmbë";
+
+/* Section heading for routing settings shared by every routing mode. */
+"routing_options_all_modes" = "Të gjitha mënyrat e udhëtimit";
 "driving_options_title" = "Mundësitë e rrugëtimit";
+
+/* Routing setting that automatically reorders intermediate stops */
+"route_optimization" = "Optimizimi i itinerarit";
+
+/* Explains that route optimization automatically reorders intermediate stops */
+"route_optimization_description" = "Riorganizon automatikisht ndalesat e ndërmjetme për të krijuar një itinerar më efikas.";
 
 /* Recommended length for CarPlay and Android Auto is around 25-27 characters */
 "avoid_tolls" = "Shmang pagesat";
@@ -705,11 +770,18 @@
 "avoid_motorways" = "Shmang autostradat";
 "unable_to_calc_alert_title" = "Nuk mund të llogaritet rruga";
 "unable_to_calc_alert_subtitle" = "Rruga nuk mund të gjendej. Kjo mund të shkaktohet nga opsionet tuaja të rrugëtimit ose të dhëna të paplota të OpenStreetMap. Ju lutemi ndryshoni opsionet tuaja të rrugëtimit dhe provoni përsëri.";
-"define_to_avoid_btn" = "Përcaktoni rrugët për të shmangur";
-"change_driving_options_btn" = "Mundësitë e rrugëtimit u aktivizuan";
 "toll_road" = "Rrugë me pagesë";
 "unpaved_road" = "Rrugë e paasfaltuar";
 "ferry_crossing" = "Kalim me traget";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_steps" = "Shkallë";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_gate" = "Portë";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_lift_gate" = "Tra";
 
 /* A generic "Yes" button in dialogs */
 "yes" = "Po";
@@ -743,9 +815,6 @@
 /* Failed planning route message in navigation view */
 "routing_planning_error" = "Planifikimi i Rrugës Dështoi";
 
-/* Arrive routing message in navigation view */
-"routing_arrive" = "Mbërritja në %@";
-
 /* Text for routing::RouterResultCode::FileTooOld dialog. */
 "dialog_routing_download_and_update_maps" = "Shkarkoni dhe përditësoni të gjitha hartat përgjatë rrugës së planifikuar për të llogaritur rrugën.";
 "editor_done_dialog_1" = "Ju keni ndryshuar hartën e botës! Mos e mbani për vete; tregojuni miqve tuaj dhe redaktojeni së bashku.";
@@ -770,7 +839,6 @@
 "please_note" = "Ju lutemi vini re";
 "migration_download_error_dialog" = "Gabim në shkarkim";
 "editor_add_select_category" = "Zgjidh kategorinë";
-"editor_add_select_category_popular_subtitle" = "Popullore";
 "editor_add_select_category_all_subtitle" = "Të Gjitha Kategoritë";
 "whatsnew_editor_message_1" = "Shtoni vende të reja në hartë dhe redaktoni ato ekzistuese drejtpërdrejt nga aplikacioni.";
 "dialog_incorrect_feature_position" = "Ndrysho vendndodhjen";
@@ -792,7 +860,6 @@
 "location_services_disabled_on_device_3" = "3. Zgjidhni Shërbimet e Vendndodhjes";
 "location_services_disabled_on_device_4" = "4. Ndizni Shërbimet e Vendndodhjes";
 "location_services_disabled_on_device_additional_message" = "Ose vazhdoni të përdorni Organic Maps pa Vendndodhje";
-"book_button" = "Rezervo";
 "placepage_call_button" = "Telefono";
 "placepage_bookmark_name_hint" = "Emri i Faqeshënuesit";
 "placepage_delete_bookmark_button" = "Fshi Faqeshënuesin";
@@ -803,18 +870,13 @@
 /* iOS dialog for the case when recent track recording is on and the app comes back from background */
 "recent_track_background_dialog_title" = "Të çaktivizohet regjistrimi i rrugës suaj të udhëtuar së fundmi?";
 "off_recent_track_background_button" = "Çaktivizo";
-
-/* For sharing via SMS and so on */
-"sharing_call_action_look" = "Shiko";
 "recent_track_background_dialog_message" = "Organic Maps përdor vendndodhjen tuaj në sfond për të regjistruar rrugën tuaj të udhëtuar së fundmi.";
 "general_settings" = "Cilësimet e përgjithshme";
 
 /* "traffic" as in road congestion */
 "traffic_update_app_message" = "Për të shfaqur të dhënat e trafikut, aplikacioni duhet të përditësohet.";
 "log_file_size" = "Madhësia e skedarit log: %@";
-"planning_route_remove_title" = "Tërhiqni këtu për të hequr";
 "placepage_replace_stop" = "Zëvendëso Ndalesën";
-"start_from_my_position" = "Fillo nga";
 
 /* For iOS message 'alert_reauth_message' should be splitted in two parts: message + link. Here's first part */
 "alert_reauth_message_ios" = "Ju lutemi hyni në OpenStreetMap për të ngarkuar automatikisht të gjitha ndryshimet tuaja të hartës. Mëso më shumë";
@@ -834,15 +896,8 @@
 "popular_place" = "Popullore";
 "hide_from_map" = "Fshih nga harta";
 "tags_loading_error_subtitle" = "Ndodhi një gabim gjatë ngarkimit të etiketave, ju lutemi provoni përsëri";
-
-/* Position of the name label on the map relative to the bookmark pin (on the right) */
-"right" = "Djathtas";
-
-/* Position of the name label on the map relative to the bookmark pin (at the bottom) */
-"bottom" = "Poshtë";
 "trip_start" = "Le të shkojmë";
 "pick_destination" = "Destinacioni";
-"follow_my_position" = "Riqendro";
 "search_results" = "Rezultatet e kërkimit";
 "then_turn" = "Pastaj";
 "redirect_route_alert" = "A dëshironi të rindërtoni rrugën?";
@@ -888,16 +943,29 @@
 "medicine" = "Mjekësi";
 "search_in_the_list" = "Kërko në listë";
 "religious_places" = "Vende fetare";
+
+/* Button that starts multi-selection in a bookmark list. */
+"select" = "Zgjidh";
+
+/* Action that selects every bookmark and track in a bookmark list. */
+"select_all" = "Zgjidh të gjitha";
+
+/* Action that clears the multi-selection in a bookmark list. */
+"deselect_all" = "Hiq përzgjedhjen";
 "transit_not_found" = "Lundrimi me metro në këtë rajon nuk është ende i disponueshëm";
 "dialog_pedestrian_route_is_long_header" = "Nuk u gjet asnjë rrugë metroje";
 "dialog_pedestrian_route_is_long_message" = "Ju lutemi zgjidhni një pikë fillimi ose fundi më afër një stacioni metroje";
-"button_layer_isolines" = "Vija Konture";
-"isolines_activation_error_dialog" = "Aktivizimi i vijave të konturit kërkon shkarkimin e të dhënave të hartës për këtë zonë";
-"isolines_location_error_dialog" = "Vijat e konturit nuk janë ende të disponueshme në këtë zonë";
+
+/* Layers menu: label of the 3D terrain layer button */
+"button_layer_terrain" = "Terren 3D";
+"isolines_location_error_dialog" = "Përditësoni këtë zonë për të parë vijat e konturit";
 "elevation_profile_ascent" = "Ngjitje";
 "elevation_profile_descent" = "Zbritje";
 "elevation_profile_min_elevation" = "Lartësia min.";
 "elevation_profile_max_elevation" = "Lartësia maks.";
+
+/* Displayed in the elevation profile chart while track recording has fewer than two points. */
+"elevation_profile_placeholder" = "Filloni të lëvizni për të parë profilin e lartësisë";
 "isolines_toast_zooms_1_10" = "Zmadhoni për të eksploruar izolinat";
 "downloader_loading_ios" = "Duke shkarkuar";
 
@@ -962,11 +1030,14 @@
 "bookmarks_export" = "Eksporto të gjithë Faqeshënuesit dhe Gjurmët";
 "drive_through" = "Drive-through";
 
+/* Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_in" = "Zmadho";
+
+/* Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_out" = "Zvogëlo";
+
 /* Restaurant or other food place's menu URL field in the Editor */
 "website_menu" = "Lidhja e Menusë";
-
-/* Title for the "Open in Another App" button on the PlacePage. */
-"open_in_app" = "Hape në Një Aplikacion Tjetër";
 
 /* To indicate if the place proposed self service… */
 "self_service" = "Vetë-shërbim";
@@ -982,11 +1053,6 @@
 
 /* Message for the toast when saving the track recording is finished but nothing to save. */
 "track_recording_toast_nothing_to_save" = "Gjurma është boshe - asgjë për t'u ruajtur";
-"edit_track" = "Ndrysho Gjurmën";
-"elevation_profile_diff_level" = "Niveli i vështirësisë";
-"elevation_profile_diff_level_easy" = "E lehtë";
-"elevation_profile_diff_level_moderate" = "Mesatare";
-"elevation_profile_diff_level_hard" = "E vështirë";
 "downloader_updating_ios" = "Duke përditësuar";
 
 /* Autoupdate dialog on start */
@@ -1019,6 +1085,12 @@
 /* Text for the editing the Track's color button. */
 "change_color" = "Ndrysho Ngjyrën";
 
+/* Text for the hiding track. */
+"hide_track" = "Hide track";
+
+/* Text for the showing track. */
+"show_track" = "Show track";
+
 /* Main screen title "Map" displayed in the navigation back button's menu. */
 "map" = "Harta";
 
@@ -1037,7 +1109,7 @@
 /* Message for the "iCloud is Disabled" alert. */
 "icloud_disabled_message" = "Ju lutemi aktivizoni iCloud në cilësimet e pajisjes suaj për të përdorur këtë veçori.";
 
-/* Title for the "Enable iCloud Syncronization" alert's "Enable" action button. */
+/* Action button that enables a disabled feature, such as iCloud synchronization or location services. */
 "enable" = "Aktivizo";
 
 /* Title for the "Enable iCloud Syncronization" alert's "Backup" action button. */
@@ -1099,10 +1171,10 @@
 /* abbreviation for kilometers */
 "km" = "km";
 
-/* abbreviation for mile(s) */
+/* Short label for miles (length unit, 1 mi = 1609.344 m), placed after a number */
 "mi" = "mi";
 
-/* A unit of measure */
+/* Short label for feet (1 ft = 0.3048 m), after numbers; local abbreviations and uninflected unit names are allowed */
 "ft" = "ft";
 
 /* Toast text when the maps version should be updated to display the OSM hiking and cycling routes */
@@ -1134,3 +1206,30 @@
 
 /* Toast message shown when track colors are changed in category settings */
 "toast_tracks_color_changed" = "Ngjyra e gjurmëve u ndryshua";
+
+/* Accessibility label of the icon-only button beside the search field, shown while choosing or replacing a route point; it opens a full-screen map picker with a crosshair */
+"choose_on_map" = "Zgjidh në hartë";
+
+/* Search field hint and full-screen map point picker title shown while choosing the starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_start_location" = "Nisja";
+
+/* Search field hint and full-screen map point picker title shown while choosing the destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_destination" = "Destinacioni";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_start_location" = "Ndrysho nisjen";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_destination" = "Ndrysho destinacionin";
+
+/* Search field hint and full-screen map point picker title shown while replacing an already added intermediate stop of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_stop_along_route" = "Ndrysho ndalesën";
+
+/* Toast shown when the user tries to add one more intermediate stop to a route that already holds the maximum allowed number */
+"routing_max_stops_reached" = "Numri maksimal i ndalesave është arritur";
+
+/* Hint under the title of the full-screen route point picker: a crosshair stays fixed in the centre of the screen while the user moves the map under it */
+"choose_point_on_map_hint" = "Lëvizni dhe zmadhoni hartën për të vendosur kryqin";
+
+/* Accessibility label for the button that reverses the complete planned route, including intermediate stops. */
+"reverse_route" = "Përmbys rrugën";

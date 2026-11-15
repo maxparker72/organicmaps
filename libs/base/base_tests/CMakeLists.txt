@@ -2,6 +2,7 @@ project(base_tests)
 
 set(SRC
   assert_test.cpp
+  atomic_shared_ptr_test.cpp
   beam_tests.cpp
   bidirectional_map_tests.cpp
   bits_test.cpp
@@ -28,12 +29,14 @@ set(SRC
   newtype_test.cpp
   non_intersecting_intervals_tests.cpp
   observer_list_test.cpp
+  random_tests.cpp
   range_iterator_test.cpp
   ref_counted_tests.cpp
   regexp_test.cpp
   rolling_hash_test.cpp
   scope_guard_test.cpp
   small_set_test.cpp
+  stats_tests.cpp
   stl_helpers_tests.cpp
   string_utils_test.cpp
   suffix_array_tests.cpp

@@ -172,6 +172,7 @@
     <string name="type.barrier.city_wall">शहराची भिंत</string>
     <string name="type.barrier.cycle_barrier">सायकल अडथळा</string>
     <string name="type.waterway.ditch">ड्रेनेज खंदक</string>
+    <string name="type.waterway.ditch.intermittent">तात्पुरता ड्रेनेज खंदक</string>
     <string name="type.natural.water.wastewater">सांडपाणी</string>
     <string name="type.barrier.entrance">प्रवेशद्वार</string>
     <string name="type.barrier.fence">कुंपण</string>
@@ -287,47 +288,47 @@
 
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">महामार्ग</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">बोगदा</string>
     <string name="type.highway.busway">समर्पित बस रस्ता</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">बोगदा</string>
     <string name="type.highway.bus_stop">बस थांबा</string>
     <string name="type.highway.construction">बांधकामाधीन रस्ता</string>
     <string name="type.highway.cycleway">सायकल वाट</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">पूल</string>
     <string name="type.highway.cycleway.permissive">सायकल वाट</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">बोगदा</string>
     <string name="type.highway.elevator">उद्वाहक(लिफ्ट)</string>
     <string name="type.highway.footway">पादचारी मार्ग</string>
     <string name="type.highway.footway.sidewalk">फुटपाथ</string>
     <string name="type.highway.footway.crossing">पादचारी ओलांडणे</string>
     <string name="type.highway.footway.area">पादचारी झोन</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">पादचारी पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">पादचारी बोगदा</string>
     <string name="type.highway.living_street">वस्ती मार्ग</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">बोगदा</string>
     <string name="type.highway.motorway">महामार्ग</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">महामार्ग पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">महामार्ग बोगदा</string>
     <string name="type.highway.motorway_junction">रस्ता निर्गमन</string>
     <string name="type.highway.motorway_link">महामार्ग उतार</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">बोगदा</string>
     <string name="type.highway.path">पथ</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -336,102 +337,103 @@
     <string name="type.highway.path.expert">अतिशय अवघड किंवा वेगळे न करता येणारी पायवाट</string>
     <string name="type.highway.path.bicycle">सायकल आणि पाऊलवाट</string>
     <string name="type.highway.footway.bicycle">सायकल आणि पाऊलवाट</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">पूल</string>
     <string name="type.highway.path.horse">पथ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">बोगदा</string>
     <string name="type.highway.pedestrian">पादचारी मार्ग</string>
     <string name="type.highway.pedestrian.area">पादचारी झोन</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">पादचारी पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">पादचारी बोगदा</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.highway.platform">फलाट</string>
     <string name="type.highway.primary">प्राथमिक मार्ग</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">बोगदा</string>
     <string name="type.highway.primary_link">प्राथमिक मार्ग उतार</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">बोगदा</string>
     <string name="type.highway.raceway">शर्यतीचा मार्ग</string>
     <string name="type.highway.residential">रस्ता</string>
     <string name="type.highway.residential.area">रस्ता</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">बोगदा</string>
     <string name="type.highway.rest_area">विश्रांती क्षेत्र</string>
     <string name="type.highway.road">रस्ता</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">पूल</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">बोगदा</string>
     <string name="type.highway.secondary">दुय्यम मार्ग</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">बोगदा</string>
     <string name="type.highway.secondary_link">दुय्यम मार्ग उतार</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">बोगदा</string>
     <string name="type.highway.service">सेवा मार्ग</string>
     <string name="type.highway.service.area">सेवा मार्ग</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">पूल</string>
     <string name="type.highway.service.driveway">चालकमार्ग</string>
     <string name="type.highway.service.parking_aisle">पार्किंग गल्ली</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">बोगदा</string>
     <string name="type.highway.services">सेवा क्षेत्र</string>
     <string name="type.highway.speed_camera">वेग कॅमेरा</string>
     <string name="type.highway.steps">पायऱ्या</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">बोगदा</string>
     <string name="type.highway.tertiary">तृतीयक मार्ग</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">बोगदा</string>
     <string name="type.highway.tertiary_link">तृतीयक मार्ग उतार</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">बोगदा</string>
     <string name="type.highway.track">ट्रॅक</string>
     <string name="type.highway.track.area">ट्रॅक</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">पूल</string>
     <string name="type.highway.track.grade1">ट्रॅक</string>
     <string name="type.highway.track.no.access">ट्रॅक</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">बोगदा</string>
     <string name="type.highway.traffic_signals">वाहतूक दिवे</string>
     <string name="type.highway.trunk">राष्ट्रीय महामार्ग</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">बोगदा</string>
     <string name="type.highway.trunk_link">राष्ट्रीय महामार्ग उतार</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">बोगदा</string>
     <string name="type.highway.unclassified">किरकोळ रस्ता</string>
     <string name="type.highway.unclassified.area">किरकोळ रस्ता</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">पूल</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">बोगदा</string>
     <string name="type.area_highway.cycleway">सायकल वाट</string>
     <string name="type.area_highway.footway">पादचारी मार्ग</string>
@@ -469,6 +471,7 @@
     <string name="type.historic.castle.shiro">जपानी किल्ला</string>
     <string name="type.historic.castle.stately">किल्ला</string>
     <string name="type.historic.city_gate">शहराचा दरवाजा</string>
+    <string name="type.man_made.ceremonial_gate">समारंभिक द्वार</string>
     <string name="type.historic.citywalls">शहराची भिंत</string>
     <string name="type.historic.fort">दुर्ग</string>
     <string name="type.historic.gallows">फाशी</string>
@@ -502,6 +505,7 @@
     <string name="type.landuse">भूमी उपयोग</string>
     <string name="type.landuse.allotments">वाटप</string>
     <string name="type.landuse.basin">कुंड</string>
+    <string name="type.landuse.basin.intermittent">तात्पुरते कुंड</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">स्मशानभूमी</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
@@ -528,7 +532,6 @@
     <string name="type.landuse.quarry">खाण</string>
     <string name="type.landuse.railway">रेल्वे परिसर</string>
     <string name="type.landuse.recreation_ground">मनोरंजन मैदान</string>
-    <string name="type.landuse.reservoir">पाणी</string>
     <string name="type.landuse.residential">निवासी जमीन</string>
     <string name="type.landuse.retail">किरकोळ जमीन</string>
     <string name="type.landuse.salt_pond">तलाव</string>
@@ -545,6 +548,7 @@
     <string name="type.leisure.hackerspace">हॅकरस्पेस</string>
     <string name="type.leisure.ice_rink">हिम क्रीडा क्षेत्र</string>
     <string name="type.leisure.nature_reserve">संरक्षित निसर्गक्षेत्र</string>
+    <string name="type.leisure.bird_hide">पक्षी निरीक्षण आसरा</string>
     <string name="type.leisure.outdoor_seating">बाहेरची आसनव्यवस्था</string>
     <string name="type.leisure.park">उद्यान</string>
     <string name="type.leisure.park.no.access">उद्यान</string>
@@ -573,6 +577,8 @@
     <string name="type.man_made.pier">धक्का</string>
     <string name="type.man_made.pipeline">नळमार्ग</string>
     <string name="type.man_made.pipeline.overground">जमिनीवरील नळमार्ग</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">झाकलेला जलाशय</string>
     <string name="type.man_made.silo">पेव(धान्यसाठा)</string>
     <string name="type.man_made.storage_tank">साठवण टाकी</string>
     <string name="type.man_made.surveillance">संनिरीक्षण कॅमेरा</string>
@@ -591,6 +597,8 @@
     <string name="type.man_made.water_tower">पाण्याचा मनोरा(टाकी)</string>
     <string name="type.man_made.water_well">पाण्याची विहीर</string>
     <string name="type.man_made.water_well.drinking_water_no">पाण्याची विहीर</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">जलशुद्धीकरण केंद्र</string>
     <string name="type.man_made.windmill">पवनचक्की</string>
     <string name="type.man_made.works">औद्योगिक कामे</string>
     <string name="type.military">लष्करी</string>
@@ -624,10 +632,13 @@
     <string name="type.natural.water.reservoir">जलाशय</string>
     <string name="type.natural.water.basin">कुंड</string>
     <string name="type.natural.water.river">नदी</string>
+    <string name="type.natural.water.intermittent">तात्पुरता पाणवठा</string>
     <string name="type.natural.land">जमीन</string>
     <string name="type.natural.meadow">कुरण</string>
     <string name="type.natural.orchard">फळबागा</string>
     <string name="type.natural.peak">शिखर</string>
+    <string name="type.natural.hill">टेकडी</string>
+    <string name="type.natural.arch">शिला मेहराब</string>
     <string name="type.natural.saddle">माउंटन सॅडल</string>
     <string name="type.natural.rock">खडक</string>
     <string name="type.natural.scrub">खुरटी झाडे</string>
@@ -708,6 +719,7 @@
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">विद्युत मनोरा</string>
     <string name="type.public_transport">सार्वजनिक वाहतूक</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.public_transport.platform">फलाट</string>
     <string name="type.railway">रेल्वे</string>
     <string name="type.railway.construction">रेल्वेचे बांधकाम</string>
@@ -1034,6 +1046,8 @@
     <string name="type.shop.gift">भेटवस्तूंचे दुकान</string>
     <string name="type.shop.greengrocer">भाजीवाला</string>
     <string name="type.shop.hairdresser">न्हावी</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">न्हाव्याचे दुकान</string>
     <string name="type.shop.hearing_aids">श्रवणयंत्र स्टोअर</string>
     <string name="type.shop.herbalist">औषधी वनस्पतींचे दुकान</string>
     <string name="type.shop.hifi">हायफाय ऑडिओ</string>
@@ -1121,6 +1135,7 @@
     <string name="type.sport.rugby_union">रग्बी</string>
     <string name="type.sport.running">धावणे</string>
     <string name="type.sport.softball">सॉफ्टबॉल</string>
+    <string name="type.sport.pilates">पिलाटेस</string>
     <string name="type.tourism">पर्यटन</string>
     <string name="type.tourism.aquarium">मत्स्यालय</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1165,23 +1180,26 @@
     <string name="type.waterway">जलमार्ग</string>
     <string name="type.waterway.access_point">जलमार्ग प्रवेश बिंदू</string>
     <string name="type.waterway.canal">कालवा</string>
+    <string name="type.waterway.canal.intermittent">तात्पुरता कालवा</string>
     <string name="type.waterway.canal.tunnel">कालवा</string>
     <string name="type.waterway.fish_pass">मासे शिडी</string>
+    <string name="type.waterway.fish_pass.intermittent">तात्पुरती मासे शिडी</string>
     <string name="type.waterway.dam">धरण</string>
     <string name="type.barrier.ditch">खंदक</string>
     <string name="type.natural.water.ditch">ड्रेनेज खंदक</string>
     <string name="type.waterway.ditch.tunnel">कल्व्हर्ट</string>
     <string name="type.waterway.dock">जलमार्ग गोद</string>
     <string name="type.waterway.drain">नाला</string>
+    <string name="type.waterway.drain.intermittent">तात्पुरता नाला</string>
     <string name="type.natural.water.drain">नाला</string>
     <string name="type.waterway.drain.tunnel">कल्व्हर्ट</string>
     <string name="type.waterway.lock_gate">जलद्वार</string>
     <string name="type.waterway.river">नदी</string>
+    <string name="type.waterway.river.intermittent">तात्पुरती नदी</string>
     <string name="type.waterway.river.tunnel">नदी</string>
-    <string name="type.waterway.stream">नदी</string>
-    <string name="type.waterway.stream.ephemeral">नदी</string>
-    <string name="type.waterway.stream.intermittent">नदी</string>
-    <string name="type.waterway.stream.tunnel">नदी</string>
+    <string name="type.waterway.stream">ओढा</string>
+    <string name="type.waterway.stream.intermittent">तात्पुरता ओढा</string>
+    <string name="type.waterway.stream.tunnel">ओढा</string>
     <string name="type.waterway.waterfall">धबधबा</string>
     <string name="type.waterway.weir">अल्प धरण</string>
     <string name="type.wheelchair">चाकखुर्ची</string>
@@ -1201,6 +1219,7 @@
     <string name="type.self_service.no">स्व-सेवा नाही</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">सामाजिक सुविधा</string>
+    <string name="type.amenity.stage">मंच</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">आपत्कालीन प्रभाग प्रवेशद्वार</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1222,6 +1241,8 @@
     <string name="type.man_made.monitoring_station.weather">हवामान निरीक्षण स्टेशन</string>
     <string name="type.amenity.student_accommodation">विद्यार्थ्यांची निवास व्यवस्था</string>
     <string name="type.craft.watchmaker">वॉचमेकर</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">खिडकी निर्मिती</string>
     <string name="type.xmas_feature.market">ख्रिसमस मार्केट</string>
     <string name="type.xmas_feature.tree">ख्रिसमस ट्री</string>
     <string name="type.amenity.hookah_lounge">हुक्का पार्लर</string>

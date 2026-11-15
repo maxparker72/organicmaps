@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "دیوار شهر";
 "type.barrier.cycle_barrier" = "Cycle Barrier";
 "type.waterway.ditch" = "خندق زهکشی";
+"type.waterway.ditch.intermittent" = "خندق زهکشی موقت";
 "type.natural.water.moat" = "ﻕﺪﻨﺧ";
 "type.natural.water.wastewater" = "فاضلاب";
 "type.barrier.entrance" = "ورودی";
@@ -407,28 +408,28 @@
 "type.highway" = "بزرگراه";
 "type.highway.bridleway" = "مسیر سوارکاری";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "پل";
 "type.highway.bridleway.permissive" = "مسیر سوارکاری";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "تونل";
 "type.highway.busway" = "ﺱﻮﺑﻮﺗﺍ ﯽﺻﺎﺼﺘﺧﺍ ﻩﺩﺎﺟ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "تونل";
 "type.highway.bus_stop" = "حمل و نقل";
 "type.highway.construction" = "جاده در دست ساخت است";
 "type.highway.cycleway" = "Cycle Path";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "پل";
 "type.highway.cycleway.permissive" = "مسیر دوچرخه";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "تونل";
 "type.highway.elevator" = "آسانسور";
 "type.highway.footway" = "مسیر";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "محل عبور عابر پیاده";
 "type.highway.footway.area" = "مسیر";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "تونل";
 "type.highway.ford" = "گدار";
 "type.highway.living_street" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "تونل";
 "type.highway.motorway" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "تونل";
 "type.highway.motorway_junction" = "تقاطع";
 "type.highway.motorway_link" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "تونل";
 "type.highway.path" = "مسیر";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "مسیر";
 "type.highway.footway.bicycle" = "مسیر";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "پل";
 "type.highway.path.horse" = "مسیر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "تونل";
 "type.highway.pedestrian" = "جاده";
 "type.highway.pedestrian.area" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "تونل";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
 "type.highway.platform" = "سکو";
 "type.highway.primary" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "تونل";
 "type.highway.primary_link" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "تونل";
 "type.highway.raceway" = "کانال";
 "type.highway.residential" = "جاده";
 "type.highway.residential.area" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "تونل";
 "type.highway.rest_area" = "استراحتگاه";
 "type.highway.road" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "پل";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "تونل";
 "type.highway.secondary" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "تونل";
 "type.highway.secondary_link" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "تونل";
 "type.highway.service" = "جاده";
 "type.highway.service.area" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "پل";
 "type.highway.service.driveway" = "جاده";
 "type.highway.service.parking_aisle" = "جاده";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "تونل";
 "type.highway.services" = "محل استراحت";
 "type.highway.speed_camera" = "دوربین سرعت سنج";
 "type.highway.steps" = "مسیر";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "تونل";
 "type.highway.ladder" = "نردبان";
 "type.highway.tertiary" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "تونل";
 "type.highway.tertiary_link" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "تونل";
 "type.highway.track" = "جاده";
 "type.highway.track.area" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "پل";
 "type.highway.track.grade1" = "جاده";
 "type.highway.track.no.access" = "جاده";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "تونل";
 "type.highway.traffic_signals" = "چراغ راهنما";
 "type.highway.trunk" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "تونل";
 "type.highway.trunk_link" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "تونل";
 "type.highway.unclassified" = "جاده";
 "type.highway.unclassified.area" = "جاده";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "پل";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "تونل";
 "type.area_highway.cycleway" = "Cycle Path";
 "type.area_highway.footway" = "مسیر";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "قلعه ژاپنی";
 "type.historic.castle.stately" = "گردشگری";
 "type.historic.city_gate" = "دروازه شهر";
+"type.man_made.ceremonial_gate" = "دروازهٔ تشریفاتی";
 "type.historic.citywalls" = "دیوار شهر";
 "type.historic.fort" = "دژ";
 "type.historic.gallows" = "چوبه دار";
@@ -718,6 +722,7 @@
 "type.landuse" = "Landuse";
 "type.landuse.allotments" = "قسمت ها";
 "type.landuse.basin" = "حوضه آب";
+"type.landuse.basin.intermittent" = "حوضه آب موقت";
 "type.landuse.brownfield" = "توسعه یافته";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Quarry";
 "type.landuse.railway" = "محدوده راه آهن";
 "type.landuse.recreation_ground" = "Recreation Ground";
-"type.landuse.reservoir" = "اب";
 "type.landuse.residential" = "Residential Area";
 "type.landuse.retail" = "Retail Area";
 "type.landuse.salt_pond" = "نمک‌زار";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Ice Rink";
 "type.leisure.marina" = "Marina";
 "type.leisure.nature_reserve" = "Nature Reserve";
+"type.leisure.bird_hide" = "مخفیگاه پرنده‌نگری";
 "type.leisure.outdoor_seating" = "نشستن در فضای باز";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "پارک";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "اسکله";
 "type.man_made.pipeline" = "خط لوله";
 "type.man_made.pipeline.overground" = "خط لوله روی زمین";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "مخزن آب سرپوشیده";
 "type.man_made.silo" = "انبار";
 "type.man_made.storage_tank" = "مخزن";
 "type.man_made.surveillance" = "دوربین نظارتی";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "منبع اب";
 "type.man_made.water_well" = "چاه اب";
 "type.man_made.water_well.drinking_water_no" = "چاه اب";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "تصفیه‌خانه آب";
 "type.man_made.windmill" = "توربین بادی";
 "type.man_made.works" = "تأسیسات صنعتی";
 
@@ -871,10 +882,13 @@
 "type.natural.water.reservoir" = "مخزن";
 "type.natural.water.basin" = "حوضه آب";
 "type.natural.water.river" = "رودخانه";
+"type.natural.water.intermittent" = "پهنه آبی موقت";
 "type.natural.land" = "خشکی";
 "type.natural.meadow" = "چمنزار";
 "type.natural.orchard" = "باغ میوه";
 "type.natural.peak" = "قله";
+"type.natural.hill" = "تپه";
+"type.natural.arch" = "کمان سنگی";
 "type.natural.saddle" = "زین کوه";
 "type.natural.rock" = "سنگ";
 "type.natural.scrub" = "بوته زار";
@@ -972,6 +986,8 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "حمل و نقل عمومی";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
 "type.public_transport.platform" = "سکو";
 "type.railway" = "راه‌آهن";
 "type.railway.abandoned" = "راه اهن متروکه";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "فروشگاه";
 "type.shop.grocery" = "ﺭﺎﺑﺭﺍﻮﺧ";
 "type.shop.hairdresser" = "ارایشگاه";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "آرایشگاه مردانه";
 "type.shop.hardware" = "ﺭﺍﺰﻓﺍ ﺖﺨﺳ ﻩﺎﮕﺷﻭﺮﻓ";
 "type.shop.health_food" = "ﯽﺘﺷﺍﺪﻬﺑ ﯽﯾﺍﺬﻏ ﺩﺍﻮﻣ ﻩﺎﮕﺷﻭﺮﻓ";
 "type.shop.hearing_aids" = "فروشگاه ساحلی";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "راگبی ۱۵ نفره";
 "type.sport.running" = "دویدن";
 "type.sport.softball" = "سافت‌بال";
+"type.sport.pilates" = "پیلاتس";
 "type.tourism" = "Tourism";
 "type.tourism.aquarium" = "آکواریوم";
 
@@ -1513,24 +1533,27 @@
 "type.traffic_calming.hump" = "Traffic Hump";
 "type.waterway" = "Waterway";
 "type.waterway.access_point" = "نقطه دسترسی به آبراهه";
-"type.waterway.canal" = "کانال اب";
+"type.waterway.canal" = "کانال آب";
+"type.waterway.canal.intermittent" = "کانال آب موقت";
 "type.waterway.canal.tunnel" = "کانال اب";
 "type.waterway.fish_pass" = "نردبان ماهی";
+"type.waterway.fish_pass.intermittent" = "نردبان ماهی موقت";
 "type.waterway.dam" = "Dam";
 "type.barrier.ditch" = "Ditch";
 "type.natural.water.ditch" = "خندق زهکشی";
 "type.waterway.ditch.tunnel" = "کولورت";
 "type.waterway.dock" = "Waterway Dock";
-"type.waterway.drain" = "Drain";
-"type.natural.water.drain" = "Drain";
+"type.waterway.drain" = "زهکش";
+"type.waterway.drain.intermittent" = "زهکش موقت";
+"type.natural.water.drain" = "زهکش";
 "type.waterway.drain.tunnel" = "کولورت";
 "type.waterway.lock_gate" = "Lock Gate";
 "type.waterway.river" = "رودخانه";
+"type.waterway.river.intermittent" = "رودخانه موقت";
 "type.waterway.river.tunnel" = "رودخانه";
-"type.waterway.stream" = "رودخانه";
-"type.waterway.stream.ephemeral" = "رودخانه";
-"type.waterway.stream.intermittent" = "رودخانه";
-"type.waterway.stream.tunnel" = "رودخانه";
+"type.waterway.stream" = "جویبار";
+"type.waterway.stream.intermittent" = "جویبار موقت";
+"type.waterway.stream.tunnel" = "جویبار";
 "type.waterway.waterfall" = "گردشگری";
 "type.waterway.weir" = "Weir";
 "type.wheelchair" = "صندلی چرخدار";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "تسهیلات اجتماعی";
+"type.amenity.stage" = "صحنه";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "ورودی بخش اورژانس";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "ایستگاه پایش آب و هوا";
 "type.amenity.student_accommodation" = "خوابگاه دانشجویی";
 "type.craft.watchmaker" = "ساعت ساز";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "ساخت پنجره";
 "type.xmas_feature.market" = "بازار کریسمس";
 "type.xmas_feature.tree" = "درخت کریسمس";
 "type.amenity.hookah_lounge" = "قلیان‌سرا";

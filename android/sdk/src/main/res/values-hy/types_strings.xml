@@ -202,6 +202,7 @@
     <string name="type.barrier.city_wall">Քաղաքի պարիսպ</string>
     <string name="type.barrier.cycle_barrier">Հեծանվային արգելապատնեշ</string>
     <string name="type.waterway.ditch">Ցամաքուրդային առու</string>
+    <string name="type.waterway.ditch.intermittent">Ընդհատվող ցամաքուրդային առու</string>
     <string name="type.natural.water.moat">Խրամ</string>
     <string name="type.natural.water.wastewater">Կեղտաջրեր</string>
     <string name="type.barrier.entrance">Մուտք</string>
@@ -385,49 +386,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Ավտոճանապարհ</string>
     <string name="type.highway.bridleway">Ձիարշավարան</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Կամուրջ</string>
     <string name="type.highway.bridleway.permissive">Ձիարշավարան</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Թունել</string>
     <string name="type.highway.busway">Ավտոբուսի ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Թունել</string>
     <string name="type.highway.bus_stop">Կանգառ</string>
     <string name="type.highway.construction">Կառուցվող ճանապարհ</string>
     <string name="type.highway.cycleway">Հեծանվուղի</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Կամուրջ</string>
     <string name="type.highway.cycleway.permissive">Հեծանվուղի</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Թունել</string>
     <string name="type.highway.elevator">Վերելակ</string>
     <string name="type.highway.footway">Հետիոտնային ճանապարհ</string>
     <string name="type.highway.footway.sidewalk">Մայթ</string>
     <string name="type.highway.footway.crossing">Հետիոտնային անցում</string>
     <string name="type.highway.footway.area">Հետիոտնային գոտի</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Հետիոտնային կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Հետիոտնային թունել</string>
     <string name="type.highway.ford">Գետանցում</string>
     <string name="type.highway.living_street">Բնակելի փողոց</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Թունել</string>
     <string name="type.highway.motorway">Մայրուղի</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Մայրուղու կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Մայրուղու թունել</string>
     <string name="type.highway.motorway_junction">Ճանապարհի ելք</string>
     <string name="type.highway.motorway_link">Մայրուղու միացում</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Թունել</string>
     <string name="type.highway.path">Արահետ</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -436,103 +437,104 @@
     <string name="type.highway.path.expert">Բարդ արահետ</string>
     <string name="type.highway.path.bicycle">Հեծանվային և հետիոտնային արահետ</string>
     <string name="type.highway.footway.bicycle">Հեծանվային և հետիոտնային արահետ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Կամուրջ</string>
     <string name="type.highway.path.horse">Ձիարշավարան</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Թունել</string>
     <string name="type.highway.pedestrian">Հետիոտնային փողոց</string>
     <string name="type.highway.pedestrian.area">Հետիոտնային գոտի</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Հետիոտնային կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Հետիոտնային թունել</string>
-    <string name="type.highway.platform">Հարթակ</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Կառամատույց</string>
     <string name="type.highway.primary">Առաջնային ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Թունել</string>
     <string name="type.highway.primary_link">Առաջնային ճանապարհի միացում</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Թունել</string>
     <string name="type.highway.raceway">Վազքուղի</string>
     <string name="type.highway.residential">Բնակելի փողոց</string>
     <string name="type.highway.residential.area">Բնակելի փողոց</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Թունել</string>
     <string name="type.highway.rest_area">Հանգստի գոտի</string>
     <string name="type.highway.road">Ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Կամուրջ</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Թունել</string>
     <string name="type.highway.secondary">Երկրորդական ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Թունել</string>
     <string name="type.highway.secondary_link">Երկրորդական ճանապարհի միացում</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Թունել</string>
     <string name="type.highway.service">Ծառայողական ճանապարհ</string>
     <string name="type.highway.service.area">Ծառայողական ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Կամուրջ</string>
     <string name="type.highway.service.driveway">Մուտքի ճանապարհ</string>
     <string name="type.highway.service.parking_aisle">Կայանատեղիի անցում</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Թունել</string>
     <string name="type.highway.services">Սպասարկման տարածք</string>
     <string name="type.highway.speed_camera">Արագաչափ</string>
     <string name="type.highway.steps">Աստիճաններ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Թունել</string>
     <string name="type.highway.ladder">Սանդուղք</string>
     <string name="type.highway.tertiary">Երրորդական ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Թունել</string>
     <string name="type.highway.tertiary_link">Երրորդական ճանապարհի միացում</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Թունել</string>
     <string name="type.highway.track">Հողային ճանապարհ</string>
     <string name="type.highway.track.area">Հողային ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Կամուրջ</string>
     <string name="type.highway.track.grade1">Հողային ճանապարհ</string>
     <string name="type.highway.track.no.access">Հողային ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Թունել</string>
     <string name="type.highway.traffic_signals">Լուսացույց</string>
     <string name="type.highway.trunk">Գլխավոր ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Թունել</string>
     <string name="type.highway.trunk_link">Գլխավոր ճանապարհի միացում</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Թունել</string>
     <string name="type.highway.unclassified">Չդասակարգված ճանապարհ</string>
     <string name="type.highway.unclassified.area">Չդասակարգված ճանապարհ</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Կամուրջ</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Թունել</string>
     <string name="type.area_highway.cycleway">Հեծանվուղի</string>
     <string name="type.area_highway.footway">Հետիոտնային ճանապարհ</string>
@@ -570,6 +572,7 @@
     <string name="type.historic.castle.shiro">Ճապոնական ամրոց</string>
     <string name="type.historic.castle.stately">Շքեղ ամրոց</string>
     <string name="type.historic.city_gate">Քաղաքի դարպաս</string>
+    <string name="type.man_made.ceremonial_gate">Արարողակարգային դարպաս</string>
     <string name="type.historic.citywalls">Քաղաքի պարիսպ</string>
     <string name="type.historic.fort">Ֆորտ</string>
     <string name="type.historic.gallows">Կախաղան</string>
@@ -603,6 +606,7 @@
     <string name="type.landuse">Հողօգտագործում</string>
     <string name="type.landuse.allotments">Հողամասեր</string>
     <string name="type.landuse.basin">Ավազան</string>
+    <string name="type.landuse.basin.intermittent">Ընդհատվող ավազան</string>
     <string name="type.landuse.brownfield">Լքված տարածք</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Գերեզմանոց</string>
@@ -633,7 +637,6 @@
     <string name="type.landuse.quarry">Քարհանք</string>
     <string name="type.landuse.railway">Երկաթուղային գոտի</string>
     <string name="type.landuse.recreation_ground">Հանգստի գոտի</string>
-    <string name="type.landuse.reservoir">Ջրամբար</string>
     <string name="type.landuse.residential">Բնակելի թաղամաս</string>
     <string name="type.landuse.retail">Առևտրի գոտի</string>
     <string name="type.landuse.salt_pond">Աղի լճակ</string>
@@ -655,6 +658,7 @@
     <string name="type.leisure.ice_rink">Սահադաշտ</string>
     <string name="type.leisure.marina">Նավակայան</string>
     <string name="type.leisure.nature_reserve">Արգելոց</string>
+    <string name="type.leisure.bird_hide">Թռչունների դիտակետ</string>
     <string name="type.leisure.outdoor_seating">Բացօթյա նստատեղեր</string>
     <string name="type.leisure.firepit">Խարուկատեղ</string>
     <string name="type.leisure.park">Զբոսայգի</string>
@@ -689,6 +693,8 @@
     <string name="type.man_made.pier">Պիրս</string>
     <string name="type.man_made.pipeline">Խողովակաշար</string>
     <string name="type.man_made.pipeline.overground">Վերգետնյա խողովակաշար</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Ծածկված ջրամբար</string>
     <string name="type.man_made.silo">Սիլոսային հոր</string>
     <string name="type.man_made.storage_tank">Պահեստային բաք</string>
     <string name="type.man_made.surveillance">Տեսախցիկ</string>
@@ -707,6 +713,8 @@
     <string name="type.man_made.water_tower">Ջրաշտարակ</string>
     <string name="type.man_made.water_well">Ջրհոր</string>
     <string name="type.man_made.water_well.drinking_water_no">Ջրհոր</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Ջրամաքրման կայան</string>
     <string name="type.man_made.windmill">Հողմաղաց</string>
     <string name="type.man_made.works">Գործարան</string>
     <string name="type.military">Ռազմական</string>
@@ -741,10 +749,13 @@
     <string name="type.natural.water.reservoir">Ջրամբար</string>
     <string name="type.natural.water.basin">Ավազան</string>
     <string name="type.natural.water.river">Գետ</string>
+    <string name="type.natural.water.intermittent">Ընդհատվող ջրային մարմին</string>
     <string name="type.natural.land">Ցամաք</string>
     <string name="type.natural.meadow">Մարգագետին</string>
     <string name="type.natural.orchard">Պտղատու այգի</string>
     <string name="type.natural.peak">Գագաթ</string>
+    <string name="type.natural.hill">Բլուր</string>
+    <string name="type.natural.arch">Քարե կամար</string>
     <string name="type.natural.saddle">Թամբարդ</string>
     <string name="type.natural.rock">Քար</string>
     <string name="type.natural.scrub">Թփուտ</string>
@@ -836,7 +847,8 @@
     <string name="type.psurface.unpaved_bad">psurface-unpaved_bad</string>
     <string name="type.psurface.unpaved_good">psurface-unpaved_good</string>
     <string name="type.public_transport">Հասարակական տրանսպորտ</string>
-    <string name="type.public_transport.platform">Հարթակ</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Կառամատույց</string>
     <string name="type.railway">Երկաթուղի</string>
     <string name="type.railway.abandoned">Լքված երկաթուղի</string>
     <string name="type.railway.abandoned.bridge">Լքված երկաթուղային կամուրջ</string>
@@ -859,7 +871,7 @@
     <string name="type.railway.narrow_gauge">Նեղուղի երկաթգիծ</string>
     <string name="type.railway.narrow_gauge.bridge">Նեղուղի երկաթգծի կամուրջ</string>
     <string name="type.railway.narrow_gauge.tunnel">Նեղուղի երկաթգծի թունել</string>
-    <string name="type.railway.platform">Երկաթուղային պլատֆորմ</string>
+    <string name="type.railway.platform">Երկաթուղային կառամատույց</string>
     <string name="type.railway.preserved">Պահպանվող երկաթգիծ</string>
     <string name="type.railway.preserved.bridge">Պահպանվող երկաթգծի կամուրջ</string>
     <string name="type.railway.preserved.tunnel">Պահպանվող երկաթգծի թունել</string>
@@ -1192,6 +1204,8 @@
     <string name="type.shop.greengrocer">Մրգի և բանջարեղենի խանութ</string>
     <string name="type.shop.grocery">Մթերային խանութ</string>
     <string name="type.shop.hairdresser">Վարսավիրանոց</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Տղամարդկանց վարսավիրանոց</string>
     <string name="type.shop.hardware">Շինանյութի խանութ</string>
     <string name="type.shop.health_food">Առողջ սննդի խանութ</string>
     <string name="type.shop.hearing_aids">Լսողական սարքերի խանութ</string>
@@ -1315,6 +1329,7 @@
     <string name="type.sport.rugby_union">Ռեգբի-15</string>
     <string name="type.sport.running">Վազք</string>
     <string name="type.sport.softball">Սոֆթբոլ</string>
+    <string name="type.sport.pilates">Պիլատես</string>
     <string name="type.tourism">Զբոսաշրջություն</string>
     <string name="type.tourism.aquarium">Ակվարիում</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1368,21 +1383,24 @@
     <string name="type.waterway">Ջրային ուղի</string>
     <string name="type.waterway.access_point">Ջրային ճանապարհի մուտքի կետ</string>
     <string name="type.waterway.canal">Ջրանցք</string>
+    <string name="type.waterway.canal.intermittent">Ընդհատվող ջրանցք</string>
     <string name="type.waterway.canal.tunnel">Ջրանցքի թունել</string>
     <string name="type.waterway.fish_pass">Ձկնանցարան</string>
+    <string name="type.waterway.fish_pass.intermittent">Ընդհատվող ձկնանցարան</string>
     <string name="type.waterway.dam">Ամբարտակ</string>
     <string name="type.barrier.ditch">Խանդակ</string>
     <string name="type.natural.water.ditch">Ցամաքուրդային առու</string>
     <string name="type.waterway.ditch.tunnel">Ջրահեռացման խողովակ</string>
     <string name="type.waterway.dock">Նավամատույց</string>
     <string name="type.waterway.drain">Ջրահեռացման առու</string>
+    <string name="type.waterway.drain.intermittent">Ընդհատվող ջրահեռացման առու</string>
     <string name="type.natural.water.drain">Ջրահեռացման առու</string>
     <string name="type.waterway.drain.tunnel">Ջրահեռացման խողովակ</string>
     <string name="type.waterway.lock_gate">Շլյուզի դարպաս</string>
     <string name="type.waterway.river">Գետ</string>
+    <string name="type.waterway.river.intermittent">Ընդհատվող գետ</string>
     <string name="type.waterway.river.tunnel">Գետ</string>
     <string name="type.waterway.stream">Առու</string>
-    <string name="type.waterway.stream.ephemeral">Ժամանակավոր առու</string>
     <string name="type.waterway.stream.intermittent">Ընդհատվող առու</string>
     <string name="type.waterway.stream.tunnel">Առու</string>
     <string name="type.waterway.waterfall">Ջրվեժ</string>
@@ -1425,6 +1443,7 @@
     <string name="type.self_service.no">Ինքնասպասարկում չկա</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Սոցիալական հաստատություն</string>
+    <string name="type.amenity.stage">Բեմ</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Շտապօգնության բաժանմունքի մուտք</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1454,6 +1473,8 @@
     <string name="type.man_made.monitoring_station.weather">Եղանակի մոնիտորինգի կայան</string>
     <string name="type.amenity.student_accommodation">Ուսանողական հանրակացարան</string>
     <string name="type.craft.watchmaker">Ժամագործ</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Պատուհանների արտադրություն</string>
     <string name="type.xmas_feature.market">Սուրբ Ծննդյան տոնավաճառ</string>
     <string name="type.xmas_feature.tree">Տոնածառ</string>
     <string name="type.amenity.hookah_lounge">Նարգիլե բար</string>

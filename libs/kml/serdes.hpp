@@ -11,6 +11,7 @@
 
 #include "base/exception.hpp"
 
+#include <optional>
 #include <string>
 
 namespace kml
@@ -61,6 +62,9 @@ public:
 
   bool IsValidAttribute(std::string_view type, std::string const & value, std::string const & attrInLowerCase) const;
 
+  size_t GetDroppedCompilationsCount() const { return m_droppedCompilations; }
+  void ResolveAreaStyles();
+
   static kml::TrackLayer GetDefaultTrackLayer();
 
 private:
@@ -82,13 +86,56 @@ private:
   void ParseLineString(std::string const & s);
 
   bool MakeValid();
-  void ParseColor(std::string const & value);
+  static bool ParseColor(std::string const & value, uint32_t & color);
   bool GetColorForStyle(std::string_view styleUrl, uint32_t & color) const;
+  // Icon color is kept separate from line color so a <Style> with both IconStyle and LineStyle does
+  // not leak a bookmark color into a track or vice versa.
+  bool GetIconColorForStyle(std::string_view styleUrl, uint32_t & color) const;
   double GetTrackWidthForStyle(std::string_view styleUrl) const;
 
+  struct AreaStylePatch
+  {
+    std::optional<uint32_t> m_fillColor;
+    std::optional<uint32_t> m_outlineColor;
+    std::optional<double> m_outlineWidth;
+    std::optional<bool> m_fill;
+    std::optional<bool> m_outline;
+    template <typename Style>
+    void Apply(Style & style) const
+    {
+      if (m_fillColor)
+        style.m_fillColor = *m_fillColor;
+      if (m_outlineColor)
+        style.m_outlineColor = *m_outlineColor;
+      if (m_outlineWidth)
+        style.m_outlineWidth = *m_outlineWidth;
+      if (m_fill)
+        style.m_fill = *m_fill;
+      if (m_outline)
+        style.m_outline = *m_outline;
+    }
+  };
+  struct PendingAreaStyle
+  {
+    size_t m_areaIndex;
+    std::string m_reference;
+    AreaStylePatch m_inline;
+  };
+  void ParseAreaRing(std::string_view value, AreaRing & ring);
+
+  std::optional<AreaPolygon> m_polygon;
+  std::vector<AreaPolygon> m_areaPolygons;
+  bool m_invalidArea = false;
+  bool m_areaIsMultiPolygon = false;
+  bool m_areaAltitudeIsWgs84 = false;
+  // A shared style or highlight must not replace accumulated placemark overrides.
+  AreaStylePatch m_areaStyle;
+  AreaStylePatch m_inlineAreaStyle;
+  std::string m_areaStyleReference;
+  std::map<std::string, AreaStylePatch, std::less<>> m_areaStyles;
+  std::vector<PendingAreaStyle> m_pendingAreaStyles;
+
   FileData & m_data;
-  CategoryData m_compilationData;
-  CategoryData * m_categoryData;  // never null
 
   std::vector<std::string> m_tags;
   GeometryType m_geometryType;
@@ -97,14 +144,16 @@ private:
   std::map<size_t, std::set<size_t>> m_skipTimes;
   size_t m_lastTrackPointsCount;
 
-  uint32_t m_color;
+  uint32_t m_color;      // current LineStyle color (tracks)
+  uint32_t m_iconColor;  // current IconStyle color (custom bookmark color)
 
   std::string m_styleId;
   std::string m_mapStyleId;
   std::string m_styleUrlKey;
   std::map<std::string, uint32_t, std::less<>> m_styleUrl2Color;
+  std::map<std::string, uint32_t, std::less<>> m_styleUrl2IconColor;
   std::map<std::string, double, std::less<>> m_styleUrl2Width;
-  std::map<std::string, std::string> m_mapStyle2Style;
+  std::map<std::string, std::string, std::less<>> m_mapStyle2Style;
 
   int8_t m_attrCode;
   std::string m_attrId;
@@ -127,8 +176,14 @@ private:
   std::vector<std::string> m_nearestToponyms;
   int m_minZoom = 1;
   kml::Properties m_properties;
-  std::vector<CompilationId> m_compilations;
   double m_trackWidth;
+  // Collections are not supported, see Push(). Counted here to log them once instead of per element.
+  size_t m_droppedCompilations = 0;
+  std::vector<TrackStopData> m_trackStops;
+  // <mwm:stop> being parsed; the point stays unset until it parses successfully (see CharData).
+  std::optional<m2::PointD> m_currentTrackStopPoint;
+  std::string m_currentTrackStopName;
+  std::string m_trackRouterType;
 };
 
 class DeserializerKml
@@ -152,6 +207,10 @@ public:
         LOG(LWARNING, (kmlText));
       MYTHROW(DeserializeException, ("Could not parse KML."));
     }
+
+    parser.ResolveAreaStyles();
+    if (auto const count = parser.GetDroppedCompilationsCount(); count > 0)
+      LOG(LWARNING, ("Ignored", count, "unsupported collections in a KML file"));
   }
 
 private:

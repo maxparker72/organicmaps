@@ -1,9 +1,9 @@
-• Tschernai rutas d'excursiun e da velo per vesair diagrams d'autezza
-• Visualisaziun correcta da la carta a l'antimeridian (±180°)
-• Midai colurs da segnapostas e percurs en ina categoria
-• Meglier retschertga per numers da chasa, dapli adressas US
-• Datas OSM dal 4 d'avrigl
-• Modus d'appariziun planisà en las configuraziuns
-• Corregì la partiziun da segnapostas/percurs ad autras apps
-• Corregì il transferiment da modificaziuns ad OSM
+• Datas OSM dals 28 da settember; Wikipedia dals 21 da settember
+• Megliers percurs alternativs e temps stimads d’arrivada
+• Nova opziun per optimar l’urden da las fermadas intermediaras
+• Novs buttuns per agiuntar u remplazzar ina fermada sin in percurs planisà
+• Il percurs alternativ tschernì resta tschernì durant la navigaziun
+• Registraziun dals percurs curregida e meglierada
+• Import da datotecas KMB curregì
+• Interfatscha d’utilisader meglierada e curregida
 …dapli sin omaps.org/news

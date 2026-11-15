@@ -17,8 +17,6 @@
 
 #include <vector>
 
-class CaptionDefProto;
-
 namespace dp
 {
 class TextureManager;
@@ -29,6 +27,12 @@ namespace df
 
 struct TextViewParams;
 struct BuildingOutline;
+
+/// Fills the line view params from the drule (color, width, dash, cap, join).
+/// Also used by the dynamic isolines path which has no FeatureType behind the lines.
+void ExtractLineParams(drule::LineRule const & lineRule, double visScale, LineViewParams & params);
+
+void CaptionDefToFontDecl(drule::CaptionDef const * capRule, double visScale, dp::FontDecl & params);
 
 struct ApplyFeatureParams;
 class BaseApplyFeature
@@ -59,12 +63,12 @@ public:
     : TBase(params, f, captions)
   {}
 
-  void ProcessPointRules(SymbolRuleProto const * symbolRule, CaptionRuleProto const * captionRule,
-                         CaptionRuleProto const * houseNumberRule, m2::PointD const & centerPoint,
+  void ProcessPointRules(drule::SymbolRule const * symbolRule, drule::CaptionRule const * captionRule,
+                         drule::CaptionRule const * houseNumberRule, m2::PointD const & centerPoint,
                          ref_ptr<dp::TextureManager> texMng);
 
 protected:
-  void ExtractCaptionParams(CaptionDefProto const * primaryProto, CaptionDefProto const * secondaryProto,
+  void ExtractCaptionParams(drule::CaptionDef const * primary, drule::CaptionDef const * secondary,
                             TextViewParams & params) const;
   float m_posZ = 0.0f;
 
@@ -78,12 +82,12 @@ class ApplyAreaFeature : public ApplyPointFeature
 
 public:
   ApplyAreaFeature(Params const & params, FeatureType & f, CaptionDescription const & captions, bool isBuilding,
-                   bool isMwmBorder, float minPosZ, float posZ, dp::BackgroundMode backgroundMode)
+                   bool isMwmBorder, float minPosZ, float posZ, float areaOpacity)
     : TBase(params, f, captions)
     , m_minPosZ(minPosZ)
     , m_isBuilding(isBuilding)
     , m_isMwmBorder(isMwmBorder)
-    , m_backgroundMode(backgroundMode)
+    , m_areaOpacity(areaOpacity)
   {
     m_posZ = posZ;
   }
@@ -92,7 +96,8 @@ public:
   void operator()(PointT const & p1, PointT const & p2, PointT const & p3);
 
   bool HasGeometry() const { return !m_triangles.empty(); }
-  void ProcessAreaRules(AreaRuleProto const * areaRule, AreaRuleProto const * hatchingRule, std::string_view hatchKey);
+  void ProcessAreaRules(drule::AreaRule const * areaRule, drule::AreaRule const * hatchingRule,
+                        std::string_view hatchKey, std::string_view patternKey);
 
   struct Edge
   {
@@ -116,7 +121,8 @@ public:
 private:
   bool HasArea() const override { return true; }
 
-  void ProcessRule(AreaRuleProto const & areaRule, double areaDepth, std::string_view hatchKey);
+  void ProcessRule(drule::AreaRule const & areaRule, double areaDepth, std::string_view hatchKey,
+                   std::string_view patternKey);
   void ProcessBuildingPolygon(PointT const & p1, PointT const & p2, PointT const & p3, double crossProduct);
 
   /// @todo Factor out to a separate outline-building component.
@@ -139,7 +145,9 @@ private:
   float const m_minPosZ;
   bool const m_isBuilding;
   bool const m_isMwmBorder;
-  dp::BackgroundMode const m_backgroundMode;
+  // Multiplier applied to area-fill alpha. 1.0 means opaque (normal map); in Satellite mode it is the
+  // user-configured "area objects" opacity (0 -> fully hidden, geometry skipped before reaching here).
+  float const m_areaOpacity;
 };
 
 class ApplyLineFeatureGeometry : public BaseApplyFeature
@@ -147,20 +155,22 @@ class ApplyLineFeatureGeometry : public BaseApplyFeature
   using TBase = BaseApplyFeature;
 
 public:
-  ApplyLineFeatureGeometry(Params const & params, FeatureType & f, RelationsDrawSettings const & relsSettings);
-  void BuildGeometry(int zoomLevel, bool isIsoline);
+  ApplyLineFeatureGeometry(Params const & params, FeatureType & f, RelationsDrawSettings const & relsSettings,
+                           bool isIsoline);
+  void BuildGeometry(int zoomLevel);
 
   bool HasGeometry() const { return m_builder.HasGeometry(); }
-  void ProcessLineRules(Stylist::LineRulesT const & lineRules, bool isIsoline);
+  void ProcessLineRules(Stylist::LineRulesT const & lineRules);
 
   std::vector<m2::SharedSpline> MoveClippedSplines() { return std::move(m_clippedSplines); }
 
 private:
-  void ProcessRule(LineRuleProto const & lineRule);
+  void ProcessRule(drule::LineRule const & lineRule);
 
   RelationsDrawInfo m_relsInfo;
   ClipSplinesBuilder m_builder;
   std::vector<m2::SharedSpline> m_clippedSplines;
+  bool const m_isIsoline;
 
 #ifdef LINES_GENERATION_CALC_FILTERED_POINTS
   int m_readCount = 0;
@@ -174,14 +184,15 @@ class ApplyLineFeatureAdditional : public BaseApplyFeature
 
 public:
   ApplyLineFeatureAdditional(Params const & params, FeatureType & f, CaptionDescription const & captions,
-                             std::vector<m2::SharedSpline> && clippedSplines)
+                             std::vector<m2::SharedSpline> && clippedSplines, bool isIsoline)
     : TBase(params, f, captions)
     , m_clippedSplines(std::move(clippedSplines))
+    , m_isIsoline(isIsoline)
   {
     ASSERT(!m_clippedSplines.empty(), ());
   }
 
-  void ProcessAdditionalLineRules(PathTextRuleProto const * pathtextRule, ShieldRuleProto const * shieldRule,
+  void ProcessAdditionalLineRules(drule::PathTextRule const * pathtextRule, drule::ShieldRule const * shieldRule,
                                   ref_ptr<dp::TextureManager> texMng, ftypes::RoadShieldsSetT const & roadShields,
                                   GeneratedRoadShields & generatedRoadShields);
 
@@ -194,9 +205,10 @@ private:
                           uint32_t minDistanceInPixels, std::vector<m2::RectD> & shields);
 
   std::vector<m2::SharedSpline> m_clippedSplines;
+  bool const m_isIsoline;
   float m_captionDepth = 0.0f, m_shieldDepth = 0.0f;
-  CaptionDefProto const * m_captionRule = nullptr;
-  ShieldRuleProto const * m_shieldRule = nullptr;
+  drule::CaptionDef const * m_captionRule = nullptr;
+  drule::ShieldRule const * m_shieldRule = nullptr;
 };
 
 extern dp::Color ToDrapeColor(uint32_t src);

@@ -61,20 +61,64 @@ inline double ClampY(double d)
 /// geographic position across the antimeridian: WrapX(185) = -175.
 inline double WrapX(double x)
 {
-  x = std::fmod(x - Bounds::kMinX, Bounds::kRangeX);
-  return (x < 0.0 ? x + Bounds::kRangeX : x) + Bounds::kMinX;
+  x = std::remainder(x, 360.0);  // [-180, 180]
+  return x == 180.0 ? -180.0 : x;
 }
 
-/// Returns x adjusted to be within 180 degrees of refX.
-/// Picks the nearest world copy across the antimeridian.
-/// Uses a loop to handle screen origins more than 360 degrees from the feature.
+/// Returns the world copy of x (x shifted by whole multiples of 360) nearest to refX,
+/// or x itself when it is already within 180 degrees of refX.
 inline double NearestWrapX(double x, double refX)
 {
-  while (x - refX > 180.0)
-    x -= 360.0;
-  while (x - refX < -180.0)
-    x += 360.0;
-  return x;
+  double const dx = x - refX;
+  if (dx >= -180.0 && dx <= 180.0)
+    return x;
+  return refX + std::remainder(dx, 360.0);
+}
+
+/// Shifts the rect by whole world widths so that its center is within [-180, 180).
+/// The result may still cross the antimeridian.
+inline m2::RectD WrapRectX(m2::RectD rect)
+{
+  double const x = rect.Center().x;
+  rect.Offset(WrapX(x) - x, 0.0);
+  return rect;
+}
+
+/// Calls \a fn for the one or two canonical parts (X in [kMinX, kMaxX]) of \a rect.
+/// Shifted rectangles are normalized and split at the antimeridian as needed. Widths
+/// of at least kRangeX emit one part covering all longitudes. Y is passed through untouched.
+/// For narrower rectangles, antimeridian contacts include both representations of the
+/// boundary, so an emitted part can have zero width.
+template <typename Fn>
+void ForEachRectWrapped(m2::RectD const & rect, Fn && fn)
+{
+  ASSERT(rect.IsValid(), (rect));
+  if (rect.SizeX() >= Bounds::kRangeX)
+  {
+    // At least one world width covers every longitude.
+    fn(m2::RectD(Bounds::kMinX, rect.minY(), Bounds::kMaxX, rect.maxY()));
+    return;
+  }
+
+  auto wrapped = rect;
+  if (rect.Center().x < Bounds::kMinX || rect.Center().x > Bounds::kMaxX)
+    wrapped = WrapRectX(rect);
+  if (wrapped.maxX() >= Bounds::kMaxX)
+  {
+    // [minX, kMaxX] stays canonical; the part beyond kMaxX wraps to the west.
+    fn(m2::RectD(wrapped.minX(), wrapped.minY(), Bounds::kMaxX, wrapped.maxY()));
+    fn(m2::RectD(Bounds::kMinX, wrapped.minY(), wrapped.maxX() - Bounds::kRangeX, wrapped.maxY()));
+  }
+  else if (wrapped.minX() <= Bounds::kMinX)
+  {
+    // [kMinX, maxX] stays canonical; the part below kMinX wraps to the east.
+    fn(m2::RectD(Bounds::kMinX, wrapped.minY(), wrapped.maxX(), wrapped.maxY()));
+    fn(m2::RectD(wrapped.minX() + Bounds::kRangeX, wrapped.minY(), Bounds::kMaxX, wrapped.maxY()));
+  }
+  else
+  {
+    fn(wrapped);
+  }
 }
 
 void ClampPoint(m2::PointD & pt);
@@ -95,11 +139,6 @@ inline double MetersToMercator(double meters)
 {
   return meters * Bounds::kDegreesInMeter;
 }
-inline double MercatorToMeters(double mercator)
-{
-  return mercator * Bounds::kMetersInDegree;
-}
-
 /// @name Get rect for center point (lon, lat) and dimensions in meters.
 /// @return mercator rect.
 m2::RectD MetersToXY(double lon, double lat, double lonMetersR, double latMetersR);
@@ -135,6 +174,9 @@ inline ms::LatLon ToLatLon(m2::PointD const & point)
   return {YToLat(point.y), XToLon(point.x)};
 }
 
+// These rect overloads keep the same axis convention as the scalar overloads and the rest of
+// mercator: X is longitude, Y is latitude. A lat/lon rect therefore reads as the standard
+// (West, South, East, North) bbox, and FromLatLon / ToLatLon are exact inverses of each other.
 m2::RectD FromLatLon(m2::RectD const & rect);
 m2::RectD ToLatLon(m2::RectD const & rect);
 

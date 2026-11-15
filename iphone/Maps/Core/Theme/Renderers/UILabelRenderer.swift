@@ -1,9 +1,6 @@
 extension UILabel {
   var isAttributed: Bool {
-    guard let attributedText = attributedText else {
-      return false
-    }
-    guard !attributedText.string.isEmpty else {
+    guard let attributedText = attributedText, !attributedText.string.isEmpty else {
       return false
     }
     var range = NSRange()
@@ -34,8 +31,9 @@ extension UILabel {
 class UILabelRenderer: UIViewRenderer {
   class func render(_ control: UILabel, style: Style) {
     super.render(control, style: style)
-    if let font = style.font {
-      control.font = font
+    if let fontStyle = style.fontStyle {
+      control.font = fontStyle.font
+      control.adjustsFontForContentSizeCategory = fontStyle.isDynamic
     }
     if let fontColor = style.fontColor {
       control.textColor = fontColor

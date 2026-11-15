@@ -22,7 +22,7 @@ on:
 env:
   RELEASE_NOTES: android/app/src/google/play/release-notes/en-US/default.txt
   FDROID_VERSION: android/app/src/fdroid/play/version.yaml
-  JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64  # Java 17 is required for Android Gradle 8 plugin
+  JAVA_HOME: /usr/lib/jvm/temurin-21-jdk-amd64  # Java 21 is required by Android Gradle plugin lint
 
 jobs:
   setup:
@@ -128,14 +128,6 @@ jobs:
           fetch-depth: 100 # enough to get all commits for the current day
           ref: 'refs/tags/${{ needs.tag.outputs.tag }}'
 
-      - name: Restore Boost submodule from cache
-        uses: actions/cache@v5
-        with:
-          path: |
-            3party/boost
-            .git/modules/3party/boost
-          key: boost-submodule
-
       - name: Check tag
         shell: bash
         run: |
@@ -171,10 +163,6 @@ jobs:
           AGCONNECT_SERVICES_JSON: ${{ secrets.AGCONNECT_SERVICES_JSON }}
           SECURE_PROPERTIES: ${{ secrets.SECURE_PROPERTIES }}
           RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
-
-      - name: Configure repository
-        shell: bash
-        run: ./configure.sh
 
       - name: Set up SDK
         shell: bash

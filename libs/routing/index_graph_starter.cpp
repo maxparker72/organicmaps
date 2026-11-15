@@ -9,7 +9,6 @@
 
 #include "geometry/distance_on_sphere.hpp"
 
-#include <algorithm>
 #include <map>
 
 namespace routing
@@ -150,23 +149,7 @@ std::set<NumMwmId> IndexGraphStarter::GetMwms() const
 
 bool IndexGraphStarter::CheckLength(RouteWeight const & weight)
 {
-  // Avoid transit through living neighbourhoods.
-  // Assume that start or end belongs to the living neighbourhood (HasNoPassThroughAllowed),
-  // if at least one of the projections is non-pass-through road (service, living_street).
-  // Interesting example here: https://github.com/organicmaps/organicmaps/issues/1008
-
-  // Allow pass-through <-> non-pass-through zone changes if start or end belongs
-  // to no-pass-through zone (have to leave or arrive at living neighbourhood).
-
-  /// @todo By VNG: Additional 2 changes to relax this restriction. Or should enchance this mechanics to allow
-  /// pass through say living_street into lower class road (track/road/unclassified?).
-  /// This additional penalty will be included in RouteWeight::GetIntegratedWeight().
-  /// @see RussiaMoscowNotCrossingTollRoadTest
-
-  int8_t const changesAllowed =
-      2 + (HasNoPassThroughAllowed(m_start) ? 1 : 0) + (HasNoPassThroughAllowed(m_finish) ? 1 : 0);
-
-  return weight.GetNumPassThroughChanges() <= changesAllowed && m_graph.CheckLength(weight, m_startToFinishDistanceM);
+  return m_graph.CheckLength(weight, m_startToFinishDistanceM);
 }
 
 void IndexGraphStarter::GetEdgesList(astar::VertexData<Vertex, Weight> const & vertexData, bool isOutgoing,
@@ -203,6 +186,13 @@ void IndexGraphStarter::GetEdgesList(astar::VertexData<Vertex, Weight> const & v
           astar::VertexData const replacedFakeSegment(real, vertexData.m_realDistance);
           m_graph.GetEdgeList(replacedFakeSegment, isOutgoing, true /* useRoutingOptions */, useAccessConditional,
                               edges);
+          // The ingoing edges have the weight of the whole |real| segment, but the route takes its part only.
+          if (!isOutgoing)
+          {
+            auto const realWeight = CalcSegmentWeight(real, EdgeEstimator::Purpose::Weight);
+            for (auto & edge : edges)
+              edge.GetWeight() += ingoingSegmentWeight - realWeight;
+          }
         }
       }
     }
@@ -276,6 +266,17 @@ RouteWeight IndexGraphStarter::CalcSegmentWeight(Segment const & segment, EdgeEs
   return m_graph.CalcOffroadWeight(vertex.GetPointFrom(), vertex.GetPointTo(), purpose);
 }
 
+RouteWeight IndexGraphStarter::CalcRouteEdgeWeight(Segment const & from, Segment const & to) const
+{
+  EdgeListT edges;
+  GetEdgesList(from, true /* isOutgoing */, edges);
+  for (auto const & edge : edges)
+    if (edge.GetTarget() == to)
+      return edge.GetWeight();
+
+  return CalcSegmentWeight(to, EdgeEstimator::Purpose::Weight);
+}
+
 double IndexGraphStarter::CalculateETA(Segment const & from, Segment const & to, time_t arrivalTime) const
 {
   // We don't distinguish fake segment weight and fake segment transit time.
@@ -283,7 +284,8 @@ double IndexGraphStarter::CalculateETA(Segment const & from, Segment const & to,
     return CalcSegmentWeight(to, EdgeEstimator::Purpose::ETA).GetWeight();
 
   if (IsFakeSegment(from))
-    return CalculateETAWithoutPenalty(to);
+    return FakeFeatureIds::IsTransitFeature(to.GetFeatureId()) ? m_graph.CalculateETA(from, to, arrivalTime)
+                                                               : CalculateETAWithoutPenalty(to);
 
   if (IsGuidesSegment(from) || IsGuidesSegment(to))
   {
@@ -409,6 +411,33 @@ void IndexGraphStarter::AddEnding(FakeEnding const & thisEnding)
   }
 
   m_otherEndings.push_back(thisEnding);
+}
+
+void IndexGraphStarter::ConnectGateAccessesToTransit(GateAccessesT const & gates, bool isStart)
+{
+  if (gates.empty())
+    return;
+
+  Segment const originSegment = isStart ? GetStartSegment() : GetFinishSegment();
+  LatLonWithAltitude const origin = GetJunction(originSegment, true /* front */);
+
+  for (auto const & gate : gates)
+  {
+    auto const & projection = gate.m_projection;
+    FakeVertex const projectionVertex(projection.m_segment.GetMwmId(), isStart ? origin : projection.m_junction,
+                                      isStart ? projection.m_junction : origin, FakeVertex::Type::PureFake);
+
+    Segment projectionSegment;
+    CHECK(m_fake.FindSegment(projectionVertex, projectionSegment), (projection.m_segment, gate.m_entrySegment));
+
+    // Hop from the checkpoint's gate snap candidate onto the gate's transit boarding entry (handled
+    // by the world graph). |m_entrySegment| is a transit segment outside this fake graph, so use
+    // AddOuterConnection.
+    if (isStart)
+      m_fake.AddOuterConnection(projectionSegment, gate.m_entrySegment);
+    else
+      m_fake.AddOuterConnection(gate.m_entrySegment, projectionSegment);
+  }
 }
 
 void IndexGraphStarter::AddEnding(FakeEnding const & thisEnding, FakeEnding const & otherEnding, bool isStart,
@@ -553,29 +582,24 @@ void IndexGraphStarter::AddFakeEdges(Segment const & segment, bool isOutgoing, E
       //  *------------>*----------->
       bool const sIsIngoing = GetJunction(s, true /* front */) == GetJunction(segment, false /* front */);
 
-      if ((isOutgoing && sIsOutgoing) || (!isOutgoing && sIsIngoing))
+      if (isOutgoing && sIsOutgoing)
+      {
+        auto weight = CalcSegmentWeight(s, EdgeEstimator::Purpose::Weight);
+        // |s| is a part of the |edge| target: it replaces the target weight and keeps the transition penalties.
+        // The regions graph has no penalties, and its edge weights differ from the segment ones.
+        if (!IsRegionsGraphMode())
+          weight += edge.GetWeight() - CalcSegmentWeight(edge.GetTarget(), EdgeEstimator::Purpose::Weight);
+        fakeEdges.emplace_back(s, weight);
+      }
+      else if (!isOutgoing && sIsIngoing)
       {
         // For ingoing edges we use source weight which is the same for |s| and for |edge| and is
         // already calculated.
-        fakeEdges.emplace_back(s, isOutgoing ? CalcSegmentWeight(s, EdgeEstimator::Purpose::Weight) : edge.GetWeight());
+        fakeEdges.emplace_back(s, edge.GetWeight());
       }
     }
   }
   edges.append(fakeEdges.begin(), fakeEdges.end());
-}
-
-bool IndexGraphStarter::HasNoPassThroughAllowed(Ending const & ending) const
-{
-  if (IsRegionsGraphMode())
-    return false;
-
-  return std::any_of(ending.m_real.cbegin(), ending.m_real.cend(), [this](Segment const & s)
-  {
-    if (IsGuidesSegment(s))
-      return false;
-
-    return !m_graph.IsPassThroughAllowed(s.GetMwmId(), s.GetFeatureId());
-  });
 }
 
 Segment IndexGraphStarter::GetFakeSegmentAndIncr()

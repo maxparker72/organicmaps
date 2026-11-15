@@ -4,6 +4,7 @@
 #
 
 import os
+import re
 import sys
 import glob
 import shutil
@@ -125,44 +126,59 @@ APPSTORE_LOCALES = [
     "te-IN", "th", "tr", "uk", "ur-PK", "vi", "zh-Hans", "zh-Hant"
 ]
 
+# Combined Android locale set for O(1) membership tests in check_path().
+ANDROID_LOCALES = frozenset(GPLAY_LOCALES + HUAWEI_ONLY_LOCALES)
+
+# Char limits for files validated by check_path(). Source of truth for the
+# `files` subcommand; the bulk check_android()/check_ios() use literals inline.
+ANDROID_LISTING_LIMITS = {
+    'title.txt': 50,
+    'title-google.txt': 30,
+    'short-description.txt': 80,
+    'short-description-google.txt': 80,
+    'full-description.txt': 4000,
+    'full-description-google.txt': 4000,
+    'release-notes.txt': 500,
+}
+IOS_METADATA_LIMITS = {
+    'name.txt': 30,
+    'subtitle.txt': 30,
+    'promotional_text.txt': 170,
+    'description.txt': 4000,
+    'release_notes.txt': 4000,
+    'keywords.txt': 100,
+}
+IOS_URL_FILES = ('support_url.txt', 'marketing_url.txt', 'privacy_url.txt')
+
+# Pre-compiled path patterns dispatched by check_path().
+_LISTINGS_RE = re.compile(r'^android/app/src/(?:fdroid|google)/play/listings/([^/]+)/([^/]+\.txt)$')
+_RELEASE_NOTES_RE = re.compile(r'^android/app/src/(?:fdroid|google)/play/release-notes/([^/]+)/([^/]+\.txt)$')
+_PLAY_TOPLEVEL_RE = re.compile(r'^android/app/src/(?:fdroid|google)/play/([^/]+\.txt)$')
+_IOS_METADATA_RE = re.compile(r'^iphone/metadata/([^/]+)/([^/]+\.txt)$')
+# Additional text-style symbols require VS16; plain copyright signs and arrows are valid.
+# Emoji properties: https://www.unicode.org/Public/18.0.0/ucd/emoji/emoji-data.txt
+_EMOJI_RE = re.compile(
+    r'[\U0001F1E6-\U0001F1FF\U0001F300-\U0001FAFF'
+    r'\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u261D\u2620\u2622\u2623\u2626\u262A\u262E\u262F'
+    r'\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F'
+    r'\u2692-\u2697\u2699\u269B\u269C\u26A0\u26A1\u26A7\u26AA\u26AB\u26B0\u26B1\u26BD\u26BE'
+    r'\u26C4\u26C5\u26C8\u26CE\u26CF\u26D1\u26D3\u26D4\u26E9\u26EA\u26F0-\u26F5\u26F7-\u26FA\u26FD'
+    r'\u2702\u2705\u2708-\u270D\u270F\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747'
+    r'\u274C\u274E\u2753-\u2755\u2757\u2763\u2764\u2795-\u2797\u27A1\u27B0\u27BF'
+    r'\u231A-\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD-\u25FE\u2B1B-\u2B1C\u2B50\u2B55\U0001F004'
+    r'\U0001F0CF\U0001F18E\U0001F191-\U0001F19A\U0001F201\U0001F21A\U0001F22F\U0001F232-\U0001F236'
+    r'\U0001F238-\U0001F23A\U0001F250-\U0001F251]'
+    r'|[#*0-9]\uFE0F?\u20E3'
+    r'|[\u00A9\u00AE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9-\u21AA\u2328\u23CF\u23ED-\u23EF'
+    r'\u23F1-\u23F2\u23F8-\u23FA\u24C2\u25AA-\u25AB\u25B6\u25C0\u25FB-\u25FC\u2934-\u2935'
+    r'\u2B05-\u2B07\u3030\u303D\u3297\u3299\U0001F170-\U0001F171\U0001F17E-\U0001F17F\U0001F202\U0001F237]'
+    r'\uFE0F'
+)
+
 
 def contains_emoji(text):
-    """Heuristic emoji detection avoiding false positives for CJK, Korean, Thai.
-
-    We purposefully restrict to well‑known emoji code point ranges and symbols
-    that are almost never used as plain alphabetic text in the app metadata.
-    This avoids broad regex character classes that accidentally match
-    non‑emoji letters in some environments.
-
-    Ranges covered (inclusive):
-      * 0x1F1E6–0x1F1FF (regional indicator symbols / flags)
-      * 0x1F300–0x1FAFF (primary emoji blocks incl. supplemental)
-      * 0x2600–0x26FF (misc symbols) – classic sun, cloud, etc.
-      * 0x2700–0x27BF (dingbats) – arrows, stars, etc.
-      * Variation Selector-16 (U+FE0F) when following an emoji base
-      * Zero Width Joiner sequences (U+200D) – if part of a chain containing
-        an emoji code point.
-    """
-    prev_was_emoji = False
-    for ch in text:
-        cp = ord(ch)
-        is_base = (
-            0x1F1E6 <= cp <= 0x1F1FF or
-            0x1F300 <= cp <= 0x1FAFF or
-            0x2600 <= cp <= 0x26FF or
-            0x2700 <= cp <= 0x27BF
-        )
-        if is_base:
-            return True
-        # Variation Selector-16 turns some symbols into emoji presentation.
-        if cp == 0xFE0F and prev_was_emoji:
-            return True
-        # Zero Width Joiner inside an emoji sequence.
-        if cp == 0x200D and prev_was_emoji:
-            # Keep prev_was_emoji True to allow continuation.
-            continue
-        prev_was_emoji = is_base
-    return False
+    """Detect emoji characters, presentation variants and keycaps."""
+    return bool(_EMOJI_RE.search(text))
 
 
 def error(path, message, *args, **kwargs):
@@ -175,48 +191,49 @@ def done(path, ok):
         print("✅", path)
     return ok
 
-def check_raw(path, max_length):
+def check_raw(path, max_length, fix=False):
     ok = True
-    with open(path, 'r') as f:
-        text = f.read()
-        if text[-1] == os.linesep:
-            text = text[:-1]
-        #else:
-        #    ok = error(path, "missing new line")
-
-        # Check for emojis
-        if contains_emoji(text):
-            ok = error(path, "contains emoji characters")
-
-        cur_length = len(text)
-        if cur_length > max_length:
-            ok = error(path, "too long: got={}, expected={}", cur_length, max_length)
-        return ok, text
-
-def check_text(path, max, optional=False):
     try:
-        return done(path, check_raw(path, max)[0])
-    except FileNotFoundError as e:
-        if optional:
-            return True,
+        with open(path, 'rb') as f:
+            raw = f.read()
+    except FileNotFoundError:
         print("🚫", path)
-        return False,
+        return False, ''
+    text = raw.decode('utf-8').rstrip()
+    if fix and (encoded := text.encode('utf-8')) != raw:
+        with open(path, 'wb') as f:
+            f.write(encoded)
+        print("✂️ ", path + ":", "trimmed trailing whitespace")
 
-def check_url(path,):
-    (ok, url) = check_raw(path, 500)
+    if contains_emoji(text):
+        ok = error(path, "contains emoji characters")
+
+    if len(text) > max_length:
+        ok = error(path, "too long: got={}, expected={}", len(text), max_length)
+    return ok, text
+
+def check_text(path, max, optional=False, fix=False):
+    if optional and not os.path.exists(path):
+        return True
+    return done(path, check_raw(path, max, fix=fix)[0])
+
+def check_url(path, fix=False):
+    (ok, url) = check_raw(path, 500, fix=fix)
+    if not ok:
+        return False
     url = urlparse(url)
-    if not url.scheme in ('https', 'http'):
+    if url.scheme not in ('https', 'http'):
         ok = error(path, "invalid URL: {}", url)
     return done(path, ok)
 
-def check_email(path):
-    (ok, email) = check_raw(path, 500)
+def check_email(path, fix=False):
+    (ok, email) = check_raw(path, 500, fix=fix)
     ok = ok and email.find('@') != -1 and email.find('.') != -1
     return done(path, ok)
 
-def check_exact(path, expected):
-    (ok, value) = check_raw(path, len(expected))
-    if value != expected:
+def check_exact(path, expected, fix=False):
+    (ok, value) = check_raw(path, len(expected), fix=fix)
+    if ok and value != expected:
         ok = error(path, "invalid value: got={}, expected={}", value, expected)
     return done(path, ok)
 
@@ -289,16 +306,69 @@ def check_ios():
             continue
     return ok
 
+def check_path(path, fix=False):
+    """Run the appropriate check on a single file based on its path.
+
+    Used by the `files` subcommand (e.g. from the pre-commit hook) to validate
+    only the files staged for commit instead of the whole tree. Unknown paths
+    are skipped (return True) so non-metadata files in the same commit are a
+    no-op rather than an error.
+    """
+    # Android Play Store listings (fdroid or google flavor share the same layout).
+    if m := _LISTINGS_RE.match(path):
+        locale, name = m[1], m[2]
+        if locale not in ANDROID_LOCALES:
+            return error(path, 'unsupported locale: {}', locale)
+        if name in ANDROID_LISTING_LIMITS:
+            return done(path, check_raw(path, ANDROID_LISTING_LIMITS[name], fix=fix)[0])
+        if name == 'video-url.txt':
+            return check_url(path, fix=fix)
+        return True
+
+    # Per-track release notes.
+    if m := _RELEASE_NOTES_RE.match(path):
+        locale, name = m[1], m[2]
+        if locale not in ANDROID_LOCALES:
+            return error(path, 'unsupported locale: {}', locale)
+        if name == 'default.txt':
+            return done(path, check_raw(path, 500, fix=fix)[0])
+        return True
+
+    # Top-level Play Store metadata.
+    if m := _PLAY_TOPLEVEL_RE.match(path):
+        match m[1]:
+            case 'contact-website.txt': return check_url(path, fix=fix)
+            case 'contact-email.txt':   return check_email(path, fix=fix)
+            case 'default-language.txt': return check_exact(path, 'en-US', fix=fix)
+        return True
+
+    # iOS metadata.
+    if m := _IOS_METADATA_RE.match(path):
+        locale, name = m[1], m[2]
+        if locale == 'review_information':
+            return True
+        if locale not in APPSTORE_LOCALES:
+            return error(path, 'unsupported locale: {}', locale)
+        if name in IOS_METADATA_LIMITS:
+            return done(path, check_raw(path, IOS_METADATA_LIMITS[name], fix=fix)[0])
+        if name in IOS_URL_FILES:
+            return check_url(path, fix=fix)
+        return True
+
+    return True  # Not a metadata file we know about — skip.
+
+
 if __name__ == "__main__":
-    ok = True
-    if len(sys.argv) == 2 and sys.argv[1] == 'android':
-        if check_android():
-            sys.exit(0)
-        sys.exit(2)
-    elif len(sys.argv) == 2 and sys.argv[1] == "ios":
-        if check_ios():
-            sys.exit(0)
-        sys.exit(2)
-    else:
-        print("Usage:", sys.argv[0], "android|ios", file=sys.stderr)
-        sys.exit(1)
+    usage = f"Usage: {sys.argv[0]} android|ios|files [--fix] FILE [FILE...]"
+    match sys.argv[1:]:
+        case ['android']:
+            sys.exit(0 if check_android() else 2)
+        case ['ios']:
+            sys.exit(0 if check_ios() else 2)
+        case ['files', *rest] if (paths := [a for a in rest if a != '--fix']):
+            fix = '--fix' in rest
+            # List comp (not generator) so every path is checked even after a failure.
+            sys.exit(0 if all([check_path(p, fix=fix) for p in paths]) else 2)
+        case _:
+            print(usage, file=sys.stderr)
+            sys.exit(1)

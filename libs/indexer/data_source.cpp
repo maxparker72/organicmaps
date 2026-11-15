@@ -30,7 +30,10 @@ public:
   // Reads features visible at |scale| covered by |cov| from mwm and applies |m_fn| to them.
   // Feature reading process consists of two steps: untouched (original) features reading and
   // touched (created, edited etc.) features reading.
-  void operator()(MwmSet::MwmHandle const & handle, covering::CoveringGetter & cov, int scale) const
+  // |cov| is any covering source exposing Get(scale) and GetRect() - both covering::CoveringGetter
+  // (single rect) and covering::Covering (aggregated rects) qualify.
+  template <class CoveringT>
+  void operator()(MwmSet::MwmHandle const & handle, CoveringT & cov, int scale) const
   {
     /// @todo
     /// - Check handle.IsAlive before and return.
@@ -52,7 +55,7 @@ public:
         scale = lastScale;
 
       // Use last coding scale for covering (see index_builder.cpp).
-      covering::Intervals const & intervals = cov.Get<RectId::DEPTH_LEVELS>(lastScale);
+      covering::Intervals const & intervals = cov.Get(lastScale);
       ScaleIndex<ModelReaderPtr> index(mwmValue->m_cont.GetReader(INDEX_FILE_TAG));
 
       // iterate through intervals
@@ -132,13 +135,6 @@ bool FeaturesLoaderGuard::IsWorld() const
 {
   ASSERT(m_handle.IsAlive(), ());
   return m_handle.GetValue()->GetHeader().GetType() == feature::DataHeader::MapType::World;
-}
-
-std::unique_ptr<FeatureType> FeaturesLoaderGuard::GetOriginalOrEditedFeatureByIndex(uint32_t index) const
-{
-  ASSERT(m_handle.IsAlive(), ());
-  ASSERT_NOT_EQUAL(m_source->GetFeatureStatus(index), FeatureStatus::Created, ());
-  return GetFeatureByIndex(index);
 }
 
 std::unique_ptr<FeatureType> FeaturesLoaderGuard::GetFeatureByIndex(uint32_t index) const
@@ -267,6 +263,14 @@ void DataSource::ForEachInScale(FeatureCallback const & f, int scale) const
 {
   ReadMWMFunctor readFunctor(*m_factory, f);
   ForEachInIntervals(readFunctor, covering::FullCover, m2::RectD::GetInfiniteRect(), scale);
+}
+
+void DataSource::ForEachInCoveringForMWM(FeatureCallback const & f, covering::AggCovering & covering, int scale,
+                                         MwmId const & id) const
+{
+  MwmHandle const handle = GetMwmHandleById(id);
+  if (handle.IsAlive())
+    ReadMWMFunctor(*m_factory, f)(handle, covering, scale);
 }
 
 void DataSource::ForEachInRectForMWM(FeatureCallback const & f, m2::RectD const & rect, int scale,

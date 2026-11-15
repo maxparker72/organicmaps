@@ -1,21 +1,15 @@
 package app.organicmaps.sdk.car.renderer;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
+import androidx.annotation.Nullable;
 import androidx.car.app.CarContext;
 import androidx.lifecycle.LifecycleOwner;
-import app.organicmaps.sdk.MapController;
-import app.organicmaps.sdk.MapView;
+import app.organicmaps.sdk.Framework;
 import app.organicmaps.sdk.display.DisplayManager;
-import app.organicmaps.sdk.display.DisplayType;
 import app.organicmaps.sdk.location.LocationHelper;
 
-@RequiresApi(23)
 final class SurfaceRenderer extends RendererImpl
 {
-  @NonNull
-  private final MapController mMapController;
-
   @NonNull
   private final SurfaceCallback mSurfaceCallback;
 
@@ -24,10 +18,8 @@ final class SurfaceRenderer extends RendererImpl
   {
     super(carContext, displayManager, locationHelper, lifecycleOwner);
 
-    mMapController = new MapController(new MapView(carContext, DisplayType.Car), locationHelper,
-                                       getMapRenderingListener(), null, false);
-    mLifecycleOwner.getLifecycle().addObserver(mMapController);
-    mSurfaceCallback = new SurfaceCallback(mCarContext, mMapController);
+    mSurfaceCallback =
+        new SurfaceCallback(mCarContext, mLifecycleOwner, locationHelper, getMapRenderingListener(), displayManager);
     setSurfaceCallback(mSurfaceCallback);
   }
 
@@ -35,9 +27,6 @@ final class SurfaceRenderer extends RendererImpl
   public void enable()
   {
     super.enable();
-
-    mMapController.onStart(mLifecycleOwner);
-    mMapController.updateMyPositionRoutingOffset(0);
     mSurfaceCallback.startPresenting();
   }
 
@@ -45,15 +34,37 @@ final class SurfaceRenderer extends RendererImpl
   public void disable()
   {
     super.disable();
-
-    mMapController.onPause(mLifecycleOwner);
     mSurfaceCallback.stopPresenting();
-    mMapController.onStop(mLifecycleOwner);
   }
 
   @Override
-  public void setSpeedLimit(int speedLimit, boolean speedLimitExceeded)
+  public void onDestroy(@NonNull LifecycleOwner owner)
   {
-    mSurfaceCallback.getSpeedLimitView().setSpeedLimit(speedLimit, speedLimitExceeded);
+    mSurfaceCallback.destroy();
+    super.onDestroy(owner);
+  }
+
+  @Override
+  public void setCurrentSpeed(int speed, @NonNull String units)
+  {
+    mSurfaceCallback.setCurrentSpeed(speed, units);
+  }
+
+  @Override
+  public void setSpeedLimit(@Nullable Integer speedLimit)
+  {
+    mSurfaceCallback.setSpeedLimit(speedLimit);
+  }
+
+  @Override
+  public void setSpeedLimitSignType(@Framework.SpeedLimitSignType int type)
+  {
+    mSurfaceCallback.setSpeedLimitSignType(type);
+  }
+
+  @Override
+  public void setAlertForced(boolean alertForced)
+  {
+    mSurfaceCallback.setAlertForced(alertForced);
   }
 }

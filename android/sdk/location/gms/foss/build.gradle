@@ -3,6 +3,7 @@ plugins {
 }
 
 apply from: "${rootProject.rootDir}/groovy/common-config.gradle"
+apply from: "${rootProject.rootDir}/groovy/publishing.gradle"
 
 android {
   namespace = 'app.organicmaps.sdk.location.gms'
@@ -14,15 +15,29 @@ android {
         srcDir(new File(project(':sdk:location:gms:google').projectDir, 'src/main/java/'))
       }
     }
+    test {
+      java {
+        srcDir(new File(project(':sdk:location:gms:google').projectDir, 'src/test/java/'))
+      }
+    }
   }
 }
 
 dependencies {
   implementation project(':sdk')
-  implementation project(':sdk:location:core')
+  api project(':sdk:location:core')
 
   implementation libs.androidx.annotation
   // This is the microG project's re-implementation which is permissible on
   // F-droid because it's Apache-2.0.
   implementation libs.microg.gms.location
+
+  testImplementation libs.androidx.junit
+  testImplementation libs.mockito.core
+  testImplementation libs.robolectric
 }
+
+Publish(project, [
+    'name'       : 'Organic Maps SDK. Google Fused Location (FOSS)',
+    'description': 'A library that provides a FOSS implementation of Google fused location services for the Organic Maps SDK'
+])

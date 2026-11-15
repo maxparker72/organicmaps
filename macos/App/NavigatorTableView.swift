@@ -49,7 +49,7 @@ struct NavigatorTableView: View {
       TableColumn("Color", value: \.colorName) { row in
         switch row.kind {
         case .bookmark(let bm):
-          Circle().fill(bm.bookmarkColor.swiftUIColor).frame(width: 10, height: 10)
+          Circle().fill(Color(nsColor: bm.bookmarkColor)).frame(width: 10, height: 10)
         case .track(let t):
           RoundedRectangle(cornerRadius: 1)
             .fill(Color(nsColor: t.trackColor)).frame(width: 14, height: 3)
@@ -162,7 +162,7 @@ struct LibraryRow: Identifiable {
 
   var colorName: String {
     switch kind {
-    case .bookmark(let b): return b.bookmarkColor.displayName
+    case .bookmark(let b): return BookmarkColor.closest(to: b.bookmarkColor).displayName
     case .track(let t): return BookmarkColor.closest(to: t.trackColor).displayName
     }
   }

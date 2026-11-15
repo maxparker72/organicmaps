@@ -128,10 +128,9 @@ Classificator & classif()
   return GetClassifImpl(GetStyleReader().GetCurrentStyle());
 }
 
-Classificator & GetOutdoorClassif()
+Classificator & classif(MapStyle mapStyle)
 {
-  auto const style = GetStyleReader().GetCurrentStyle();
-  return GetClassifImpl(MapStyleIsDark(style) ? MapStyleOutdoorsDark : MapStyleOutdoorsLight);
+  return GetClassifImpl(mapStyle);
 }
 
 namespace ftype
@@ -411,12 +410,15 @@ uint32_t Classificator::GetTypeByPath(base::StringIL const & lst) const
 uint32_t Classificator::GetTypeByReadableObjectName(std::string const & name) const
 {
   ASSERT(!name.empty(), ());
+  // KML bookmarks store readable type names, so they need the same replacement as numeric map indices.
+  if (name == "waterway-stream-ephemeral")
+    return GetTypeByPath({"waterway", "stream", "intermittent"});
   return GetTypeByPathSafe(strings::Tokenize(name, "-"));
 }
 
 void Classificator::ReadTypesMapping(std::istream & s)
 {
-  m_mapping.Load(s);
+  m_mapping.Load(s, *this);
 }
 
 void Classificator::Clear()

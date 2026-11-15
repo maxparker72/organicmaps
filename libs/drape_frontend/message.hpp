@@ -43,6 +43,7 @@ public:
     BuildSelectionLines,
     AddSubroute,
     RemoveSubroute,
+    RemoveAlternativeSubroutes,
     PrepareSubrouteArrows,
     CacheSubrouteArrows,
     FlushSubroute,
@@ -59,6 +60,7 @@ public:
     Allow3dMode,
     Allow3dBuildings,
     SetMapLangIndex,
+    SetTerrainLight,
     EnablePerspective,
     FlushCirclesPack,
     CacheCirclesPack,
@@ -110,9 +112,11 @@ public:
     OnEnterBackground,
     Arrow3dRecache,
     VisualScaleChanged,
+    AddTileBackgroundImage,
     SetTileBackgroundData,
     SetTileBackgroundMode,
-    AssignTileBackgroundTexture
+    ScenarioViewport,
+    AssignTileBackgroundImage
   };
 
   virtual ~Message() = default;

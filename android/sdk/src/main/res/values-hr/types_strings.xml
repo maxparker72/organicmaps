@@ -74,22 +74,35 @@
 
     <!-- SECTION: Types: Recycling -->
     <string name="type.barrier.block">Blok</string>
+    <string name="type.waterway.ditch">Odvodni jarak</string>
+    <string name="type.waterway.ditch.intermittent">Povremeni odvodni jarak</string>
     <string name="type.craft.photographer">Fotograf</string>
     <string name="type.cuisine.noodle">Rezanci</string>
     <string name="type.cuisine.uzbek">Uzbečka</string>
     <string name="type.healthcare.laboratory">Medicinski laboratorij</string>
 
     <!-- SECTION: Types: Roads -->
-    <string name="type.highway.platform">Platforma</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Peron</string>
 
     <!-- SECTION: Types: Historic -->
+    <string name="type.man_made.ceremonial_gate">Ceremonijalna vrata</string>
+    <string name="type.landuse.basin.intermittent">Povremeni bazen</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Groblje</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery.christian">Kršćansko groblje</string>
+    <string name="type.leisure.bird_hide">Promatračnica za ptice</string>
     <string name="type.leisure.track">Sportska staza</string>
     <string name="type.leisure.track.area">Sportska staza</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Vodosprema</string>
     <string name="type.man_made.silo">Silos</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Vodovodno postrojenje</string>
+    <string name="type.natural.water.intermittent">Povremena vodena površina</string>
+    <string name="type.natural.hill">Brdo</string>
+    <string name="type.natural.arch">Stijenska luč</string>
     <string name="type.natural.volcano.active">Aktivni vulkan</string>
     <string name="type.power.generator.gas">Plinska elektrana</string>
     <string name="type.power.generator.hydro">Hidroelektrana</string>
@@ -99,7 +112,8 @@
     <string name="type.power.plant.hydro">Hidroelektrana</string>
     <string name="type.power.plant.solar">Solarna elektrana</string>
     <string name="type.power.plant.wind">Vjetroelektrana</string>
-    <string name="type.public_transport.platform">Platforma</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Peron</string>
     <string name="type.railway">Željeznica</string>
     <string name="type.railway.disused.tunnel">Nekorišteni željeznički tunel</string>
     <string name="type.railway.rail">Željeznica</string>
@@ -115,6 +129,8 @@
     <string name="type.shop.clothes.underwear">Donje rublje</string>
     <string name="type.shop.clothes.wedding">Salon vjenčanica</string>
     <string name="type.shop.clothes.women">Ženska odjeća</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Brijačnica</string>
     <string name="type.shop.leather">Trgovina kožnom galanterijom</string>
     <string name="type.shop.religion">Trgovina vjerskim predmetima</string>
     <string name="type.sport.boules">Boćanje</string>
@@ -129,8 +145,26 @@
     <string name="type.sport.rugby_union">Ragbi union</string>
     <string name="type.sport.running">Trčanje</string>
     <string name="type.sport.softball">Softball</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.waterway.access_point">Pristupna točka plovnom putu</string>
+    <string name="type.waterway.canal">Kanal</string>
+    <string name="type.waterway.canal.intermittent">Povremeni kanal</string>
+    <string name="type.waterway.fish_pass">Riblji prolaz</string>
+    <string name="type.waterway.fish_pass.intermittent">Povremeni riblji prolaz</string>
+    <string name="type.natural.water.ditch">Odvodni jarak</string>
+    <string name="type.waterway.drain">Odvodni kanal</string>
+    <string name="type.waterway.drain.intermittent">Povremeni odvodni kanal</string>
+    <string name="type.natural.water.drain">Odvodni kanal</string>
+    <string name="type.waterway.river">Rijeka</string>
+    <string name="type.waterway.river.intermittent">Povremena rijeka</string>
+    <string name="type.waterway.river.tunnel">Rijeka</string>
+    <string name="type.waterway.stream">Potok</string>
+    <string name="type.waterway.stream.intermittent">Povremeni potok</string>
+    <string name="type.waterway.stream.tunnel">Potok</string>
+    <string name="type.amenity.stage">Scena</string>
     <string name="type.barrier.jersey_barrier">Blok</string>
     <string name="type.barrier.debris">Ruševina</string>
     <string name="type.amenity.boat_rental">Iznajmljivanje čamaca</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Izrada prozora</string>
 </resources>

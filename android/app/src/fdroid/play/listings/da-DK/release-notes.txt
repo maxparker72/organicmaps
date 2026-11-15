@@ -1,10 +1,9 @@
-• Vælg vandre- og cykelruter for at se deres højdekurver
-• Korrekt kortindpakning ved antimeridianen (±180° længdegrad)
-• Skift alle bogmærke- og sporfarver i en kategori på én gang
-• Bedre søgning efter husnumre, flere amerikanske adresser dækket
-• OSM-data fra den 4. april
-• Planlagt udseende i Indstillinger
-• Fikseret deling af bogmærker/spor til andre apps
-• Rettet upload af kortredigeringer til OSM
-• Tilføjet nyligt anvendt kategorihistorik i kortredigeringen
-…mere på omaps.org/news
+• OSM-data: 28. september; Wikipedia-data: 21. september
+• Forbedrede alternative ruter og ankomstestimater
+• Ny indstilling optimerer rækkefølgen af mellemliggende stop
+• Nye knapper til at tilføje eller erstatte stop på en planlagt rute
+• Den valgte alternative rute forbliver valgt under navigationen
+• Sporoptagelse rettet og forbedret
+• Import af KMB-filer er rettet
+• Forbedringer og rettelser af brugergrænsefladen
+…flere detaljer på omaps.org/news

@@ -8,6 +8,7 @@
 #import "MWMMapViewControlsManager.h"
 #import "MWMNavigationDashboardManager+Entity.h"
 #import "MWMRoutePoint+CPP.h"
+#import "MWMRoutingManager.h"
 #import "MWMStorage+UI.h"
 #import "MapsAppDelegate.h"
 #import "SwiftBridge.h"
@@ -18,7 +19,10 @@
 #include <CoreApi/StringUtils+Core.h>
 #include <CoreApi/TrackInfo+Core.h>
 
+#include "routing/routing_options.hpp"
+
 #include "kml/type_utils.hpp"
+#include "map/routing_mark.hpp"
 #include "platform/local_country_file_utils.hpp"
 #include "platform/localization.hpp"
 
@@ -28,7 +32,6 @@ using namespace routing;
 
 @property(nonatomic) uint32_t routeManagerTransactionId;
 @property(nonatomic) BOOL canAutoAddLastLocation;
-@property(nonatomic) BOOL isAPICall;
 @property(nonatomic) BOOL isRestoreProcessCompleted;
 @property(strong, nonatomic) MWMRoutingOptions * routingOptions;
 
@@ -68,8 +71,7 @@ using namespace routing;
     return nil;
 
   auto const altitudesInfo = elevationInfo.CalculateAltitudesInfo(ElevationInfo::kDefThresholdMWM);
-  // A zero vertical range collapses the chart's Y-axis transforms, so suppress the preview instead of
-  // showing a misleading flat chart. This matches the previous bitmap-based behavior.
+  // Uniform profiles can be fallback values when elevation data is unavailable.
   if (altitudesInfo.m_maxAltitude == altitudesInfo.m_minAltitude)
     return nil;
 
@@ -83,6 +85,28 @@ using namespace routing;
   ElevationProfileData * profileData = [[ElevationProfileData alloc] initWithTrackId:kml::kInvalidTrackId
                                                                        elevationInfo:elevationInfo];
   return [[RouteElevationPreviewData alloc] initWithTrackInfo:trackInfo elevationInfo:profileData];
+}
+
++ (void)setRouteElevationActivePointDistance:(double)distance
+{
+  auto & framework = GetFramework();
+  if (framework.GetDrapeEngine() == nullptr)
+    return;
+
+  auto const point = framework.GetRoutingManager().GetRoutePointAtDistance(distance);
+  if (!point)
+    return;
+
+  framework.GetDrapeEngine()->SelectObject(df::SelectionShape::ESelectedObject::OBJECT_TRACK, *point, FeatureID(),
+                                           false /* isAnim */, false /* isGeometrySelectionAllowed */,
+                                           true /* isSelectionShapeVisible */);
+}
+
++ (void)resetRouteElevationActivePoint
+{
+  auto & framework = GetFramework();
+  if (!framework.HasPlacePageInfo())
+    framework.DeactivateMapSelectionCircle(false /* restoreViewport */);
 }
 
 + (void)saveRouteAsTrack
@@ -120,7 +144,7 @@ using namespace routing;
 {
   return GetFramework().GetRoutingManager().IsRoutingFollowing();
 }
-+ (BOOL)IsRouteValid
++ (BOOL)isRouteValid
 {
   return GetFramework().GetRoutingManager().IsRouteValid();
 }
@@ -175,6 +199,12 @@ using namespace routing;
   return GetFramework().GetRoutingManager().CouldAddIntermediatePoint();
 }
 
++ (BOOL)isRoutePointsLimitReached
+{
+  // Unlike canAddIntermediatePoint, this also works before routing becomes active.
+  return GetFramework().GetRoutingManager().GetRoutePointsCount() >= RoutePointsLayout::kMaxRoutePointsCount;
+}
+
 - (instancetype)initRouter
 {
   self = [super init];
@@ -184,7 +214,7 @@ using namespace routing;
     [MWMLocationManager addObserver:self];
     [MWMFrameworkListener addObserver:self];
     _canAutoAddLastLocation = YES;
-    _routingOptions = [MWMRoutingOptions new];
+    _routingOptions = [[MWMRoutingOptions alloc] initWithRouterType:MWMRouter.type];
     _isRestoreProcessCompleted = NO;
   }
   return self;
@@ -252,18 +282,18 @@ using namespace routing;
   return [turnNotifications copy];
 }
 
-+ (void)removePoint:(MWMRoutePoint *)point
-{
-  RouteMarkData pt = point.routeMarkData;
-  GetFramework().GetRoutingManager().RemoveRoutePoint(pt.m_pointType, pt.m_intermediateIndex);
-  [[MWMNavigationDashboardManager sharedManager] onRoutePointsUpdated];
-}
-
 + (void)removePointAndRebuild:(MWMRoutePoint *)point
 {
   if (!point)
     return;
-  [self removePoint:point];
+  if ([self pointsCount] == 1)
+  {
+    [self stopRouting];
+    return;
+  }
+  RouteMarkData pt = point.routeMarkData;
+  GetFramework().GetRoutingManager().RemoveRoutePoint(pt.m_pointType, pt.m_intermediateIndex);
+  [[MWMNavigationDashboardManager sharedManager] onRoutePointsUpdated];
   [self rebuildWithBestRouter:NO];
 }
 
@@ -279,39 +309,30 @@ using namespace routing;
     NSAssert(NO, @"Target point can not be nil");
     return;
   }
-  switch (point.type)
+  if (point.type == MWMRoutePointTypeStart)
   {
-  case MWMRoutePointTypeStart: [self buildFromPoint:newPoint bestRouter:NO]; break;
-  case MWMRoutePointTypeFinish: [self buildToPoint:newPoint bestRouter:NO]; break;
-  case MWMRoutePointTypeIntermediate:
-    RouteMarkData pt = point.routeMarkData;
-    auto & routingManager = GetFramework().GetRoutingManager();
-    routingManager.RemoveRoutePoint(pt.m_pointType, pt.m_intermediateIndex);
-    RouteMarkData newPt = newPoint.routeMarkData;
-    routingManager.AddRoutePoint(std::move(newPt), NO /* reorderIntermediatePoints */);
-    [[MWMNavigationDashboardManager sharedManager] onRoutePointsUpdated];
-    [self rebuildWithBestRouter:NO];
+    [self buildFromPoint:newPoint bestRouter:NO];
+    return;
   }
+  if (point.type == MWMRoutePointTypeFinish)
+  {
+    // Destination setup can add the current location when this is the only route point.
+    [self buildToPoint:newPoint bestRouter:NO];
+    return;
+  }
+
+  auto & routingManager = GetFramework().GetRoutingManager();
+  RouteMarkData pt = point.routeMarkData;
+  RouteMarkData newPt = newPoint.routeMarkData;
+  routingManager.ReplaceRoutePoint(pt.m_pointType, pt.m_intermediateIndex, std::move(newPt));
+  [[MWMNavigationDashboardManager sharedManager] onRoutePointsUpdated];
+  [self rebuildWithBestRouter:NO];
 }
 
-+ (void)swapStartAndFinish
++ (void)reverseRoute
 {
-  auto const points = GetFramework().GetRoutingManager().GetRoutePoints();
-  CHECK(!points.empty(), ("Should never be empty"));
-  auto & rm = GetFramework().GetRoutingManager();
-  if (points.size() == 1)
-  {
-    RouteMarkType currentType = points[0].m_pointType;
-    ASSERT(currentType != RouteMarkType::Intermediate, ("There should be no intermediate points if points count is 1"));
-    RouteMarkType targetType = currentType == RouteMarkType::Start ? RouteMarkType::Finish : RouteMarkType::Start;
-    rm.MoveRoutePoint(currentType, 0, targetType, 0);
-  }
-  else
-  {
-    rm.MoveRoutePoint(0, points.size() - 1);
-    rm.MoveRoutePoint(points.size() - 2, 0);
-  }
-
+  if (!GetFramework().GetRoutingManager().ReverseRoutePoints())
+    return;
   [self rebuildWithBestRouter:NO];
 }
 
@@ -329,7 +350,7 @@ using namespace routing;
   }
 
   RouteMarkData pt = point.routeMarkData;
-  GetFramework().GetRoutingManager().AddRoutePoint(std::move(pt));
+  GetFramework().GetRoutingManager().AddRoutePoint(std::move(pt), RoutingOptions::LoadRouteOptimizationFromSettings());
   [[MWMNavigationDashboardManager sharedManager] onRoutePointsUpdated];
 }
 
@@ -342,7 +363,9 @@ using namespace routing;
   }
 
   RouteMarkData pt = point.routeMarkData;
-  GetFramework().GetRoutingManager().ContinueRouteToPoint(std::move(pt));
+  if (!GetFramework().GetRoutingManager().ContinueRouteToPoint(std::move(pt)))
+    return;
+
   [[MWMNavigationDashboardManager sharedManager] onRoutePointsUpdated];
   [self rebuildWithBestRouter:NO];
 }
@@ -381,13 +404,14 @@ using namespace routing;
   if (!startPoint || !finishPoint)
     return;
 
-  [MWMRouter setType:type];
-
-  auto router = [MWMRouter router];
-  router.isAPICall = YES;
-  [self addPoint:startPoint];
-  [self addPoint:finishPoint];
-  router.isAPICall = NO;
+  // Notify mark observers only after both endpoints have replaced the itinerary.
+  {
+    auto editSession = GetFramework().GetBookmarkManager().GetEditSession();
+    [self doStop:YES];
+    GetFramework().GetRoutingManager().SetRouter(coreRouterType(type));
+    [self addPoint:startPoint];
+    [self addPoint:finishPoint];
+  }
 
   [self rebuildWithBestRouter:NO];
 }
@@ -412,7 +436,6 @@ using namespace routing;
 
 + (void)start
 {
-  [self saveRoute];
   auto const doStart = ^{
     auto & rm = GetFramework().GetRoutingManager();
     auto const routePoints = rm.GetRoutePoints();
@@ -424,11 +447,15 @@ using namespace routing;
       CLLocation * lastLocation = [MWMLocationManager lastLocation];
       if (p1.isMyPosition && lastLocation)
       {
-        rm.FollowRoute();
+        [[MWMRoutingManager routingManager] startRoute];
         [[MWMMapViewControlsManager manager] onRouteStart];
       }
       else
       {
+        // The route is not followed here, and only following saves the points, so save them for
+        // restoreRouteIfNeeded.
+        [self saveRoute];
+
         BOOL const needToRebuild = lastLocation && [MWMLocationManager isStarted] && !p2.isMyPosition;
 
         [[MWMAlertViewController activeAlertController]
@@ -457,6 +484,9 @@ using namespace routing;
 
 + (void)stop:(BOOL)removeRoutePoints
 {
+  // End transit previews even when quick actions stop without an active route.
+  GetFramework().HideRouteTransitIfNeeded();
+  GetFramework().DeactivateMapSelection();
   [self doStop:removeRoutePoints];
   [self hideNavigationMapControls];
   [MWMRouter router].canAutoAddLastLocation = YES;
@@ -464,9 +494,9 @@ using namespace routing;
 
 + (void)doStop:(BOOL)removeRoutePoints
 {
-  GetFramework().GetRoutingManager().CloseRouting(removeRoutePoints);
+  [[MWMRoutingManager routingManager] stopRoutingAndRemoveRoutePoints:removeRoutePoints];
   if (removeRoutePoints)
-    GetFramework().GetRoutingManager().DeleteSavedRoutePoints();
+    [[MWMRoutingManager routingManager] deleteSavedRoutePoints];
 }
 
 - (void)updateFollowingInfo
@@ -506,11 +536,11 @@ using namespace routing;
 
 - (void)onRouteReady:(BOOL)hasWarnings
 {
-  self.routingOptions = [MWMRoutingOptions new];
+  self.routingOptions = [[MWMRoutingOptions alloc] initWithRouterType:MWMRouter.type];
 
   auto startPoint = [MWMRouter startPoint];
   if (!startPoint || !startPoint.isMyPosition)
-    dispatch_async(dispatch_get_main_queue(), ^{ [MWMRouter disableFollowMode]; });
+    [MWMRouter disableFollowMode];
 
   [[MWMMapViewControlsManager manager] onRouteReady:hasWarnings];
   [self updateFollowingInfo];
@@ -525,18 +555,16 @@ using namespace routing;
   case routing::RouterResultCode::NoError: [self onRouteReady:NO]; break;
   case routing::RouterResultCode::HasWarnings: [self onRouteReady:YES]; break;
   case routing::RouterResultCode::NeedMoreMaps:
-    self.routingOptions = [MWMRoutingOptions new];
+    self.routingOptions = [[MWMRoutingOptions alloc] initWithRouterType:MWMRouter.type];
     [self presentDownloaderAlert:code countries:absentCountries];
     // NeedMoreMaps can arrive after a valid route is already built. In that case
     // the user may decline extra maps and still navigate along the current route.
-    if (![MWMRouter IsRouteValid])
+    if (![MWMRouter isRouteValid])
       [[MWMNavigationDashboardManager sharedManager] onRouteError:L(@"routing_planning_error")];
     break;
-  case routing::RouterResultCode::RouteFileNotExist:
-  case routing::RouterResultCode::InconsistentMWMandRoute:
   case routing::RouterResultCode::FileTooOld:
   case routing::RouterResultCode::RouteNotFound:
-    self.routingOptions = [MWMRoutingOptions new];
+    self.routingOptions = [[MWMRoutingOptions alloc] initWithRouterType:MWMRouter.type];
     [self presentDownloaderAlert:code countries:absentCountries];
     [[MWMNavigationDashboardManager sharedManager] onRouteError:L(@"routing_planning_error")];
     break;
@@ -589,7 +617,7 @@ using namespace routing;
           NSMutableArray * array = [NSMutableArray arrayWithCapacity:downloadCountries.size()];
           for (auto const & cid : downloadCountries)
             [array addObject:@(cid.c_str())];
-          [[MWMStorage sharedStorage] downloadNodes:array onSuccess:onSuccess];
+          [[MWMStorage sharedStorage] downloadMaps:array onSuccess:onSuccess];
         }
         downloadCompleteBlock:^{ [MWMRouter rebuildWithBestRouter:NO]; }];
   }
@@ -626,17 +654,9 @@ using namespace routing;
   if ([MapsAppDelegate theApp].isDrapeEngineCreated)
   {
     auto & rm = GetFramework().GetRoutingManager();
-    if ([self isRoutingActive] || ![self hasSavedRoute])
-    {
-      self.router.isRestoreProcessCompleted = YES;
-      return;
-    }
-    rm.LoadRoutePoints([self](bool success)
-    {
-      if (success)
-        [self rebuildWithBestRouter:YES];
-      self.router.isRestoreProcessCompleted = YES;
-    });
+    if (rm.LoadRoutePoints())
+      [self rebuildWithBestRouter:YES];
+    self.router.isRestoreProcessCompleted = YES;
   }
   else
   {
@@ -656,19 +676,19 @@ using namespace routing;
 
 + (void)updateRoute
 {
-  MWMRoutingOptions * newOptions = [MWMRoutingOptions new];
+  MWMRoutingOptions * newOptions = [[MWMRoutingOptions alloc] initWithRouterType:MWMRouter.type];
   if ((self.isRoutingActive && !self.isOnRoute) && ![newOptions isEqual:[self router].routingOptions])
     [self rebuildWithBestRouter:YES];
 }
 
 + (BOOL)hasActiveDrivingOptions
 {
-  return [MWMRoutingOptions new].hasOptions && self.type != MWMRouterTypeRuler;
+  return [[MWMRoutingOptions alloc] initWithRouterType:self.type].hasOptions;
 }
 
 + (void)avoidRoadTypeAndRebuild:(MWMRoadType)type
 {
-  MWMRoutingOptions * options = [MWMRoutingOptions new];
+  MWMRoutingOptions * options = [[MWMRoutingOptions alloc] initWithRouterType:MWMRouter.type];
   switch (type)
   {
   case MWMRoadTypeToll: options.avoidToll = YES; break;
@@ -678,6 +698,13 @@ using namespace routing;
   }
   [options save];
   [self rebuildWithBestRouter:YES];
+}
+
++ (void)optimizeRoutePointsAndRebuild
+{
+  // The core keeps the approved order while following or in Ruler mode.
+  if ([self isRoutingActive] && GetFramework().GetRoutingManager().OptimizeRoutePoints())
+    [self rebuildWithBestRouter:NO];
 }
 
 + (void)showNavigationMapControls

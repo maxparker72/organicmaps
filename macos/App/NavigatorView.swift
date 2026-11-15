@@ -379,7 +379,7 @@ struct NavigatorView: View {
     let tags = OMBookmarksHelper.tags(forBookmark: bm.bookmarkId)
     return Button { handleClick(item, in: list) } label: {
       HStack(spacing: 8) {
-        Circle().fill(bm.bookmarkColor.swiftUIColor).frame(width: 10, height: 10)
+        Circle().fill(Color(nsColor: bm.bookmarkColor)).frame(width: 10, height: 10)
         VStack(alignment: .leading, spacing: 2) {
           Text(bm.bookmarkName)
           if let sub = bookmarkSubtitle(bm) {

@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "Stadsmuur";
 "type.barrier.cycle_barrier" = "Fietsbarrière";
 "type.waterway.ditch" = "Sloot";
+"type.waterway.ditch.intermittent" = "Periodieke sloot";
 "type.natural.water.moat" = "Gracht";
 "type.natural.water.wastewater" = "Afvalwater";
 "type.barrier.entrance" = "Ingang";
@@ -407,28 +408,28 @@
 "type.highway" = "Straat";
 "type.highway.bridleway" = "Ruiterpad";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Brug";
 "type.highway.bridleway.permissive" = "Ruiterpad";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Tunnel";
 "type.highway.busway" = "Speciale busweg";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Tunnel";
 "type.highway.bus_stop" = "Bushalte";
 "type.highway.construction" = "Baan in aanbouw";
 "type.highway.cycleway" = "Fietspad";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Fietsbrug";
 "type.highway.cycleway.permissive" = "Fietspad";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Fietstunnel";
 "type.highway.elevator" = "Lift";
 "type.highway.footway" = "Voetpad";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Voetgangersoversteekplaats";
 "type.highway.footway.area" = "Voetgangerszone";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Voetgangersbrug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Voetgangerstunnel";
 "type.highway.ford" = "Voorde";
 "type.highway.living_street" = "Straat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Tunnel";
 "type.highway.motorway" = "Snelweg";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Snelwegbrug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Snelwegtunnel";
 "type.highway.motorway_junction" = "Afrit";
 "type.highway.motorway_link" = "Snelwegoprit";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Tunnel";
 "type.highway.path" = "Pad";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Fietspad";
 "type.highway.footway.bicycle" = "Fietspad";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Brug";
 "type.highway.path.horse" = "Ruiterpad";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Tunnel";
 "type.highway.pedestrian" = "Voetgangersgebied";
 "type.highway.pedestrian.area" = "Voetgangersgebied";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Voetgangersbrug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Voetgangerstunnel";
-"type.highway.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "Opstapplaats";
 "type.highway.primary" = "Hoofdweg";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Tunnel";
 "type.highway.primary_link" = "Hoofdweg";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Tunnel";
 "type.highway.raceway" = "Racebaan";
 "type.highway.residential" = "Straat";
 "type.highway.residential.area" = "Straat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Tunnel";
 "type.highway.rest_area" = "Parkeerplaats";
 "type.highway.road" = "Straat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Brug";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Tunnel";
 "type.highway.secondary" = "Secundaire weg";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Tunnel";
 "type.highway.secondary_link" = "Secundaire weg";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Tunnel";
 "type.highway.service" = "Straat";
 "type.highway.service.area" = "Straat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Brug";
 "type.highway.service.driveway" = "Straat";
 "type.highway.service.parking_aisle" = "Straat";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Tunnel";
 "type.highway.services" = "Servicegebied";
 "type.highway.speed_camera" = "Flitspaal";
 "type.highway.steps" = "Trap";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Tunnel";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "Tertiaire weg";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Tunnel";
 "type.highway.tertiary_link" = "Tertiaire weg";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Tunnel";
 "type.highway.track" = "Straat";
 "type.highway.track.area" = "Straat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Brug";
 "type.highway.track.grade1" = "Straat";
 "type.highway.track.no.access" = "Straat";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Tunnel";
 "type.highway.traffic_signals" = "Verkeerslichten";
 "type.highway.trunk" = "Straat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Tunnel";
 "type.highway.trunk_link" = "Straat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Tunnel";
 "type.highway.unclassified" = "Straat";
 "type.highway.unclassified.area" = "Straat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Brug";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Tunnel";
 "type.area_highway.cycleway" = "Fietspad";
 "type.area_highway.footway" = "Voetpad";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Japans kasteel";
 "type.historic.castle.stately" = "Landhuis";
 "type.historic.city_gate" = "Stadspoort";
+"type.man_made.ceremonial_gate" = "Ceremoniële poort";
 "type.historic.citywalls" = "Stadsmuur";
 "type.historic.fort" = "Fort";
 "type.historic.gallows" = "Galg";
@@ -718,6 +722,7 @@
 "type.landuse" = "Landgebruik";
 "type.landuse.allotments" = "Volkstuinen";
 "type.landuse.basin" = "Waterbassin";
+"type.landuse.basin.intermittent" = "Periodiek waterbassin";
 "type.landuse.brownfield" = "Braakliggend terrein";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Steengroeve";
 "type.landuse.railway" = "Spoorwegfaciliteiten";
 "type.landuse.recreation_ground" = "Recreatiezone";
-"type.landuse.reservoir" = "Reservoir";
 "type.landuse.residential" = "Woonwijk";
 "type.landuse.retail" = "Detailhandel";
 "type.landuse.salt_pond" = "Zoutpoel";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Schaatsbaan";
 "type.leisure.marina" = "Jachthaven";
 "type.leisure.nature_reserve" = "Natuurreservaat";
+"type.leisure.bird_hide" = "Vogelkijkhut";
 "type.leisure.outdoor_seating" = "Zitplaatsen buiten";
 "type.leisure.firepit" = "Vuurplaats";
 "type.leisure.park" = "Park";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Pier";
 "type.man_made.pipeline" = "Pijpleiding";
 "type.man_made.pipeline.overground" = "Bovengrondse pijpleiding";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Overdekt reservoir";
 "type.man_made.silo" = "Silo";
 "type.man_made.storage_tank" = "Opslagtank";
 "type.man_made.surveillance" = "Bewakingscamera";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Watertoren";
 "type.man_made.water_well" = "Waterput";
 "type.man_made.water_well.drinking_water_no" = "Waterput";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Drinkwaterbedrijf";
 "type.man_made.windmill" = "Windmolen";
 "type.man_made.works" = "Fabriek";
 
@@ -871,10 +882,13 @@
 "type.natural.water.reservoir" = "Reservoir";
 "type.natural.water.basin" = "Waterbassin";
 "type.natural.water.river" = "Rivier";
+"type.natural.water.intermittent" = "Periodiek waterlichaam";
 "type.natural.land" = "Land";
 "type.natural.meadow" = "Weiland";
 "type.natural.orchard" = "Boomgaard";
 "type.natural.peak" = "Top";
+"type.natural.hill" = "Heuvel";
+"type.natural.arch" = "Rotsboog";
 "type.natural.saddle" = "Bergzadel";
 "type.natural.rock" = "Steen";
 "type.natural.scrub" = "Kreupel bos";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "Onverhard";
 "type.psurface.unpaved_good" = "Onverhard";
 "type.public_transport" = "Openbaar vervoer";
-"type.public_transport.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "Opstapplaats";
 "type.railway" = "Spoorweg";
 "type.railway.abandoned" = "Voormalig treinspoor";
 "type.railway.abandoned.bridge" = "Voormalige spoorbrug";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Groentenwinkel";
 "type.shop.grocery" = "Boodschappen";
 "type.shop.hairdresser" = "Kapper";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Barbier";
 "type.shop.hardware" = "IJzerwaren";
 "type.shop.health_food" = "Natuurvoedingswinkel";
 "type.shop.hearing_aids" = "Winkel met hoortoestellen";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Rugby union";
 "type.sport.running" = "Hardlopen";
 "type.sport.softball" = "Softbal";
+"type.sport.pilates" = "Pilates";
 "type.tourism" = "Tourisme";
 "type.tourism.aquarium" = "Aquarium";
 
@@ -1514,22 +1534,25 @@
 "type.waterway" = "Waterweg";
 "type.waterway.access_point" = "Toegangspunt waterweg";
 "type.waterway.canal" = "Kanaal";
+"type.waterway.canal.intermittent" = "Periodiek kanaal";
 "type.waterway.canal.tunnel" = "Kanaal";
 "type.waterway.fish_pass" = "Vistrap";
+"type.waterway.fish_pass.intermittent" = "Periodieke vistrap";
 "type.waterway.dam" = "Dam";
 "type.barrier.ditch" = "Sloot";
 "type.natural.water.ditch" = "Sloot";
 "type.waterway.ditch.tunnel" = "Duiker";
 "type.waterway.dock" = "Dok";
 "type.waterway.drain" = "Afvoer";
+"type.waterway.drain.intermittent" = "Periodieke afvoer";
 "type.natural.water.drain" = "Afvoer";
 "type.waterway.drain.tunnel" = "Duiker";
 "type.waterway.lock_gate" = "Sluisdeur";
 "type.waterway.river" = "Rivier";
+"type.waterway.river.intermittent" = "Periodieke rivier";
 "type.waterway.river.tunnel" = "Rivier";
 "type.waterway.stream" = "Beek";
-"type.waterway.stream.ephemeral" = "Rivier";
-"type.waterway.stream.intermittent" = "Beek";
+"type.waterway.stream.intermittent" = "Periodieke beek";
 "type.waterway.stream.tunnel" = "Beek";
 "type.waterway.waterfall" = "Waterval";
 "type.waterway.weir" = "Stuw";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Sociale Voorziening";
+"type.amenity.stage" = "Podium";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Ingang spoedeisende hulp";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Weerstation";
 "type.amenity.student_accommodation" = "Studentenhuisvesting";
 "type.craft.watchmaker" = "Horlogemaker";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Kozijnenbedrijf";
 "type.xmas_feature.market" = "Kerstmarkt";
 "type.xmas_feature.tree" = "Kerstboom";
 "type.amenity.hookah_lounge" = "Shisha bar";

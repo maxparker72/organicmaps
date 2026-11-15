@@ -2,8 +2,6 @@
 
 #include "map/framework.hpp"
 
-#include "platform/downloader_defines.hpp"
-
 #include "base/thread_checker.hpp"
 
 #include <cstdint>
@@ -13,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include <QtCore/QLocale>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
 
@@ -30,16 +29,19 @@ class UpdateDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit UpdateDialog(QWidget * parent, Framework & framework);
+  explicit UpdateDialog(QWidget * parent, Framework & framework, QLocale const & dataSizeLocale);
   virtual ~UpdateDialog();
 
   /// @name Called from downloader to notify GUI
   //@{
   void OnCountryChanged(storage::CountryId const & countryId);
-  void OnCountryDownloadProgress(storage::CountryId const & countryId, downloader::Progress const & progress);
+  void OnCountryDownloadProgress(storage::CountryId const & countryId, storage::Progress const & progress);
   //@}
 
   void ShowModal();
+
+  void FillTreeForTesting();
+  QTreeWidget const & GetTreeForTesting() const { return *m_tree; }
 
 private slots:
   void OnItemClick(QTreeWidgetItem * item, int column);
@@ -73,6 +75,7 @@ private:
 
   QTreeWidget * m_tree;
   Framework & m_framework;
+  QLocale const m_dataSizeLocale;
   int m_observerSlotId;
 
   // Params of the queries to the search engine.

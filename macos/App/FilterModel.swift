@@ -257,7 +257,7 @@ final class FilterModel: ObservableObject {
     case .name: return bookmark.bookmarkName
     case .type: return bookmark.bookmarkType ?? ""
     case .description: return EntityEditor.bookmarkDescription(bookmark.bookmarkId)
-    case .color: return bookmark.bookmarkColor.displayName
+    case .color: return BookmarkColor.closest(to: bookmark.bookmarkColor).displayName
     case .list: return listName
     case .tag, .region, .distance, .length: return ""  // handled in matches() directly
     }

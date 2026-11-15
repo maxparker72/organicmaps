@@ -8,6 +8,7 @@
 
 #include "geometry/spline.hpp"
 
+#include <optional>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -16,7 +17,7 @@ namespace df
 {
 using MarksIDGroups = std::map<kml::MarkGroupId, drape_ptr<IDCollections>>;
 
-/// Created and initialize in DrapeEngine::GenerateMarkRenderInfo only.
+/// Prepared by DrapeEngine::GenerateMarkRenderInfo for user-mark geometry and overlays.
 struct UserMarkRenderParams
 {
   kml::MarkId m_markId = kml::kInvalidMarkId;
@@ -31,6 +32,8 @@ struct UserMarkRenderParams
   drape_ptr<UserPointMark::SymbolSizes> m_symbolSizes;
   drape_ptr<UserPointMark::SymbolOffsets> m_symbolOffsets;
   df::ColorConstant m_color;
+  // Explicit theme-independent color; nullopt => resolve the preset m_color string instead.
+  std::optional<dp::Color> m_customColor;
   bool m_symbolIsPOI = false;
   bool m_hasTitlePriority = false;
   uint16_t m_priority = 0;
@@ -62,15 +65,37 @@ struct LineLayer
 
 struct UserLineRenderParams
 {
+  // Skips points closer than Spline's minimum segment length to the previously kept point,
+  // and lines left with fewer than two points.
+  void AddSpline(std::vector<m2::PointD> const & points);
+
   int m_minZoom = 1;
   DepthLayer m_depthLayer = DepthLayer::UserLineLayer;
   std::vector<LineLayer> m_layers;
   std::vector<m2::SharedSpline> m_splines;
-  bool m_isVisible = true;
+  bool m_visible = true;
+  bool m_hasDirection = true;
+};
+
+struct UserAreaRenderParams
+{
+  dp::Color m_fillColor = dp::Color::Transparent();
+  dp::Color m_outlineColor;
+  float m_outlineWidth = 0;  ///< 0 means no outline.
+  m2::RectD m_limitRect;
+  /// Closed Mercator rings of each polygon: the outer ring followed by its holes.
+  std::vector<std::vector<m2::SharedSpline>> m_polygons;
+  /// Bounds of each polygon, so that tiles skip the others.
+  std::vector<m2::RectD> m_polygonRects;
+  /// Only for filled areas: vertices of the same rings, which TessellateUserArea releases (splines skip short
+  /// segments), and clockwise fill triangles, which it makes when a tile needs them.
+  std::vector<std::vector<std::vector<m2::PointD>>> m_fillRings;
+  std::vector<std::vector<m2::PointD>> m_triangles;
 };
 
 using UserMarksRenderCollection = std::unordered_map<kml::MarkId, drape_ptr<UserMarkRenderParams>>;
 using UserLinesRenderCollection = std::unordered_map<kml::MarkId, drape_ptr<UserLineRenderParams>>;
+using UserAreasRenderCollection = std::unordered_map<kml::AreaId, drape_ptr<UserAreaRenderParams>>;
 using UserGroupsVisibilitySet = std::unordered_set<kml::MarkGroupId>;
 
 class SourceBase
@@ -127,7 +152,8 @@ class TracksSource : public SourceBase
 public:
   using SourceBase::SourceBase;
 
-  /// Iterates unique tracks across all visible groups, filtering by minZoom.
+  /// Iterates unique tracks across all visible groups, skipping individually-hidden tracks
+  /// (m_visible) and those above their minZoom.
   /// @param fn is called with UserLineRenderParams const &.
   template <class FnT>
   void ForEachUniqueTrack(int zoom, UserLinesRenderCollection const & lines, FnT && fn) const
@@ -139,7 +165,7 @@ public:
         if (visited.insert(lineId).second)
         {
           auto it = lines.find(lineId);
-          if (it != lines.end() && it->second->m_minZoom <= zoom)
+          if (it != lines.end() && it->second->m_visible && it->second->m_minZoom <= zoom)
             fn(*it->second);
         }
     });
@@ -161,9 +187,40 @@ struct UserMarkRenderData
 
 using TUserMarksRenderData = std::vector<UserMarkRenderData>;
 
+// Hit testing and search-symbol suppression need the same anchor and pixel offset as the sprite vertices.
+drape_ptr<dp::OverlayHandle> CreateUserMarkOverlayHandle(UserMarkRenderParams const & renderInfo,
+                                                         TileKey const & tileKey, m2::RectD const & pixelRect);
+
 void CacheUserMarks(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKey, ref_ptr<dp::TextureManager> textures,
                     MarksSource const & source, UserMarksRenderCollection const & renderParams, dp::Batcher & batcher);
 
 void CacheUserLines(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKey, ref_ptr<dp::TextureManager> textures,
                     TracksSource const & source, UserLinesRenderCollection const & renderParams, dp::Batcher & batcher);
+
+/// Areas beyond the ordinary Mercator extent get no geometry.
+drape_ptr<UserAreaRenderParams> GenerateAreaRenderInfo(kml::AreaData const & area);
+/// Fills UserAreaRenderParams::m_triangles of the polygon once. It is slow, so it runs on the backend thread and
+/// only for polygons that a tile needs.
+void TessellateUserArea(UserAreaRenderParams & area, size_t polygon);
+
+/// Pieces of a closed ring in the rect for its outline, simplified unless minSqrLength is 0. All vertices of the ring
+/// are inner points of the pieces to get line joins: the end pieces of a ring that starts in the rect are joined, and
+/// a ring in the rect repeats its first segment, which the depth test draws once. A start in the middle of an edge
+/// wouldn't do, as simplification can move a corner there.
+std::vector<m2::SharedSpline> ClipUserAreaRing(m2::SharedSpline const & ring, m2::RectD const & rect,
+                                               double minSqrLength);
+
+/// The tile rect inflated by the outline width: a vertex on a tile side is an inner point of the outline pieces of
+/// both tiles, to get a line join, and outlines beyond the tile whose strokes reach into it are cached too.
+/// @todo The padding doesn't keep the paint order of overlapping translucent outlines across tiles: a neighbor tile
+/// that comes first may blend a later outline over this tile's pixels without an earlier one beyond its padding.
+/// It needs a global area order of outline draws or strokes clipped by their tiles.
+m2::RectD GetUserAreaOutlineRect(UserAreaRenderParams const & area, TileKey const & tileKey, double vs);
+
+/// Areas in paint order with their outline depths, the same in all tiles and growing with the paint order. Their
+/// fills get the same order below all outlines, so that fill copies of the replaced tiles fail the depth test.
+/// Caching tessellates polygons on demand.
+using UserAreasToCache = std::vector<std::pair<UserAreaRenderParams *, float>>;
+void CacheUserAreas(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKey, ref_ptr<dp::TextureManager> textures,
+                    UserAreasToCache const & areas, dp::Batcher & batcher);
 }  // namespace df

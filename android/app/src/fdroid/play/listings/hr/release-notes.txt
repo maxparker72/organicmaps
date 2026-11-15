@@ -1,9 +1,9 @@
-• Odaberite planinarske i biciklističke staze za pregled njihovih visinskih profila
-• Ispravno presavijanje karte na antimeridijanu (±180° geografske dužine)
-• Promjena boja svih oznaka i tragova u jednoj kategoriji odjednom
-• Bolja pretraga kućnih brojeva, pokriveno je više američkih adresa
-• OSM podaci od 4. travnja
-• Planirani način prikaza u postavkama
-• Ispravljeno dijeljenje oznaka/tragova s drugim aplikacijama
-• Ispravljeno učitavanje izmjena karte u OSM
-…više na omaps.org/news
+• OSM podaci od 28. rujna, Wikipedija od 21. rujna
+• Poboljšane alternativne rute i njihova procijenjena vremena dolaska
+• Dodana je postavka za optimizaciju redoslijeda međutočaka na ruti
+• Dodani su gumbi za dodavanje ili zamjenu usputne točke u planiranoj ruti
+• Odabrana alternativna ruta sada se čuva tijekom navigacije
+• Popravljeno i poboljšano snimanje staze
+• Popravljen je uvoz KMB datoteka
+• Poboljšanja i ispravci korisničkog sučelja
+…više detalja na omaps.org/news

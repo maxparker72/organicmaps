@@ -143,6 +143,8 @@ void Track::UpdateSelectionInfo(m2::PointD const & tapPoint, TrackSelectionInfo 
       if (squaredDist >= info.m_squareDist)
         continue;
 
+      info.m_title = GetName();
+      info.m_color = GetColor(0);
       info.m_squareDist = squaredDist;
       info.m_trackId = m_data.m_id;
       info.m_trackPoint = closestPoint;
@@ -155,7 +157,7 @@ void Track::UpdateSelectionInfo(m2::PointD const & tapPoint, TrackSelectionInfo 
 
 df::DepthLayer Track::GetDepthLayer() const
 {
-  return df::DepthLayer::UserLineLayer;
+  return m_isSelected ? df::DepthLayer::SelectedUserLineLayer : df::DepthLayer::UserLineLayer;
 }
 
 size_t Track::GetLayerCount() const
@@ -181,6 +183,19 @@ float Track::GetWidth(size_t layerIndex) const
   return static_cast<float>(m_data.m_layers[layerIndex].m_lineWidth);
 }
 
+bool Track::IsVisible() const
+{
+  return m_data.m_visible;
+}
+
+void Track::SetVisibility(bool visible)
+{
+  // Visibility doesn't affect geometry, so (unlike SetData) the elevation/interaction caches
+  // stay valid and are intentionally preserved across a hide/show toggle.
+  m_isDirty = true;
+  m_data.m_visible = visible;
+}
+
 float Track::GetDepth(size_t layerIndex) const
 {
   return layerIndex * 10;
@@ -202,11 +217,13 @@ void Track::ForEachGeometry(GeometryFnT && fn) const
 void Track::Attach(kml::MarkGroupId groupId)
 {
   ASSERT_EQUAL(m_groupID, kml::kInvalidMarkGroupId, ());
+  m_isDirty = true;
   m_groupID = groupId;
 }
 
 void Track::Detach()
 {
+  m_isDirty = true;
   m_groupID = kml::kInvalidMarkGroupId;
 }
 

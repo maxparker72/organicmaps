@@ -50,7 +50,7 @@ public class LayerBottomSheetItem
       break;
     case ISOLINES:
       drawableResId = R.drawable.ic_layers_isoline;
-      buttonTextResource = R.string.button_layer_isolines;
+      buttonTextResource = R.string.button_layer_terrain;
       break;
     case TRAFFIC:
       drawableResId = R.drawable.ic_layers_traffic;
@@ -63,6 +63,10 @@ public class LayerBottomSheetItem
     case CYCLING:
       drawableResId = R.drawable.ic_layers_cycling;
       buttonTextResource = R.string.button_layer_cycling;
+      break;
+    case SATELLITE:
+      drawableResId = R.drawable.ic_layers_satellite;
+      buttonTextResource = R.string.button_layer_satellite;
       break;
     }
     return new LayerBottomSheetItem(drawableResId, buttonTextResource, mode, layerItemClickListener);

@@ -3,6 +3,8 @@
 
 #include "indexer/scales.hpp"
 
+#include "geometry/mercator.hpp"
+
 #include "base/string_utils.hpp"
 
 namespace
@@ -56,12 +58,11 @@ std::string GetBookmarkIconType(kml::BookmarkIcon const & icon)
 }
 
 std::string const kCustomImageProperty = "CustomImage";
-std::string const kHasElevationProfileProperty = "has_elevation_profile";
-int constexpr kInvalidColor = 0;
 }  // namespace
 
 Bookmark::Bookmark(m2::PointD const & ptOrg) : Base(ptOrg, UserMark::BOOKMARK), m_groupId(kml::kInvalidMarkGroupId)
 {
+  ASSERT(mercator::ValidX(ptOrg.x) && mercator::ValidY(ptOrg.y), (ptOrg));
   m_data.m_point = ptOrg;
   m_data.m_id = GetId();
 }
@@ -71,13 +72,16 @@ Bookmark::Bookmark(kml::BookmarkData && data)
   , m_data(std::move(data))
   , m_groupId(kml::kInvalidMarkGroupId)
 {
+  ASSERT(mercator::ValidX(m_data.m_point.x) && mercator::ValidY(m_data.m_point.y), (m_data.m_point));
   m_data.m_id = GetId();
+  m_data.m_color = kml::NormalizeBookmarkColorData(m_data.m_color);
 }
 
 void Bookmark::SetData(kml::BookmarkData const & data)
 {
   SetDirty();
   m_data = data;
+  m_data.m_color = kml::NormalizeBookmarkColorData(m_data.m_color);
 }
 
 kml::BookmarkData const & Bookmark::GetData() const
@@ -96,12 +100,6 @@ void Bookmark::SetAddress(search::ReverseGeocoder::RegionAddress const & address
   m_address = address;
 }
 
-void Bookmark::SetIsVisible(bool isVisible)
-{
-  SetDirty();
-  m_isVisible = isVisible;
-}
-
 drape_ptr<df::UserPointMark::TitlesInfo> Bookmark::GetTitleDeclEx(settings::Placement p, dp::Color outlineColor) const
 {
   if (p == settings::Placement::None)
@@ -115,7 +113,7 @@ drape_ptr<df::UserPointMark::TitlesInfo> Bookmark::GetTitleDeclEx(settings::Plac
   default: UNREACHABLE();
   }
 
-  title.m_primaryTextFont.m_color = df::GetColorConstant(GetColorConstant());
+  title.m_primaryTextFont.m_color = GetColorForRendering();
   title.m_primaryTextFont.m_outlineColor = outlineColor;
   title.m_primaryTextFont.m_size = 11;  // most frequent font size in styles
   title.m_primaryText = GetPreferredName();
@@ -216,19 +214,34 @@ kml::PredefinedColor Bookmark::GetColor() const
   return m_data.m_color.m_predefinedColor;
 }
 
-void Bookmark::InvalidateRGBAColor()
+void Bookmark::SetColor(dp::Color color)
 {
-  m_data.m_color.m_rgba = kInvalidColor;
-}
-
-void Bookmark::SetColor(kml::PredefinedColor color)
-{
-  if (m_data.m_color.m_predefinedColor == color)
+  auto const colorData = kml::MakeCustomBookmarkColorData(color);
+  if (m_data.m_color == colorData)
     return;
 
   SetDirty();
-  m_data.m_color.m_predefinedColor = color;
-  InvalidateRGBAColor();
+  m_data.m_color = colorData;
+}
+
+void Bookmark::SetVisibility(bool visible)
+{
+  if (m_data.m_visible == visible)
+    return;
+  SetDirty();
+  m_data.m_visible = visible;
+}
+
+std::optional<dp::Color> Bookmark::GetCustomColor() const
+{
+  if (kml::IsCustomBookmarkColor(m_data.m_color))
+    return dp::Color(m_data.m_color.m_rgba);
+  return std::nullopt;
+}
+
+dp::Color Bookmark::GetColorForRendering() const
+{
+  return GetCustomColor().value_or(df::GetColorConstant(GetColorConstant()));
 }
 
 std::string Bookmark::GetPreferredName() const
@@ -251,11 +264,6 @@ void Bookmark::SetName(std::string const & name, int8_t langCode)
 {
   SetDirty();
   m_data.m_name[langCode] = name;
-}
-
-std::string Bookmark::GetCustomName() const
-{
-  return GetPreferredBookmarkStr(m_data.m_customName);
 }
 
 void Bookmark::SetCustomName(std::string const & customName)
@@ -319,19 +327,14 @@ void Bookmark::Attach(kml::MarkGroupId groupId)
 {
   ASSERT_NOT_EQUAL(groupId, kml::kInvalidMarkGroupId, ());
   ASSERT_EQUAL(m_groupId, kml::kInvalidMarkGroupId, ());
+  // A restored bookmark may have been rendered before, so re-attaching has to make it dirty again.
+  SetDirty();
   m_groupId = groupId;
-}
-
-void Bookmark::AttachCompilation(kml::MarkGroupId groupId)
-{
-  ASSERT(groupId != kml::kInvalidMarkGroupId, ());
-  m_compilationIds.push_back(groupId);
 }
 
 void Bookmark::Detach()
 {
   m_groupId = kml::kInvalidMarkGroupId;
-  m_compilationIds.clear();
 }
 
 BookmarkCategory::BookmarkCategory(std::string const & name, kml::MarkGroupId groupId, bool autoSave)
@@ -368,15 +371,6 @@ void BookmarkCategory::SetDescription(std::string const & desc)
   kml::SetDefaultStr(m_data.m_description, desc);
 }
 
-void BookmarkCategory::SetServerId(std::string const & serverId)
-{
-  if (m_serverId == serverId)
-    return;
-
-  SetDirty(true /* updateModificationTime */);
-  m_serverId = serverId;
-}
-
 void BookmarkCategory::SetTags(std::vector<std::string> const & tags)
 {
   if (m_data.m_tags == tags)
@@ -401,22 +395,6 @@ std::string BookmarkCategory::GetName() const
   return GetPreferredBookmarkStr(m_data.m_name);
 }
 
-bool BookmarkCategory::HasElevationProfile() const
-{
-  auto const it = m_data.m_properties.find(kHasElevationProfileProperty);
-  return (it != m_data.m_properties.end()) && (it->second != "0");
-}
-
-void BookmarkCategory::SetAuthor(std::string const & name, std::string const & id)
-{
-  if (m_data.m_authorName == name && m_data.m_authorId == id)
-    return;
-
-  SetDirty(true /* updateModificationTime */);
-  m_data.m_authorName = name;
-  m_data.m_authorId = id;
-}
-
 void BookmarkCategory::SetAccessRules(kml::AccessRules accessRules)
 {
   if (m_data.m_accessRules == accessRules)
@@ -424,12 +402,6 @@ void BookmarkCategory::SetAccessRules(kml::AccessRules accessRules)
 
   SetDirty(true /* updateModificationTime */);
   m_data.m_accessRules = accessRules;
-}
-
-// static
-kml::PredefinedColor BookmarkCategory::GetDefaultColor()
-{
-  return kml::PredefinedColor::Red;
 }
 
 void BookmarkCategory::SetDirty(bool updateModificationDate)

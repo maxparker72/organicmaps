@@ -8,6 +8,7 @@
 #include <QtGui/QOpenGLContext>
 
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <mutex>
 
@@ -26,25 +27,30 @@ public:
   void SetFramebuffer(ref_ptr<dp::BaseFramebuffer> framebuffer) override;
   void Resize(uint32_t w, uint32_t h) override;
 
+  // Called by one consumer with its shared GL context current; the frame stays valid until its next acquisition.
   bool AcquireFrame();
   GLuint GetTextureHandle() const;
   QRectF const & GetTexRect() const;
+  // The listener runs on the render thread under the frame mutex after each new frame.
+  void SetPresentListener(std::function<void()> fn);
 
 private:
+  // Requires the render context; only the producer accesses the back frame and pending size.
+  void PrepareBackFrame();
+
   QOffscreenSurface * m_surface = nullptr;
   std::unique_ptr<QOpenGLContext> m_ctx;
+  std::function<void()> m_onPresent;
 
   std::unique_ptr<QOpenGLFramebufferObject> m_frontFrame;
   std::unique_ptr<QOpenGLFramebufferObject> m_backFrame;
   std::unique_ptr<QOpenGLFramebufferObject> m_acquiredFrame;
-  QRectF m_acquiredFrameRect = QRectF(0.0, 0.0, 0.0, 0.0);
-  QRectF m_frameRect = QRectF(0.0, 0.0, 0.0, 0.0);
   bool m_frameUpdated = false;
 
   std::atomic<bool> m_isContextAvailable;
-  int m_width = 0;
-  int m_height = 0;
+  QSize m_size;
 
+  // Protects publication and swaps of the front frame between the producer and consumer.
   std::mutex m_frameMutex;
 };
 

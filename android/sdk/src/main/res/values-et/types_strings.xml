@@ -202,6 +202,7 @@
     <string name="type.barrier.city_wall">Linnamüür</string>
     <string name="type.barrier.cycle_barrier">Jalgrattabarjäär</string>
     <string name="type.waterway.ditch">Drenaažikraav</string>
+    <string name="type.waterway.ditch.intermittent">Ajutine drenaažikraav</string>
     <string name="type.natural.water.moat">Vallikraav</string>
     <string name="type.natural.water.wastewater">Reovesi</string>
     <string name="type.barrier.entrance">Sissepääs</string>
@@ -387,49 +388,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Tee</string>
     <string name="type.highway.bridleway">Ratsutamisrada</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Sild</string>
     <string name="type.highway.bridleway.permissive">Ratsutamisrada</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Tunnel</string>
     <string name="type.highway.busway">Roobastega bussirada</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Tunnel</string>
     <string name="type.highway.bus_stop">Bussipeatus</string>
     <string name="type.highway.construction">Ehitusjärgus tee</string>
     <string name="type.highway.cycleway">Jalgrattatee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Jalgrattasild</string>
     <string name="type.highway.cycleway.permissive">Piiratud jalgrattatee</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Jalgrattatunnel</string>
     <string name="type.highway.elevator">Lift</string>
     <string name="type.highway.footway">Jalgrada</string>
     <string name="type.highway.footway.sidewalk">Kõnnitee</string>
     <string name="type.highway.footway.crossing">Jalakäijate ülekäigurada</string>
     <string name="type.highway.footway.area">Jalakäijate ala</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Jalakäijate sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Jalakäijate tunnel</string>
     <string name="type.highway.ford">Koolmekoht</string>
     <string name="type.highway.living_street">Õueala tee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Elamupiirkonna tänava tunnel</string>
     <string name="type.highway.motorway">Kiirtee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Kiirtee sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Kiirtee tunnel</string>
     <string name="type.highway.motorway_junction">Mahasõit kiirteelt</string>
     <string name="type.highway.motorway_link">Kiirtee kaldtee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Tunnel</string>
     <string name="type.highway.path">Rada</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -438,103 +439,104 @@
     <string name="type.highway.path.expert">Väga raske või eristamatu rada</string>
     <string name="type.highway.path.bicycle">Jalgratta- ja jalgtee</string>
     <string name="type.highway.footway.bicycle">Jalgratta- ja jalgtee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Sild</string>
     <string name="type.highway.path.horse">Ratsutamisrada</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Tunnel</string>
     <string name="type.highway.pedestrian">Jalakäijate tänav</string>
     <string name="type.highway.pedestrian.area">Jalakäijate ala</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Jalakäijate sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Jalakäijate tunnel</string>
-    <string name="type.highway.platform">Ooteplatvorm</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Ooteala</string>
     <string name="type.highway.primary">Põhimaantee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Põhimaantee sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Põhimaantee tunnel</string>
     <string name="type.highway.primary_link">Põhimaantee kaldtee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Põhimaantee ühendustee sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Põhimaantee ühendustee tunnel</string>
     <string name="type.highway.raceway">Võistlusrada</string>
     <string name="type.highway.residential">Elamupiirkonna tänav</string>
     <string name="type.highway.residential.area">Elamupiirkonna tänav</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Elamupirkonna tänava tunnel</string>
     <string name="type.highway.rest_area">Teeäärne puhkekoht</string>
     <string name="type.highway.road">Maantee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Sild</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Tunnel</string>
     <string name="type.highway.secondary">Tugimaantee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Tugimaantee sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Tugimaantee tunnel</string>
     <string name="type.highway.secondary_link">Tugimaantee ühendustee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Tugimaantee ühendustee sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Tugimaantee ühendustee tunnel</string>
     <string name="type.highway.service">Juurdepääsutee</string>
     <string name="type.highway.service.area">Juurdepääsutee ala</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Juurdepääsutee sild</string>
     <string name="type.highway.service.driveway">Sissesõidutee</string>
     <string name="type.highway.service.parking_aisle">Parkla vahetee</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Juurdepääsutee tunnel</string>
     <string name="type.highway.services">Maantee teenindusala</string>
     <string name="type.highway.speed_camera">Kiiruskaamera</string>
     <string name="type.highway.steps">Trepp</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Tunnel</string>
     <string name="type.highway.ladder">Redel</string>
     <string name="type.highway.tertiary">Kohalik maantee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Kohaliku maantee sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Kohaliku maantee tunnel</string>
     <string name="type.highway.tertiary_link">Kohaliku maantee ühendustee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Kohaliku maantee ühendustee sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Kohaliku maantee ühendustee tunnel</string>
     <string name="type.highway.track">Rada</string>
     <string name="type.highway.track.area">Rada</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Sild</string>
     <string name="type.highway.track.grade1">Rada</string>
     <string name="type.highway.track.no.access">Rada</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Tunnel</string>
     <string name="type.highway.traffic_signals">Valgusfoor</string>
     <string name="type.highway.trunk">E-tähistusega põhimaantee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">E-tähistusega põhimaantee tunnel</string>
     <string name="type.highway.trunk_link">E-tähistusega põhimaantee ühendustee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Tunnel</string>
     <string name="type.highway.unclassified">Vähetähtis tee</string>
     <string name="type.highway.unclassified.area">Vähetähtis tee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Sild</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Tunnel</string>
     <string name="type.area_highway.cycleway">Jalgrattatee</string>
     <string name="type.area_highway.footway">Jalgrada</string>
@@ -572,6 +574,7 @@
     <string name="type.historic.castle.shiro">Jaapani kindlusloss</string>
     <string name="type.historic.castle.stately">Suur härrastemaja</string>
     <string name="type.historic.city_gate">Linnavärav</string>
+    <string name="type.man_made.ceremonial_gate">Tseremoniaalne värav</string>
     <string name="type.historic.citywalls">Linnamüür</string>
     <string name="type.historic.fort">Kindlus</string>
     <string name="type.historic.gallows">Võllas</string>
@@ -605,6 +608,7 @@
     <string name="type.landuse">Maakasutus</string>
     <string name="type.landuse.allotments">Aianduskrundid</string>
     <string name="type.landuse.basin">Kogumisbassein</string>
+    <string name="type.landuse.basin.intermittent">Ajutine kogumisbassein</string>
     <string name="type.landuse.brownfield">Pruunala</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Surnuaed</string>
@@ -635,7 +639,6 @@
     <string name="type.landuse.quarry">Karjäär</string>
     <string name="type.landuse.railway">Raudteekoridor</string>
     <string name="type.landuse.recreation_ground">Puhkeala</string>
-    <string name="type.landuse.reservoir">Veehoidla</string>
     <string name="type.landuse.residential">Elamuala</string>
     <string name="type.landuse.retail">Jaekaubandusala</string>
     <string name="type.landuse.salt_pond">Soolatiik</string>
@@ -657,6 +660,7 @@
     <string name="type.leisure.ice_rink">Uisustaadion</string>
     <string name="type.leisure.marina">Väikesadam</string>
     <string name="type.leisure.nature_reserve">Looduskaitseala</string>
+    <string name="type.leisure.bird_hide">Linnuvaatlusvarje</string>
     <string name="type.leisure.outdoor_seating">Istekohad õues</string>
     <string name="type.leisure.firepit">Tulease</string>
     <string name="type.leisure.park">Park</string>
@@ -691,6 +695,8 @@
     <string name="type.man_made.pier">Kai</string>
     <string name="type.man_made.pipeline">Torujuhe</string>
     <string name="type.man_made.pipeline.overground">Maapealne torujuhe</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Kaetud veereservuaar</string>
     <string name="type.man_made.silo">Silo</string>
     <string name="type.man_made.storage_tank">Mahuti</string>
     <string name="type.man_made.surveillance">Valvekaamera</string>
@@ -709,6 +715,8 @@
     <string name="type.man_made.water_tower">Veetorn</string>
     <string name="type.man_made.water_well">Veekaev</string>
     <string name="type.man_made.water_well.drinking_water_no">Pole joogivesi</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Veepuhastusjaam</string>
     <string name="type.man_made.windmill">Tuuleveski</string>
     <string name="type.man_made.works">Tehas</string>
     <string name="type.military">Militaarobjekt</string>
@@ -743,10 +751,13 @@
     <string name="type.natural.water.reservoir">Veehoidla</string>
     <string name="type.natural.water.basin">Kogumisbassein</string>
     <string name="type.natural.water.river">Jõgi</string>
+    <string name="type.natural.water.intermittent">Ajutine veekogu</string>
     <string name="type.natural.land">Maa</string>
     <string name="type.natural.meadow">Heinamaa</string>
     <string name="type.natural.orchard">Viljapuuaed</string>
     <string name="type.natural.peak">Mäetipp</string>
+    <string name="type.natural.hill">Küngas</string>
+    <string name="type.natural.arch">Kivikaar</string>
     <string name="type.natural.saddle">Mäesadul</string>
     <string name="type.natural.rock">Kaljurahn</string>
     <string name="type.natural.scrub">Võsa</string>
@@ -838,7 +849,8 @@
     <string name="type.psurface.unpaved_bad">psurface-unpaved_bad</string>
     <string name="type.psurface.unpaved_good">psurface-unpaved_good</string>
     <string name="type.public_transport">Ühistransport</string>
-    <string name="type.public_transport.platform">Ooteplatvorm</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Ooteala</string>
     <string name="type.railway">Raudtee</string>
     <string name="type.railway.abandoned">Mahajäetud raudtee</string>
     <string name="type.railway.abandoned.bridge">Mahajäetud sild</string>
@@ -1195,6 +1207,8 @@
     <string name="type.shop.greengrocer">Puu- ja köögiviljapood</string>
     <string name="type.shop.grocery">Toidukauplus</string>
     <string name="type.shop.hairdresser">Juuksur</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Meestejuuksur</string>
     <string name="type.shop.hardware">Rauakauplus</string>
     <string name="type.shop.health_food">Tervisliku toidu kauplus</string>
     <string name="type.shop.hearing_aids">Kuuldeaparaatide kauplus</string>
@@ -1318,6 +1332,7 @@
     <string name="type.sport.rugby_union">Ragbi</string>
     <string name="type.sport.running">Jooks</string>
     <string name="type.sport.softball">Softball</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turism</string>
     <string name="type.tourism.aquarium">Akvaarium</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1371,22 +1386,25 @@
     <string name="type.waterway">Veetee</string>
     <string name="type.waterway.access_point">Veetee juurdepääsupunkt</string>
     <string name="type.waterway.canal">Kanal</string>
+    <string name="type.waterway.canal.intermittent">Ajutine kanal</string>
     <string name="type.waterway.canal.tunnel">Kanal tunnelis</string>
     <string name="type.waterway.fish_pass">Kalatrepp</string>
+    <string name="type.waterway.fish_pass.intermittent">Ajutine kalatrepp</string>
     <string name="type.waterway.dam">Tamm</string>
     <string name="type.barrier.ditch">Kraav</string>
     <string name="type.natural.water.ditch">Drenaažikraav</string>
     <string name="type.waterway.ditch.tunnel">Truup</string>
     <string name="type.waterway.dock">Dokk</string>
     <string name="type.waterway.drain">Kuivenduskraav</string>
+    <string name="type.waterway.drain.intermittent">Ajutine kuivenduskraav</string>
     <string name="type.natural.water.drain">Kuivenduskraav</string>
     <string name="type.waterway.drain.tunnel">Truup</string>
     <string name="type.waterway.lock_gate">Lüüsivärav</string>
     <string name="type.waterway.river">Jõgi</string>
+    <string name="type.waterway.river.intermittent">Ajutine jõgi</string>
     <string name="type.waterway.river.tunnel">Jõgi tunnelis</string>
     <string name="type.waterway.stream">Oja</string>
-    <string name="type.waterway.stream.ephemeral">Väga ajutine jõgi</string>
-    <string name="type.waterway.stream.intermittent">Ajutine jõgi</string>
+    <string name="type.waterway.stream.intermittent">Ajutine oja</string>
     <string name="type.waterway.stream.tunnel">Oja tunnelis</string>
     <string name="type.waterway.waterfall">Kosk</string>
     <string name="type.waterway.weir">Ülevoolupais</string>
@@ -1428,6 +1446,7 @@
     <string name="type.self_service.no">Iseteenindus puudub</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Sotsiaalasutus</string>
+    <string name="type.amenity.stage">Lava</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Erakorralise meditsiini osakonna sissepääs</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1457,6 +1476,8 @@
     <string name="type.man_made.monitoring_station.weather">Ilmaseirejaam</string>
     <string name="type.amenity.student_accommodation">Üliõpilaskodu</string>
     <string name="type.craft.watchmaker">Kellassepp</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Akende valmistamine</string>
     <string name="type.xmas_feature.market">Jõuluturg</string>
     <string name="type.xmas_feature.tree">Jõulupuu</string>
     <string name="type.amenity.hookah_lounge">Vesipiibu kohvik</string>

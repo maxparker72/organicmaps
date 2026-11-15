@@ -1,9 +1,9 @@
-• OSM podaci o mapama od 10. marta, podaci s Wikipedije od 1. marta
-• Detaljnije izohipse za kineske pokrajine
-• Dodani redovi stabala, kožne radnje i radnje koje prodaju vjerske proizvode
-• Dodana podrška za uslovna ograničenja brzine
-• Tanzanija podijeljena na manje regija
-• Poboljšan prikaz radnog vremena objekata
-• Ispravljeno nekoliko padova aplikacije
-• Poboljšani prijevodi naziva aplikacija i zemalja
-…više na omaps.org/news
+• OSM podaci od 28. septembra, Wikipedija od 21. septembra
+• Poboljšane alternativne rute i njihova procijenjena vremena dolaska
+• Dodana je postavka za optimizaciju redoslijeda međutačaka na ruti
+• Dodata su dugmad za dodavanje ili zamjenu usputne tačke u planiranoj ruti
+• Odabrana alternativna ruta sada se čuva tokom navigacije
+• Popravljeno i poboljšano snimanje staze
+• Popravljen je uvoz KMB datoteka
+• Poboljšanja i ispravke korisničkog interfejsa
+…više detalja na omaps.org/news

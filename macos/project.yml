@@ -16,7 +16,6 @@ configFiles:
   Release: ../xcode/common-release.xcconfig
 
 projectReferences:
-  agg: { path: ../xcode/agg/agg.xcodeproj }
   base: { path: ../xcode/base/base.xcodeproj }
   bsdiff: { path: ../xcode/bsdiff/bsdiff.xcodeproj }
   coding: { path: ../xcode/coding/coding.xcodeproj }
@@ -38,15 +37,17 @@ projectReferences:
   open_location_code: { path: ../xcode/open_location_code/open_location_code.xcodeproj }
   opening_hours: { path: ../xcode/opening_hours/opening_hours.xcodeproj }
   platform: { path: ../xcode/platform/platform.xcodeproj }
-  protobuf: { path: ../xcode/protobuf/protobuf.xcodeproj }
   pugixml: { path: ../xcode/pugixml/pugixml.xcodeproj }
   routing: { path: ../xcode/routing/routing.xcodeproj }
   routing_common: { path: ../xcode/routing_common/routing_common.xcodeproj }
   search: { path: ../xcode/search/search.xcodeproj }
   shaders: { path: ../xcode/shaders/shaders.xcodeproj }
+  sperr: { path: ../xcode/sperr/sperr.xcodeproj }
   stb_image: { path: ../xcode/stb_image/stb_image.xcodeproj }
   storage: { path: ../xcode/storage/storage.xcodeproj }
   succinct: { path: ../xcode/succinct/succinct.xcodeproj }
+  terrain: { path: ../xcode/terrain/terrain.xcodeproj }
+  tess2: { path: ../xcode/tess2/tess2.xcodeproj }
   timezone: { path: ../xcode/timezone/timezone.xcodeproj }
   traffic: { path: ../xcode/traffic/traffic.xcodeproj }
   transit: { path: ../xcode/transit/transit.xcodeproj }
@@ -182,7 +183,6 @@ targets:
     dependencies:
       - target: CoreApi
         embed: false
-      - target: agg/agg
       - target: base/base
       - target: bsdiff/bsdiff
       - target: coding/coding
@@ -205,15 +205,17 @@ targets:
       - target: open_location_code/open_location_code
       - target: opening_hours/opening_hours
       - target: platform/platform
-      - target: protobuf/protobuf
       - target: pugixml/pugixml
       - target: routing/routing
       - target: routing_common/routing_common
       - target: search/search
       - target: shaders/shaders
+      - target: sperr/sperr
       - target: stb_image/stb_image
       - target: storage/storage
       - target: succinct/succinct
+      - target: terrain/terrain
+      - target: tess2/tess2
       - target: timezone/timezone
       - target: traffic/traffic
       - target: transit/transit

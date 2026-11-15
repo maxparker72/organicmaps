@@ -92,19 +92,17 @@ public:
   // Fills info for the country by id.
   void GetRegionInfo(CountryId const & countryId, CountryInfo & info) const;
 
-  // Fills limit rects of the USA:
-  // 0 - continental part
-  // 1 - Alaska
-  // 2 - Hawaii
-  void CalcUSALimitRect(m2::RectD rects[3]) const;
-
+  /// @note These bounds may extend beyond the canonical longitude range.
+  /// @see CountryDef::IsIntersectOrInside.
+  /// @todo Review all usages.
+  /// @{
   // Calculates the limit rect for all countries whose names start with |prefix|.
   m2::RectD CalcLimitRect(std::string const & prefix) const;
 
-  // Returns the limit rect for |countryId| (non-expandable node).
-  // Returns the bounding box in mercator coordinates if |countryId| is a country id of
-  // a non-expandable node and zero rect otherwise.
+  // Returns the Mercator bounds for a leaf country, or FullRect() if its name is absent
+  // from the border index, including World files and obsolete country names.
   m2::RectD GetLimitRectForLeaf(CountryId const & leafCountryId) const;
+  /// @}
 
   // Returns identifiers for all regions matching to |affiliation|.
   virtual void GetMatchedRegions(std::string const & affiliation, RegionIdVec & regions) const;
@@ -138,12 +136,11 @@ protected:
   Affiliations const * m_affiliations = nullptr;
 };
 
-// This class reads info about countries from polygons file and
-// countries file and caches it.
+// Reads country bounds and geometry from packed_polygons.bin and caches decoded geometry.
 class CountryInfoReader : public CountryInfoGetter
 {
 public:
-  /// \returns CountryInfoReader/CountryInfoGetter based on countries.txt and packed_polygons.bin.
+  /// \returns A reader for packed_polygons.bin.
   static std::unique_ptr<CountryInfoReader> CreateCountryInfoReader(Platform const & platform);
   static std::unique_ptr<CountryInfoGetter> CreateCountryInfoGetter(Platform const & platform);
 

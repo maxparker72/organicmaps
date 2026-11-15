@@ -21,7 +21,6 @@ CGFloat constexpr kSearchButtonsViewWidthPortrait = 200;
 CGFloat constexpr kSearchButtonsViewHeightLandscape = 56;
 CGFloat constexpr kSearchButtonsViewWidthLandscape = 286;
 CGFloat constexpr kSearchButtonsSideSize = 44;
-CGFloat constexpr kSearchButtonsBottomOffset = 32;
 CGFloat constexpr kBaseTurnsTopOffset = 28;
 CGFloat constexpr kShiftedTurnsTopOffset = 8;
 
@@ -49,6 +48,13 @@ BOOL defaultOrientation(CGSize const & size)
   CGSize const & mapViewSize = [MapViewController sharedController].view.frame.size;
   CGFloat const minWidth = MIN(mapViewSize.width, mapViewSize.height);
   return IPAD || (size.height > size.width && size.width >= minWidth);
+}
+
+CGFloat ScaledTurnsWidth()
+{
+  CGFloat const baseWidth = IPAD ? kTurnsiPadWidth : kTurnsiPhoneWidth;
+  CGFloat const scaledWidth = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleTitle1] scaledValueForValue:baseWidth];
+  return MAX(baseWidth, scaledWidth);
 }
 }  // namespace
 
@@ -99,30 +105,35 @@ BOOL defaultOrientation(CGSize const & size)
 
 @implementation MWMNavigationInfoView
 
+- (void)awakeFromNib
+{
+  [super awakeFromNib];
+
+  self.streetNameLabel.font = UIFont.bold24.dynamic;
+  self.streetNameLabel.adjustsFontForContentSizeCategory = YES;
+
+  self.roundTurnLabel.font = UIFont.bold24.dynamic;
+  self.roundTurnLabel.adjustsFontForContentSizeCategory = YES;
+
+  self.distanceToNextTurnLabel.adjustsFontForContentSizeCategory = YES;
+  self.turnsWidth.constant = ScaledTurnsWidth();
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+  [super traitCollectionDidChange:previousTraitCollection];
+  if (previousTraitCollection && [previousTraitCollection.preferredContentSizeCategory
+                                     isEqualToString:self.traitCollection.preferredContentSizeCategory])
+    return;
+
+  self.turnsWidth.constant = ScaledTurnsWidth();
+  [self onNavigationInfoUpdated:self.navigationInfo];
+  [self setNeedsLayout];
+}
+
 - (void)setMapSearch
 {
   [self setSearchState:NavigationSearchStateMinimizedSearch animated:YES];
-}
-
-- (void)updateSideButtonsAvailableArea:(CGRect)frame animated:(BOOL)animated
-{
-  CGFloat const height = frame.size.height;
-  if (height == 0)
-    return;
-  CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
-  CGFloat bottomOffset = screenHeight - height + kSearchButtonsBottomOffset;
-
-  self.searchMainButtonBottomConstraint.constant = bottomOffset;
-  BOOL isOutOfBounds = height < kSearchButtonsViewHeightPortrait;
-  [UIView animateWithDuration:animated ? 0 : kDefaultAnimationDuration
-      animations:^{
-        self.searchMainButton.alpha = isOutOfBounds ? 0.0 : 1.0;
-        self.bookmarksButton.alpha = isOutOfBounds ? 0.0 : 1.0;
-      }
-      completion:^(BOOL finished) {
-        self.searchMainButton.hidden = isOutOfBounds;
-        self.bookmarksButton.hidden = isOutOfBounds;
-      }];
 }
 
 - (SearchOnMapManager *)searchManager
@@ -260,11 +271,11 @@ BOOL defaultOrientation(CGSize const & size)
 
     NSDictionary * turnNumberAttributes = @{
       NSForegroundColorAttributeName: [UIColor whitePrimary],
-      NSFontAttributeName: IPAD ? [UIFont bold36] : [UIFont bold28]
+      NSFontAttributeName: IPAD ? UIFont.bold36.dynamic : UIFont.bold28.dynamic
     };
     NSDictionary * turnLegendAttributes = @{
       NSForegroundColorAttributeName: [UIColor whitePrimary],
-      NSFontAttributeName: IPAD ? [UIFont bold24] : [UIFont bold16]
+      NSFontAttributeName: IPAD ? UIFont.bold24.dynamic : UIFont.bold16.dynamic
     };
 
     NSMutableAttributedString * distance = [[NSMutableAttributedString alloc] initWithString:info.distanceToTurn
@@ -401,7 +412,7 @@ BOOL defaultOrientation(CGSize const & size)
   if (animated)
   {
     [self layoutIfNeeded];
-    [UIView animateWithDuration:kDefaultAnimationDuration animations:block];
+    [UIView animateWithDuration:AppConstants.defaultAnimationDuration animations:block];
   }
   else
   {
@@ -459,7 +470,7 @@ BOOL defaultOrientation(CGSize const & size)
   if (isVisible)
   {
     [self setSearchState:NavigationSearchStateMinimizedNormal animated:NO];
-    self.turnsWidth.constant = IPAD ? kTurnsiPadWidth : kTurnsiPhoneWidth;
+    self.turnsWidth.constant = ScaledTurnsWidth();
     UIView * sv = self.ownerView;
     NSAssert(sv != nil, @"Superview can't be nil");
     if (![sv.subviews containsObject:self])
@@ -468,7 +479,7 @@ BOOL defaultOrientation(CGSize const & size)
       [self configLayout];
     }
   }
-  [UIView animateWithDuration:kDefaultAnimationDuration
+  [UIView animateWithDuration:AppConstants.defaultAnimationDuration
       animations:^{
         self.alpha = isVisible ? 1 : 0;
         [self layoutIfNeeded];

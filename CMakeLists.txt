@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.22.1)
 
+# Let CMAKE_MSVC_DEBUG_INFORMATION_FORMAT choose between /Zi and /Z7, and keep the debug info inside the
+# object files: ccache cannot cache /Zi compilations, which write PDBs.
+if (POLICY CMP0141)
+  cmake_policy(SET CMP0141 NEW)
+  if (NOT CMAKE_MSVC_DEBUG_INFORMATION_FORMAT)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,RelWithDebInfo>:Embedded>")
+  endif()
+endif()
+
 project(omim C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -27,6 +36,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 include(OmimPlatform)
 include(OmimOptions)
+if (PLATFORM_SAILFISH)
+  set(OMIM_QT_VERSION 5 CACHE STRING "Qt major version, 5 or 6")
+else()
+  set(OMIM_QT_VERSION 6 CACHE STRING "Qt major version, 5 or 6")
+endif()
+if (OMIM_QT_VERSION STREQUAL "5")
+  option(BUILD_TESTING "Build the tests" OFF)
+elseif (NOT OMIM_QT_VERSION STREQUAL "6")
+  message(FATAL_ERROR "OMIM_QT_VERSION must be 5 or 6, not ${OMIM_QT_VERSION}")
+endif()
+include(OmimWindowsDistribution)
 include(OmimConfig)
 include(OmimHelpers)
 include(OmimTesting)
@@ -49,6 +69,7 @@ endif()
 message(STATUS "Using compiler ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 if (CMAKE_UNITY_BUILD)
+  set(CMAKE_UNITY_BUILD_RELOCATABLE ON)
   message(STATUS "Using Unity Build with batch ${CMAKE_UNITY_BUILD_BATCH_SIZE}, use -DCMAKE_UNITY_BUILD=OFF to disable it.")
 endif()
 
@@ -65,24 +86,16 @@ endif()
 
 if(${PLATFORM_MAC})
   set(XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
-
-  # Metal language support
-  list(APPEND CMAKE_MODULE_PATH ${OMIM_ROOT}/3party/CMake-MetalShaderSupport/cmake)
-  include(CheckLanguage)
-  include(CMakeMetalInformation)
-  include(MetalShaderSupport)
-  check_language(Metal)
-  if(CMAKE_Metal_COMPILER)
-    enable_language(Metal)
-  endif()
 endif()
 
 # Global compile options for all configurations.
 if (MSVC)
-  add_compile_options(/utf-8)
+  add_compile_options($<$<COMPILE_LANGUAGE:C,CXX>:/utf-8>)
+  add_compile_options($<$<COMPILE_LANGUAGE:C,CXX>:/bigobj>)
   add_link_options(/INCREMENTAL:NO)
 else()
-  add_compile_options(-ffast-math $<$<CXX_COMPILER_ID:GNU>:-Wno-psabi>)
+  # Sailfish Harbour forbids libmvec, which GCC can use with -ffast-math on aarch64.
+  add_compile_options($<$<NOT:$<BOOL:${PLATFORM_SAILFISH}>>:-ffast-math> $<$<CXX_COMPILER_ID:GNU>:-Wno-psabi>)
 endif()
 
 if (PLATFORM_WIN)
@@ -92,40 +105,54 @@ if (PLATFORM_WIN)
   )
 endif()
 
-# Built-in CMake configurations: Debug, Release, RelWithDebInfo, MinSizeRel
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  add_definitions(-DDEBUG)
-  if (NOT MSVC)
-    add_compile_options(-fno-omit-frame-pointer)
-  endif()
-elseif (${CMAKE_BUILD_TYPE} MATCHES "Rel")
-  add_definitions(-DRELEASE)
-  if (NOT MSVC)
-    add_compile_options(-O3)
-  endif()
-else()
-  message(FATAL_ERROR "Unknown build type: " ${CMAKE_BUILD_TYPE})
+# Built-in CMake configurations: Debug, Release, RelWithDebInfo, MinSizeRel.
+# Use generator expressions so this also works with multi-config generators
+# (Xcode, Visual Studio, Ninja Multi-Config) where CMAKE_BUILD_TYPE is empty
+# at configure time and the active config is only known per-build.
+add_compile_definitions(
+  $<$<CONFIG:Debug>:DEBUG>
+  $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:RELEASE>
+)
+if (NOT MSVC)
+  add_compile_options(
+    $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
+    $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:-O3>
+  )
 endif()
 
-message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
+# For single-config generators we can still validate CMAKE_BUILD_TYPE early.
+get_property(_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if (NOT _is_multi_config)
+  if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT CMAKE_BUILD_TYPE MATCHES "Rel")
+    message(FATAL_ERROR "Unknown build type: " ${CMAKE_BUILD_TYPE})
+  endif()
+  message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
+else()
+  message(STATUS "Multi-config generator: build type selected per-build (Debug/Release/RelWithDebInfo/MinSizeRel)")
+endif()
 
 if (PLATFORM_LINUX OR PLATFORM_ANDROID)
   find_program(LLD_FOUND ld.lld)
   if (LLD_FOUND)
     message(STATUS "Using ld.lld linker")
-    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
+    add_link_options(-fuse-ld=lld)
   else()
     find_program(GOLD_FOUND ld.gold)
     if (GOLD_FOUND)
       message(STATUS "Using ld.gold")
-      set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=gold")
+      add_link_options(-fuse-ld=gold)
     endif()
   endif()
 endif()
 
-if (NOT PYTHON_VERSION)
-  # FDroid build server has 3.5.3 Python installed.
-  set(PYTHON_VERSION 3.5)
+set(OMIM_OPTIMIZED_CONFIG "$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>")
+if (MSVC)
+  add_compile_options("$<$<AND:$<COMPILE_LANGUAGE:C,CXX>,${OMIM_OPTIMIZED_CONFIG}>:/Gy;/Gw>")
+elseif (APPLE)
+  add_link_options($<${OMIM_OPTIMIZED_CONFIG}:-Wl,-dead_strip>)
+else()
+  add_compile_options($<${OMIM_OPTIMIZED_CONFIG}:-ffunction-sections> $<${OMIM_OPTIMIZED_CONFIG}:-fdata-sections>)
+  add_link_options($<${OMIM_OPTIMIZED_CONFIG}:-Wl,--gc-sections>)
 endif()
 
 # End of setting environment variables
@@ -134,22 +161,27 @@ find_package(Threads REQUIRED)
 
 # Scripts
 
-if (NOT PLATFORM_IPHONE AND NOT PLATFORM_ANDROID)
+if (NOT PLATFORM_IPHONE AND NOT PLATFORM_ANDROID AND OMIM_QT_VERSION EQUAL 5)
+  if (BUILD_TESTING OR (PLATFORM_DESKTOP AND NOT SKIP_QT_GUI))
+    message(FATAL_ERROR "The tests and the desktop app need Qt 6: add -DBUILD_TESTING=OFF -DSKIP_QT_GUI=ON")
+  endif()
+  find_package(Qt5 5.6 COMPONENTS REQUIRED Core Network)
+elseif (NOT PLATFORM_IPHONE AND NOT PLATFORM_ANDROID)
   list(APPEND qt_components Core Network)
   if (NOT SKIP_QT_GUI OR BUILD_TESTING)
     list(APPEND qt_components Widgets)
   endif()
   if (NOT SKIP_QT_GUI)
-    list(APPEND qt_components Gui Xml Svg OpenGL OpenGLWidgets)
+    list(APPEND qt_components Gui Xml Svg OpenGL OpenGLWidgets LinguistTools)
   endif()
   # PATHS are hard-coded hints where to look for qt6 in addition to other places.
   find_package(Qt6 COMPONENTS REQUIRED ${qt_components} OPTIONAL_COMPONENTS Positioning PATHS $ENV{QT_PATH} /opt/homebrew/opt/qt@6 /usr/local/opt/qt@6 /usr/lib/x86_64-linux-gnu/qt6)
 
   set(MINIMUM_REQUIRED_QT_VERSION 6.4.0)
-  if (Qt6Widgets_VERSION VERSION_LESS ${MINIMUM_REQUIRED_QT_VERSION})
-    message(FATAL_ERROR "Unsupported Qt version: ${Qt6Widgets_VERSION}, the minimum required is ${MINIMUM_REQUIRED_QT_VERSION}")
+  if (Qt6Core_VERSION VERSION_LESS ${MINIMUM_REQUIRED_QT_VERSION})
+    message(FATAL_ERROR "Unsupported Qt version: ${Qt6Core_VERSION}, the minimum required is ${MINIMUM_REQUIRED_QT_VERSION}")
   else()
-    message(STATUS "Found Qt version: ${Qt6Widgets_VERSION}")
+    message(STATUS "Found Qt version: ${Qt6Core_VERSION}")
   endif()
 
   if (PLATFORM_LINUX AND Qt6_DIR MATCHES "/\\.?linuxbrew/")
@@ -190,7 +222,7 @@ if (WITH_SYSTEM_PROVIDED_3PARTY)
   set(GFLAGS_USE_TARGET_NAMESPACE ON)
   find_package(gflags REQUIRED)
 
-  find_package(expat CONFIG REQUIRED)
+  find_package(expat 2.9.0 CONFIG REQUIRED)
 
   find_package(pugixml REQUIRED)
   find_package(utf8cpp REQUIRED)
@@ -198,9 +230,11 @@ if (WITH_SYSTEM_PROVIDED_3PARTY)
   if (BUILD_TESTING)
     find_package(GTest REQUIRED)
   endif()
-endif()
 
-find_package(ZLIB REQUIRED)
+  # Otherwise zlib-ng is built from 3party/zlib-ng (see 3party/CMakeLists.txt) as
+  # a drop-in replacement -- system zlib is not available out of the box on Windows.
+  find_package(ZLIB REQUIRED)
+endif()
 
 # Include 3party dependencies.
 add_subdirectory(3party)
@@ -212,12 +246,16 @@ if (PLATFORM_DESKTOP AND NOT WITH_SYSTEM_PROVIDED_3PARTY)
 endif()
 
 # Used in qt/ and shaders/
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
+find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 
 add_subdirectory(libs)
 
 if (PLATFORM_DESKTOP)
-  add_subdirectory(dev_sandbox)
+  if (BUILD_DEV_SANDBOX)
+    add_subdirectory(dev_sandbox)
+  else()
+    message(STATUS "dev_sandbox: disabled by BUILD_DEV_SANDBOX=OFF")
+  endif()
   add_subdirectory(generator)
   add_subdirectory(tools)
   if (NOT SKIP_QT_GUI)

@@ -29,6 +29,7 @@ namespace df
 {
 class Message;
 class ReadManager;
+struct ScenarioViewportRequest;
 class RouteBuilder;
 class MetalineManager;
 
@@ -43,7 +44,7 @@ public:
            ref_ptr<dp::GraphicsContextFactory> factory, ref_ptr<dp::TextureManager> texMng,
            MapDataProvider const & model, TUpdateCurrentCountryFn const & updateCurrentCountryFn,
            ref_ptr<RequestedTiles> requestedTiles, bool allow3dBuildings, bool trafficEnabled, bool isolinesEnabled,
-           bool simplifiedTrafficColors, dp::BackgroundMode backgroundMode,
+           bool simplifiedTrafficColors, dp::BackgroundMode backgroundMode, float satelliteAreaOpacity,
            std::optional<Arrow3dCustomDecl> arrow3dCustomDecl,
            OnGraphicsContextInitialized const & onGraphicsContextInitialized)
       : BaseRenderer::Params(apiVersion, commutator, factory, texMng, onGraphicsContextInitialized)
@@ -55,6 +56,7 @@ public:
       , m_isolinesEnabled(isolinesEnabled)
       , m_simplifiedTrafficColors(simplifiedTrafficColors)
       , m_backgroundMode(backgroundMode)
+      , m_satelliteAreaOpacity(satelliteAreaOpacity)
       , m_arrow3dCustomDecl(std::move(arrow3dCustomDecl))
     {}
 
@@ -66,6 +68,7 @@ public:
     bool m_isolinesEnabled;
     bool m_simplifiedTrafficColors;
     dp::BackgroundMode m_backgroundMode;
+    float m_satelliteAreaOpacity;
     std::optional<Arrow3dCustomDecl> m_arrow3dCustomDecl;
   };
 
@@ -123,6 +126,10 @@ private:
   MapDataProvider m_model;
   drape_ptr<BatchersPool<TileKey, TileKeyStrictComparator>> m_batchersPool;
   drape_ptr<ReadManager> m_readManager;
+#ifdef SCENARIO_ENABLE
+  std::shared_ptr<ScenarioViewportRequest> m_pendingScenarioViewport;
+  uint64_t m_pendingScenarioViewportRevision = 0;
+#endif
   drape_ptr<RouteBuilder> m_routeBuilder;
   drape_ptr<TransitSchemeBuilder> m_transitBuilder;
   drape_ptr<TrafficGenerator> m_trafficGenerator;

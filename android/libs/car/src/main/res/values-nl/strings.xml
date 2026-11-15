@@ -47,6 +47,8 @@
     <string name="auto">Automatisch</string>
     <!-- Settings «Map» category: «3D buildings» title -->
     <string name="pref_map_3d_buildings_title">3D-gebouwen</string>
+    <!-- Settings «Route» category: «Tts unavailable» subtitle. Also used as a CarToast in Android Auto when the user taps the muted voice icon. -->
+    <string name="pref_tts_unavailable">Niet beschikbaar</string>
     <!-- Text in menu -->
     <string name="help">Hulp</string>
     <!-- In maps downloader and country place page shows how many maps are downloaded / to download, e.g. "Maps: 3 of 10" -->
@@ -66,9 +68,12 @@
     <string name="editor_time_open">Open</string>
     <string name="twentyfour_seven">24/7</string>
     <string name="day_off_today">Vandaag gesloten</string>
+    <string name="midnight">Middernacht</string>
+    <string name="noon">Middaguur</string>
     <string name="opens_in">Opent over %s</string>
     <string name="closes_in">Sluit over %s</string>
     <string name="closed">Gesloten</string>
+    <!-- Short label for minutes (time unit), placed after a number -->
     <string name="minute">min</string>
     <string name="big_font">Vergroot lettergrootte op de kaart</string>
     <string name="transliteration_title">Transliteratie in het Latijnse alfabet</string>

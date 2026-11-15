@@ -13,7 +13,6 @@
 #include "base/assert.hpp"
 
 #include <algorithm>
-#include <unordered_map>
 
 namespace routing
 {
@@ -61,13 +60,12 @@ bool IsTransit(std::optional<HighwayType> type)
 
 template <class CalcSpeed>
 double CalcClimbSegment(EdgeEstimator::Purpose purpose, Segment const & segment, RoadGeometry const & road,
-                        CalcSpeed && calcSpeed)
+                        double distanceM, CalcSpeed && calcSpeed)
 {
-  double const distance = road.GetDistance(segment.GetSegmentIdx());
   double speedMpS = GetSpeedMpS(purpose, segment, road);
 
   static double constexpr kSmallDistanceM = 1;  // we have altitude threshold is 0.5m
-  if (distance > kSmallDistanceM && !IsTransit(road.GetHighwayType()))
+  if (distanceM > kSmallDistanceM && !IsTransit(road.GetHighwayType()))
   {
     LatLonWithAltitude const & from = road.GetJunction(segment.GetPointId(false /* front */));
     LatLonWithAltitude const & to = road.GetJunction(segment.GetPointId(true /* front */));
@@ -77,14 +75,22 @@ double CalcClimbSegment(EdgeEstimator::Purpose purpose, Segment const & segment,
 
     if (altitudeDiff != 0)
     {
-      speedMpS = calcSpeed(speedMpS, altitudeDiff / distance, to.GetAltitude());
+      speedMpS = calcSpeed(speedMpS, altitudeDiff / distanceM, to.GetAltitude());
       ASSERT_GREATER(speedMpS, 0.0, (segment));
     }
   }
 
-  return distance / speedMpS;
+  return distanceM / speedMpS;
 }
+
+// Turns onto and off service roads and living streets, see CarEstimator::GetTurnPenalty.
+double constexpr kServiceTurnPenaltyS = 30.0;
 }  // namespace
+
+bool IsServiceOrLivingStreet(HighwayType type)
+{
+  return type == HighwayType::HighwayService || type == HighwayType::HighwayLivingStreet;
+}
 
 double GetPedestrianClimbPenalty(EdgeEstimator::Purpose purpose, double tangent, geometry::Altitude altitudeM)
 {
@@ -166,26 +172,50 @@ double GetCarClimbPenalty(EdgeEstimator::Purpose, double, geometry::Altitude)
 }
 
 // EdgeEstimator -----------------------------------------------------------------------------------
-EdgeEstimator::EdgeEstimator(double maxWeightSpeedKMpH, SpeedKMpH const & offroadSpeedKMpH,
-                             DataSource * /*dataSourcePtr*/, std::shared_ptr<NumMwmIds> /*numMwmIds*/)
+EdgeEstimator::EdgeEstimator(double maxWeightSpeedKMpH, double distanceBiasCapSpeedKMpH,
+                             SpeedKMpH const & offroadSpeedKMpH, DataSource * /*dataSourcePtr*/,
+                             std::shared_ptr<NumMwmIds> /*numMwmIds*/)
   : m_maxWeightSpeedMpS(KmphToMps(maxWeightSpeedKMpH))
+  , m_distanceBiasSecPerM(1.0 / KmphToMps(distanceBiasCapSpeedKMpH))
   , m_offroadSpeedKMpH(offroadSpeedKMpH)
 //, m_dataSourcePtr(dataSourcePtr)
 //, m_numMwmIds(numMwmIds)
 {
+  CHECK_GREATER(distanceBiasCapSpeedKMpH, 0.0, ());
+  CHECK_LESS_OR_EQUAL(distanceBiasCapSpeedKMpH, maxWeightSpeedKMpH, ());
   CHECK_GREATER(m_offroadSpeedKMpH.m_weight, 0.0, ());
   CHECK_GREATER(m_offroadSpeedKMpH.m_eta, 0.0, ());
+  // Pure fake edges bypass ApplyStrategy(), so their weight speed must also preserve the tight
+  // DistanceBiased heuristic bound.
+  CHECK_LESS_OR_EQUAL(m_offroadSpeedKMpH.m_weight, distanceBiasCapSpeedKMpH, ());
   CHECK_GREATER_OR_EQUAL(m_maxWeightSpeedMpS, KmphToMps(m_offroadSpeedKMpH.m_weight), ());
 
   if (m_offroadSpeedKMpH.m_eta != kNotUsed)
     CHECK_GREATER_OR_EQUAL(m_maxWeightSpeedMpS, KmphToMps(m_offroadSpeedKMpH.m_eta), ());
 }
 
-double EdgeEstimator::CalcHeuristic(ms::LatLon const & from, ms::LatLon const & to) const
+double EdgeEstimator::GetTurnPenaltyFactor(std::optional<HighwayType> to, ms::LatLon const & junction) const
+{
+  auto const & [start, finish] = m_serviceEndings;
+  if (!start && !finish)
+    return 1.0;
+
+  bool const isStartRule =
+      start && (!finish || ms::DistanceOnEarth(*start, junction) <= ms::DistanceOnEarth(*finish, junction));
+  bool const isOntoService = to && IsServiceOrLivingStreet(*to);
+  return isStartRule == isOntoService ? 2.0 : 0.0;
+}
+
+double EdgeEstimator::CalcHeuristic(ms::LatLon const & from, ms::LatLon const & to, bool tightAllowed) const
 {
   // For the correct A*, we should use maximum _possible_ speed here, including:
-  // default model, feature stored, unlimited autobahn, ferry or rail transit.
-  return TimeBetweenSec(from, to, m_maxWeightSpeedMpS);
+  // default model, feature stored, unlimited autobahn, ferry or rail transit. Under DistanceBiased
+  // every estimator weight is >= distance / cap, so the cap is the maximum possible speed — unless
+  // the search can also see leap, precomputed cross-mwm or guides edges, which are priced by other
+  // models (see the declaration).
+  bool const tight = tightAllowed && m_tightHeuristicAllowed && m_strategy == Strategy::DistanceBiased;
+  double const distanceM = ms::DistanceOnEarth(from, to);
+  return tight ? (distanceM * m_distanceBiasSecPerM) : (distanceM / m_maxWeightSpeedMpS);
 }
 
 double EdgeEstimator::ComputeDefaultLeapWeightSpeed() const
@@ -257,7 +287,8 @@ double EdgeEstimator::CalcOffroad(ms::LatLon const & from, ms::LatLon const & to
   if (offroadSpeedKMpH == kNotUsed)
     return 0.0;
 
-  return TimeBetweenSec(from, to, KmphToMps(offroadSpeedKMpH));
+  double const time = TimeBetweenSec(from, to, KmphToMps(offroadSpeedKMpH));
+  return purpose == Purpose::Weight ? time * m_transitWalkWeightFactor : time;
 }
 
 // PedestrianEstimator -----------------------------------------------------------------------------
@@ -265,7 +296,7 @@ class PedestrianEstimator final : public EdgeEstimator
 {
 public:
   PedestrianEstimator(double maxWeightSpeedKMpH, SpeedKMpH const & offroadSpeedKMpH)
-    : EdgeEstimator(maxWeightSpeedKMpH, offroadSpeedKMpH)
+    : EdgeEstimator(maxWeightSpeedKMpH, kDistanceBiasCapSpeedKMpH, offroadSpeedKMpH)
   {}
 
   // EdgeEstimator overrides:
@@ -283,10 +314,25 @@ public:
   double CalcSegmentWeight(Segment const & segment, RoadGeometry const & road, Purpose purpose,
                            time_t arrivalTime) const override
   {
-    return CalcClimbSegment(purpose, segment, road,
-                            [purpose](double speedMpS, double tangent, geometry::Altitude altitude)
+    double const distanceM = road.GetDistance(segment.GetSegmentIdx());
+    double weight = CalcClimbSegment(purpose, segment, road, distanceM,
+                                     [purpose](double speedMpS, double tangent, geometry::Altitude altitude)
     { return speedMpS / GetPedestrianClimbPenalty(purpose, tangent, altitude); });
+
+    // Bias the transit alternative away from walking (see SetTransitAltFactors). No-op (factor 1.0)
+    // for standalone pedestrian routing and for the primary transit route.
+    if (purpose == Purpose::Weight)
+      weight *= GetTransitWalkWeightFactor();
+
+    return ApplyStrategy(purpose, weight, distanceM);
   }
+
+private:
+  // On flat, good surfaces, ordinary walkable ways tie by distance: footways (5.5),
+  // tracks/paths/living streets (5.0), residential/service (4.5), cycleways/tertiary (4.0).
+  // Secondary and bigger roads, steps, bridleways and ladders stay below the cap. Climb and surface
+  // penalties remain whenever they reduce the effective weight speed below the cap.
+  static double constexpr kDistanceBiasCapSpeedKMpH = 4.0;
 };
 
 // BicycleEstimator --------------------------------------------------------------------------------
@@ -294,7 +340,7 @@ class BicycleEstimator final : public EdgeEstimator
 {
 public:
   BicycleEstimator(double maxWeightSpeedKMpH, SpeedKMpH const & offroadSpeedKMpH)
-    : EdgeEstimator(maxWeightSpeedKMpH, offroadSpeedKMpH)
+    : EdgeEstimator(maxWeightSpeedKMpH, kDistanceBiasCapSpeedKMpH, offroadSpeedKMpH)
   {}
 
   // EdgeEstimator overrides:
@@ -312,8 +358,9 @@ public:
   double CalcSegmentWeight(Segment const & segment, RoadGeometry const & road, Purpose purpose,
                            time_t arrivalTime) const override
   {
-    return CalcClimbSegment(purpose, segment, road,
-                            [purpose, this](double speedMpS, double tangent, geometry::Altitude altitude)
+    double const distanceM = road.GetDistance(segment.GetSegmentIdx());
+    double const weight = CalcClimbSegment(purpose, segment, road, distanceM,
+                                           [purpose, this](double speedMpS, double tangent, geometry::Altitude altitude)
     {
       auto const factor = GetBicycleClimbPenalty(purpose, tangent, altitude);
       ASSERT_GREATER(factor, 0.0, ());
@@ -342,7 +389,16 @@ public:
 
       return std::min(speedMpS, GetMaxWeightSpeedMpS());
     });
+
+    return ApplyStrategy(purpose, weight, distanceM);
   }
+
+private:
+  // On flat, good surfaces, cycleways and ordinary streets down to in-city
+  // residential/living_street (12) tie by distance. Primary (10), tracks (8-10), paths (6-7),
+  // dismount footways (2) and steps (1) stay below the cap. Climb and surface penalties remain
+  // whenever they reduce the effective weight speed below the cap.
+  static double constexpr kDistanceBiasCapSpeedKMpH = 12.0;
 };
 
 // CarEstimator ------------------------------------------------------------------------------------
@@ -356,7 +412,7 @@ public:
   CarEstimator(DataSource * dataSourcePtr, std::shared_ptr<NumMwmIds> numMwmIds,
                std::shared_ptr<TrafficStash> trafficStash, double maxWeightSpeedKMpH,
                SpeedKMpH const & offroadSpeedKMpH)
-    : EdgeEstimator(maxWeightSpeedKMpH, offroadSpeedKMpH, dataSourcePtr, numMwmIds)
+    : EdgeEstimator(maxWeightSpeedKMpH, kDistanceBiasCapSpeedKMpH, offroadSpeedKMpH, dataSourcePtr, numMwmIds)
     , m_trafficStash(std::move(trafficStash))
   {}
 
@@ -381,7 +437,21 @@ public:
     UNREACHABLE();
   }
 
+  double GetTurnPenalty(Purpose purpose, std::optional<HighwayType> from, std::optional<HighwayType> to) const override
+  {
+    // Turns onto and off service roads (parking aisles, driveways) and living streets are slow, and these roads are
+    // not for through traffic. A route preference: the ETA is not changed.
+    if (purpose != Purpose::Weight || !from || !to)
+      return 0.0;
+    return IsServiceOrLivingStreet(*from) != IsServiceOrLivingStreet(*to) ? kServiceTurnPenaltyS : 0.0;
+  }
+
 private:
+  // Between the default tertiary (35-37.5) and secondary (48+) weight speeds: secondary and faster
+  // roads tie, tertiary gets a mild penalty, while residential, service, tracks and bad surfaces
+  // keep their full cost (and jammed roads keep the traffic factor).
+  static double constexpr kDistanceBiasCapSpeedKMpH = 40.0;
+
   std::shared_ptr<TrafficStash> m_trafficStash;
 };
 
@@ -399,7 +469,8 @@ double CarEstimator::CalcSegmentWeight(Segment const & segment, RoadGeometry con
   }
 #endif
 
-  double result = road.GetDistance(segment.GetSegmentIdx()) / speed;
+  double const distanceM = road.GetDistance(segment.GetSegmentIdx());
+  double result = distanceM / speed;
 
   if (m_trafficStash)
   {
@@ -417,7 +488,7 @@ double CarEstimator::CalcSegmentWeight(Segment const & segment, RoadGeometry con
     }
   }
 
-  return result;
+  return ApplyStrategy(purpose, result, distanceM);
 }
 
 // EdgeEstimator -----------------------------------------------------------------------------------

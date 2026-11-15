@@ -1,56 +1,33 @@
+## Routenplanung
+• Verbesserte Alternativrouten und deren voraussichtliche Ankunftszeiten
+• Es wurden Schaltflächen zum Hinzufügen oder Ersetzen eines Zwischenstopps in einer geplanten Route hinzugefügt
+• Es wurde eine Einstellung hinzugefügt, um die Reihenfolge der Zwischenstopps auf der Route zu optimieren
+• Die ausgewählte alternative Route bleibt nun erhalten, wenn die Navigation die Route neu berechnet
+• Die Reihenfolge der Routenstopps wird nun nach einem Neustart der App wiederhergestellt
+
 ## Karte
+• OpenStreetMap-Daten vom 28. September
+• Wikipedia-Daten vom 21. September
+• Wasserreservoire sind nun sichtbar, wenn weiter herausgezoomt wird
+• Wassertunnel werden nicht mehr auf der Karte angezeigt
+• Die Symbole für die Stationen und Eingänge der Suzhou-U-Bahn wurden korrigiert
+• Seltene Fälle behoben, in denen Beschriftungen auf der U-Bahn-Kartenebene verschoben wurden
 
-- NEU! Korrekte Kartenanpassung am Antimeridian beim Ziehen und Drehen
-- OpenStreetMap-Daten aktualisiert (Stand: 4. April)
-- Wikipedia-Daten aktualisiert (Stand: 1. April)
-- Symbole für Food Courts und Stadttore hinzugefügt
-- Unterkategorien für Bekleidungsgeschäfte hinzugefügt: Damen, Herren, Kinder, Hochzeit, Sport, Unterwäsche sowie Bürokleidung
-- Farben der U-Bahn-Linien in Sydney korrigiert
-- Anzeige der Öffnungszeiten für Orte mit Sonnenaufgangs-/Sonnenuntergangsversatz korrigiert
+## CarPlay
+• Abbiegehinweise werden nun auf unterstützten Head-up-Displays (HUDs) im Auto und auf dem CarPlay-Dashboard angezeigt
+• CarPlay-Schaltflächen und Suche korrigiert
 
-## Routenplanung und Navigation
-
-- NEU! Tippen Sie auf eine Rad- oder Wanderroute, um sie auszuwählen und das Höhenprofil anzuzeigen
-- Verbesserte mehrfarbige Darstellung für Wander- und Radrouten
-- Die Radnavigation verwendet bei niedrigen Geschwindigkeiten nun die Kompassrichtung
-- Ein Systemfehler bei der Routenplanung in der Nähe einiger regionaler Grenzen wurde behoben
-- Sie können nun eine gültige Route starten, auch wenn Sie zum Herunterladen zusätzlicher Karten aufgefordert werden
-
-## Lesezeichen und Tracks
-
-- NEU! Ändern Sie alle Lesezeichen- und Trackfarben einer Kategorie auf einmal
-- Angepasste Annäherung an Höhengewinne und -verluste in Trackdiagrammen, um eine bessere Übereinstimmung mit anderen Apps zu erzielen
-- Verbesserte Darstellung von HTML-Inhalten mit Tabellen und Bildern in den Lesezeichendetails
-- Vertikale Trennlinien für mehrsegmentige Tracks im Höhenprofil hinzugefügt
-- Punkteselektion im Höhenprofil für interpolierte Punkte korrigiert
-- Fehler behoben, bei dem bei der GPS-Trackaufzeichnung Punkte zwischen Segmenten fehlten
-- GeoJSON-Import korrigiert
-- Absturz beim Exportieren von Tracks behoben
+## Tracks
+• Ein Augensymbol zum Ausblenden einzelner Tracks wurde hinzugefügt
+• Fehler behoben und die Trackaufzeichnung verbessert
+• Fehler beim Import von KMB-Dateien behoben
 
 ## Suche
+• Fehler bei der Suche behoben, wenn der sichtbare Kartenbereich den 180°-Meridian (±180° Längengrad) überschreitet
+• Die Kategoriesuche in Spotlight wurde wiederhergestellt
 
-- Bessere Suche in den USA mit zwei Millionen zusätzlichen Adressen, die aus TIGER-Volkszählungsdaten extrahiert wurden
-- Aktualisierte Suchkategorien: „Brot“ für Bäckereien, „Shawarma“ für die Küche sowie weitere Verbesserungen bei Synonymen hinzugefügt
-- Verbesserte Suche nach Hausnummern
-- US-Straßensynonyme hinzugefügt: highway, hwy, freeway, fwy
-- Suchergebnisse korrigiert, wenn Stadt- und Bundesstaatsnamen identisch sind
-
-## Editor / OpenStreetMap
-
-- Sie können nun einen neuen Ort zu OpenStreetMap hinzufügen, nachdem Sie Ihre aktuelle Position auf der Karte ausgewählt haben
-- Fehlerbehebung bei der Fehlausrichtung des Fadenkreuzes im Editor beim Drücken von „Ort hinzufügen“
-- Vergrößerung der Berührungsfläche der Schaltflächen in der Navigationsleiste „Ort hinzufügen“
-
-## UI und UX
-
-- Verbesserte Modal-Gesten: Ausrichten am nächsten Schritt, Schließen beim Schwenken am Rand und Wiederherstellen des vorherigen Zustands beim erneuten Öffnen
-- Fehlerbehebung bei der Behandlung der Sommerzeit für Zeitzonen
-
-## Stabilität und Lokalisierung
-
-- Verbesserte Stabilität und Leistung, reduzierter Akkuverbrauch
-- Aktualisierte Übersetzungen
-
-## Plattformunterstützung
-
-- Aufgrund von Änderungen bei TestFlight und im App Store unterstützt diese Version nur noch iOS 15 und höher. iOS 12, 13 und 14 werden nicht mehr unterstützt.
+## Benutzeroberfläche
+• Bei den Öffnungszeiten wird nun für 12:00 Uhr „Mittag“ und für 00:00 Uhr bzw. 24:00 Uhr „Mitternacht“ angezeigt
+• Verschiedene Fehler wurden behoben und die Benutzeroberfläche verbessert
+• Korrigierte Übersetzungen ins Englische, Französische und Asturische
+• Unterstützung für die Auswahl und das Probehören einer installierten Navigationsstimme hinzugefügt

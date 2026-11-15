@@ -1,9 +1,13 @@
 #include "testing/testing.hpp"
 
+#include "drape_frontend/drape_frontend_tests/visual_params_fixture.hpp"
 #include "drape_frontend/navigator.hpp"
 #include "drape_frontend/screen_operations.hpp"
 #include "drape_frontend/tile_key.hpp"
+#include "drape_frontend/tile_utils.hpp"
 #include "drape_frontend/visual_params.hpp"
+
+#include "drape/constants.hpp"
 
 #include "geometry/mercator.hpp"
 #include "geometry/screenbase.hpp"
@@ -13,6 +17,7 @@
 
 namespace screen_operations_tests
 {
+using df::test_support::VisualParamsFixture;
 
 // -- WrapTileX ----------------------------------------------------------------
 
@@ -116,6 +121,92 @@ UNIT_TEST(GetCanonicalTileKey_Preserves_Y_and_Zoom)
   df::TileKey canonical = key.GetCanonicalTileKey();
   TEST_EQUAL(canonical.m_y, key.m_y, ());
   TEST_EQUAL(canonical.m_zoomLevel, key.m_zoomLevel, ());
+}
+
+UNIT_TEST(CalcTilesToInvalidate_WorldCopies)
+{
+  struct TestCase
+  {
+    char const * m_name;
+    m2::RectD m_rect;
+    m2::RectD m_clipRect;
+    df::TTilesCollection m_expected;
+  };
+  // Zoom 3 has four 90-degree tiles per world; the results keep their extended X.
+  TestCase const cases[] = {
+      {"tile boundaries", {0, 0, 90, 90}, {-1, -1, 91, 91}, {{0, 0, 3}}},
+      {"touching clip edge", {5, 10, 10, 20}, {10, 0, 20, 20}, {{0, 0, 3}}},
+      {"point on clip edge", {10, 10, 10, 10}, {10, 0, 20, 20}, {{0, 0, 3}}},
+      {"point inside tile", {10, 10, 10, 10}, {5, 0, 25, 40}, {{0, 0, 3}}},
+      {"point on tile boundary", {90, 10, 90, 10}, {80, 0, 100, 40}, {}},
+      {"canonical", {10, 10, 20, 20}, {5, 0, 25, 40}, {{0, 0, 3}}},
+      {"east seam", {-179, 10, -177, 20}, {175, 0, 185, 40}, {{2, 0, 3}}},
+      {"west seam", {177, 10, 179, 20}, {-185, 0, -175, 40}, {{-3, 0, 3}}},
+      {"crossing dirty rect", {170, 10, 190, 20}, {-185, 0, -175, 40}, {{-3, 0, 3}, {-2, 0, 3}}},
+      {"full world", {-180, 10, 180, 20}, {175, 0, 185, 200}, {{1, 0, 3}, {2, 0, 3}}},
+      {"wider than world", {-540, 10, 540, 20}, {175, 0, 185, 200}, {{1, 0, 3}, {2, 0, 3}}},
+      {"wide dirty rect", {-179, 10, 179, 20}, {175, 0, 185, 40}, {{1, 0, 3}, {2, 0, 3}}},
+      {"extended dirty rect", {-210, 10, -204, 20}, {150, 0, 160, 40}, {{1, 0, 3}}},
+      {"multiple visible copies", {-179, 10, -177, 20}, {-185, 0, 185, 40}, {{-2, 0, 3}, {2, 0, 3}}},
+      {"longitude miss", {10, 10, 20, 20}, {90, 0, 100, 40}, {}},
+      {"latitude miss", {-179, 50, -177, 60}, {175, 0, 185, 40}, {}},
+  };
+  for (auto const & test : cases)
+  {
+    for (int world = -2; world <= 2; ++world)
+    {
+      auto clipRect = test.m_clipRect;
+      clipRect.Offset(world * 360.0, 0.0);
+      df::TTilesCollection expected;
+      for (auto key : test.m_expected)
+      {
+        key.m_x += world * 4;
+        expected.insert(key);
+      }
+      for (int dirtyWorld : {-2, 0, 2})
+      {
+        auto rect = test.m_rect;
+        rect.Offset(dirtyWorld * 360.0, 0.0);
+        TEST_EQUAL(df::CalcTilesToInvalidate(rect, clipRect, 3), expected, (test.m_name, world, dirtyWorld));
+      }
+    }
+  }
+}
+
+UNIT_TEST(CalcTilesToInvalidate_MinZoom)
+{
+  df::TTilesCollection const east{{0, 0, 1}};
+  TEST_EQUAL(df::CalcTilesToInvalidate({-179, 10, -177, 20}, {175, 0, 185, 40}, 1), east, ());
+  TEST_EQUAL(df::CalcTilesToInvalidate({180, 10, 180, 20}, {175, 0, 185, 40}, 1), east, ());
+  df::TTilesCollection const west{{-1, 0, 1}};
+  TEST_EQUAL(df::CalcTilesToInvalidate({177, 10, 179, 20}, {-185, 0, -175, 40}, 1), west, ());
+}
+
+UNIT_TEST(CalcTilesToInvalidate_ViewportMargin)
+{
+  ScreenBase screen;
+  screen.OnSize(0, 0, 512, 512);
+  screen.SetFromRect(m2::AnyRectD(m2::RectD(177.9, -1, 179.9, 1)));
+  m2::RectD const rect(-179.95, 0.01, -179.9, 0.1);
+  auto clipRect = screen.ClipRect();
+  TEST(df::CalcTilesToInvalidate(rect, clipRect, 3).empty(), ());
+  double const extension = dp::kScreenPixelRectExtension * screen.GetScale();
+  clipRect.Inflate(extension, extension);
+  df::TTilesCollection const expected{{2, 0, 3}};
+  TEST_EQUAL(df::CalcTilesToInvalidate(rect, clipRect, 3), expected, ());
+}
+
+UNIT_TEST(CalcTilesToInvalidate_ClippedDataZoom)
+{
+  int constexpr kZoom = 20;
+  int const dataZoom = df::ClipTileZoomByMaxDataZoom(kZoom);
+  TEST_LESS(dataZoom, kZoom, ());
+  auto rect = df::TileKey(3, 5, kZoom).GetGlobalRect();
+  rect.Scale(0.5);
+  auto clipRect = rect;
+  clipRect.Offset(720.0, 0.0);
+  df::TTilesCollection const expected{{3 + 2 * (1 << (dataZoom - 1)), 5, kZoom}};
+  TEST_EQUAL(df::CalcTilesToInvalidate(rect, clipRect, kZoom), expected, ());
 }
 
 // -- AdjustPointForViewport ---------------------------------------------------
@@ -283,8 +374,6 @@ UNIT_TEST(ShrinkInto_DoesNotClampX)
 
 UNIT_TEST(ScaleInto_ScalesForY)
 {
-  df::VisualParams::Init(1.0, 1024);
-
   ScreenBase screen;
   screen.OnSize(0, 0, 800, 600);
   // Screen with Y exceeding world bounds.
@@ -300,8 +389,6 @@ UNIT_TEST(ScaleInto_ScalesForY)
 
 UNIT_TEST(ScaleInto_ClampsXWidth)
 {
-  df::VisualParams::Init(1.0, 1024);
-
   ScreenBase screen;
   screen.OnSize(0, 0, 2000, 100);
   // Viewport wider than world; center off the canonical range to verify X
@@ -321,8 +408,6 @@ UNIT_TEST(ScaleInto_ClampsXWidth)
 
 UNIT_TEST(ShrinkAndScaleInto_ClampsXWidth)
 {
-  df::VisualParams::Init(1.0, 1024);
-
   ScreenBase screen;
   screen.OnSize(0, 0, 2000, 100);
   // Viewport wider than world.
@@ -337,8 +422,6 @@ UNIT_TEST(ShrinkAndScaleInto_ClampsXWidth)
 
 UNIT_TEST(ShrinkAndScaleInto_ClampsY)
 {
-  df::VisualParams::Init(1.0, 1024);
-
   ScreenBase screen;
   screen.OnSize(0, 0, 800, 600);
   screen.SetFromRect(m2::AnyRectD(m2::RectD(-50, 100, 50, 200)));
@@ -353,9 +436,8 @@ UNIT_TEST(ShrinkAndScaleInto_ClampsY)
 
 // -- Navigator DoDrag (antimeridian wrapping) ----------------------------------
 
-UNIT_TEST(Navigator_DoDrag_HorizontalUnbounded)
+UNIT_CLASS_TEST(VisualParamsFixture, Navigator_DoDrag_HorizontalUnbounded)
 {
-  df::VisualParams::Init(1.0, 1024);
   df::Navigator navigator;
 
   navigator.OnSize(800, 600);
@@ -373,9 +455,8 @@ UNIT_TEST(Navigator_DoDrag_HorizontalUnbounded)
   TEST_GREATER(navigator.Screen().GetOrg().x, 170.0, ());
 }
 
-UNIT_TEST(Navigator_SetFromRect_ClampsWideX)
+UNIT_CLASS_TEST(VisualParamsFixture, Navigator_SetFromRect_ClampsWideX)
 {
-  df::VisualParams::Init(1.0, 1024);
   df::Navigator navigator;
   navigator.OnSize(800, 600);
 
@@ -387,9 +468,8 @@ UNIT_TEST(Navigator_SetFromRect_ClampsWideX)
   TEST_LESS_OR_EQUAL(clip.SizeX(), worldR.SizeX() + 1e-5, ());
 }
 
-UNIT_TEST(Navigator_DoDrag_VerticalClamped)
+UNIT_CLASS_TEST(VisualParamsFixture, Navigator_DoDrag_VerticalClamped)
 {
-  df::VisualParams::Init(1.0, 1024);
   df::Navigator navigator;
 
   navigator.OnSize(800, 600);
@@ -447,9 +527,8 @@ bool PointsClose(m2::PointD const & a, m2::PointD const & b, double eps)
 }
 }  // namespace
 
-UNIT_TEST(Navigator_PerspectiveScale_KeepsFingersOnSameGeoPoints)
+UNIT_CLASS_TEST(VisualParamsFixture, Navigator_PerspectiveScale_KeepsFingersOnSameGeoPoints)
 {
-  df::VisualParams::Init(1.0, 1024);
   df::Navigator nav = MakePerspectiveNavigator(800, 600);
 
   // Two fingers on a horizontal line, centered near the middle of the screen.
@@ -482,9 +561,8 @@ UNIT_TEST(Navigator_PerspectiveScale_KeepsFingersOnSameGeoPoints)
   TEST(PointsClose(g2After, g2Before, 0.03 * fingerSpan), (g2Before, g2After));
 }
 
-UNIT_TEST(Navigator_PerspectiveRotate_KeepsFingersOnSameGeoPoints)
+UNIT_CLASS_TEST(VisualParamsFixture, Navigator_PerspectiveRotate_KeepsFingersOnSameGeoPoints)
 {
-  df::VisualParams::Init(1.0, 1024);
   df::Navigator nav = MakePerspectiveNavigator(800, 600);
 
   m2::PointD const screenCenter(400, 400);
@@ -519,9 +597,8 @@ UNIT_TEST(Navigator_PerspectiveRotate_KeepsFingersOnSameGeoPoints)
   TEST(PointsClose(g2After, g2Before, 0.02 * fingerSpan), (g2Before, g2After));
 }
 
-UNIT_TEST(Navigator_PerspectiveRotate_LargeAngle_TracksOffPivotFinger)
+UNIT_CLASS_TEST(VisualParamsFixture, Navigator_PerspectiveRotate_LargeAngle_TracksOffPivotFinger)
 {
-  df::VisualParams::Init(1.0, 1024);
   df::Navigator nav = MakePerspectiveNavigator(800, 600);
 
   // Vertical finger pair — the two fingers sit at very different perspective
@@ -556,9 +633,8 @@ UNIT_TEST(Navigator_PerspectiveRotate_LargeAngle_TracksOffPivotFinger)
   TEST(PointsClose(g2After, g2Before, 0.1 * fingerSpan), (g2Before, g2After));
 }
 
-UNIT_TEST(Navigator_PerspectiveScaleAndRotate_KeepsBothFingersAnchored)
+UNIT_CLASS_TEST(VisualParamsFixture, Navigator_PerspectiveScaleAndRotate_KeepsBothFingersAnchored)
 {
-  df::VisualParams::Init(1.0, 1024);
   df::Navigator nav = MakePerspectiveNavigator(800, 600);
 
   // Asymmetric pair: finger 2 noticeably above finger 1 (closer to the

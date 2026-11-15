@@ -1,56 +1,33 @@
+## Načrtovanje poti
+• Izboljšane alternativne poti in njihovi predvideni časi prihoda
+• Dodani so gumbi za dodajanje ali zamenjavo postanka v načrtovani poti
+• Dodana je bila nastavitev za optimizacijo vrstnega reda vmesnih postankov na poti
+• Izbrana alternativna pot se zdaj ohrani, ko navigacija ponovno izračuna pot
+• Po ponovnem zagonu aplikacije se zdaj obnovi vrstni red postankov na poti
+
 ## Zemljevid
+• Podatki OpenStreetMap z dne 28. septembra
+• Podatki iz Wikipedije z dne 21. septembra
+• Vodni rezervoarji so zdaj vidni, ko se slika še bolj oddalji
+• Vodni tuneli se na zemljevidu ne prikazujejo več
+• Popravljene so bile ikone postaj in vhodov v podzemno železnico v Suzhouju
+• Popravljeni so redki primeri, ko so se oznake na sloju zemljevida podzemne železnice premaknile iz položaja
 
-- NOVOST! Pravilno zavijanje zemljevida na antimeridianu pri vlečenju in vrtenju
-- Podatki OpenStreetMap posodobljeni na dan 4. aprila
-- Podatki Wikipedije posodobljeni na dan 1. aprila
-- Dodane ikone za restavracije in mestna vrata
-- Dodane podkategorije trgovin z oblačili: ženska, moška, otroška, poročna, športna, spodnja perila ter pisarniška oblačila
-- Popravljene barve linij podzemne železnice v Sydneyju
-- Popravljen prikaz delovnega časa za kraje z zamikom sončnega vzhoda/zahoda
+## CarPlay
+• Dodana so navodila za manevriranje na podprtih avtomobilskih zaslonih HUD (head-up display) in na nadzorni plošči CarPlay
+• Popravljeni gumbi CarPlay in iskanje
 
-## Načrtovanje poti in navigacija
-
-- NOVOST! Dotaknite se kolesarske ali pohodniške poti, da jo izberete in si ogledate njen višinski profil
-- Izboljšano večbarvno prikazovanje pohodniških in kolesarskih poti
-- Kolesarska navigacija zdaj pri nizkih hitrostih uporablja smer kompasa
-- Popravljena sistemska napaka pri načrtovanju poti v bližini nekaterih regionalnih meja
-- Zdaj lahko začnete veljavno pot tudi, če vas aplikacija pozove k prenosu dodatnih zemljevidov
-
-## Zaznamki in poti
-
-- NOVOST! Hkrati spremenite vse barve zaznamkov in poti v kategoriji
-- Prilagojena približna vrednost vzpona in spusta na grafikonih poti, da se bolje ujemajo z drugimi aplikacijami
-- Izboljšano prikazovanje HTML-vsebine s tabelami in slikami v podrobnostih zaznamkov
-- Dodani so bili navpični ločevalniki za večsegmentne poti na grafu nadmorske višine
-- Popravljena je bila izbira točk na grafu nadmorske višine za interpolirane točke
-- Popravljeno je bilo izpadanje točk med segmenti pri snemanju poti z GPS
-- Popravljen je bil uvoz GeoJSON
-- Popravljena je bila napaka, ki je povzročala sesutje aplikacije pri izvozu poti
+## Sledi
+• Dodana je bila ikona očesa za skritje posameznih sledi
+• Popravljene napake in izboljšano snemanje sledi
+• Popravljeno uvažanje datotek KMB
 
 ## Iskanje
+• Popravljeno iskanje, ko vidno območje zemljevida prečka 180° poldnevnik (±180° zemljepisne dolžine)
+• V Spotlightu je bilo ponovno vzpostavljeno iskanje po kategorijah
 
-- Izboljšano iskanje v ZDA z dodatnimi dvema milijonoma naslovov, pridobljenih iz podatkov popisa prebivalstva TIGER
-- Posodobljene kategorije iskanja: dodano »Bread« za pekarne, »Shawarma« za kuhinjo in druge izboljšave sinonimov
-- Izboljšano iskanje naslovov s hišnimi številkami
-- Dodani sinonimi za ulice v ZDA: highway, hwy, freeway, fwy
-- Popravljeni rezultati iskanja, ko so imena mest in držav enaka
-
-## Urednik / OpenStreetMap
-
-- Zdaj lahko dodate novo mesto v OpenStreetMap po izbiri trenutnega položaja na zemljevidu
-- Popravljeno napačno poravnavanje križca v urejevalniku ob pritisku na »Dodaj mesto«
-- Povečano dotikno območje gumbov v navigacijski vrstici »Dodaj mesto«
-
-## UI in UX
-
-- Izboljšani modalni gesti: prileganje najbližjemu koraku, zapiranje ob premikanju po robu in obnovitev prejšnjega stanja ob ponovnem odprtju
-- Popravljeno ravnanje z letnim časom za časovne pasove
-
-## Stabilnost in lokalizacija
-
-- Izboljšana stabilnost in zmogljivost, zmanjšana poraba baterije
-- Posodobljeni prevodi
-
-## Podpora platformam
-
-- Zaradi sprememb v TestFlight in App Store ta izdaja podpira le iOS 15 in novejše različice. iOS 12, 13 in 14 niso več podprti.
+## Uporabniški vmesnik
+• Delovni čas zdaj prikazuje »Poldne« za 12:00 in »Polnoč« za 00:00 ali 24:00
+• Popravljene so bile različne napake in izboljšan uporabniški vmesnik
+• Popravljeni prevodi v angleščino, francoščino in asturijščino
+• Dodana je možnost izbire nameščenega navigacijskega glasu in poslušanja njegovega vzorca

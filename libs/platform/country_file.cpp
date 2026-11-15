@@ -14,6 +14,7 @@ std::string GetFileName(std::string const & countryName, MapFileType type)
   {
   case MapFileType::Map: return countryName + DATA_FILE_EXTENSION;
   case MapFileType::Diff: return countryName + DIFF_FILE_EXTENSION;
+  case MapFileType::Terrain: return countryName + TERRAIN_FILE_EXT;
   case MapFileType::Count: break;
   }
 
@@ -24,10 +25,10 @@ CountryFile::CountryFile() : m_mapSize(0) {}
 
 CountryFile::CountryFile(std::string name) : m_name(std::move(name)), m_mapSize(0) {}
 
-CountryFile::CountryFile(std::string name, MwmSize size, std::string sha1)
+CountryFile::CountryFile(std::string name, MwmSize size, std::string hash)
   : m_name(std::move(name))
   , m_mapSize(size)
-  , m_sha1(std::move(sha1))
+  , m_hash(std::move(hash))
 {}
 
 std::string DebugPrint(CountryFile const & file)

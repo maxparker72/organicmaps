@@ -201,7 +201,8 @@
     <string name="type.barrier.chain">سلسلة</string>
     <string name="type.barrier.city_wall">جدار المدينة</string>
     <string name="type.barrier.cycle_barrier">حاجز دراجات هوائية</string>
-    <string name="type.waterway.ditch">حفرة الصرف الصحي</string>
+    <string name="type.waterway.ditch">خندق تصريف</string>
+    <string name="type.waterway.ditch.intermittent">خندق تصريف متقطع</string>
     <string name="type.natural.water.moat">خندق</string>
     <string name="type.natural.water.wastewater">مياه الصرف</string>
     <string name="type.barrier.entrance">مدخل</string>
@@ -387,49 +388,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">طريق السريع</string>
     <string name="type.highway.bridleway">طريق خيول</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">جسر</string>
     <string name="type.highway.bridleway.permissive">طريق خيول</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">نفق</string>
     <string name="type.highway.busway">طريق حافلات مخصص</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">نفق</string>
     <string name="type.highway.bus_stop">موقف حافلات</string>
     <string name="type.highway.construction">طريق تحت الإنشاء</string>
     <string name="type.highway.cycleway">مسار للدراجات</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">جسر</string>
     <string name="type.highway.cycleway.permissive">مسار للدراجات</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">نفق</string>
     <string name="type.highway.elevator">مِصعَد</string>
     <string name="type.highway.footway">مسار للمشاة</string>
     <string name="type.highway.footway.sidewalk">رصيف</string>
     <string name="type.highway.footway.crossing">عبور المشاة</string>
     <string name="type.highway.footway.area">منطقة مشاة</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">جسر للمشاة</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">نفق للمشاة</string>
     <string name="type.highway.ford">مخاضة</string>
     <string name="type.highway.living_street">شارع</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">نفق</string>
     <string name="type.highway.motorway">طريق سريع</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">نفق</string>
     <string name="type.highway.motorway_junction">مخرج</string>
     <string name="type.highway.motorway_link">طريق سريع</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">نفق</string>
     <string name="type.highway.path">مسار</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -438,103 +439,104 @@
     <string name="type.highway.path.expert">أثر صعب للغاية أو لا يمكن تمييزه</string>
     <string name="type.highway.path.bicycle">مسار للمشاة والدراجات معاً</string>
     <string name="type.highway.footway.bicycle">مسار للمشاة والدراجات معاً</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">جسر</string>
     <string name="type.highway.path.horse">مسار</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">نفق</string>
     <string name="type.highway.pedestrian">شارع للمشاة</string>
     <string name="type.highway.pedestrian.area">شارع للمشاة</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">نفق</string>
-    <string name="type.highway.platform">منصة</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">رصيف الركوب</string>
     <string name="type.highway.primary">شارع رئيسي</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">نفق</string>
     <string name="type.highway.primary_link">شارع رئيسي</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">نفق</string>
     <string name="type.highway.raceway">مسار سباق</string>
     <string name="type.highway.residential">شارع سكني</string>
     <string name="type.highway.residential.area">شارع سكني</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">نفق</string>
     <string name="type.highway.rest_area">استراحة</string>
     <string name="type.highway.road">طريق</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">جسر</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">نفق</string>
     <string name="type.highway.secondary">شارع ثانوي</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">نفق</string>
     <string name="type.highway.secondary_link">شارع ثانوي</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">نفق</string>
     <string name="type.highway.service">شارع خدمي</string>
     <string name="type.highway.service.area">شارع خدمي</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">جسر</string>
     <string name="type.highway.service.driveway">شارع خدمي</string>
     <string name="type.highway.service.parking_aisle">شارع خدمي</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">نفق</string>
     <string name="type.highway.services">موقف الراحة</string>
     <string name="type.highway.speed_camera">كاميرا لرصد السرعة</string>
     <string name="type.highway.steps">درج</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">نفق</string>
     <string name="type.highway.ladder">ﺳُﻠﻢ</string>
     <string name="type.highway.tertiary">شارع</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">نفق</string>
     <string name="type.highway.tertiary_link">شارع</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">نفق</string>
     <string name="type.highway.track">شارع</string>
     <string name="type.highway.track.area">شارع</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">جسر</string>
     <string name="type.highway.track.grade1">شارع</string>
     <string name="type.highway.track.no.access">شارع</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">نفق</string>
     <string name="type.highway.traffic_signals">إشارات مرورية</string>
     <string name="type.highway.trunk">شارع وطني</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">نفق</string>
     <string name="type.highway.trunk_link">شارع وطني</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">نفق</string>
     <string name="type.highway.unclassified">شارع صغير</string>
     <string name="type.highway.unclassified.area">شارع صغير</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">جسر</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">نفق</string>
     <string name="type.area_highway.cycleway">مسار للدراجات</string>
     <string name="type.area_highway.footway">مسار للمشاة</string>
@@ -572,6 +574,7 @@
     <string name="type.historic.castle.shiro">قلعة يابانية</string>
     <string name="type.historic.castle.stately">شاتو</string>
     <string name="type.historic.city_gate">بوابة المدينة</string>
+    <string name="type.man_made.ceremonial_gate">بوابة الاحتفالات</string>
     <string name="type.historic.citywalls">جدار المدينة</string>
     <string name="type.historic.fort">حصن</string>
     <string name="type.historic.gallows">مشنقة</string>
@@ -605,6 +608,7 @@
     <string name="type.landuse">استخدام الارض</string>
     <string name="type.landuse.allotments">حصص الحدائق</string>
     <string name="type.landuse.basin">حوض مياه</string>
+    <string name="type.landuse.basin.intermittent">حوض مياه متقطع</string>
     <string name="type.landuse.brownfield">أرض صناعية مهجورة</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">مقبرة</string>
@@ -635,7 +639,6 @@
     <string name="type.landuse.quarry">مقلع</string>
     <string name="type.landuse.railway">موقع سكك حديد</string>
     <string name="type.landuse.recreation_ground">أراضي ترفيهية</string>
-    <string name="type.landuse.reservoir">بحيرة لخزن المياه</string>
     <string name="type.landuse.residential">منطقة سكنية</string>
     <string name="type.landuse.retail">منطقة تجارية</string>
     <string name="type.landuse.salt_pond">ملّاحة</string>
@@ -657,6 +660,7 @@
     <string name="type.leisure.ice_rink">حلبة تزلج على الجليد</string>
     <string name="type.leisure.marina">مرسى</string>
     <string name="type.leisure.nature_reserve">محمية طبيعية</string>
+    <string name="type.leisure.bird_hide">مخبأ لمراقبة الطيور</string>
     <string name="type.leisure.outdoor_seating">جلوس في الهواء الطلق</string>
     <string name="type.leisure.firepit">موقد نار</string>
     <string name="type.leisure.park">متنزه</string>
@@ -691,6 +695,8 @@
     <string name="type.man_made.pier">رصيف بحري</string>
     <string name="type.man_made.pipeline">خط أنبوب</string>
     <string name="type.man_made.pipeline.overground">خط أنبوب فوق الارض</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">خزان مياه مغطى</string>
     <string name="type.man_made.silo">صومعة</string>
     <string name="type.man_made.storage_tank">خزان</string>
     <string name="type.man_made.surveillance">كاميرا مراقبة</string>
@@ -709,6 +715,8 @@
     <string name="type.man_made.water_tower">برج مياه</string>
     <string name="type.man_made.water_well">بئر ماء</string>
     <string name="type.man_made.water_well.drinking_water_no">بئر ماء</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">محطة تنقية المياه</string>
     <string name="type.man_made.windmill">طاحونة هواء</string>
     <string name="type.man_made.works">مُنشأة صناعية</string>
     <string name="type.military">عسكري</string>
@@ -743,10 +751,13 @@
     <string name="type.natural.water.reservoir">بحيرة لخزن المياه</string>
     <string name="type.natural.water.basin">حوض مياه</string>
     <string name="type.natural.water.river">نهر</string>
+    <string name="type.natural.water.intermittent">مسطح مائي متقطع</string>
     <string name="type.natural.land">بر</string>
     <string name="type.natural.meadow">مرج</string>
     <string name="type.natural.orchard">بستان</string>
     <string name="type.natural.peak">قمة</string>
+    <string name="type.natural.hill">تل</string>
+    <string name="type.natural.arch">قوس الصخرة</string>
     <string name="type.natural.saddle">سرج الجبل</string>
     <string name="type.natural.rock">صخر</string>
     <string name="type.natural.scrub">أَيْكَة</string>
@@ -833,7 +844,8 @@
     <!-- A single pole supporting various public utilities, such as lighting or telephony. -->
     <string name="type.man_made.utility_pole">عمود خدمات</string>
     <string name="type.public_transport">النقل العام</string>
-    <string name="type.public_transport.platform">منصة</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">رصيف الركوب</string>
     <string name="type.railway">سكك حديدية</string>
     <string name="type.railway.abandoned">سكك حديدية مهجورة</string>
     <string name="type.railway.abandoned.bridge">جسر سكة حديد مهجور</string>
@@ -1167,6 +1179,8 @@
     <string name="type.shop.greengrocer">محل خضار</string>
     <string name="type.shop.grocery">محل بقالة</string>
     <string name="type.shop.hairdresser">حلاق</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">حلاق رجالي</string>
     <string name="type.shop.hardware">محل معدات</string>
     <string name="type.shop.health_food">متجر أغذية صحية</string>
     <string name="type.shop.hearing_aids">متجر المعينات السمعية</string>
@@ -1290,6 +1304,7 @@
     <string name="type.sport.rugby_union">رغبي الاتحاد</string>
     <string name="type.sport.running">الجري</string>
     <string name="type.sport.softball">الكرة اللينة</string>
+    <string name="type.sport.pilates">بيلاتس</string>
     <string name="type.tourism.aquarium">حوض سمك</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
     <string name="type.tourism.alpine_hut">لودج الجبل</string>
@@ -1337,19 +1352,22 @@
     <string name="type.traffic_calming.bump">مطبة</string>
     <string name="type.waterway.access_point">نقطة وصول الممر المائي</string>
     <string name="type.waterway.canal">قناة</string>
+    <string name="type.waterway.canal.intermittent">قناة متقطعة</string>
     <string name="type.waterway.canal.tunnel">نفق قناة</string>
     <string name="type.waterway.fish_pass">سلم سمك</string>
+    <string name="type.waterway.fish_pass.intermittent">سلم سمك متقطع</string>
     <string name="type.waterway.dam">سد</string>
-    <string name="type.natural.water.ditch">حفرة الصرف الصحي</string>
+    <string name="type.natural.water.ditch">خندق تصريف</string>
     <string name="type.waterway.ditch.tunnel">بربخ</string>
     <string name="type.waterway.drain">قناة تصريف المياه</string>
+    <string name="type.waterway.drain.intermittent">قناة تصريف مياه متقطعة</string>
     <string name="type.natural.water.drain">قناة تصريف المياه</string>
     <string name="type.waterway.drain.tunnel">بربخ</string>
     <string name="type.waterway.lock_gate">بوابة هويس</string>
     <string name="type.waterway.river">نهر</string>
+    <string name="type.waterway.river.intermittent">نهر متقطع</string>
     <string name="type.waterway.river.tunnel">نهر</string>
     <string name="type.waterway.stream">تيار مائي</string>
-    <string name="type.waterway.stream.ephemeral">نهر</string>
     <string name="type.waterway.stream.intermittent">تيار مائي متقطع</string>
     <string name="type.waterway.stream.tunnel">تيار مائي</string>
     <string name="type.waterway.waterfall">شلّال</string>
@@ -1370,6 +1388,7 @@
     <string name="type.self_service.no">لا توجد خدمة ذاتية</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">المرفق الاجتماعي</string>
+    <string name="type.amenity.stage">خشبة المسرح</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">مدخل جناح الطوارئ</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1392,6 +1411,8 @@
     <string name="type.man_made.monitoring_station.weather">محطة مراقبة الطقس</string>
     <string name="type.amenity.student_accommodation">سكن الطلاب</string>
     <string name="type.craft.watchmaker">صانع الساعات</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">تصنيع النوافذ</string>
     <string name="type.xmas_feature.market">سوق الكريسماس</string>
     <string name="type.xmas_feature.tree">شجرة الكريسماس</string>
     <string name="type.amenity.hookah_lounge">مقهى شيشة</string>

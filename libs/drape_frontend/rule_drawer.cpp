@@ -1,28 +1,40 @@
 #include "drape_frontend/rule_drawer.hpp"
 
 #include "drape_frontend/apply_feature_functors.hpp"
+#include "drape_frontend/clip_splines_builder.hpp"
 #include "drape_frontend/engine_context.hpp"
+#include "drape_frontend/line_shape.hpp"
+#include "drape_frontend/map_data_provider.hpp"
 #include "drape_frontend/metaline_manager.hpp"
+#include "drape_frontend/path_text_shape.hpp"
+#include "drape_frontend/terrain_shade_shape.hpp"
 #include "drape_frontend/traffic_renderer.hpp"
+
+#include "drape/drape_diagnostics.hpp"
+
+#include "terrain/isolines_tracer.hpp"
+#include "terrain/terrain_utils.hpp"
 
 #include "indexer/drawing_rules.hpp"
 #include "indexer/feature.hpp"
 #include "indexer/feature_algo.hpp"
 #include "indexer/feature_visibility.hpp"
 #include "indexer/map_style_reader.hpp"
+#include "indexer/scales.hpp"
+
+#include "platform/measurement_utils.hpp"
 
 #include "geometry/clipping.hpp"
 #include "geometry/mercator.hpp"
 
 #include "base/assert.hpp"
+#include "base/macros.hpp"
+#include "base/string_utils.hpp"
 
-#ifdef DRAW_TILE_NET
-#include "drape/drape_diagnostics.hpp"
-
-#include "drape_frontend/line_shape.hpp"
+#if defined(DRAW_TILE_NET) || defined(TERRAIN_DEBUG_MESH)
 #include "drape_frontend/text_shape.hpp"
 
-#include "base/string_utils.hpp"
+#include <set>
 #endif
 
 #include <array>
@@ -36,9 +48,11 @@ namespace
 {
 // The first zoom level in kAverageSegmentsCount.
 int constexpr kFirstZoomInAverageSegments = 10;
+// clang-format off
 std::array<size_t, 10> const kAverageSegmentsCount = {
     // 10  11    12     13    14    15    16    17    18   19
     10000, 5000, 10000, 5000, 2500, 5000, 2000, 1000, 500, 500};
+// clang-format on
 
 double constexpr kMetersPerLevel = 3.0;
 
@@ -150,28 +164,28 @@ void ExtractTrafficGeometry(FeatureType const & f, df::RoadClass const & roadCla
     }
   }
 }
+
 }  // namespace
 
-RuleDrawer::RuleDrawer(TCheckCancelledCallback const & checkCancelled, TIsCountryLoadedByNameFn const & isLoadedFn,
-                       ref_ptr<EngineContext> engineContext, int8_t deviceLang)
-  : m_checkCancelled(checkCancelled)
-  , m_isLoadedFn(isLoadedFn)
+RuleDrawer::RuleDrawer(TIsCountryLoadedByNameFn const & isLoadedFn, ref_ptr<EngineContext> engineContext,
+                       int8_t deviceLang, bool drawTerrain)
+  : m_isLoadedFn(isLoadedFn)
   , m_context(engineContext)
   , m_customFeaturesContext(engineContext->GetCustomFeaturesContext().lock())
+  , m_mapStyle(GetStyleReader().GetCurrentStyle())
   , m_deviceLang(deviceLang)
+  , m_drawTerrain(drawTerrain)
 {
-  ASSERT(m_checkCancelled != nullptr, ());
-
   m_applyParams.Init(m_context->GetTileKey());
   m_zoomLevel = m_applyParams.m_tileKey.m_zoomLevel;
 
   m_mapShapes[df::OverlayType].reserve(200 /* average overlays count */);
 
-  if (!GetStyleReader().IsCarNavigationStyle())
+  if (!MapStyleIsVehicle(m_mapStyle))
   {
     /// @todo Make naive implementation for now. Fetch draw settings from EngineContext.
     /// Should refactor and generalize these settings (3D, isolines, hiking, cycling, ...)
-    m_relsSettings.Load();
+    m_relsSettings.Load(m_mapStyle);
   }
 
   m_applyParams.m_insertShape = [this](drape_ptr<MapShape> && shape)
@@ -188,7 +202,7 @@ RuleDrawer::RuleDrawer(TCheckCancelledCallback const & checkCancelled, TIsCountr
 
 RuleDrawer::~RuleDrawer()
 {
-  if (m_wasCancelled)
+  if (CheckCancelled())
     return;
 
   auto & overlayShapes = m_mapShapes[df::OverlayType];
@@ -204,10 +218,9 @@ RuleDrawer::~RuleDrawer()
   m_context->FlushTrafficGeometry(std::move(m_trafficGeometry));
 }
 
-bool RuleDrawer::CheckCancelled()
+bool RuleDrawer::CheckCancelled() const
 {
-  m_wasCancelled = m_checkCancelled();
-  return m_wasCancelled;
+  return m_context->IsCancelled();
 }
 
 bool RuleDrawer::IsDiscardCustomFeature(FeatureID const & id) const
@@ -289,10 +302,15 @@ void RuleDrawer::ProcessAreaAndPointStyle(FeatureType & f, Stylist const & s)
   if (!skipTriangles && isBuilding && f.GetTrgVerticesCount(m_zoomLevel) >= 10000)
     isBuilding = false;
 
-  ApplyAreaFeature apply(m_applyParams, f, s.m_captionDescriptor, isBuilding, m_isMwmBorder(types),
-                         areaMinHeight /* minPosZ */, areaHeight /* posZ */, m_context->GetBackgroundMode());
+  // In Satellite mode area fills are drawn at the user-configured opacity so the imagery shows through;
+  // 0 hides them entirely (skip the geometry below). Outside Satellite mode areas are always opaque.
+  float const areaOpacity =
+      m_context->GetBackgroundMode() == dp::BackgroundMode::Satellite ? m_context->GetAreaOpacity() : 1.0f;
 
-  if (!skipTriangles && (s.m_areaRule || s.m_hatchingRule))
+  ApplyAreaFeature apply(m_applyParams, f, s.m_captionDescriptor, isBuilding, m_isMwmBorder(types),
+                         areaMinHeight /* minPosZ */, areaHeight /* posZ */, areaOpacity);
+
+  if (areaOpacity > 0.0f && !skipTriangles && (s.m_areaRule || s.m_hatchingRule))
   {
     f.ForEachTriangle(apply, m_zoomLevel);
     if (apply.HasGeometry())
@@ -300,7 +318,10 @@ void RuleDrawer::ProcessAreaAndPointStyle(FeatureType & f, Stylist const & s)
       std::string_view hatchKey;
       if (s.m_hatchingRule)
         hatchKey = m_isHatching.GetHatch(types);
-      apply.ProcessAreaRules(s.m_areaRule, s.m_hatchingRule, hatchKey);
+      std::string_view patternKey;
+      if (s.m_areaRule)
+        patternKey = m_isAreaPattern.GetPattern(types);
+      apply.ProcessAreaRules(s.m_areaRule, s.m_hatchingRule, hatchKey, patternKey);
     }
   }
 
@@ -315,11 +336,11 @@ void RuleDrawer::ProcessAreaAndPointStyle(FeatureType & f, Stylist const & s)
 void RuleDrawer::ProcessLineStyle(FeatureType & f, Stylist const & s)
 {
   bool const isIsoline = m_isIsoline(f);
-  ApplyLineFeatureGeometry applyGeom(m_applyParams, f, m_relsSettings);
-  applyGeom.BuildGeometry(m_zoomLevel, isIsoline);
+  ApplyLineFeatureGeometry applyGeom(m_applyParams, f, m_relsSettings, isIsoline);
+  applyGeom.BuildGeometry(m_zoomLevel);
 
   if (applyGeom.HasGeometry())
-    applyGeom.ProcessLineRules(s.m_lineRules, isIsoline);
+    applyGeom.ProcessLineRules(s.m_lineRules);
 
   if (s.m_pathtextRule || s.m_shieldRule)
   {
@@ -339,7 +360,8 @@ void RuleDrawer::ProcessLineStyle(FeatureType & f, Stylist const & s)
 
     if (!clippedSplines.empty())
     {
-      ApplyLineFeatureAdditional applyAdditional(m_applyParams, f, s.m_captionDescriptor, std::move(clippedSplines));
+      ApplyLineFeatureAdditional applyAdditional(m_applyParams, f, s.m_captionDescriptor, std::move(clippedSplines),
+                                                 isIsoline);
       applyAdditional.ProcessAdditionalLineRules(s.m_pathtextRule, s.m_shieldRule, m_context->GetTextureManager(),
                                                  s.m_roadShields, m_generatedRoadShields);
     }
@@ -397,7 +419,11 @@ void RuleDrawer::operator()(FeatureType & f)
     return;
 
   feature::TypesHolder const types(f);
-  if ((!m_context->IsolinesEnabled() && m_isIsoline(types)) ||
+  // m_drawTerrain suppresses the baked isoline features for the WHOLE tile while the
+  // dynamic ones cover only the terrain blocks: a tile straddling the coverage border
+  // shows a one-tile-wide gap. Accepted: per-feature gating against the mesh rects
+  // costs more than the artifact is worth, and the coverage grows block by block.
+  if (((!m_context->IsolinesEnabled() || m_drawTerrain) && m_isIsoline(types)) ||
       (!m_context->Is3dBuildingsEnabled() && m_isBuildingPart(types) && !m_isBuilding(types)))
     return;
 
@@ -406,18 +432,17 @@ void RuleDrawer::operator()(FeatureType & f)
 
   feature::GeomType const geomType = f.GetGeomType();
 
-  // Force use Outdoor style (mainly because of visibility), for the hiking/cycling related Features
-  // (has correspondent Relation references). Otherwise, we get routes torn to separate pieces
-  // (e.g. highway=path is visible from z15, but highway=secondary from z13 in a regular Map style).
-  bool forceOutdoorStyle = false;
+  // Outdoors rules give hiking/cycling relation members consistent low-zoom visibility, so routes
+  // remain continuous even when their member roads have different visibility in the base style.
+  auto style = m_mapStyle;
   if (m_applyParams.IsRelationRoutes() && geomType == feature::GeomType::Line && !m_relsSettings.IsEmpty())
   {
     RelationsDrawInfo drawInfo(m_relsSettings);
     if (drawInfo.HasHikingOrCycling(f))
-      forceOutdoorStyle = true;
+      style = MapStyleIsDark(m_mapStyle) ? MapStyleOutdoorsDark : MapStyleOutdoorsLight;
   }
 
-  Stylist const s(f, m_zoomLevel, m_deviceLang, forceOutdoorStyle);
+  Stylist const s(f, m_zoomLevel, m_deviceLang, style);
 
   // No drawing rules.
   if (!s.m_symbolRule && !s.m_captionRule && !s.m_houseNumberRule && s.m_lineRules.empty() && !s.m_areaRule &&
@@ -460,15 +485,224 @@ void RuleDrawer::operator()(FeatureType & f)
   if (CheckCancelled())
     return;
 
-  for (auto const & shape : m_mapShapes[df::GeometryType])
+  FlushGeometryShapes();
+}
+
+void RuleDrawer::FlushGeometryShapes()
+{
+  auto & shapes = m_mapShapes[df::GeometryType];
+  for (auto const & shape : shapes)
     shape->Prepare(m_context->GetTextureManager());
 
-  if (!m_mapShapes[df::GeometryType].empty())
+  if (!shapes.empty())
+    m_context->Flush(std::move(shapes));
+}
+
+void RuleDrawer::DrawTerrain(MapDataProvider const & model)
+{
+  ASSERT(m_drawTerrain, ());
+  if (CheckCancelled())
+    return;
+
+  // The isolines drawing policy (trace step, line and label rules per altitude) is
+  // resolved from the tile's style once per tile; the units are read once here, so
+  // the traced levels, the labels and the steps always agree.
+  auto const units = measurement_utils::GetMeasurementUnits();
+  terrain::IsolinesStyle const isolinesStyle(m_mapStyle, m_zoomLevel, units);
+  /// @todo Separate visibility settings for the isolines and the hillshading.
+  bool const drawIsolines = isolinesStyle.GetStep() != 0;
+
+  // One read serves the hillshading, the isolines and the debug mesh. The rect is
+  // inflated for the isolines smoothing overhang (see ClipSplinesBuilder::Release);
+  // it also completes the shade normals of the vertices near the tile border.
+  m2::RectD const queryRect = GetTerrainReadRect(m_applyParams.m_tileRect);
+
+  terrain::TerrainData data;
+  model.ReadTerrain(queryRect, m_zoomLevel, data, m_context->GetCancellable());
+  if (CheckCancelled() || data.IsEmpty())
+    return;
+
+#ifdef TERRAIN_DEBUG_MESH
+  DrawTerrainDebugMesh(data.m_mesh);
+  DrawTerrainDebugRaster(data);
+#else
+  DrawTerrainShade(data);
+#endif
+  if (drawIsolines && !CheckCancelled())
+    DrawDynamicIsolines(data, isolinesStyle, units);
+
+  if (CheckCancelled())
+    return;
+
+  FlushGeometryShapes();
+}
+
+#ifdef TERRAIN_DEBUG_MESH
+void RuleDrawer::DrawTerrainDebugMesh(terrain::TileMesh const & mesh)
+{
+  // The half-open tile ownership draws every edge and label exactly once across the
+  // neighbor tiles; the mesh vertices and edges are already deduplicated.
+  m2::RectD const & tileRect = m_applyParams.m_tileRect;
+  auto const ownedByTile = [&tileRect](m2::PointD const & p)
+  { return p.x >= tileRect.minX() && p.x < tileRect.maxX() && p.y >= tileRect.minY() && p.y < tileRect.maxY(); };
+
+  auto const & points = mesh.GetPoints();
+  auto const & triangles = mesh.GetTriangles();
+
+  std::set<std::pair<uint32_t, uint32_t>> edges;
+  for (size_t t = 0; t + 2 < triangles.size(); t += 3)
+    for (int i = 0; i < 3; ++i)
+      edges.emplace(std::min(triangles[t + i], triangles[t + (i + 1) % 3]),
+                    std::max(triangles[t + i], triangles[t + (i + 1) % 3]));
+
+  for (auto const & [a, b] : edges)
   {
-    TMapShapes geomShapes;
-    geomShapes.swap(m_mapShapes[df::GeometryType]);
-    m_context->Flush(std::move(geomShapes));
+    m2::PointD const & pa = points[a];
+    m2::PointD const & pb = points[b];
+    if (!ownedByTile((pa + pb) * 0.5))
+      continue;
+    df::LineViewParams params;
+    params.m_tileCenter = tileRect.Center();
+    params.m_baseGtoPScale = m_applyParams.m_currentScaleGtoP;
+    params.m_cap = dp::ButtCap;
+    params.m_join = dp::RoundJoin;
+    params.m_color = dp::Color(255, 0, 0, 160);
+    params.m_depth = dp::kMaxDepth;
+    params.m_depthLayer = DepthLayer::GeometryLayer;
+    params.m_width = 1;
+    params.m_zoomLevel = m_zoomLevel;
+    m_applyParams.m_insertShape(make_unique_dp<LineShape>(m2::SharedSpline(std::vector<m2::PointD>{pa, pb}), params));
   }
+
+  // The running text index keeps the per-tile OverlayIDs unique (cf. the isoline
+  // labels starting at 128).
+  double const visScale = m_applyParams.m_vparams.GetVisualScale();
+  uint32_t textIndex = 1 << 16;
+  for (size_t i = 0; i < points.size(); ++i)
+  {
+    if (!ownedByTile(points[i]))
+      continue;
+    df::TextViewParams tp;
+    tp.m_markId = kml::kDebugMarkId;
+    tp.m_tileCenter = tileRect.Center();
+    tp.m_titleDecl.m_anchor = dp::Center;
+    tp.m_depth = dp::kMaxDepth;
+    tp.m_depthLayer = DepthLayer::OverlayLayer;
+    tp.m_titleDecl.m_primaryText = strings::to_string(mesh.GetAltitudes()[i]);
+    tp.m_titleDecl.m_primaryTextFont = dp::FontDecl(dp::Color::Red(), 10 * visScale);
+    tp.m_titleDecl.m_primaryOffset = {0.0f, 0.0f};
+    auto textShape = make_unique_dp<TextShape>(points[i], tp, m_context->GetTileKey(), m2::PointF(0.0f, 0.0f),
+                                               m2::PointF(0.0f, 0.0f), dp::Anchor::Center, textIndex++);
+    textShape->DisableDisplacing();
+    m_applyParams.m_insertShape(std::move(textShape));
+  }
+}
+
+void RuleDrawer::DrawTerrainDebugRaster(terrain::TerrainData const & data)
+{
+  auto const & tileRect = m_applyParams.m_tileRect;
+  for (auto const & patch : data.m_rasterPatches)
+  {
+    auto const rect = patch.GetRect();
+    if (!tileRect.IsIntersect(rect))
+      continue;
+    std::vector<m2::SharedSpline> splines;
+    m2::ClipPathByRect(
+        tileRect, {rect.LeftBottom(), rect.RightBottom(), rect.RightTop(), rect.LeftTop(), rect.LeftBottom()}, splines);
+    df::LineViewParams params;
+    params.m_tileCenter = tileRect.Center();
+    params.m_baseGtoPScale = m_applyParams.m_currentScaleGtoP;
+    params.m_cap = dp::ButtCap;
+    params.m_join = dp::RoundJoin;
+    params.m_color = dp::Color(0, 80, 255, 160);
+    params.m_depth = dp::kMaxDepth;
+    params.m_depthLayer = DepthLayer::GeometryLayer;
+    params.m_width = 1;
+    params.m_zoomLevel = m_zoomLevel;
+    for (auto const & spline : splines)
+      m_applyParams.m_insertShape(make_unique_dp<LineShape>(spline, params));
+  }
+}
+#endif
+
+void RuleDrawer::DrawTerrainShade(terrain::TerrainData const & data)
+{
+  auto geometry = BuildTerrainShade(data, m_applyParams.m_tileRect, m_context->GetCancellable());
+  if (!geometry.m_gridRows.empty())
+    m_applyParams.m_insertShape(make_unique_dp<TerrainGridShadeShape>(std::move(geometry.m_gridRows)));
+  if (!geometry.m_triangles.empty())
+    m_applyParams.m_insertShape(make_unique_dp<TerrainShadeShape>(std::move(geometry.m_triangles)));
+}
+
+void RuleDrawer::DrawDynamicIsolines(terrain::TerrainData const & data, terrain::IsolinesStyle const & isolinesStyle,
+                                     measurement_utils::Units units)
+{
+  double const visScale = m_applyParams.m_vparams.GetVisualScale();
+  ClipSplinesBuilder builder(m_applyParams);
+
+  // All the dynamic labels of a tile share an invalid FeatureID, so their OverlayID
+  // uniqueness rests entirely on the running text index (cf. kPathTextBaseTextIndex
+  // of the baked path texts); each shape reserves one index per repeated placement.
+  uint32_t textIndex = 128;
+
+  // Feet are marked with the prime, like 500′, the metric altitudes go without a unit.
+  char const * const unitSuffix = units == measurement_utils::Units::Imperial ? "′" : "";
+  // The isolines come in the display units (see terrain::TraceIsolines).
+  terrain::TraceIsolines(data, isolinesStyle.GetStep(), units, [&](terrain::Isoline && isoline)
+  {
+    if (CheckCancelled())
+      return;
+    auto const * lineRule = isolinesStyle.GetLineRule(isoline.m_altitude);
+    if (lineRule == nullptr)
+      return;
+    auto const * textRule = isolinesStyle.GetPathTextRule(isoline.m_altitude);
+
+    builder.SetPath(std::move(isoline.m_points));
+    for (auto const & spline : builder.Release(true /* isIsoline */))
+    {
+      LineViewParams params;
+      params.m_tileCenter = m_applyParams.m_tileRect.Center();
+      ExtractLineParams(*lineRule, visScale, params);
+
+      // The depths share the class line drules, the color comes from the style's palette.
+      if (isoline.m_altitude < 0)
+        params.m_color = dp::Color(isolinesStyle.GetDepthLineColor(), params.m_color.GetAlpha());
+
+      // Just below the hillshade (see df::BuildTerrainShade), which is drawn after the lines: the shade
+      // blends over the translucent contours instead of being depth-tested out underneath them.
+      params.m_depth = drule::kMinLayeredDepthFg - 1;
+      params.m_depthLayer = DepthLayer::GeometryLayer;
+      params.m_baseGtoPScale = m_applyParams.m_currentScaleGtoP;
+      params.m_zoomLevel = m_zoomLevel;
+      m_applyParams.m_insertShape(make_unique_dp<LineShape>(spline, params));
+
+      if (textRule == nullptr)
+        continue;
+
+      auto const & caption = *textRule->primary;
+      PathTextViewParams textParams;
+      textParams.m_tileCenter = m_applyParams.m_tileRect.Center();
+      textParams.m_depthLayer = DepthLayer::OverlayLayer;
+      textParams.m_depthTestEnabled = false;
+      // Pathtext drule priorities map to the overlay depth directly.
+      textParams.m_depth = textRule->priority;
+      textParams.m_mainText = strings::to_string(isoline.m_altitude) + unitSuffix;
+      CaptionDefToFontDecl(&caption, visScale, textParams.m_textFont);
+
+      if (isoline.m_altitude < 0)
+        textParams.m_textFont.m_color = ToDrapeColor(isolinesStyle.GetDepthTextColor());
+
+      textParams.m_baseGtoPScale = m_applyParams.m_currentScaleGtoP;
+      textParams.m_allowRepositioning = true;
+
+      auto shape = make_unique_dp<PathTextShape>(spline, textParams, m_applyParams.m_tileKey, textIndex);
+      // The layout fails on splines too short for the text: no label then.
+      if (!shape->CalculateLayout(m_context->GetTextureManager()))
+        continue;
+      textIndex += static_cast<uint32_t>(shape->GetOffsets().size());
+      m_applyParams.m_insertShape(std::move(shape));
+    }
+  }, m_context->GetCancellable());
 }
 
 #ifdef DRAW_TILE_NET
@@ -481,14 +715,14 @@ void RuleDrawer::DrawTileNet()
 
   std::vector<m2::PointD> path;
   path.reserve(4);
-  path.push_back(m_globalRect.LeftBottom());
-  path.push_back(m_globalRect.LeftTop());
-  path.push_back(m_globalRect.RightTop());
-  path.push_back(m_globalRect.RightBottom());
+  path.push_back(m_applyParams.m_tileRect.LeftBottom());
+  path.push_back(m_applyParams.m_tileRect.LeftTop());
+  path.push_back(m_applyParams.m_tileRect.RightTop());
+  path.push_back(m_applyParams.m_tileRect.RightBottom());
 
   m2::SharedSpline spline(path);
   df::LineViewParams p;
-  p.m_tileCenter = m_globalRect.Center();
+  p.m_tileCenter = m_applyParams.m_tileRect.Center();
   p.m_baseGtoPScale = 1.0;
   p.m_cap = dp::ButtCap;
   p.m_color = dp::Color::Blue();
@@ -505,7 +739,7 @@ void RuleDrawer::DrawTileNet()
 
   df::TextViewParams tp;
   tp.m_markId = kml::kDebugMarkId;
-  tp.m_tileCenter = m_globalRect.Center();
+  tp.m_tileCenter = p.m_tileCenter;
   tp.m_titleDecl.m_anchor = dp::Center;
   tp.m_depth = dp::kMaxDepth;
   tp.m_depthLayer = DepthLayer::OverlayLayer;
@@ -514,7 +748,7 @@ void RuleDrawer::DrawTileNet()
   tp.m_titleDecl.m_primaryTextFont = dp::FontDecl(dp::Color::Red(), 30);
   tp.m_titleDecl.m_primaryOffset = {0.0f, 0.0f};
   auto textShape =
-      make_unique_dp<TextShape>(m_globalRect.Center(), tp, key, m2::PointF(0.0f, 0.0f) /* symbolSize */,
+      make_unique_dp<TextShape>(p.m_tileCenter, tp, key, m2::PointF(0.0f, 0.0f) /* symbolSize */,
                                 m2::PointF(0.0f, 0.0f) /* symbolOffset */, dp::Anchor::Center, 0 /* textIndex */);
   textShape->DisableDisplacing();
 

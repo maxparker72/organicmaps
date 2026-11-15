@@ -38,8 +38,9 @@ OMCountryNode * MakeNode(storage::Storage const & storage, storage::CountryId co
   node.sizeBytes = attrs.m_mwmSize;
   node.status = ToDownloadStatus(attrs.m_status);
   node.expandable = attrs.m_mwmCounter > 1;
-  node.downloadedBytes = static_cast<int64_t>(attrs.m_downloadingMwmSize);
-  node.totalBytes = static_cast<int64_t>(attrs.m_mwmSize);
+  auto const & progress = attrs.m_downloadingProgress;
+  node.downloadedBytes = progress.m_bytesDownloaded;
+  node.totalBytes = progress.m_bytesTotal > 0 ? progress.m_bytesTotal : static_cast<int64_t>(attrs.m_mwmSize);
   return node;
 }
 }  // namespace
@@ -55,7 +56,7 @@ OMCountryNode * MakeNode(storage::Storage const & storage, storage::CountryId co
   GetFramework().GetStorage().Subscribe([weakSelf](storage::CountryId const &)
   {
     dispatch_async(dispatch_get_main_queue(), ^{ [weakSelf.delegate mapsManagerDidChange]; });
-  }, [weakSelf](storage::CountryId const &, downloader::Progress const &)
+  }, [weakSelf](storage::CountryId const &, storage::Progress const &)
   {
     dispatch_async(dispatch_get_main_queue(), ^{ [weakSelf.delegate mapsManagerDidChange]; });
   });

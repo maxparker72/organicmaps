@@ -166,6 +166,7 @@
     <string name="type.barrier.city_wall">Zidurile orașului</string>
     <string name="type.barrier.cycle_barrier">Barieră de biciclete</string>
     <string name="type.waterway.ditch">Șanț de drenaj</string>
+    <string name="type.waterway.ditch.intermittent">Șanț de drenaj temporar</string>
     <string name="type.natural.water.moat">Şanţ</string>
     <string name="type.natural.water.wastewater">Ape uzate</string>
     <string name="type.barrier.entrance">Intrare</string>
@@ -336,47 +337,47 @@
     <string name="type.healthcare.speech_therapist">Logopedie</string>
 
     <!-- SECTION: Types: Roads -->
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Tunel</string>
     <string name="type.highway.busway">Drum dedicat autobuzului</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Tunel</string>
     <string name="type.highway.bus_stop">Stație de autobuz</string>
     <string name="type.highway.construction">Drum în construcție</string>
     <string name="type.highway.cycleway">Pistă de biciclete</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Pod</string>
     <string name="type.highway.cycleway.permissive">Pistă de biciclete</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Tunel</string>
     <string name="type.highway.footway">Alee</string>
     <string name="type.highway.footway.sidewalk">Trotuar</string>
     <string name="type.highway.footway.crossing">Trecere de pietoni</string>
     <string name="type.highway.footway.area">Alee</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Tunel</string>
     <string name="type.highway.ford">Superficial</string>
     <string name="type.highway.living_street">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Tunel</string>
     <string name="type.highway.motorway">Autostradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Tunel</string>
     <string name="type.highway.motorway_junction">Ieșire</string>
     <string name="type.highway.motorway_link">Autostradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Tunel</string>
     <string name="type.highway.path">Cale</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -385,101 +386,103 @@
     <string name="type.highway.path.expert">Traseu foarte dificil sau imposibil de distins</string>
     <string name="type.highway.path.bicycle">Cale</string>
     <string name="type.highway.footway.bicycle">Cale</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Pod</string>
     <string name="type.highway.path.horse">Cale</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Tunel</string>
     <string name="type.highway.pedestrian">Stradă pietonală</string>
     <string name="type.highway.pedestrian.area">Stradă pietonală</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Tunel</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Peron</string>
     <string name="type.highway.primary">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Tunel</string>
     <string name="type.highway.primary_link">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Tunel</string>
     <string name="type.highway.raceway">Pistă de curse</string>
     <string name="type.highway.residential">Stradă</string>
     <string name="type.highway.residential.area">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Tunel</string>
     <string name="type.highway.rest_area">Zonă de odihnă</string>
     <string name="type.highway.road">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Pod</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Tunel</string>
     <string name="type.highway.secondary">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Tunel</string>
     <string name="type.highway.secondary_link">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Tunel</string>
     <string name="type.highway.service">Stradă</string>
     <string name="type.highway.service.area">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Pod</string>
     <string name="type.highway.service.driveway">Stradă</string>
     <string name="type.highway.service.parking_aisle">Stradă</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Tunel</string>
     <string name="type.highway.speed_camera">Detector de viteză</string>
     <string name="type.highway.steps">Scări</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Tunel</string>
     <string name="type.highway.ladder">Scară</string>
     <string name="type.highway.tertiary">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Tunel</string>
     <string name="type.highway.tertiary_link">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Tunel</string>
     <string name="type.highway.track">Stradă</string>
     <string name="type.highway.track.area">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Pod</string>
     <string name="type.highway.track.grade1">Stradă</string>
     <string name="type.highway.track.no.access">Stradă</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Tunel</string>
     <string name="type.highway.traffic_signals">Semafoare</string>
     <string name="type.highway.trunk">Drum expres</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Tunel</string>
     <string name="type.highway.trunk_link">Drum expres</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Tunel</string>
     <string name="type.highway.unclassified">Stradă</string>
     <string name="type.highway.unclassified.area">Stradă</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Pod</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Tunel</string>
     <string name="type.area_highway.cycleway">Pistă de biciclete</string>
     <string name="type.area_highway.footway">Alee</string>
@@ -517,6 +520,7 @@
     <string name="type.historic.castle.shiro">Castelul japonez</string>
     <string name="type.historic.castle.stately">Castel</string>
     <string name="type.historic.city_gate">Poarta orașului</string>
+    <string name="type.man_made.ceremonial_gate">Poarta Ceremonială</string>
     <string name="type.historic.citywalls">Zidurile orașului</string>
     <string name="type.historic.fort">Fort</string>
     <string name="type.historic.gallows">Spânzurătoare</string>
@@ -543,6 +547,7 @@
     <string name="type.historic.wayside_shrine">Altarul de la marginea drumului</string>
     <string name="type.historic.wreck">Naufragiu</string>
     <string name="type.landuse.basin">Bazin de apă</string>
+    <string name="type.landuse.basin.intermittent">Bazin de apă temporar</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Cimitir</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
@@ -558,7 +563,6 @@
     <string name="type.landuse.grass">Gazon</string>
     <string name="type.landuse.landfill">Gunoiște</string>
     <string name="type.landuse.railway">Instalații feroviare</string>
-    <string name="type.landuse.reservoir">Apă</string>
     <string name="type.leisure.dog_park">Loc de plimbare a câinilor</string>
     <string name="type.leisure.fitness_centre">Centru fitness</string>
     <string name="type.leisure.fitness_station">Sală de fitness</string>
@@ -569,6 +573,7 @@
     <string name="type.leisure.miniature_golf">Minigolf</string>
     <string name="type.leisure.ice_rink">Patinoar</string>
     <string name="type.leisure.nature_reserve">Rezervație naturală</string>
+    <string name="type.leisure.bird_hide">Observator de păsări</string>
     <string name="type.leisure.outdoor_seating">Scaune în aer liber</string>
     <string name="type.leisure.park">Parc</string>
     <string name="type.leisure.park.no.access">Parc</string>
@@ -589,6 +594,8 @@
     <string name="type.leisure.water_park">Parc acvatic</string>
     <string name="type.man_made.chimney">Coș de fabrică</string>
     <string name="type.man_made.lighthouse">Far</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Rezervor de apă acoperit</string>
     <string name="type.man_made.surveillance">Cameră de supraveghere</string>
     <string name="type.man_made.tower">Turn</string>
     <!-- A huge telecommunications tower. Often a local monument or a landmark. -->
@@ -604,6 +611,8 @@
     <string name="type.man_made.water_tower">Turn de apă</string>
     <string name="type.man_made.water_well">Puț de apă</string>
     <string name="type.man_made.water_well.drinking_water_no">Puț de apă</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Stație de tratare a apei</string>
     <string name="type.man_made.windmill">Moară de vânt</string>
     <string name="type.military.bunker">Buncăr</string>
     <string name="type.mountain_pass">Pas</string>
@@ -632,13 +641,16 @@
     <string name="type.natural.water.lake">Lac</string>
     <string name="type.natural.water.lock">Camera de blocare</string>
     <string name="type.natural.water.pond">Heleșteu</string>
-    <string name="type.natural.water.reservoir">Rezervor</string>
+    <string name="type.natural.water.reservoir">Lac de acumulare</string>
     <string name="type.natural.water.basin">Bazin de apă</string>
     <string name="type.natural.water.river">Râu</string>
+    <string name="type.natural.water.intermittent">Corp de apă temporar</string>
     <string name="type.natural.land">Teren</string>
     <string name="type.natural.meadow">Fâneață</string>
     <string name="type.natural.orchard">Livadă</string>
     <string name="type.natural.peak">Munte</string>
+    <string name="type.natural.hill">Deal</string>
+    <string name="type.natural.arch">Arcul de piatră</string>
     <string name="type.natural.saddle">Sela da Montanha</string>
     <string name="type.natural.rock">Rocă</string>
     <string name="type.natural.scrub">Boschet</string>
@@ -711,6 +723,8 @@
     <string name="type.power.substation">Stație subterană</string>
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">Stâlp de electricitate</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Peron</string>
     <string name="type.railway">Cale ferată</string>
     <string name="type.railway.disused.tunnel">Tunel feroviar dezafectat</string>
     <string name="type.railway.funicular">Funicular</string>
@@ -1035,6 +1049,8 @@
     <string name="type.shop.greengrocer">Băcănie</string>
     <string name="type.shop.grocery">Băcănie</string>
     <string name="type.shop.hairdresser">Coafor</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Frizerie</string>
     <string name="type.shop.hardware">Magazin de hardware</string>
     <string name="type.shop.health_food">Magazin de alimente naturiste</string>
     <string name="type.shop.hearing_aids">Magazin de aparate auditive</string>
@@ -1155,6 +1171,7 @@
     <string name="type.sport.rugby_union">Rugby</string>
     <string name="type.sport.running">Alergare</string>
     <string name="type.sport.softball">Softball</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism.aquarium">Acvariu</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
     <string name="type.tourism.alpine_hut">Cabana de munte</string>
@@ -1195,16 +1212,22 @@
     <string name="type.tourism.zoo">Grădină zoologică</string>
     <string name="type.tourism.zoo.petting">Grădina Zoologică</string>
     <string name="type.waterway.access_point">Punct de acces la calea navigabilă</string>
+    <string name="type.waterway.canal">Canal</string>
+    <string name="type.waterway.canal.intermittent">Canal temporar</string>
     <string name="type.waterway.fish_pass">Scară de pește</string>
+    <string name="type.waterway.fish_pass.intermittent">Scară de pește temporară</string>
     <string name="type.natural.water.ditch">Șanț de drenaj</string>
     <string name="type.waterway.ditch.tunnel">Canal de scurgere</string>
+    <string name="type.waterway.drain">Canal de scurgere</string>
+    <string name="type.waterway.drain.intermittent">Canal de scurgere temporar</string>
+    <string name="type.natural.water.drain">Canal de scurgere</string>
     <string name="type.waterway.drain.tunnel">Canal de scurgere</string>
     <string name="type.waterway.lock_gate">Ecluză</string>
     <string name="type.waterway.river">Râu</string>
+    <string name="type.waterway.river.intermittent">Râu temporar</string>
     <string name="type.waterway.river.tunnel">Râu</string>
     <string name="type.waterway.stream">Pârâu</string>
-    <string name="type.waterway.stream.ephemeral">Pârâu</string>
-    <string name="type.waterway.stream.intermittent">Pârâu</string>
+    <string name="type.waterway.stream.intermittent">Pârâu temporar</string>
     <string name="type.waterway.stream.tunnel">Pârâu</string>
     <string name="type.waterway.waterfall">Cascadă</string>
     <string name="type.wheelchair.limited">Parțial utilat pentru invalizi</string>
@@ -1223,6 +1246,7 @@
     <string name="type.self_service.no">Fără autoservire</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Facilitate socială</string>
+    <string name="type.amenity.stage">Scenă</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Intrarea secției de urgență</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1244,6 +1268,8 @@
     <string name="type.man_made.monitoring_station.weather">Stație de monitorizare meteorologică</string>
     <string name="type.amenity.student_accommodation">Cazare pentru studenți</string>
     <string name="type.craft.watchmaker">Ceasornicar</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Producție de ferestre</string>
     <string name="type.xmas_feature.market">Piață de Crăciun</string>
     <string name="type.xmas_feature.tree">Pom de Crăciun</string>
     <string name="type.amenity.hookah_lounge">Lounge de narghilea</string>

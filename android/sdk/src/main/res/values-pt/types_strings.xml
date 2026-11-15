@@ -183,6 +183,7 @@
     <string name="type.barrier.city_wall">Muralha</string>
     <string name="type.barrier.cycle_barrier">Barreira de bicicletas</string>
     <string name="type.waterway.ditch">Vala de drenagem</string>
+    <string name="type.waterway.ditch.intermittent">Vala de drenagem intermitente</string>
     <string name="type.natural.water.moat">Fosso</string>
     <string name="type.natural.water.wastewater">Águas residuais</string>
     <string name="type.barrier.entrance">Entrada</string>
@@ -365,48 +366,48 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Rodovia</string>
     <string name="type.highway.bridleway">Caminho para cavaleiros</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Ponte</string>
     <string name="type.highway.bridleway.permissive">Caminho para cavaleiros</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Túnel</string>
     <string name="type.highway.busway">Via exclusiva de autocarro</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Túnel</string>
     <string name="type.highway.bus_stop">Paragem de autocarros</string>
     <string name="type.highway.construction">Estrada em construção</string>
     <string name="type.highway.cycleway">Ciclovia</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Ponte</string>
     <string name="type.highway.cycleway.permissive">Ciclovia</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Túnel</string>
     <string name="type.highway.footway">Caminho pedonal</string>
     <string name="type.highway.footway.sidewalk">Passeio</string>
     <string name="type.highway.footway.crossing">Passagem de peões</string>
     <string name="type.highway.footway.area">Caminho pedonal</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Túnel</string>
     <string name="type.highway.ford">Vau</string>
     <string name="type.highway.living_street">Zona de coexistência</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Túnel</string>
     <string name="type.highway.motorway">Autoestrada</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Túnel</string>
     <string name="type.highway.motorway_junction">Saída de autoestrada</string>
     <string name="type.highway.motorway_link">Ligação a autoestrada</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Túnel</string>
     <string name="type.highway.path">Caminho</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -415,102 +416,103 @@
     <string name="type.highway.path.expert">Trilho muito difícil ou indistinguível</string>
     <string name="type.highway.path.bicycle">Caminho</string>
     <string name="type.highway.footway.bicycle">Caminho</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Ponte</string>
     <string name="type.highway.path.horse">Caminho</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Túnel</string>
     <string name="type.highway.pedestrian">Rua pedonal</string>
     <string name="type.highway.pedestrian.area">Rua pedonal</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Túnel</string>
-    <string name="type.highway.platform">Plataforma de transporte público</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Plataforma</string>
     <string name="type.highway.primary">Estrada primária</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Túnel</string>
     <string name="type.highway.primary_link">Estrada primária</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Túnel</string>
     <string name="type.highway.raceway">Pista de corridas</string>
     <string name="type.highway.residential">Rua residencial</string>
     <string name="type.highway.residential.area">Rua residencial</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Túnel</string>
     <string name="type.highway.rest_area">Área de descanso</string>
     <string name="type.highway.road">Estrada</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Ponte</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Túnel</string>
     <string name="type.highway.secondary">Estrada secundária</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Túnel</string>
     <string name="type.highway.secondary_link">Estrada secundária</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Túnel</string>
     <string name="type.highway.service">Estrada de acesso ou serviço</string>
     <string name="type.highway.service.area">Estrada de acesso ou serviço</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Ponte</string>
     <string name="type.highway.service.driveway">Estrada de acesso ou serviço</string>
     <string name="type.highway.service.parking_aisle">Estrada de estacionamento</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Túnel</string>
     <string name="type.highway.services">Área de serviço</string>
     <string name="type.highway.speed_camera">Radar de velocidade</string>
     <string name="type.highway.steps">Escadas</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Túnel</string>
     <string name="type.highway.tertiary">Estrada terciária</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Túnel</string>
     <string name="type.highway.tertiary_link">Estrada terciária</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Túnel</string>
     <string name="type.highway.track">Carreiro florestal ou agrícola</string>
     <string name="type.highway.track.area">Carreiro florestal ou agrícola</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Ponte</string>
     <string name="type.highway.track.grade1">Carreiro florestal ou agrícola</string>
     <string name="type.highway.track.no.access">Carreiro florestal ou agrícola</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Túnel</string>
     <string name="type.highway.traffic_signals">Semáforo</string>
     <string name="type.highway.trunk">Via rápida</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Túnel</string>
     <string name="type.highway.trunk_link">Via rápida</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Túnel</string>
     <string name="type.highway.unclassified">Estrada sem classificação</string>
     <string name="type.highway.unclassified.area">Estrada sem classificação</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Ponte</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Túnel</string>
     <string name="type.area_highway.cycleway">Ciclovia</string>
     <string name="type.area_highway.footway">Caminho pedonal</string>
@@ -548,6 +550,7 @@
     <string name="type.historic.castle.shiro">Castelo japonês</string>
     <string name="type.historic.castle.stately">Château</string>
     <string name="type.historic.city_gate">Portas da cidade</string>
+    <string name="type.man_made.ceremonial_gate">Portão Cerimonial</string>
     <string name="type.historic.citywalls">Muralha</string>
     <string name="type.historic.fort">Forte</string>
     <string name="type.historic.gallows">Forca</string>
@@ -580,7 +583,8 @@
     <string name="type.junction.roundabout">Rotunda</string>
     <string name="type.landuse">Uso do solo</string>
     <string name="type.landuse.allotments">Horta comunitária</string>
-    <string name="type.landuse.basin">Reservatório</string>
+    <string name="type.landuse.basin">Bacia</string>
+    <string name="type.landuse.basin.intermittent">Bacia intermitente</string>
     <string name="type.landuse.brownfield">Terreno industrial devoluto</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Cemitério</string>
@@ -610,7 +614,6 @@
     <string name="type.landuse.quarry">Pedreira</string>
     <string name="type.landuse.railway">Área ferroviária</string>
     <string name="type.landuse.recreation_ground">Área de lazer</string>
-    <string name="type.landuse.reservoir">Água</string>
     <string name="type.landuse.residential">Área residencial</string>
     <string name="type.landuse.retail">Área de retalho</string>
     <string name="type.landuse.salt_pond">Salinas</string>
@@ -632,6 +635,7 @@
     <string name="type.leisure.ice_rink">Rinque de patinagem</string>
     <string name="type.leisure.marina">Marina</string>
     <string name="type.leisure.nature_reserve">Reserva natural</string>
+    <string name="type.leisure.bird_hide">Observatório de aves</string>
     <string name="type.leisure.outdoor_seating">Assentos ao ar livre</string>
     <string name="type.leisure.firepit">Lugar para Fogueira</string>
     <string name="type.leisure.park">Parque</string>
@@ -666,6 +670,8 @@
     <string name="type.man_made.pier">Píer</string>
     <string name="type.man_made.pipeline">Gasoduto</string>
     <string name="type.man_made.pipeline.overground">Gasoduto aéreo</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Reservatório coberto</string>
     <string name="type.man_made.silo">Silo</string>
     <string name="type.man_made.storage_tank">Tanque de armazenamento</string>
     <string name="type.man_made.surveillance">Câmara de vigilância</string>
@@ -684,6 +690,8 @@
     <string name="type.man_made.water_tower">Torre de água</string>
     <string name="type.man_made.water_well">Poço de água</string>
     <string name="type.man_made.water_well.drinking_water_no">Poço de água não potável</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Estação de tratamento de água</string>
     <string name="type.man_made.windmill">Moinho de vento</string>
     <string name="type.man_made.works">Fábrica</string>
     <string name="type.military">Militar</string>
@@ -718,10 +726,13 @@
     <string name="type.natural.water.reservoir">Reservatório</string>
     <string name="type.natural.water.basin">Bacia</string>
     <string name="type.natural.water.river">Rio</string>
+    <string name="type.natural.water.intermittent">Corpo de água intermitente</string>
     <string name="type.natural.land">Terra</string>
     <string name="type.natural.meadow">Pradaria</string>
     <string name="type.natural.orchard">Pomar</string>
     <string name="type.natural.peak">Pico</string>
+    <string name="type.natural.hill">Colina</string>
+    <string name="type.natural.arch">Arco de Rocha</string>
     <string name="type.natural.saddle">Sela da Montanha</string>
     <string name="type.natural.rock">Rochedo</string>
     <string name="type.natural.scrub">Matagal</string>
@@ -813,7 +824,8 @@
     <string name="type.psurface.unpaved_bad">Superfície não pavimentada ruim</string>
     <string name="type.psurface.unpaved_good">Superfície não pavimentada boa</string>
     <string name="type.public_transport">Transporte público</string>
-    <string name="type.public_transport.platform">Plataforma de transporte público</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Plataforma</string>
     <string name="type.railway">Ferrovia</string>
     <string name="type.railway.abandoned">Ferrovia abandonada</string>
     <string name="type.railway.abandoned.bridge">Ponte de Ferrovia abandonada</string>
@@ -1166,6 +1178,8 @@
     <string name="type.shop.greengrocer">Loja de frutas e verduras</string>
     <string name="type.shop.grocery">Mercearia</string>
     <string name="type.shop.hairdresser">Cabeleireiro(a)</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Barbearia</string>
     <string name="type.shop.hardware">Loja de ferragens</string>
     <string name="type.shop.health_food">Loja de alimentos saudáveis</string>
     <string name="type.shop.hearing_aids">Loja de aparelhos auditivos</string>
@@ -1289,6 +1303,7 @@
     <string name="type.sport.rugby_union">Râguebi</string>
     <string name="type.sport.running">Corrida</string>
     <string name="type.sport.softball">Softbol</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turismo</string>
     <string name="type.tourism.aquarium">Aquário</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1341,22 +1356,25 @@
     <string name="type.waterway">Curso de água</string>
     <string name="type.waterway.access_point">Ponto de acesso à via navegável</string>
     <string name="type.waterway.canal">Canal</string>
+    <string name="type.waterway.canal.intermittent">Canal intermitente</string>
     <string name="type.waterway.canal.tunnel">Túnel de canal</string>
     <string name="type.waterway.fish_pass">Escada de peixes</string>
+    <string name="type.waterway.fish_pass.intermittent">Escada de peixes intermitente</string>
     <string name="type.waterway.dam">Barragem</string>
     <string name="type.barrier.ditch">Vala</string>
     <string name="type.natural.water.ditch">Vala de drenagem</string>
     <string name="type.waterway.ditch.tunnel">Bueiro</string>
     <string name="type.waterway.dock">Doca</string>
     <string name="type.waterway.drain">Valeta de drenagem</string>
+    <string name="type.waterway.drain.intermittent">Valeta de drenagem intermitente</string>
     <string name="type.natural.water.drain">Valeta de drenagem</string>
     <string name="type.waterway.drain.tunnel">Bueiro</string>
     <string name="type.waterway.lock_gate">Comporta de eclusa</string>
     <string name="type.waterway.river">Rio</string>
+    <string name="type.waterway.river.intermittent">Rio intermitente</string>
     <string name="type.waterway.river.tunnel">Rio</string>
     <string name="type.waterway.stream">Ribeiro</string>
-    <string name="type.waterway.stream.ephemeral">Ribeiro efémero</string>
-    <string name="type.waterway.stream.intermittent">Ribeiro sasonal</string>
+    <string name="type.waterway.stream.intermittent">Ribeiro intermitente</string>
     <string name="type.waterway.stream.tunnel">Ribeiro</string>
     <string name="type.waterway.waterfall">Queda de água</string>
     <string name="type.waterway.weir">Represa</string>
@@ -1398,6 +1416,7 @@
     <string name="type.self_service.no">Sem autosserviço</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Instituição de serviços sociais</string>
+    <string name="type.amenity.stage">Palco</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Entrada do Serviço de Urgência</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1419,6 +1438,8 @@
     <string name="type.man_made.monitoring_station.weather">Estação de monitorização meteorológica</string>
     <string name="type.amenity.student_accommodation">Alojamento para estudantes</string>
     <string name="type.craft.watchmaker">Relojoeiro</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Fabrico de janelas</string>
     <string name="type.xmas_feature.market">Mercado de Natal</string>
     <string name="type.xmas_feature.tree">Árvore de Natal</string>
     <string name="type.amenity.hookah_lounge">Bar de narguilé</string>

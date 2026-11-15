@@ -31,13 +31,14 @@ public final class BookmarkCategory implements Parcelable
   private String mDescription;
   private final int mTracksCount;
   private final int mBookmarksCount;
+  private final int mAreasCount;
   private boolean mIsVisible;
 
   // Used by JNI.
   @Keep
   @SuppressWarnings("unused")
   private BookmarkCategory(long id, @NonNull String name, @NonNull String annotation, @NonNull String description,
-                           int tracksCount, int bookmarksCount, boolean isVisible)
+                           int tracksCount, int bookmarksCount, int areasCount, boolean isVisible)
   {
     mId = id;
     mName = name;
@@ -45,6 +46,7 @@ public final class BookmarkCategory implements Parcelable
     mDescription = description;
     mTracksCount = tracksCount;
     mBookmarksCount = bookmarksCount;
+    mAreasCount = areasCount;
     mIsVisible = isVisible;
   }
 
@@ -92,6 +94,11 @@ public final class BookmarkCategory implements Parcelable
     return mBookmarksCount;
   }
 
+  public int getAreasCount()
+  {
+    return mAreasCount;
+  }
+
   public boolean isVisible()
   {
     mIsVisible = nativeIsVisible(mId);
@@ -111,7 +118,7 @@ public final class BookmarkCategory implements Parcelable
 
   public int size()
   {
-    return getBookmarksCount() + getTracksCount();
+    return getBookmarksCount() + getTracksCount() + getAreasCount();
   }
 
   @NonNull
@@ -132,9 +139,9 @@ public final class BookmarkCategory implements Parcelable
     nativeSetDescription(mId, mDescription);
   }
 
-  public void setCategoryBookmarksColor(@PredefinedColors.Color int colorIndex)
+  public void setCategoryBookmarksColor(@ColorInt int color)
   {
-    nativeSetCategoryBookmarksColor(mId, colorIndex);
+    nativeSetCategoryBookmarksColor(mId, color);
   }
 
   public void setCategoryTracksCustomColor(@ColorInt int color)
@@ -150,6 +157,24 @@ public final class BookmarkCategory implements Parcelable
   public long getTrackIdByPosition(int positionInCategory)
   {
     return nativeGetTrackIdByPosition(mId, positionInCategory);
+  }
+
+  /**
+   * Reads the whole category at once; a loop of {@link #getBookmarkIdByPosition(int)} would be quadratic.
+   */
+  @NonNull
+  public long[] getBookmarkIds()
+  {
+    return nativeGetBookmarkIds(mId);
+  }
+
+  /**
+   * @see #getBookmarkIds()
+   */
+  @NonNull
+  public long[] getTrackIds()
+  {
+    return nativeGetTrackIds(mId);
   }
 
   public boolean hasLastSortingType()
@@ -212,6 +237,7 @@ public final class BookmarkCategory implements Parcelable
     dest.writeString(this.mDescription);
     dest.writeInt(this.mTracksCount);
     dest.writeInt(this.mBookmarksCount);
+    dest.writeInt(this.mAreasCount);
     dest.writeByte(this.mIsVisible ? (byte) 1 : (byte) 0);
   }
 
@@ -223,6 +249,7 @@ public final class BookmarkCategory implements Parcelable
     this.mDescription = Objects.requireNonNull(in.readString());
     this.mTracksCount = in.readInt();
     this.mBookmarksCount = in.readInt();
+    this.mAreasCount = in.readInt();
     this.mIsVisible = in.readByte() != 0;
   }
 
@@ -250,10 +277,16 @@ public final class BookmarkCategory implements Parcelable
   private static native void nativeSetCustomProperty(long catId, String key, String value);
   private static native boolean nativeIsEmpty(long catId);
 
-  private static native void nativeSetCategoryBookmarksColor(long catId, @PredefinedColors.Color int colorIndex);
+  private static native void nativeSetCategoryBookmarksColor(long catId, @ColorInt int color);
   private static native void nativeSetCategoryTracksCustomColor(long catId, @ColorInt int color);
   private static native long nativeGetBookmarkIdByPosition(long catId, int position);
   private static native long nativeGetTrackIdByPosition(long catId, int position);
+
+  @NonNull
+  private static native long[] nativeGetBookmarkIds(long catId);
+
+  @NonNull
+  private static native long[] nativeGetTrackIds(long catId);
 
   private static native boolean nativeHasLastSortingType(long catId);
   @SortingType

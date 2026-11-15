@@ -16,8 +16,8 @@
 /* Choose measurement on first launch alert - choose metric system button */
 "kilometres" = "Kilometer";
 
-/* Choose measurement on first launch alert - choose imperial system button */
-"miles" = "Miles";
+/* Imperial measurement option: 1 mile = 1609.344 m; Swedish/Norwegian "mil" = 10 km */
+"miles" = "Engelske mil";
 
 /* Update maps later button text */
 "later" = "Senere";
@@ -115,7 +115,7 @@
 /* Search category sight seeings and touristic attractions; any changes should be duplicated in categories.txt @category_tourism! */
 "category_tourism" = "Severdigheter";
 
-/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! */
+/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! Also a bookmarks list group header when sorting by type. */
 "category_entertainment" = "Underholdning";
 
 /* Search category for ATMs; any changes should be duplicated in categories.txt @category_atm! */
@@ -148,7 +148,7 @@
 /* Search category for recycling; any changes should be duplicated in categories.txt @category_recycling! */
 "category_recycling" = "Resirkulering";
 
-/* Search category for water; any changes should be duplicated in categories.txt @category_water! also used to sort bookmarks by type */
+/* Search category for water; any changes should be duplicated in categories.txt @category_water! Also a bookmarks list group header when sorting by type. */
 "category_water" = "Vann";
 
 /* Search category for RV facilities; any changes should be duplicated in categories.txt @category_rv! */
@@ -174,11 +174,23 @@
 /* Warning message when doing search around current position */
 "unknown_current_position" = "Posisjonen din har ikke blitt fastslått enda";
 
-/* Subject for emailed bookmark */
-"bookmark_share_email_subject" = "Hei, se merket mitt på Organic Maps-kartet";
+/* Text shown before a shared "my position" link, and the email subject when sharing the current location. */
+"share_my_position" = "Jeg er her på Organic Maps";
 
-/* Subject for emailed position */
-"my_position_share_email_subject" = "Hei, se posisjonen min på Organic Maps-kartet!";
+/* Email subject when sharing a place. %1$@ is the place name or address. */
+"share_place_subject" = "%1$@ på Organic Maps";
+
+/* Email subject when sharing a place that has no name or address. */
+"share_place_subject_default" = "Et sted på Organic Maps";
+
+/* Shared email link text; opens the shared place in Organic Maps or in a web browser. */
+"share_open_in_om_or_browser" = "Åpne i Organic Maps eller i en nettleser";
+
+/* Shared email link text; leads to the Organic Maps download page. */
+"share_get_om" = "Skaff deg Organic Maps";
+
+/* Title for the "Open in Another App" button on the PlacePage; also shared email link text: opens the shared place in another (geo:) maps app. */
+"open_in_app" = "Åpne i en annen app";
 
 /* Share by email button text, also used in editor and About. */
 "email" = "E-post";
@@ -195,6 +207,7 @@
 /* Length of track in cell that describes route */
 "length" = "Lengde";
 "share_my_location" = "Del posisjonen min";
+"prefs_group_network" = "Nettverk";
 "prefs_group_route" = "Navigasjon";
 
 /* Setting name which enables or disables zoom buttons on the map screen. */
@@ -218,6 +231,24 @@
 /* A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled */
 "pref_map_3d_buildings_disabled_summary" = "3D-bygninger er slått av i strømsparingsmodus";
 
+/* Settings: title of the satellite imagery (custom raster tiles) screen */
+"pref_bg_tiles_title" = "Satellittbilder";
+
+/* Settings «Satellite Imagery»: title of the tile server URL input field */
+"pref_bg_tiles_url_title" = "Tjener-URL";
+
+/* Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) */
+"pref_bg_tiles_url_error" = "Skriv inn en gyldig URL med {z}/{x}/{y}";
+
+/* Settings «Satellite Imagery»: title of the on-disk tile cache size limit (in megabytes) */
+"pref_bg_tiles_size_title" = "Bufferstørrelse (MB)";
+
+/* Settings «Satellite Imagery»: opacity of vector area objects drawn over the imagery (0% hides them) */
+"pref_bg_tiles_opacity_title" = "Ugjennomsiktighet for områdeobjekter";
+
+/* Settings «Satellite Imagery»: legal note that the user is responsible for the custom tile source they configure */
+"pref_bg_tiles_disclaimer" = "Tilpassede flisekilder leveres av deg. Bruk kun tjenester du har tillatelse til å bruke. Du er ansvarlig for kreditering, lisensvilkår, API-nøkler, kvoter og bruksgrenser.";
+
 /* Settings «Route» category: «Tts enabled» title */
 "pref_tts_enable_title" = "Taleinstrukser";
 
@@ -233,8 +264,14 @@
 /* Settings «Navigation» category: «Voice language» footer */
 "pref_tts_download_voices_description" = "For å laste ned en stemme med høyere kvalitet, åpne Innstillinger-appen og gå til Tilgjengelighet → VoiceOver → Tale → Stemme.";
 
-/* Settings «Route» category: «Test Voice Directions» title */
-"pref_tts_test_voice_title" = "Test taleanvisninger (TTS, tekst-til-tale)";
+/* Header above Apple's group of novelty text-to-speech voices (Bells, Bubbles, Zarvox...), shown after the regional voice sections and Eloquence group. Use Apple's term for this group from Settings > Accessibility > VoiceOver > Speech. */
+"pref_tts_voice_group_novelty" = "Novelty";
+
+/* Accessibility label of the button that plays a sample of a text-to-speech voice. */
+"pref_tts_voice_preview_play" = "Play sample";
+
+/* Accessibility label of the button that stops the sample of a text-to-speech voice being played. */
+"pref_tts_voice_preview_stop" = "Stop sample";
 "pref_map_auto_zoom" = "Automatisk zooming";
 "placepage_distance" = "Avstand";
 "search_show_on_map" = "Vis på kartet";
@@ -355,9 +392,6 @@
 /* blue gray color */
 "blue_gray" = "Gråblå";
 
-/* place preview title */
-"info" = "Informasjon";
-
 /* Prints version number in About dialog */
 "version" = "Organic Maps versjon: %@";
 
@@ -369,9 +403,6 @@
 
 /* Settings "Appearance" category: "Dark" title, should be consistent with the pref_appearance_title translation. */
 "pref_appearance_dark" = "Mørke";
-
-/* Title for "Other" section in TTS settings. */
-"pref_tts_other_section_title" = "Andre";
 
 /* Tex label above the Donate button */
 "donate_description" = "Gi gratis kart uten reklame til millioner av brukere!";
@@ -390,9 +421,6 @@
 
 /* Alert title */
 "email_error_title" = "Feil ved sending av e-post";
-
-/* Settings item title */
-"pref_calibration_title" = "Kompasskalibrering";
 
 /* Downloaded maps category */
 "downloader_available_maps" = "Tilgjengelig";
@@ -491,6 +519,8 @@
 "twentyfour_seven" = "Dag og natt";
 "day_off_today" = "Fridag i dag";
 "day_off" = "Fridag";
+"midnight" = "Midnatt";
+"noon" = "Midt på dagen";
 "today" = "I dag";
 "opens_in" = "Åpner om %@";
 "closes_in" = "Stenger om %@";
@@ -568,15 +598,22 @@
 
 /* abbreviation for kilometers per hour */
 "kilometers_per_hour" = "km/t";
+
+/* Short label for miles per hour (1 mile = 1609.344 m), placed after a number; e.g. mph or mi/h */
 "miles_per_hour" = "mph";
+
+/* Short label for hours (time unit), placed after a number */
 "hour" = "t";
+
+/* Short label for minutes (time unit), placed after a number */
 "minute" = "min";
+
+/* Short label for days (time unit), placed after a number */
 "day" = "d";
+
+/* Short label for seconds (time unit), placed after a number */
 "second" = "s";
 "placepage_more_button" = "Mer";
-
-/* A disable button text in the explanation dialog that opens hotel details page on Kayak website. */
-"placepage_edit_bookmark_button" = "Rediger bokmerke";
 "placepage_personal_notes_hint" = "Personlige notater (text or html)";
 "editor_comment_hint" = "Kommentar…";
 "editor_reset_edits_message" = "Nullstille alle lokale endringer?";
@@ -621,11 +658,13 @@
 "traffic_data_unavailable" = "Trafikkdata er ikke tilgjengelig";
 "enable_logging" = "Aktiver loggføring";
 "transliteration_title" = "Omskrivning til latin";
-"planning_route_manage_route" = "Administrere rute";
-"button_plan" = "Planlegge";
 "placepage_remove_stop" = "Fjern stopp";
-"placepage_add_stop" = "Angi stopp";
-"saved" = "Reddet";
+
+/* Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. */
+"route_add_destination" = "Legg til destinasjon";
+
+/* Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. */
+"placepage_add_stop" = "Legg til stopp";
 "error_enter_correct_name" = "Skriv inn korrekt navn";
 "bookmark_lists" = "Lister";
 
@@ -643,6 +682,9 @@
 "bookmarks_error_title_list_name_already_taken" = "Dette navnet er allerede tatt";
 "profile" = "OpenStreetMap profil";
 "restore" = "Restaurere";
+
+/* Settings privacy group in settings screen */
+"privacy" = "Personvern";
 "privacy_policy" = "Personvernpolitikk";
 "terms_of_use" = "Bruksbetingelser";
 
@@ -651,6 +693,11 @@
 
 /* Cycling routes layer name in the Styles and Layers dialog */
 "button_layer_cycling" = "Sykling";
+
+/* Map layers menu: toggle button for the satellite imagery layer */
+"button_layer_satellite" = "Satellitt";
+
+/* Subway map layer button; also the spoken name of the subway (metro, underground) transport type, read by screen readers before a line number on transit line badges. */
 "button_layer_subway" = "T-bane";
 "layers_title" = "Kartstiler og -lag";
 
@@ -692,7 +739,25 @@
 "show_to_the_right" = "Vis til høyre";
 "show_at_the_bottom" = "Vis nederst";
 "enable_logging_warning_message" = "Alternativet slår på logging for diagnostiske formål. Det kan være nyttig for våre supportpersonale som feilsøker problemer med appen. Aktiver dette alternativet bare på forespørsel fra Organic Maps-brukerstøtte.";
+
+/* Driving profile in routing options settings. */
+"routing_options_driving" = "Bil";
+
+/* Cycling profile in routing options settings. */
+"routing_options_cycling" = "Sykkel";
+
+/* Walking profile in routing options settings; also the label of a walking leg in transit route details. */
+"routing_options_walking" = "Gange";
+
+/* Section heading for routing settings shared by every routing mode. */
+"routing_options_all_modes" = "Alle reisemåter";
 "driving_options_title" = "Kjørealternativer";
+
+/* Routing setting that automatically reorders intermediate stops */
+"route_optimization" = "Ruteoptimalisering";
+
+/* Explains that route optimization automatically reorders intermediate stops */
+"route_optimization_description" = "Omorganiserer mellomstopp automatisk for å lage en mer effektiv rute.";
 
 /* Recommended length for CarPlay and Android Auto is around 25-27 characters */
 "avoid_tolls" = "Unngå bompenger";
@@ -705,11 +770,18 @@
 "avoid_motorways" = "Unngå motorveien";
 "unable_to_calc_alert_title" = "Kan ikke beregne rute";
 "unable_to_calc_alert_subtitle" = "Dessverre kunne vi ikke finne en rute sannsynligvis på grunn av dine definerte alternativer. Vennligst endre innstillingene og prøv igjen";
-"define_to_avoid_btn" = "Definer veier som skal unngås";
-"change_driving_options_btn" = "Kjørealternativer aktivert";
 "toll_road" = "Bompengevei";
 "unpaved_road" = "Uasfaltert vei";
 "ferry_crossing" = "Fergeovergang";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_steps" = "Trapper";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_gate" = "Port";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_lift_gate" = "Bom";
 
 /* A generic "Yes" button in dialogs */
 "yes" = "Ja";
@@ -743,9 +815,6 @@
 /* Failed planning route message in navigation view */
 "routing_planning_error" = "Mislykket ruteplanlegging";
 
-/* Arrive routing message in navigation view */
-"routing_arrive" = "Ankomme: %@";
-
 /* Text for routing::RouterResultCode::FileTooOld dialog. */
 "dialog_routing_download_and_update_maps" = "Hvis du vil oppprette en rute, last ned og oppdater alle kartene langs ruten.";
 "editor_done_dialog_1" = "Du har endret verdenskartet. Ikke skjul denne! Fortell vennene dine, og rediger det sammen.";
@@ -770,7 +839,6 @@
 "please_note" = "Vær oppmerksom på at";
 "migration_download_error_dialog" = "Nedlastningsfeil";
 "editor_add_select_category" = "Velg kategori";
-"editor_add_select_category_popular_subtitle" = "Populære";
 "editor_add_select_category_all_subtitle" = "Alle kategorier";
 "whatsnew_editor_message_1" = "Legg til nye steder i kartet og rediger eksisterende steder direkte fra appen.";
 "dialog_incorrect_feature_position" = "Endre plassering";
@@ -792,7 +860,6 @@
 "location_services_disabled_on_device_3" = "3. Velg Stedstjenester";
 "location_services_disabled_on_device_4" = "4. Slå på Stedstjenester";
 "location_services_disabled_on_device_additional_message" = "Eller fortsett å bruke Organic Maps uten plassering";
-"book_button" = "Bestill";
 "placepage_call_button" = "Ring";
 "placepage_bookmark_name_hint" = "Bokmerkenavn";
 "placepage_delete_bookmark_button" = "Slett bokmerke";
@@ -803,18 +870,13 @@
 /* iOS dialog for the case when recent track recording is on and the app comes back from background */
 "recent_track_background_dialog_title" = "Deaktivere opptak av nylig reiste rute?";
 "off_recent_track_background_button" = "Deaktiver";
-
-/* For sharing via SMS and so on */
-"sharing_call_action_look" = "Sjekk ut";
 "recent_track_background_dialog_message" = "Organic Maps bruker geografiske funksjoner i bakgrunnen for å registrere din nylig reiste rute.";
 "general_settings" = "Generelle innstillinger";
 
 /* "traffic" as in road congestion */
 "traffic_update_app_message" = "Du må oppdatere applikasjonen for å kunne se trafikkdata.";
 "log_file_size" = "Loggfilstørrelse: %@";
-"planning_route_remove_title" = "Dra hit for å fjerne";
 "placepage_replace_stop" = "Erstatt stopp";
-"start_from_my_position" = "Start fra";
 
 /* For iOS message 'alert_reauth_message' should be splitted in two parts: message + link. Here's first part */
 "alert_reauth_message_ios" = "Logg inn på OpenStreetMap for automatisk å laste opp alle kartredigeringene dine. Finn ut mer";
@@ -834,15 +896,8 @@
 "popular_place" = "Populær";
 "hide_from_map" = "Skjul fra kart";
 "tags_loading_error_subtitle" = "Det oppsto en feil under lasting av emneknagger, prøv igjen";
-
-/* Position of the name label on the map relative to the bookmark pin (on the right) */
-"right" = "Høyre";
-
-/* Position of the name label on the map relative to the bookmark pin (at the bottom) */
-"bottom" = "Bunn";
 "trip_start" = "La oss begynne";
 "pick_destination" = "Destinasjon";
-"follow_my_position" = "Sentrer";
 "search_results" = "Søkeresultater";
 "then_turn" = "Deretter";
 "redirect_route_alert" = "Vil du planlegge en rute på nytt?";
@@ -888,16 +943,29 @@
 "medicine" = "Medisin";
 "search_in_the_list" = "Søk på lista";
 "religious_places" = "Hellige steder";
+
+/* Button that starts multi-selection in a bookmark list. */
+"select" = "Velg";
+
+/* Action that selects every bookmark and track in a bookmark list. */
+"select_all" = "Velg alle";
+
+/* Action that clears the multi-selection in a bookmark list. */
+"deselect_all" = "Fjern all merking";
 "transit_not_found" = "T-bane navigasjon er ikke tilgjengelig i denne regionen ennå";
 "dialog_pedestrian_route_is_long_header" = "T-bane rute ikke funnet";
 "dialog_pedestrian_route_is_long_message" = "Velg utgangspunkt eller destinasjon som befinner seg nærmere en T-bane stasjon";
-"button_layer_isolines" = "Høyder";
-"isolines_activation_error_dialog" = "For å bruke høydekurver oppdater eller last opp kartet til nødvendig område";
-"isolines_location_error_dialog" = "Høydekurver er ikke tilgjengelige i dette området ennå";
+
+/* Layers menu: label of the 3D terrain layer button */
+"button_layer_terrain" = "3D-terreng";
+"isolines_location_error_dialog" = "Oppdater dette området for å se høydekurver";
 "elevation_profile_ascent" = "Stigning";
 "elevation_profile_descent" = "Nedstigning";
 "elevation_profile_min_elevation" = "Min. høyde";
 "elevation_profile_max_elevation" = "Maks. høyde";
+
+/* Displayed in the elevation profile chart while track recording has fewer than two points. */
+"elevation_profile_placeholder" = "Begynn å bevege deg for å se høydeprofilen";
 "isolines_toast_zooms_1_10" = "Forstørr kartet for å se høydekurver";
 "downloader_loading_ios" = "Nedlasting";
 
@@ -962,11 +1030,14 @@
 "bookmarks_export" = "Eksporter alle bokmerker og spor";
 "drive_through" = "Gjennomkjøring";
 
+/* Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_in" = "Zoom inn";
+
+/* Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_out" = "Zoom ut";
+
 /* Restaurant or other food place's menu URL field in the Editor */
 "website_menu" = "Lenke til menyen";
-
-/* Title for the "Open in Another App" button on the PlacePage. */
-"open_in_app" = "Åpne i en annen app";
 
 /* To indicate if the place proposed self service… */
 "self_service" = "Selvbetjening";
@@ -982,11 +1053,6 @@
 
 /* Message for the toast when saving the track recording is finished but nothing to save. */
 "track_recording_toast_nothing_to_save" = "Ruten er tom - ingenting å lagre";
-"edit_track" = "Rediger ruten";
-"elevation_profile_diff_level" = "Vanskelighetsgrad";
-"elevation_profile_diff_level_easy" = "Lett";
-"elevation_profile_diff_level_moderate" = "Middels";
-"elevation_profile_diff_level_hard" = "Vanskelig";
 "downloader_updating_ios" = "Oppdatering";
 
 /* Autoupdate dialog on start */
@@ -1019,6 +1085,12 @@
 /* Text for the editing the Track's color button. */
 "change_color" = "Endre farge";
 
+/* Text for the hiding track. */
+"hide_track" = "Skjul ruten";
+
+/* Text for the showing track. */
+"show_track" = "Vis ruten";
+
 /* Main screen title "Map" displayed in the navigation back button's menu. */
 "map" = "Kart";
 
@@ -1037,7 +1109,7 @@
 /* Message for the "iCloud is Disabled" alert. */
 "icloud_disabled_message" = "Aktiver iCloud i enhetens innstillinger for å bruke denne funksjonen.";
 
-/* Title for the "Enable iCloud Syncronization" alert's "Enable" action button. */
+/* Action button that enables a disabled feature, such as iCloud synchronization or location services. */
 "enable" = "Aktiver";
 
 /* Title for the "Enable iCloud Syncronization" alert's "Backup" action button. */
@@ -1099,10 +1171,10 @@
 /* abbreviation for kilometers */
 "km" = "km";
 
-/* abbreviation for mile(s) */
+/* Short label for miles (length unit, 1 mi = 1609.344 m), placed after a number */
 "mi" = "mi";
 
-/* A unit of measure */
+/* Short label for feet (1 ft = 0.3048 m), after numbers; local abbreviations and uninflected unit names are allowed */
 "ft" = "fot";
 
 /* Toast text when the maps version should be updated to display the OSM hiking and cycling routes */
@@ -1134,3 +1206,30 @@
 
 /* Toast message shown when track colors are changed in category settings */
 "toast_tracks_color_changed" = "Sporfarge endret";
+
+/* Accessibility label of the icon-only button beside the search field, shown while choosing or replacing a route point; it opens a full-screen map picker with a crosshair */
+"choose_on_map" = "Velg på kartet";
+
+/* Search field hint and full-screen map point picker title shown while choosing the starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_start_location" = "Startsted";
+
+/* Search field hint and full-screen map point picker title shown while choosing the destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_destination" = "Destinasjon";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_start_location" = "Endre startsted";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_destination" = "Endre destinasjon";
+
+/* Search field hint and full-screen map point picker title shown while replacing an already added intermediate stop of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_stop_along_route" = "Endre stoppested";
+
+/* Toast shown when the user tries to add one more intermediate stop to a route that already holds the maximum allowed number */
+"routing_max_stops_reached" = "Maksimalt antall stopp er nådd";
+
+/* Hint under the title of the full-screen route point picker: a crosshair stays fixed in the centre of the screen while the user moves the map under it */
+"choose_point_on_map_hint" = "Flytt og zoom på kartet for å plassere korset";
+
+/* Accessibility label for the button that reverses the complete planned route, including intermediate stops. */
+"reverse_route" = "Snu ruten";

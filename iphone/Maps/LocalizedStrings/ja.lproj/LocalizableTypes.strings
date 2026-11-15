@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "城壁";
 "type.barrier.cycle_barrier" = "バリカー";
 "type.waterway.ditch" = "排水溝";
+"type.waterway.ditch.intermittent" = "間欠的な排水溝";
 "type.natural.water.moat" = "堀";
 "type.natural.water.wastewater" = "廃水";
 "type.barrier.entrance" = "エントランス";
@@ -407,28 +408,28 @@
 "type.highway" = "道路";
 "type.highway.bridleway" = "馬道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "馬道(橋)";
 "type.highway.bridleway.permissive" = "馬道";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "馬道(トンネル)";
 "type.highway.busway" = "バス専用道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "トンネル";
 "type.highway.bus_stop" = "バス停";
 "type.highway.construction" = "工事中の道路";
 "type.highway.cycleway" = "自転車道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "自転車道(橋)";
 "type.highway.cycleway.permissive" = "自転車道";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "自転車道(トンネル)";
 "type.highway.elevator" = "Elevator";
 "type.highway.footway" = "歩道";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "横断歩道";
 "type.highway.footway.area" = "歩道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "トンネル";
 "type.highway.ford" = "浅瀬";
 "type.highway.living_street" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "トンネル";
 "type.highway.motorway" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "トンネル";
 "type.highway.motorway_junction" = "ジャンクション";
 "type.highway.motorway_link" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "トンネル";
 "type.highway.path" = "歩道";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "歩道";
 "type.highway.footway.bicycle" = "歩道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "橋";
 "type.highway.path.horse" = "歩道";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "トンネル";
 "type.highway.pedestrian" = "ストリート";
 "type.highway.pedestrian.area" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "トンネル";
-"type.highway.platform" = "公共交通機関のプラットホーム";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "乗り場";
 "type.highway.primary" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "トンネル";
 "type.highway.primary_link" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "トンネル";
 "type.highway.raceway" = "レース場";
 "type.highway.residential" = "ストリート";
 "type.highway.residential.area" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "トンネル";
 "type.highway.rest_area" = "休憩所";
 "type.highway.road" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "橋";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "トンネル";
 "type.highway.secondary" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "トンネル";
 "type.highway.secondary_link" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "トンネル";
 "type.highway.service" = "ストリート";
 "type.highway.service.area" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "橋";
 "type.highway.service.driveway" = "ストリート";
 "type.highway.service.parking_aisle" = "ストリート";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "トンネル";
 "type.highway.services" = "サービスエリア";
 "type.highway.speed_camera" = "自動速度違反取締装置";
 "type.highway.steps" = "歩道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "トンネル";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "トンネル";
 "type.highway.tertiary_link" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "トンネル";
 "type.highway.track" = "ストリート";
 "type.highway.track.area" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "橋";
 "type.highway.track.grade1" = "ストリート";
 "type.highway.track.no.access" = "ストリート";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "トンネル";
 "type.highway.traffic_signals" = "交通信号";
 "type.highway.trunk" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "トンネル";
 "type.highway.trunk_link" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "トンネル";
 "type.highway.unclassified" = "ストリート";
 "type.highway.unclassified.area" = "ストリート";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "橋";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "トンネル";
 "type.area_highway.cycleway" = "自転車道";
 "type.area_highway.footway" = "歩道";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "日本の城";
 "type.historic.castle.stately" = "城";
 "type.historic.city_gate" = "城門";
+"type.man_made.ceremonial_gate" = "セレモニアルゲート";
 "type.historic.citywalls" = "城壁";
 "type.historic.fort" = "歴史的な要塞";
 "type.historic.gallows" = "絞首台";
@@ -717,7 +721,8 @@
 "type.junction.roundabout" = "ラウンドアバウト";
 "type.landuse" = "土地利用";
 "type.landuse.allotments" = "市民農園";
-"type.landuse.basin" = "水地";
+"type.landuse.basin" = "調整池";
+"type.landuse.basin.intermittent" = "間欠的な調整池";
 "type.landuse.brownfield" = "再開発用地";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "採石場";
 "type.landuse.railway" = "鉄道施設";
 "type.landuse.recreation_ground" = "レクリエーション";
-"type.landuse.reservoir" = "貯水池";
 "type.landuse.residential" = "住宅地";
 "type.landuse.retail" = "小売店エリア";
 "type.landuse.salt_pond" = "塩田";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "アイスリンク";
 "type.leisure.marina" = "マリーナ";
 "type.leisure.nature_reserve" = "自然保護区";
+"type.leisure.bird_hide" = "野鳥観察舎";
 "type.leisure.outdoor_seating" = "屋外席";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "公園";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "桟橋";
 "type.man_made.pipeline" = "パイプライン";
 "type.man_made.pipeline.overground" = "地表のパイプライン";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "配水池";
 "type.man_made.silo" = "Silo";
 "type.man_made.storage_tank" = "Storage Tank";
 "type.man_made.surveillance" = "監視カメラ";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "給水塔";
 "type.man_made.water_well" = "井戸";
 "type.man_made.water_well.drinking_water_no" = "井戸";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "浄水場";
 "type.man_made.windmill" = "風車";
 "type.man_made.works" = "工場";
 
@@ -869,12 +880,15 @@
 "type.natural.water.lock" = "ロックチャンバー";
 "type.natural.water.pond" = "池";
 "type.natural.water.reservoir" = "貯水池";
-"type.natural.water.basin" = "水地";
+"type.natural.water.basin" = "調整池";
 "type.natural.water.river" = "河川";
+"type.natural.water.intermittent" = "間欠的な水域";
 "type.natural.land" = "陸地";
 "type.natural.meadow" = "牧草地";
 "type.natural.orchard" = "果樹園";
 "type.natural.peak" = "山頂";
+"type.natural.hill" = "丘";
+"type.natural.arch" = "ロック・アーチ";
 "type.natural.saddle" = "鞍部";
 "type.natural.rock" = "岩";
 "type.natural.scrub" = "雑木林";
@@ -885,7 +899,7 @@
 "type.natural.vineyard" = "ブドウ園";
 "type.natural.volcano" = "火山";
 "type.natural.volcano.active" = "活火山";
-"type.natural.water" = "水地";
+"type.natural.water" = "水域";
 "type.natural.wetland" = "湿地帯";
 "type.natural.wetland.bog" = "泥炭地";
 "type.natural.wetland.marsh" = "沼地";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "公共交通機関";
-"type.public_transport.platform" = "公共交通機関のプラットホーム";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "乗り場";
 "type.railway" = "鉄道";
 "type.railway.abandoned" = "廃線";
 "type.railway.abandoned.bridge" = "廃線(橋)";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "八百屋";
 "type.shop.grocery" = "買い物";
 "type.shop.hairdresser" = "美容院/理容店";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "理容室";
 "type.shop.hardware" = "ホームセンター";
 "type.shop.health_food" = "健康食品店";
 "type.shop.hearing_aids" = "補聴器店";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "ラグビーユニオン";
 "type.sport.running" = "ランニング";
 "type.sport.softball" = "ソフトボール";
+"type.sport.pilates" = "ピラティス";
 "type.tourism" = "観光";
 "type.tourism.aquarium" = "水族館";
 
@@ -1514,22 +1534,25 @@
 "type.waterway" = "水域";
 "type.waterway.access_point" = "水路アクセスポイント";
 "type.waterway.canal" = "運河";
+"type.waterway.canal.intermittent" = "間欠的な運河";
 "type.waterway.canal.tunnel" = "運河";
 "type.waterway.fish_pass" = "魚道";
+"type.waterway.fish_pass.intermittent" = "間欠的な魚道";
 "type.waterway.dam" = "ダム";
 "type.barrier.ditch" = "排水路";
 "type.natural.water.ditch" = "排水溝";
 "type.waterway.ditch.tunnel" = "暗渠";
 "type.waterway.dock" = "ドック";
-"type.waterway.drain" = "用水路";
-"type.natural.water.drain" = "用水路";
+"type.waterway.drain" = "排水路";
+"type.waterway.drain.intermittent" = "間欠的な排水路";
+"type.natural.water.drain" = "排水路";
 "type.waterway.drain.tunnel" = "暗渠";
 "type.waterway.lock_gate" = "水門";
 "type.waterway.river" = "河川";
+"type.waterway.river.intermittent" = "間欠的な河川";
 "type.waterway.river.tunnel" = "河川";
 "type.waterway.stream" = "小川";
-"type.waterway.stream.ephemeral" = "小川";
-"type.waterway.stream.intermittent" = "小川";
+"type.waterway.stream.intermittent" = "間欠的な小川";
 "type.waterway.stream.tunnel" = "小川";
 "type.waterway.waterfall" = "滝";
 "type.waterway.weir" = "堰";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "社会施設";
+"type.amenity.stage" = "舞台";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "救急病棟入口";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "気象観測ステーション";
 "type.amenity.student_accommodation" = "学生寮";
 "type.craft.watchmaker" = "ウォッチメーカー";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "窓製造";
 "type.xmas_feature.market" = "クリスマス・マーケット";
 "type.xmas_feature.tree" = "クリスマスツリー";
 "type.amenity.hookah_lounge" = "シーシャラウンジ";

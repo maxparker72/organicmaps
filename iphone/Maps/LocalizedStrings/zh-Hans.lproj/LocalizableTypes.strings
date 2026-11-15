@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "城墙";
 "type.barrier.cycle_barrier" = "自行车障碍";
 "type.waterway.ditch" = "排水沟";
+"type.waterway.ditch.intermittent" = "间歇性排水沟";
 "type.natural.water.moat" = "沟渠";
 "type.natural.water.wastewater" = "废水";
 "type.barrier.entrance" = "入口";
@@ -407,28 +408,28 @@
 "type.highway" = "道路";
 "type.highway.bridleway" = "马道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "桥";
 "type.highway.bridleway.permissive" = "允许通行的骑马道";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "隧道";
 "type.highway.busway" = "巴士专用道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "隧道";
 "type.highway.bus_stop" = "公交站";
 "type.highway.construction" = "在建道路";
 "type.highway.cycleway" = "自行车道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "桥";
 "type.highway.cycleway.permissive" = "允许通行的自行车道";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "隧道";
 "type.highway.elevator" = "电梯";
 "type.highway.footway" = "步行道路";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "过街人行横道";
 "type.highway.footway.area" = "步行道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "行人过街天桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "隧道";
 "type.highway.ford" = "浅滩";
 "type.highway.living_street" = "生活性街道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "隧道";
 "type.highway.motorway" = "高速公路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "隧道";
 "type.highway.motorway_junction" = "出口";
 "type.highway.motorway_link" = "高速公路匝道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "隧道";
 "type.highway.path" = "小道";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "小道";
 "type.highway.footway.bicycle" = "小道";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "桥";
 "type.highway.path.horse" = "小道";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "隧道";
 "type.highway.pedestrian" = "步行街";
 "type.highway.pedestrian.area" = "步行区";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "人行天桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "人行隧道";
-"type.highway.platform" = "公共交通站台";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "站台";
 "type.highway.primary" = "主要道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "隧道";
 "type.highway.primary_link" = "主要道路连接路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "隧道";
 "type.highway.raceway" = "赛车场";
 "type.highway.residential" = "住宅区道路";
 "type.highway.residential.area" = "住宅区道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "隧道";
 "type.highway.rest_area" = "休息区";
 "type.highway.road" = "道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "桥";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "隧道";
 "type.highway.secondary" = "次要道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "隧道";
 "type.highway.secondary_link" = "次要道路连接路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "隧道";
 "type.highway.service" = "服务道路";
 "type.highway.service.area" = "服务道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "桥";
 "type.highway.service.driveway" = "车道";
 "type.highway.service.parking_aisle" = "停车场通道";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "隧道";
 "type.highway.services" = "服务区";
 "type.highway.speed_camera" = "超速摄像头";
 "type.highway.steps" = "阶梯";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "隧道";
 "type.highway.ladder" = "梯子";
 "type.highway.tertiary" = "三级道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "隧道";
 "type.highway.tertiary_link" = "三级道路连接路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "隧道";
 "type.highway.track" = "土路";
 "type.highway.track.area" = "土路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "桥";
 "type.highway.track.grade1" = "土路";
 "type.highway.track.no.access" = "土路";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "隧道";
 "type.highway.traffic_signals" = "交通信号灯";
 "type.highway.trunk" = "干线道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "隧道";
 "type.highway.trunk_link" = "干线道路连接路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "隧道";
 "type.highway.unclassified" = "道路";
 "type.highway.unclassified.area" = "道路";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "桥";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "隧道";
 "type.area_highway.cycleway" = "自行车道";
 "type.area_highway.footway" = "步行道路";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "日本城堡";
 "type.historic.castle.stately" = "庄严城堡";
 "type.historic.city_gate" = "城门";
+"type.man_made.ceremonial_gate" = "礼仪之门";
 "type.historic.citywalls" = "城墙";
 "type.historic.fort" = "历史要塞";
 "type.historic.gallows" = "绞架";
@@ -717,7 +721,8 @@
 "type.junction.roundabout" = "环形交叉口";
 "type.landuse" = "土地利用要素";
 "type.landuse.allotments" = "市民农园";
-"type.landuse.basin" = "水盆地";
+"type.landuse.basin" = "蓄水池";
+"type.landuse.basin.intermittent" = "间歇性蓄水池";
 "type.landuse.brownfield" = "废弃的工业用地";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "矿场";
 "type.landuse.railway" = "铁路用地";
 "type.landuse.recreation_ground" = "娱乐场地";
-"type.landuse.reservoir" = "水库";
 "type.landuse.residential" = "住宅区";
 "type.landuse.retail" = "零售区";
 "type.landuse.salt_pond" = "盐田";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "滑冰场";
 "type.leisure.marina" = "游艇码头";
 "type.leisure.nature_reserve" = "自然保护区";
+"type.leisure.bird_hide" = "观鸟屋";
 "type.leisure.outdoor_seating" = "室外座椅";
 "type.leisure.firepit" = "火坑";
 "type.leisure.park" = "公园";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "码头";
 "type.man_made.pipeline" = "管道";
 "type.man_made.pipeline.overground" = "地面管道";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "加盖蓄水池";
 "type.man_made.silo" = "筒仓";
 "type.man_made.storage_tank" = "储罐";
 "type.man_made.surveillance" = "监视器";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "水塔";
 "type.man_made.water_well" = "水井";
 "type.man_made.water_well.drinking_water_no" = "水井";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "自来水厂";
 "type.man_made.windmill" = "风车";
 "type.man_made.works" = "工厂";
 
@@ -869,12 +880,15 @@
 "type.natural.water.lock" = "船闸";
 "type.natural.water.pond" = "池塘";
 "type.natural.water.reservoir" = "水库";
-"type.natural.water.basin" = "水盆地";
+"type.natural.water.basin" = "蓄水池";
 "type.natural.water.river" = "河流";
+"type.natural.water.intermittent" = "间歇性水体";
 "type.natural.land" = "陆地";
 "type.natural.meadow" = "草甸";
 "type.natural.orchard" = "果园";
 "type.natural.peak" = "山峰";
+"type.natural.hill" = "山丘";
+"type.natural.arch" = "岩石拱门";
 "type.natural.saddle" = "山坳";
 "type.natural.rock" = "岩石";
 "type.natural.scrub" = "灌木丛";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "未铺装路面—较差";
 "type.psurface.unpaved_good" = "未铺装路面—良好";
 "type.public_transport" = "公共交通要素";
-"type.public_transport.platform" = "公共交通站台";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "站台";
 "type.railway" = "铁路";
 "type.railway.abandoned" = "铁路遗迹";
 "type.railway.abandoned.bridge" = "铁路遗迹";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "蔬果零售店";
 "type.shop.grocery" = "杂货店";
 "type.shop.hairdresser" = "理发师";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "男士理发店";
 "type.shop.hardware" = "五金店";
 "type.shop.health_food" = "保健食品店";
 "type.shop.hearing_aids" = "助听器商店";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "联合式橄榄球";
 "type.sport.running" = "跑步";
 "type.sport.softball" = "垒球";
+"type.sport.pilates" = "普拉提";
 "type.tourism" = "旅游要素";
 "type.tourism.aquarium" = "水族馆";
 
@@ -1514,22 +1534,25 @@
 "type.waterway" = "航道要素";
 "type.waterway.access_point" = "水道入口";
 "type.waterway.canal" = "运河";
+"type.waterway.canal.intermittent" = "间歇性运河";
 "type.waterway.canal.tunnel" = "运河";
 "type.waterway.fish_pass" = "鱼梯";
+"type.waterway.fish_pass.intermittent" = "间歇性鱼梯";
 "type.waterway.dam" = "水坝";
 "type.barrier.ditch" = "沟渠";
 "type.natural.water.ditch" = "排水沟";
 "type.waterway.ditch.tunnel" = "涵洞";
 "type.waterway.dock" = "船坞";
 "type.waterway.drain" = "渠";
+"type.waterway.drain.intermittent" = "间歇性水渠";
 "type.natural.water.drain" = "渠";
 "type.waterway.drain.tunnel" = "涵洞";
 "type.waterway.lock_gate" = "闸门";
 "type.waterway.river" = "河流";
+"type.waterway.river.intermittent" = "间歇性河流";
 "type.waterway.river.tunnel" = "河流";
 "type.waterway.stream" = "溪";
-"type.waterway.stream.ephemeral" = "季节性河流";
-"type.waterway.stream.intermittent" = "间歇性河流";
+"type.waterway.stream.intermittent" = "间歇性溪流";
 "type.waterway.stream.tunnel" = "溪";
 "type.waterway.waterfall" = "瀑布";
 "type.waterway.weir" = "堰";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "社会设施";
+"type.amenity.stage" = "舞台";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "急诊室入口";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "气象监测站";
 "type.amenity.student_accommodation" = "学生宿舍";
 "type.craft.watchmaker" = "钟表匠";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "门窗制作";
 "type.xmas_feature.market" = "圣诞市场";
 "type.xmas_feature.tree" = "圣诞树";
 "type.amenity.hookah_lounge" = "水烟馆";

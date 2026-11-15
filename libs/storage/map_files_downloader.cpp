@@ -13,9 +13,40 @@
 #include "coding/url.hpp"
 
 #include "base/assert.hpp"
+#include "base/logging.hpp"
+#include "base/string_utils.hpp"
+
+#include "defines.hpp"
 
 namespace storage
 {
+bool NormalizeDebugMapDownloadServer(std::string const & rawUrl, std::string & normalizedUrl)
+{
+  normalizedUrl = rawUrl;
+  strings::Trim(normalizedUrl);
+
+  // Expect a plain "http(s)://host[/path]" with no spaces, query or fragment.
+  if (normalizedUrl.find_first_of(" \t\n\r\f\v?#") != std::string::npos)
+    return false;
+
+  // url::Url accepts any scheme and collapses repeated slashes, so enforce the explicit
+  // "scheme://host" shape before trusting the parsed result.
+  auto const schemeEnd = normalizedUrl.find("://");
+  if (schemeEnd == std::string::npos || schemeEnd + 3 >= normalizedUrl.size() || normalizedUrl[schemeEnd + 3] == '/')
+    return false;
+
+  url::Url const parsedUrl(normalizedUrl);
+  auto scheme = parsedUrl.GetScheme();
+  strings::AsciiToLower(scheme);
+  if ((scheme != "http" && scheme != "https") || parsedUrl.GetHost().empty())
+    return false;
+
+  if (!normalizedUrl.ends_with('/'))
+    normalizedUrl.push_back('/');
+
+  return true;
+}
+
 MapFilesDownloader::~MapFilesDownloader()
 {
   m_alive->store(false, std::memory_order_release);
@@ -33,7 +64,8 @@ void MapFilesDownloader::DownloadMapFile(QueuedCountry && queuedCountry)
     return;
   }
 
-  m_pendingRequests.Append(std::move(queuedCountry));
+  // Nothing is downloaded until the servers are known.
+  m_pendingRequests.Append(std::move(queuedCountry), false /* preserveFront */);
 
   EnsureMetaConfigReady([this, alive = m_alive]()
   {
@@ -47,8 +79,9 @@ void MapFilesDownloader::DownloadMapFile(QueuedCountry && queuedCountry)
 void MapFilesDownloader::RunMetaConfigAsync()
 {
   m_isMetaConfigRequested = true;
+  auto const metaConfigGeneration = m_metaConfigGeneration;
 
-  GetPlatform().RunTask(Platform::Thread::Network, [this, alive = m_alive]()
+  GetPlatform().RunTask(Platform::Thread::Network, [this, alive = m_alive, metaConfigGeneration]()
   {
     if (!alive->load(std::memory_order_acquire))
       return;
@@ -58,11 +91,14 @@ void MapFilesDownloader::RunMetaConfigAsync()
     settings::Update(metaConfig.settings);
     products::ProductsSettings::Instance().Update(std::move(metaConfig.productsConfig));
 
-    GetPlatform().RunTask(Platform::Thread::Gui, [this, alive, servers = metaConfig.servers]()
+    GetPlatform().RunTask(Platform::Thread::Gui,
+                          [this, alive, metaConfigGeneration, servers = std::move(metaConfig.servers),
+                           terrainServers = std::move(metaConfig.terrainServers)]() mutable
     {
-      if (!alive->load(std::memory_order_acquire))
+      if (!alive->load(std::memory_order_acquire) || metaConfigGeneration != m_metaConfigGeneration)
         return;
       m_serversList = std::move(servers);
+      m_terrainServersList = std::move(terrainServers);
 
       // Drain all queued waiters (from DownloadMapFile and DownloadAsString).
       auto waiters = std::move(m_metaConfigWaiters);
@@ -152,7 +188,33 @@ std::vector<std::string> MapFilesDownloader::MakeUrlListLegacy(std::string const
 
 void MapFilesDownloader::SetServersList(ServersList const & serversList)
 {
+  if (m_downloadHandle)
+  {
+    m_downloadHandle->Cancel();
+    m_downloadHandle.reset();
+  }
+  ++m_generation;
+  ++m_metaConfigGeneration;
+
   m_serversList = serversList;
+  m_terrainServersList = serversList;
+  m_isMetaConfigRequested = false;
+
+  if (m_serversList.empty())
+  {
+    if (!m_metaConfigWaiters.empty())
+      RunMetaConfigAsync();
+    return;
+  }
+
+  auto waiters = std::move(m_metaConfigWaiters);
+  for (auto & w : waiters)
+    w();
+}
+
+void MapFilesDownloader::ResetServersList()
+{
+  SetServersList({});
 }
 
 void MapFilesDownloader::SetDownloadingPolicy(DownloadingPolicy * policy)
@@ -167,9 +229,10 @@ bool MapFilesDownloader::IsDownloadingAllowed() const
 
 std::vector<std::string> MapFilesDownloader::MakeUrlList(std::string const & relativeUrl) const
 {
+  auto const & servers = relativeUrl.starts_with(TERRAIN_DIR "/") ? m_terrainServersList : m_serversList;
   std::vector<std::string> urls;
-  urls.reserve(m_serversList.size());
-  for (auto const & server : m_serversList)
+  urls.reserve(servers.size());
+  for (auto const & server : servers)
     urls.emplace_back(url::Join(server, relativeUrl));
 
   return urls;
@@ -191,6 +254,8 @@ downloader::MetaConfig MapFilesDownloader::LoadMetaConfig() const
   {
     platform::HttpClient request(metaServerUrl);
     request.SetRawHeader("X-OM-DataVersion", std::to_string(m_dataVersion));
+    if (m_terrainDataVersion > 0)
+      request.SetRawHeader("X-OM-TerrainDataVersion", std::to_string(m_terrainDataVersion));
 
     request.SetRawHeader("X-OM-AppVersion", pl.Version());
     request.SetRawHeader("Accept-Language", GetAcceptLanguage());

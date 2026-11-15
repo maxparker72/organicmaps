@@ -31,9 +31,8 @@ class RouteMatchingInfo;
 
 namespace routing
 {
-/// \breaf This class is responsible for the route built in the program.
-/// \note All method of this class should be called from ui thread if there's no
-/// a special note near a method.
+/// Owns the active route and its following state.
+/// All methods must be called from the GUI thread unless documented otherwise.
 class RoutingSession
   : public traffic::TrafficObserver
   , public traffic::TrafficCache
@@ -54,7 +53,6 @@ public:
                     NeedMoreMapsCallback const & needMoreMapsCallback, RemoveRouteCallback const & removeRouteCallback,
                     uint32_t timeoutSec, SessionState routeRebuildingState, bool adjustToPrevRoute);
 
-  m2::PointD GetStartPoint() const;
   m2::PointD GetEndPoint() const;
 
   bool IsActive() const;
@@ -106,8 +104,9 @@ public:
   /// Returns true if following was disabled, false if a route is not ready for the following yet.
   bool DisableFollowMode();
 
-  /// Now indicates only that user pushed start button. Route follows by default.
-  /// Returns true if following was enabled, false if a route is not ready for the following yet.
+  /// Starts navigation and queues a track approach prompt when needed.
+  /// Track previews start matching GPS positions only after the user presses Start.
+  /// Returns true when following is active.
   bool EnableFollowMode();
 
   void SetRoutingSettings(RoutingSettings const & routingSettings);
@@ -148,7 +147,13 @@ public:
   /// protected by mutex in TrafficCache class.
   void CopyTraffic(traffic::AllMwmTrafficInfo & trafficColoring) const override;
 
-  void AssignRouteForTesting(std::shared_ptr<Route> route, RouterResultCode e) { AssignRoute(route, e); }
+  void AssignRouteForTesting(Route && route, RouterResultCode e);
+
+  /// \brief Swap the currently active route to alternative |idx| inside m_lastResult.
+  /// Used when the user taps an alternative ETA balloon. Returns false if the index is out of range,
+  /// already active, or the router refuses the swap (it is calculating, or the result is stale).
+  /// The follow state (m_route) is rebuilt from the newly-promoted RouteBase.
+  bool SwapActiveAlternative(size_t idx);
 
   bool IsSpeedCamLimitExceeded() const { return m_speedCameraManager.IsSpeedLimitExceeded(); }
   SpeedCameraManager & GetSpeedCamManager() { return m_speedCameraManager; }
@@ -159,26 +164,23 @@ public:
   double GetCompletionPercent() const;
 
 private:
-  struct DoReadyCallback
-  {
-    RoutingSession & m_rs;
-    ReadyCallback m_callback;
-
-    DoReadyCallback(RoutingSession & rs, ReadyCallback const & cb) : m_rs(rs), m_callback(cb) {}
-
-    void operator()(std::shared_ptr<Route> const & route, RouterResultCode e);
-  };
-
-  void AssignRoute(std::shared_ptr<Route> const & route, RouterResultCode e);
-  /// RemoveRoute() removes m_route and resets route attributes (m_lastDistance, m_moveAwayCounter).
+  void AssignRoute(std::shared_ptr<RoutesResult> const & result, RouterResultCode e);
+  /// Removes route geometry and resets position metrics (m_lastDistance, m_moveAwayCounter).
+  /// Retains track reach observations and pending speech across rebuilds.
   void RemoveRoute();
   void RebuildRouteOnTrafficUpdate();
+  bool IsTrackRoute() const;
+  bool IsOffTrack() const;
+  void ResetTrackGuidance();
 
   void PassCheckpoints();
 
 private:
   std::unique_ptr<AsyncRouter> m_router;
   std::shared_ptr<Route> m_route;
+  // Latest delivered RoutesResult. Kept alongside m_route so callbacks can pass the whole
+  // result (including alternative routes) to higher layers.
+  std::shared_ptr<RoutesResult> m_lastResult;
   SessionState m_state;
   bool m_isFollowing;
   Checkpoints m_checkpoints;
@@ -196,6 +198,18 @@ private:
 
   // Sound turn notification parameters.
   turns::sound::NotificationManager m_turnNotificationsMgr;
+
+  // Confirmed by GPS or Start within the entry corridor; cleared on departure.
+  // Rebuilds retain this observation rather than infer a reach from their approach geometry.
+  bool m_reachedFollowedTrack = false;
+  enum class TrackNotification
+  {
+    None,
+    Approach,
+    Departure
+  };
+  // One-shot track speech; muting and reaching the track discard it.
+  TrackNotification m_pendingTrackNotification = TrackNotification::None;
 
   SpeedCameraManager m_speedCameraManager;
   RoutingSettings m_routingSettings;

@@ -117,8 +117,14 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
   func deleteBookmark(_ id: MWMMarkID) { manager.deleteBookmark(id); refresh() }
   func deleteTrack(_ id: MWMTrackID) { manager.deleteTrack(id); refresh() }
   func deleteList(_ id: MWMMarkGroupID) { manager.deleteCategory(id); refresh() }
-  func moveBookmark(_ id: MWMMarkID, to group: MWMMarkGroupID) { manager.moveBookmark(id, toGroupId: group); refresh() }
-  func moveTrack(_ id: MWMTrackID, to group: MWMMarkGroupID) { manager.moveTrack(id, toGroupId: group); refresh() }
+  func moveBookmark(_ id: MWMMarkID, to group: MWMMarkGroupID) {
+    manager.move(bookmarks: [NSNumber(value: id)], tracks: [], toGroupId: group)
+    refresh()
+  }
+  func moveTrack(_ id: MWMTrackID, to group: MWMMarkGroupID) {
+    manager.move(bookmarks: [], tracks: [NSNumber(value: id)], toGroupId: group)
+    refresh()
+  }
 
   // MARK: - Bulk operations
 
@@ -239,10 +245,10 @@ final class BookmarksNavigatorModel: NSObject, ObservableObject, BookmarksObserv
 
   private func captureColorAssignment(bookmarkIds: [MWMMarkID], trackIds: [MWMTrackID]) -> ColorAssignment {
     var bm: [MWMMarkID: BookmarkColor] = [:]
-    for id in bookmarkIds { bm[id] = manager.bookmark(withId: id).bookmarkColor }
+    for id in bookmarkIds { bm[id] = BookmarkColor.closest(to: manager.bookmark(withId: id).bookmarkColor) }
     var tr: [MWMTrackID: BookmarkColor] = [:]
-    // Tracks store a dp::Color that may not match the palette exactly; snap
-    // to the nearest palette entry for the undo. Round-trip loss is the
+    // Colors may not match the palette exactly; snap to the nearest palette
+    // entry for the undo. Round-trip loss is the
     // cost of staying inside the BookmarkColor bulk-bridge.
     for id in trackIds {
       tr[id] = BookmarkColor.closest(to: manager.track(withId: id).trackColor)

@@ -40,6 +40,7 @@
 @glacier: #FFFFFF;
 @water: #8BD3E0;
 @water_bad: #9dc7c1;
+@water_intermittent: #C4E9EF;
 @river: #36B0BF;
 @wetland: #7093a5;
 @beach: #FCEC7E;
@@ -172,6 +173,7 @@
 /* 6.2 Natural labels */
 
 @water_label: #4499Bb;
+@water_label_halo: #FFFFFF;
 @park_label: #3A7921;
 @halo_park_label: #FFFFFF;
 

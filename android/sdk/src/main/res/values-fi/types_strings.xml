@@ -193,7 +193,8 @@
     <string name="type.barrier.chain">Ketju</string>
     <string name="type.barrier.city_wall">Kaupungin muuri</string>
     <string name="type.barrier.cycle_barrier">Polkupyöräeste</string>
-    <string name="type.waterway.ditch">Viemäröinti oja</string>
+    <string name="type.waterway.ditch">Kuivatusoja</string>
+    <string name="type.waterway.ditch.intermittent">Ajoittainen kuivatusoja</string>
     <string name="type.natural.water.moat">Vallihauta</string>
     <string name="type.natural.water.wastewater">Jätevesi</string>
     <string name="type.barrier.entrance">Sisäänkäynti</string>
@@ -372,48 +373,48 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Valtatie</string>
     <string name="type.highway.bridleway">Ratsastustie</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Silta</string>
     <string name="type.highway.bridleway.permissive">Ratsastustie</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Tunneli</string>
     <string name="type.highway.busway">Busseille varattu tie</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Tunneli</string>
     <string name="type.highway.bus_stop">Bussipysäkki</string>
     <string name="type.highway.construction">Rakenteilla oleva tie</string>
     <string name="type.highway.cycleway">Pyörätie</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Silta</string>
     <string name="type.highway.cycleway.permissive">Pyörätie</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Tunneli</string>
     <string name="type.highway.elevator">Hissi</string>
     <string name="type.highway.footway">Polku</string>
     <string name="type.highway.footway.crossing">Jalankulkijoiden ylitys</string>
     <string name="type.highway.footway.area">Jalankulkualue</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Jalankulkusilta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Jalankulkutunneli</string>
     <string name="type.highway.ford">Kahluupaikka</string>
     <string name="type.highway.living_street">Asuinkatu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Tunneli</string>
     <string name="type.highway.motorway">Moottoritie</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Moottoritiesilta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Moottoritietunneli</string>
     <string name="type.highway.motorway_junction">Poistumistie</string>
     <string name="type.highway.motorway_link">Moottoritieramppi</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Tunneli</string>
     <string name="type.highway.path">Polku</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -422,101 +423,103 @@
     <string name="type.highway.path.expert">Erittäin vaikea tai erottamaton jälki</string>
     <string name="type.highway.path.bicycle">Kevyen liikenteen väylä</string>
     <string name="type.highway.footway.bicycle">Kevyen liikenteen väylä</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Silta</string>
     <string name="type.highway.path.horse">Ratsastuspolku</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Tunneli</string>
     <string name="type.highway.pedestrian">Jalankulkutie</string>
     <string name="type.highway.pedestrian.area">Jalankulkualue</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Jalankulkusilta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Jalankulkutunneli</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Laituri</string>
     <string name="type.highway.primary">Pääkatu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Tunneli</string>
     <string name="type.highway.primary_link">Pääkatu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Tunneli</string>
     <string name="type.highway.raceway">Kilparata</string>
     <string name="type.highway.residential">Katu</string>
     <string name="type.highway.residential.area">Katu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Tunneli</string>
     <string name="type.highway.rest_area">Levähdyspaikka</string>
     <string name="type.highway.road">Katu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Silta</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Tunneli</string>
     <string name="type.highway.secondary">Katu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Tunneli</string>
     <string name="type.highway.secondary_link">Katu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Tunneli</string>
     <string name="type.highway.service">Huoltotie</string>
     <string name="type.highway.service.area">Huoltotie</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Silta</string>
     <string name="type.highway.service.driveway">Ajotie</string>
     <string name="type.highway.service.parking_aisle">Pysäköintikäytävä</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Huoltotunneli</string>
     <string name="type.highway.services">Palvelualue</string>
     <string name="type.highway.speed_camera">Nopeusvalvontakamera</string>
     <string name="type.highway.steps">Portaat</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Tunneli</string>
     <string name="type.highway.tertiary">Katu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Tunneli</string>
     <string name="type.highway.tertiary_link">Katu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Tunneli</string>
     <string name="type.highway.track">Katu</string>
     <string name="type.highway.track.area">Katu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Silta</string>
     <string name="type.highway.track.grade1">Katu</string>
     <string name="type.highway.track.no.access">Katu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Tunneli</string>
     <string name="type.highway.traffic_signals">Liikennevalot</string>
     <string name="type.highway.trunk">Päätie</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Tunneli</string>
     <string name="type.highway.trunk_link">Päätien ramppi</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Tunneli</string>
     <string name="type.highway.unclassified">Katu</string>
     <string name="type.highway.unclassified.area">Katu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Silta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Tunneli</string>
     <string name="type.area_highway.cycleway">Pyörätie</string>
     <string name="type.area_highway.footway">Polku</string>
@@ -554,6 +557,7 @@
     <string name="type.historic.castle.shiro">Japanilainen linna</string>
     <string name="type.historic.castle.stately">Arvokas linna</string>
     <string name="type.historic.city_gate">Kaupungin portti</string>
+    <string name="type.man_made.ceremonial_gate">Seremoniallinen portti</string>
     <string name="type.historic.citywalls">Kaupungin muuri</string>
     <string name="type.historic.fort">Linnake</string>
     <string name="type.historic.gallows">Hirsipuu</string>
@@ -585,6 +589,7 @@
     <string name="type.landuse">Maankäyttö</string>
     <string name="type.landuse.allotments">Siirtolapuutarha</string>
     <string name="type.landuse.basin">Vesisäiliö</string>
+    <string name="type.landuse.basin.intermittent">Ajoittainen vesisäiliö</string>
     <string name="type.landuse.brownfield">Tuhoalue</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Hautausmaa</string>
@@ -615,7 +620,6 @@
     <string name="type.landuse.quarry">Louhos</string>
     <string name="type.landuse.railway">Rautatierakennukset</string>
     <string name="type.landuse.recreation_ground">Virkistysalue</string>
-    <string name="type.landuse.reservoir">Vesiallas</string>
     <string name="type.landuse.residential">Asuinalue</string>
     <string name="type.landuse.retail">Kauppa-alue</string>
     <string name="type.landuse.salt_pond">Suolalampi</string>
@@ -631,6 +635,7 @@
     <string name="type.leisure.ice_rink">Luistinrata</string>
     <string name="type.leisure.marina">Venesatama</string>
     <string name="type.leisure.nature_reserve">Luonnonsuojelualue</string>
+    <string name="type.leisure.bird_hide">Lintupiilo</string>
     <string name="type.leisure.outdoor_seating">Ulkona istuminen</string>
     <string name="type.leisure.park">Puisto</string>
     <string name="type.leisure.park.no.access">Puisto</string>
@@ -655,6 +660,8 @@
     <string name="type.man_made.lighthouse">Majakka</string>
     <string name="type.man_made.mast">Masto</string>
     <string name="type.man_made.pier">Laituri</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Katettu vesisäiliö</string>
     <string name="type.man_made.silo">Siilo</string>
     <string name="type.man_made.surveillance">Valvontakamera</string>
     <string name="type.man_made.tower">Torni</string>
@@ -671,6 +678,8 @@
     <string name="type.man_made.water_tower">Vesitorni</string>
     <string name="type.man_made.water_well">Kaivo</string>
     <string name="type.man_made.water_well.drinking_water_no">Kaivo</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Vesilaitos</string>
     <string name="type.man_made.windmill">Tuulimylly</string>
     <string name="type.military.bunker">Bunkkeri</string>
     <string name="type.natural">Luonto</string>
@@ -699,13 +708,16 @@
     <string name="type.natural.water.lake">Järvi</string>
     <string name="type.natural.water.lock">Lukko kammio</string>
     <string name="type.natural.water.pond">Lampi</string>
-    <string name="type.natural.water.reservoir">Säiliö</string>
+    <string name="type.natural.water.reservoir">Tekojärvi</string>
     <string name="type.natural.water.basin">Vesisäiliö</string>
     <string name="type.natural.water.river">Joki</string>
+    <string name="type.natural.water.intermittent">Ajoittainen vesialue</string>
     <string name="type.natural.land">Maa</string>
     <string name="type.natural.meadow">Niitty</string>
     <string name="type.natural.orchard">Hedelmänviljely</string>
     <string name="type.natural.peak">Huippu</string>
+    <string name="type.natural.hill">Mäki</string>
+    <string name="type.natural.arch">Kivikaari</string>
     <string name="type.natural.saddle">Vuoristo satula</string>
     <string name="type.natural.rock">Kivi</string>
     <string name="type.natural.scrub">Tiheiköt</string>
@@ -778,6 +790,8 @@
     <string name="type.power.substation">Muuntoasema</string>
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">Sähköpylväs</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Laituri</string>
     <string name="type.railway.disused.tunnel">Käytöstä poistettu rautatietunneli</string>
     <string name="type.railway.funicular">Köysirata</string>
     <string name="type.railway.halt">Rautatieasema</string>
@@ -1102,6 +1116,8 @@
     <string name="type.shop.greengrocer">Vihanneskauppias</string>
     <string name="type.shop.grocery">Päivittäistavarakauppa</string>
     <string name="type.shop.hairdresser">Kampaamo</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Parturi</string>
     <string name="type.shop.hardware">Rautakauppa</string>
     <string name="type.shop.health_food">Terveysruokakauppa</string>
     <string name="type.shop.hearing_aids">Kuulolaitteiden myymälä</string>
@@ -1225,6 +1241,7 @@
     <string name="type.sport.rugby_union">Rugby union</string>
     <string name="type.sport.running">Juoksu</string>
     <string name="type.sport.softball">Softball</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turismi</string>
     <string name="type.tourism.aquarium">Akvaario</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1273,21 +1290,26 @@
     <string name="type.waterway">Vesiväylä</string>
     <string name="type.waterway.access_point">Vesiväylän liittymispiste</string>
     <string name="type.waterway.canal">Kanaali</string>
+    <string name="type.waterway.canal.intermittent">Ajoittainen kanaali</string>
     <string name="type.waterway.canal.tunnel">Kanaali</string>
     <string name="type.waterway.fish_pass">Kalatikkaat</string>
+    <string name="type.waterway.fish_pass.intermittent">Ajoittaiset kalatikkaat</string>
     <string name="type.waterway.dam">Pato</string>
     <string name="type.barrier.ditch">Oja</string>
-    <string name="type.natural.water.ditch">Viemäröinti oja</string>
+    <string name="type.natural.water.ditch">Kuivatusoja</string>
     <string name="type.waterway.ditch.tunnel">Holvirumpu</string>
     <string name="type.waterway.dock">Telakka</string>
+    <string name="type.waterway.drain">Kuivatuskanava</string>
+    <string name="type.waterway.drain.intermittent">Ajoittainen kuivatuskanava</string>
+    <string name="type.natural.water.drain">Kuivatuskanava</string>
     <string name="type.waterway.drain.tunnel">Holvirumpu</string>
     <string name="type.waterway.lock_gate">Kanavasulku</string>
     <string name="type.waterway.river">Joki</string>
+    <string name="type.waterway.river.intermittent">Ajoittainen joki</string>
     <string name="type.waterway.river.tunnel">Joki</string>
-    <string name="type.waterway.stream">Joki</string>
-    <string name="type.waterway.stream.ephemeral">Joki</string>
-    <string name="type.waterway.stream.intermittent">Joki</string>
-    <string name="type.waterway.stream.tunnel">Joki</string>
+    <string name="type.waterway.stream">Puro</string>
+    <string name="type.waterway.stream.intermittent">Ajoittainen puro</string>
+    <string name="type.waterway.stream.tunnel">Puro</string>
     <string name="type.waterway.waterfall">Vesiputous</string>
     <string name="type.wheelchair">Rullatuoli</string>
     <string name="type.wheelchair.limited">Osittain varustettu vammaisille</string>
@@ -1325,6 +1347,7 @@
     <string name="type.self_service.no">Ei itsepalvelua</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Sosiaalinen väline</string>
+    <string name="type.amenity.stage">Näyttämö</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Hätäosaston sisäänkäynti</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1346,6 +1369,8 @@
     <string name="type.man_made.monitoring_station.weather">Sään seuranta-asema</string>
     <string name="type.amenity.student_accommodation">Opiskelijoiden majoitus</string>
     <string name="type.craft.watchmaker">Kelloseppä</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Ikkunoiden valmistus</string>
     <string name="type.xmas_feature.market">Joulumarkkinat</string>
     <string name="type.xmas_feature.tree">Joulukuusi</string>
     <string name="type.amenity.hookah_lounge">Vesipiippubaari</string>

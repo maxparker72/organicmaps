@@ -1,7 +1,9 @@
-• Pumili ng mga ruta para sa pag-hiking at pagbibisikleta upang makita ang kanilang tsart ng taas
-• Tamang pagbalot ng mapa sa antimeridian (±180° longhitud)
-• Baguhin ang lahat ng kulay ng bookmark at track sa isang kategorya nang sabay-sabay
-• Mas mahusay na paghahanap para sa mga numero ng bahay, mas maraming sakop na address sa US
-• OSM data mula Abril 4
-• Naka-iskedyul na mode ng hitsura sa Mga Setting
-…marami pa sa omaps.org/news
+• OSM: 28 Setyembre; Wikipedia: 21 Setyembre
+• Mas mahusay na alternatibong ruta at pagtataya ng pagdating
+• Bagong setting na nag-o-optimize sa pagkakasunod-sunod ng mga hintuan
+• Ang mga bagong pindutan ay nagdaragdag o pumapalit ng mga hintuan sa mga planadong ruta
+• Ang napiling alternatibong ruta ay pinananatili habang nagna-navigate
+• Mga pag-aayos at pagpapabuti sa pagre-record ng track
+• Naayos ang pag-import ng KMB
+• Pag-aayos at pagpapabuti ng UI
+…mas marami sa omaps.org/news

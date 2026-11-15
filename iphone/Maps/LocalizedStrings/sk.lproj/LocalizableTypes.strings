@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "Mestský múr";
 "type.barrier.cycle_barrier" = "Cyklistická zábrana";
 "type.waterway.ditch" = "Drenážna priekopa";
+"type.waterway.ditch.intermittent" = "Občasná drenážna priekopa";
 "type.natural.water.moat" = "Priekopa";
 "type.natural.water.wastewater" = "Odpadová voda";
 "type.barrier.entrance" = "Vstup";
@@ -407,28 +408,28 @@
 "type.highway" = "Cesta";
 "type.highway.bridleway" = "Cesta pre jazdca na zvierati";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Most";
 "type.highway.bridleway.permissive" = "Cesta pre jazdca na zvierati";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Tunel";
 "type.highway.busway" = "Cesta pre autobusy";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Tunel";
 "type.highway.bus_stop" = "Autobusová zastávka";
 "type.highway.construction" = "Cesta vo výstavbe";
 "type.highway.cycleway" = "Cyklocesta";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Most";
 "type.highway.cycleway.permissive" = "Cyklocesta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Tunel";
 "type.highway.elevator" = "Výťah";
 "type.highway.footway" = "Cesta pre chodcov";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Priechod pre chodcov";
 "type.highway.footway.area" = "Pešia zóna";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Most pre chodcov";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Tunel pre chodcov";
 "type.highway.ford" = "Brod";
 "type.highway.living_street" = "Obytná zóna";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Tunel";
 "type.highway.motorway" = "Diaľnica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Tunel";
 "type.highway.motorway_junction" = "Dopravný uzol";
 "type.highway.motorway_link" = "Diaľnica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Tunel";
 "type.highway.path" = "Cesta";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Cesta pre cyklistov a chodcov";
 "type.highway.footway.bicycle" = "Cesta pre cyklistov a chodcov";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Most";
 "type.highway.path.horse" = "Cesta pre jazdca na zvierati";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Tunel";
 "type.highway.pedestrian" = "Ulica";
 "type.highway.pedestrian.area" = "Pešia zóna";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Most pre chodcov";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Tunel pre chodcov";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
 "type.highway.platform" = "Nástupište";
 "type.highway.primary" = "Cesta I. triedy";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Tunel";
 "type.highway.primary_link" = "Cesta I. triedy";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Tunel";
 "type.highway.raceway" = "Pretekárska dráha";
 "type.highway.residential" = "Miestna komunikácia";
 "type.highway.residential.area" = "Miestna komunikácia";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Tunel";
 "type.highway.rest_area" = "Odpočívadlo";
 "type.highway.road" = "Ulica";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Most";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Tunel";
 "type.highway.secondary" = "Cesta II. triedy";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Tunel";
 "type.highway.secondary_link" = "Cesta II. triedy";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Tunel";
 "type.highway.service" = "Účelová cesta";
 "type.highway.service.area" = "Účelová cesta";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Most";
 "type.highway.service.driveway" = "Príjazdová cesta";
 "type.highway.service.parking_aisle" = "Cesta na parkovisku";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Tunel";
 "type.highway.services" = "Účelová oblasť";
 "type.highway.speed_camera" = "Rýchlostná kamera";
 "type.highway.steps" = "Schody";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Tunel";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "Cesta III. triedy";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Tunel";
 "type.highway.tertiary_link" = "Cesta III. triedy";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Tunel";
 "type.highway.track" = "Poľná cesta";
 "type.highway.track.area" = "Poľná cesta";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Most";
 "type.highway.track.grade1" = "Poľná cesta";
 "type.highway.track.no.access" = "Poľná cesta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Tunel";
 "type.highway.traffic_signals" = "Semafor";
 "type.highway.trunk" = "Cesta";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Tunel";
 "type.highway.trunk_link" = "Cesta";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Tunel";
 "type.highway.unclassified" = "Cesta bez administratívneho zaradenia";
 "type.highway.unclassified.area" = "Cesta bez administratívneho zaradenia";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Most";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Tunel";
 "type.area_highway.cycleway" = "Cyklocesta";
 "type.area_highway.footway" = "Cesta pre chodcov";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Japonský hrad";
 "type.historic.castle.stately" = "Zámok";
 "type.historic.city_gate" = "Mestská brána";
+"type.man_made.ceremonial_gate" = "Slávnostná brána";
 "type.historic.citywalls" = "Mestský múr";
 "type.historic.fort" = "Pevnosť";
 "type.historic.gallows" = "Šibenica";
@@ -718,6 +722,7 @@
 "type.landuse" = "Využitie pôdy";
 "type.landuse.allotments" = "Záhradky";
 "type.landuse.basin" = "Vodná nádrž";
+"type.landuse.basin.intermittent" = "Občasná vodná nádrž";
 "type.landuse.brownfield" = "Brownfield";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Lom";
 "type.landuse.railway" = "Priestory železnice";
 "type.landuse.recreation_ground" = "Priestranstvo na rekreáciu";
-"type.landuse.reservoir" = "Voda";
 "type.landuse.residential" = "Obytná zóna";
 "type.landuse.retail" = "Obchodná zóna";
 "type.landuse.salt_pond" = "Salina";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Klzisko";
 "type.leisure.marina" = "Marína";
 "type.leisure.nature_reserve" = "Prírodná rezervácia";
+"type.leisure.bird_hide" = "Pozorovateľňa vtákov";
 "type.leisure.outdoor_seating" = "Posedenie vonku";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "Park";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Mólo";
 "type.man_made.pipeline" = "Potrubie";
 "type.man_made.pipeline.overground" = "Pozemné potrubie";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Zemný vodojem";
 "type.man_made.silo" = "Silo";
 "type.man_made.storage_tank" = "Skladovacia nádrž";
 "type.man_made.surveillance" = "Bezpečnostná kamera";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Vodojem";
 "type.man_made.water_well" = "Studňa";
 "type.man_made.water_well.drinking_water_no" = "Studňa";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Vodáreň";
 "type.man_made.windmill" = "Veterný mlyn";
 "type.man_made.works" = "Továreň";
 
@@ -868,13 +879,16 @@
 "type.natural.water.lake" = "Jazero";
 "type.natural.water.lock" = "Plavebná komora";
 "type.natural.water.pond" = "Rybník";
-"type.natural.water.reservoir" = "Nádrž";
+"type.natural.water.reservoir" = "Priehradná nádrž";
 "type.natural.water.basin" = "Vodná nádrž";
 "type.natural.water.river" = "Rieka";
+"type.natural.water.intermittent" = "Občasná vodná plocha";
 "type.natural.land" = "Pôda";
 "type.natural.meadow" = "Lúka";
 "type.natural.orchard" = "Sad";
 "type.natural.peak" = "Hora";
+"type.natural.hill" = "Kopec";
+"type.natural.arch" = "Skalný oblúk";
 "type.natural.saddle" = "Sedlo";
 "type.natural.rock" = "Kameň";
 "type.natural.scrub" = "Krovie";
@@ -972,6 +986,8 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "Hromadná doprava";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
 "type.public_transport.platform" = "Nástupište";
 "type.railway" = "Železnica";
 "type.railway.abandoned" = "Zrušená trať";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Zelovoc";
 "type.shop.grocery" = "Potraviny";
 "type.shop.hairdresser" = "Kaderníctvo";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Holičstvo";
 "type.shop.hardware" = "Železiarstvo";
 "type.shop.health_food" = "Obchod so zdravou výživou";
 "type.shop.hearing_aids" = "Obchod s pomôckami na počúvanie";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Rugby";
 "type.sport.running" = "Beh";
 "type.sport.softball" = "Softbal";
+"type.sport.pilates" = "Pilates";
 "type.tourism" = "Turistika";
 "type.tourism.aquarium" = "Akvárium";
 
@@ -1514,21 +1534,24 @@
 "type.waterway" = "Vodný tok";
 "type.waterway.access_point" = "Prístupový bod k vodnej ceste";
 "type.waterway.canal" = "Kanál";
+"type.waterway.canal.intermittent" = "Občasný kanál";
 "type.waterway.canal.tunnel" = "Tunel v kanáli";
 "type.waterway.fish_pass" = "Rybovod";
+"type.waterway.fish_pass.intermittent" = "Občasný rybovod";
 "type.waterway.dam" = "Priehrada";
 "type.barrier.ditch" = "Priekopa";
 "type.natural.water.ditch" = "Drenážna priekopa";
 "type.waterway.ditch.tunnel" = "Priepust";
 "type.waterway.dock" = "Dok";
 "type.waterway.drain" = "Stoka";
+"type.waterway.drain.intermittent" = "Občasná stoka";
 "type.natural.water.drain" = "Stoka";
 "type.waterway.drain.tunnel" = "Priepust";
 "type.waterway.lock_gate" = "Stavidlo";
 "type.waterway.river" = "Rieka";
+"type.waterway.river.intermittent" = "Občasná rieka";
 "type.waterway.river.tunnel" = "Rieka";
 "type.waterway.stream" = "Potok";
-"type.waterway.stream.ephemeral" = "Občasný potok";
 "type.waterway.stream.intermittent" = "Občasný potok";
 "type.waterway.stream.tunnel" = "Potok";
 "type.waterway.waterfall" = "Vodopád";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Sociálne zariadenie";
+"type.amenity.stage" = "Javisko";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Vchod do pohotovostného oddelenia";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Stanica na monitorovanie počasia";
 "type.amenity.student_accommodation" = "Ubytovanie študentov";
 "type.craft.watchmaker" = "Hodinár";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Výroba okien";
 "type.xmas_feature.market" = "Vianočný trh";
 "type.xmas_feature.tree" = "Vianočný stromček";
 "type.amenity.hookah_lounge" = "Shisha bar";

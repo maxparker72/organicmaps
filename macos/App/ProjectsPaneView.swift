@@ -169,7 +169,7 @@ struct ProjectsPaneView: View {
 
   private func memberBookmarkRow(_ bm: Bookmark, project: Project) -> some View {
     HStack(spacing: 8) {
-      Circle().fill(bm.bookmarkColor.swiftUIColor).frame(width: 8, height: 8)
+      Circle().fill(Color(nsColor: bm.bookmarkColor)).frame(width: 8, height: 8)
       Text(bm.bookmarkName).lineLimit(1)
       Spacer()
       Button { projects.removeBookmark(bm.bookmarkId, from: project) } label: {

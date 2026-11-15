@@ -2,6 +2,7 @@
 #include "testing/testing.hpp"
 
 #include "indexer/classificator.hpp"
+#include "indexer/drawing_rules.hpp"
 #include "indexer/feature_data.hpp"
 #include "indexer/feature_visibility.hpp"
 
@@ -247,19 +248,33 @@ UNIT_TEST(Classificator_AreaPriority)
       {
           // ? - linear waterways @todo: add ability to compare different drule types (areas vs lines)
           //{"waterway", "river"}, {"waterway", "stream"}, {"natural", "strait"}, {"waterway", "ditch"},
-          // 0 - water areas
+          // 0 - intermittent water draws behind separate permanent water polygons.
+          {"natural", "water", "intermittent"},
+          {"landuse", "basin", "intermittent"},
+          // 1 - permanent water areas
           {"natural", "water"},
-          {"landuse", "reservoir"},
+          {"natural", "water", "basin"},
+          {"natural", "water", "lake"},
+          {"natural", "water", "lock"},
+          {"natural", "water", "moat"},
+          {"natural", "water", "pond"},
+          {"natural", "water", "reservoir"},
           {"natural", "water", "river"},
+          {"landuse", "basin"},
+          {"landuse", "salt_pond"},
           {"waterway", "dock"},
+          // 2 - water areas with their own look, also when intermittent
+          {"natural", "water", "ditch"},
+          {"natural", "water", "drain"},
+          {"natural", "water", "wastewater"},
           // ? - hatching fills @todo: absent in vehicle style, need to test main style only
           //{"leisure", "nature_reserve"}, {"boundary", "national_park"}, {"landuse", "military"},
-          // 1 - above-water features
+          // 3 - above-water features
           {"man_made", "pier"},
           {"man_made", "breakwater"},
           {"waterway", "dam"},
       },
-      {4, 3}, drule::area);
+      {2, 11, 3, 3}, drule::area);
 
   CheckPriority(
       {
@@ -332,6 +347,16 @@ UNIT_TEST(Classificator_MultipleTypesPoiPriority)
   {
     CheckPriority(
         {// 1
+         {"leisure", "fitness_centre"},
+         // 2
+         {"sport", "pilates"},
+         {"sport", "yoga"}},
+        {1, 2}, drule::symbol);
+  }
+
+  {
+    CheckPriority(
+        {// 1
          {"leisure", "sports_centre"},
          // 2
          {"sport", "shooting"}},
@@ -346,6 +371,73 @@ UNIT_TEST(Classificator_MultipleTypesPoiPriority)
          {"sport", "multi"}},
         {1, 1}, drule::symbol);
   }
+}
+
+// A specific water type with a caption should be the main one for captions and the place page,
+// no matter the types order.
+UNIT_TEST(Classificator_IntermittentWaterCaptionPriority)
+{
+  CheckPriority(
+      {
+          // 1
+          {"natural", "water", "intermittent"},
+          // 2
+          {"natural", "water", "basin"},
+          {"natural", "water", "ditch"},
+          {"natural", "water", "drain"},
+          {"natural", "water", "lake"},
+          {"natural", "water", "lock"},
+          {"natural", "water", "moat"},
+          {"natural", "water", "pond"},
+          {"natural", "water", "reservoir"},
+          {"natural", "water", "river"},
+          {"natural", "water", "wastewater"},
+      },
+      {1, 10}, drule::caption);
+}
+
+// An intermittent waterway is drawn and labelled like its base waterway, only dashed, with a longer gap if the base
+// is already dashed.
+UNIT_TEST(Classificator_IntermittentWaterwayRules)
+{
+  styles::RunForEveryMapStyle([](MapStyle style)
+  {
+    auto const & rules = drule::GetCurrentRules();
+    auto const getKeys = [](base::StringIL const & path, int level)
+    {
+      drule::KeysT keys;
+      GetDrawRule({classif().GetTypeByPath(path)}, level, GeomType::Line, keys);
+      return keys;
+    };
+
+    for (int level = scales::GetUpperWorldScale() + 1; level <= scales::GetUpperStyleScale(); ++level)
+    {
+      for (char const * base : {"canal", "ditch", "drain", "fish_pass", "river"})
+      {
+        auto const baseKeys = getKeys({"waterway", base}, level);
+        auto const keys = getKeys({"waterway", base, "intermittent"}, level);
+        TEST_EQUAL(keys.size(), baseKeys.size(), (style, base, level));
+        for (size_t i = 0; i < keys.size(); ++i)
+        {
+          TEST_EQUAL(keys[i].m_type, baseKeys[i].m_type, (style, base, level));
+          TEST_EQUAL(keys[i].m_priority, baseKeys[i].m_priority, (style, base, level));
+          if (keys[i].m_type == drule::pathtext)
+            TEST(*rules.Find(keys[i])->GetPathtext() == *rules.Find(baseKeys[i])->GetPathtext(), (style, base, level));
+          if (keys[i].m_type != drule::line)
+            continue;
+          auto line = *rules.Find(keys[i])->GetLine();
+          auto const & baseLine = *rules.Find(baseKeys[i])->GetLine();
+          TEST(line.dashdot, (style, base, level));
+          TEST_EQUAL(line.dashdot->dd.size(), 2, (style, base, level));
+          if (baseLine.dashdot)
+            TEST_EQUAL(baseLine.dashdot->dd.size(), 2, (style, base, level));
+          TEST(!baseLine.dashdot || line.dashdot->dd[1] > baseLine.dashdot->dd[1], (style, base, level));
+          line.dashdot = baseLine.dashdot;
+          TEST(line == baseLine, (style, base, level));
+        }
+      }
+    }
+  });
 }
 
 namespace

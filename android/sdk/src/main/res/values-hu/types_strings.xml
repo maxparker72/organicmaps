@@ -202,6 +202,7 @@
     <string name="type.barrier.city_wall">Városfal</string>
     <string name="type.barrier.cycle_barrier">Kerékpárakadály</string>
     <string name="type.waterway.ditch">Vízelvezető árok</string>
+    <string name="type.waterway.ditch.intermittent">Időszakos vízelvezető árok</string>
     <string name="type.natural.water.moat">Várárok</string>
     <string name="type.natural.water.wastewater">Szennyvíz</string>
     <string name="type.barrier.entrance">Bejárat</string>
@@ -387,49 +388,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Közút</string>
     <string name="type.highway.bridleway">Lovaglóút</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Híd</string>
     <string name="type.highway.bridleway.permissive">Lovaglóút</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Alagút</string>
     <string name="type.highway.busway">Kijelölt buszút</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Alagút</string>
     <string name="type.highway.bus_stop">Buszmegálló</string>
     <string name="type.highway.construction">Útépítés</string>
     <string name="type.highway.cycleway">Kerékpárút</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Híd</string>
     <string name="type.highway.cycleway.permissive">Kerékpárút</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Alagút</string>
     <string name="type.highway.elevator">Felvonó</string>
     <string name="type.highway.footway">Gyalogút</string>
     <string name="type.highway.footway.sidewalk">Járda</string>
     <string name="type.highway.footway.crossing">Gyalogátkelőhely</string>
     <string name="type.highway.footway.area">Gyalogút területe</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Gyalogoshíd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Gyalogosalagút</string>
     <string name="type.highway.ford">Gázló</string>
     <string name="type.highway.living_street">Lakó-pihenő övezet</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Alagút</string>
     <string name="type.highway.motorway">Autópálya</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Autópályahíd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Autópálya-alagút</string>
     <string name="type.highway.motorway_junction">Autópálya-csomópont</string>
     <string name="type.highway.motorway_link">Autópályafel- és lehajtó</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Alagút</string>
     <string name="type.highway.path">Ösvény</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -438,103 +439,104 @@
     <string name="type.highway.path.expert">Nagyon nehéz vagy megkülönböztethetetlen nyomvonal</string>
     <string name="type.highway.path.bicycle">Közös gyalog- és kerékpárút</string>
     <string name="type.highway.footway.bicycle">Közös gyalog- és kerékpárút</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Híd</string>
     <string name="type.highway.path.horse">Ösvény</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Alagút</string>
     <string name="type.highway.pedestrian">Sétálóutca</string>
     <string name="type.highway.pedestrian.area">Sétálóutca</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Alagút</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.highway.platform">Peron</string>
     <string name="type.highway.primary">Utca</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Alagút</string>
     <string name="type.highway.primary_link">Utca</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Alagút</string>
     <string name="type.highway.raceway">Versenypálya</string>
     <string name="type.highway.residential">Utca</string>
     <string name="type.highway.residential.area">Utca</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Alagút</string>
     <string name="type.highway.rest_area">Pihenőzóna</string>
     <string name="type.highway.road">Út</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Híd</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Alagút</string>
     <string name="type.highway.secondary">Utca</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Alagút</string>
     <string name="type.highway.secondary_link">Utca</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Alagút</string>
     <string name="type.highway.service">Szervizút</string>
     <string name="type.highway.service.area">Szervizút</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Híd</string>
     <string name="type.highway.service.driveway">Kocsibehajtó</string>
     <string name="type.highway.service.parking_aisle">Parkolón belüli út</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Alagút</string>
     <string name="type.highway.services">Pihenőhely</string>
     <string name="type.highway.speed_camera">Traffipax</string>
     <string name="type.highway.steps">Lépcső</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Alagút</string>
     <string name="type.highway.ladder">Létra</string>
     <string name="type.highway.tertiary">Bekötőút</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Alagút</string>
     <string name="type.highway.tertiary_link">Bekötőút fel- vagy lehajtó</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Alagút</string>
     <string name="type.highway.track">Mezőgazdasági vagy erdészeti út</string>
     <string name="type.highway.track.area">Mezőgazdasági vagy erdészeti út</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Híd</string>
     <string name="type.highway.track.grade1">Mezőgazdasági vagy erdészeti út</string>
     <string name="type.highway.track.no.access">Mezőgazdasági vagy erdészeti út</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Alagút</string>
     <string name="type.highway.traffic_signals">Jelzőlámpa</string>
     <string name="type.highway.trunk">Autóút</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Alagút</string>
     <string name="type.highway.trunk_link">Autóút fel- vagy lehajtó</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Alagút</string>
     <string name="type.highway.unclassified">Egyéb közút</string>
     <string name="type.highway.unclassified.area">Egyéb közút</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Híd</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Alagút</string>
     <string name="type.area_highway.cycleway">Kerékpárút</string>
     <string name="type.area_highway.footway">Gyalogút</string>
@@ -572,6 +574,7 @@
     <string name="type.historic.castle.shiro">Siró (japán várkastély)</string>
     <string name="type.historic.castle.stately">Kastély</string>
     <string name="type.historic.city_gate">Városkapu</string>
+    <string name="type.man_made.ceremonial_gate">Szertartásos kapu</string>
     <string name="type.historic.citywalls">Városfal</string>
     <string name="type.historic.fort">Erőd</string>
     <string name="type.historic.gallows">Akasztófa</string>
@@ -604,7 +607,8 @@
     <string name="type.junction.roundabout">Körforgalom</string>
     <string name="type.landuse">Területhasználat</string>
     <string name="type.landuse.allotments">Kiskertek</string>
-    <string name="type.landuse.basin">Víztározó</string>
+    <string name="type.landuse.basin">Medence</string>
+    <string name="type.landuse.basin.intermittent">Időszakos medence</string>
     <string name="type.landuse.brownfield">Barnamezős terület</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Temető</string>
@@ -635,7 +639,6 @@
     <string name="type.landuse.quarry">Külszíni fejtés, kőfejtő</string>
     <string name="type.landuse.railway">Vasúti terület</string>
     <string name="type.landuse.recreation_ground">Szabadidőpark</string>
-    <string name="type.landuse.reservoir">Tározó</string>
     <string name="type.landuse.residential">Lakóövezet</string>
     <string name="type.landuse.retail">Kiskereskedelmi terület</string>
     <string name="type.landuse.salt_pond">Sólepárló medence</string>
@@ -657,6 +660,7 @@
     <string name="type.leisure.ice_rink">Jégpálya</string>
     <string name="type.leisure.marina">Kishajókikötő</string>
     <string name="type.leisure.nature_reserve">Természetvédelmi terület</string>
+    <string name="type.leisure.bird_hide">Madárles</string>
     <string name="type.leisure.outdoor_seating">Kiülős helyek</string>
     <string name="type.leisure.firepit">Tűzrakóhely</string>
     <string name="type.leisure.park">Park</string>
@@ -691,6 +695,8 @@
     <string name="type.man_made.pier">Móló</string>
     <string name="type.man_made.pipeline">Csővezeték</string>
     <string name="type.man_made.pipeline.overground">Felszíni csővezeték</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Fedett víztároló</string>
     <string name="type.man_made.silo">Falközi siló</string>
     <string name="type.man_made.storage_tank">Tárolótartály</string>
     <string name="type.man_made.surveillance">Térfigyelő kamera</string>
@@ -709,6 +715,8 @@
     <string name="type.man_made.water_tower">Víztorony</string>
     <string name="type.man_made.water_well">Kút</string>
     <string name="type.man_made.water_well.drinking_water_no">Kút (nem ivóvíz)</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Vízmű</string>
     <string name="type.man_made.windmill">Szélmalom</string>
     <string name="type.man_made.works">Gyár, üzem</string>
     <string name="type.military">Katonai</string>
@@ -741,12 +749,15 @@
     <string name="type.natural.water.lock">Zsilipkamra</string>
     <string name="type.natural.water.pond">Tavacska</string>
     <string name="type.natural.water.reservoir">Víztározó</string>
-    <string name="type.natural.water.basin">Vízgyűjtő</string>
+    <string name="type.natural.water.basin">Medence</string>
     <string name="type.natural.water.river">Folyó</string>
+    <string name="type.natural.water.intermittent">Időszakos vízfelület</string>
     <string name="type.natural.land">Föld</string>
     <string name="type.natural.meadow">Rét</string>
     <string name="type.natural.orchard">Gyümölcsöskert</string>
     <string name="type.natural.peak">Csúcs</string>
+    <string name="type.natural.hill">Domb</string>
+    <string name="type.natural.arch">Sziklaív</string>
     <string name="type.natural.saddle">Hegynyereg</string>
     <string name="type.natural.rock">Szikla</string>
     <string name="type.natural.scrub">Cserjés</string>
@@ -838,6 +849,7 @@
     <string name="type.psurface.unpaved_bad">felület-burkolatlan_rossz</string>
     <string name="type.psurface.unpaved_good">felület-burkolatlan_jó</string>
     <string name="type.public_transport">Közösségi közlekedés</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.public_transport.platform">Peron</string>
     <string name="type.railway">Vasút</string>
     <string name="type.railway.abandoned">Elhagyott vasútvonal</string>
@@ -1195,6 +1207,8 @@
     <string name="type.shop.greengrocer">Zöldséges</string>
     <string name="type.shop.grocery">Élelmiszerbolt</string>
     <string name="type.shop.hairdresser">Fodrász</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Borbély</string>
     <string name="type.shop.hardware">Vas-műszaki bolt</string>
     <string name="type.shop.health_food">Egészséges élelmiszerek boltja</string>
     <string name="type.shop.hearing_aids">Hallókészülék bolt</string>
@@ -1318,6 +1332,7 @@
     <string name="type.sport.rugby_union">Rögbi</string>
     <string name="type.sport.running">Futás</string>
     <string name="type.sport.softball">Softball</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turizmus</string>
     <string name="type.tourism.aquarium">Akvárium</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1371,21 +1386,24 @@
     <string name="type.waterway">Vízfolyás</string>
     <string name="type.waterway.access_point">Víziút hozzáférési pont</string>
     <string name="type.waterway.canal">Csatorna</string>
+    <string name="type.waterway.canal.intermittent">Időszakos csatorna</string>
     <string name="type.waterway.canal.tunnel">Csatornaalagút</string>
     <string name="type.waterway.fish_pass">Hallépcső</string>
+    <string name="type.waterway.fish_pass.intermittent">Időszakos hallépcső</string>
     <string name="type.waterway.dam">Duzzasztógát</string>
     <string name="type.barrier.ditch">Árok</string>
     <string name="type.natural.water.ditch">Vízelvezető árok</string>
     <string name="type.waterway.ditch.tunnel">Áteresz</string>
     <string name="type.waterway.dock">Dokk</string>
-    <string name="type.waterway.drain">Vízelvezető árok</string>
-    <string name="type.natural.water.drain">Vízelvezető árok területe</string>
+    <string name="type.waterway.drain">Vízelvezető csatorna</string>
+    <string name="type.waterway.drain.intermittent">Időszakos vízelvezető csatorna</string>
+    <string name="type.natural.water.drain">Vízelvezető csatorna területe</string>
     <string name="type.waterway.drain.tunnel">Áteresz</string>
     <string name="type.waterway.lock_gate">Zsilipkapu</string>
     <string name="type.waterway.river">Folyó</string>
+    <string name="type.waterway.river.intermittent">Időszakos folyó</string>
     <string name="type.waterway.river.tunnel">Folyó</string>
     <string name="type.waterway.stream">Patak</string>
-    <string name="type.waterway.stream.ephemeral">Csapadék után rövid időre megjelenő patak</string>
     <string name="type.waterway.stream.intermittent">Időszakos patak</string>
     <string name="type.waterway.stream.tunnel">Patak</string>
     <string name="type.waterway.waterfall">Vízesés</string>
@@ -1428,6 +1446,7 @@
     <string name="type.self_service.no">Nem önkiszolgáló</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Szociális létesítmény</string>
+    <string name="type.amenity.stage">Színpad</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Sürgősségi kórterem bejárata</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1457,6 +1476,8 @@
     <string name="type.man_made.monitoring_station.weather">Időjárás megfigyelő állomás</string>
     <string name="type.amenity.student_accommodation">Diákszállás</string>
     <string name="type.craft.watchmaker">Órás</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Ablakgyártás</string>
     <string name="type.xmas_feature.market">Karácsonyi piac</string>
     <string name="type.xmas_feature.tree">Karácsonyfa</string>
     <string name="type.amenity.hookah_lounge">Vízipipa bár</string>

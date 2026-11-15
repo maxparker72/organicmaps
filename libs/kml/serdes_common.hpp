@@ -13,11 +13,23 @@ auto constexpr kDefaultLang = StringUtf8Multilang::kDefaultCode;
 auto constexpr kDefaultTrackWidth = 5.0;
 auto constexpr kDefaultTrackColor = 0x006ec7ff;
 
+std::string PointToString(m2::PointD const & org, char const separator);
 std::string PointToLineString(geometry::PointWithAltitude const & pt);
 std::string PointToGxString(geometry::PointWithAltitude const & pt);
 
-void SaveStringWithCDATA(Writer & writer, std::string const & s);
-std::string const * GetDefaultLanguage(LocalizableString const & lstr);
+// True if the line carries real elevation, i.e. any point has a non-default, non-invalid
+// altitude. Used to decide whether to export elevation (GPX <ele>, GeoJSON Z) for a line, so a
+// flat sea-level track isn't bloated with zero altitudes. Mirrors Track::HasAltitudes intent.
+bool LineHasAltitude(TrackGeometry const & line);
+
+// Checks WGS84 coordinate ranges. The import parsers guarantee finite inputs.
+bool IsValidLatLon(double lat, double lon);
+
+// Rounds a finite altitude to meters and clamps it to the representable range, excluding
+// geometry::kInvalidAltitude. The import parsers guarantee finite inputs.
+geometry::Altitude ToAltitude(double altitude);
+
+void SaveStringWithCDATA(Writer & writer, std::string_view s);
 
 std::string_view constexpr kIndent0{};
 std::string_view constexpr kIndent2{"  "};

@@ -8,11 +8,13 @@ import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -41,13 +43,16 @@ import app.organicmaps.R;
 import app.organicmaps.sdk.util.Config;
 import app.organicmaps.sdk.util.Constants;
 import app.organicmaps.sdk.util.Distance;
-import app.organicmaps.sdk.util.StringUtils;
 import app.organicmaps.sdk.util.concurrency.UiThread;
 import app.organicmaps.sdk.util.log.Logger;
 import app.organicmaps.sdk.util.log.LogsManager;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import java.lang.ref.WeakReference;
-import java.time.LocalTime;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Keep
@@ -63,6 +68,50 @@ public class Utils
   public static final String EMAIL_MIME_TYPE = "message/rfc822";
 
   private Utils() {}
+
+  public static void showBatteryOptimizationWarningIfNeeded(@NonNull Activity activity)
+  {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+      return;
+
+    final SharedPreferences prefs = activity.getSharedPreferences("OrganicMapsPrefs", Context.MODE_PRIVATE);
+    if (prefs.getBoolean("battery_optimization_warning_seen", false))
+      return;
+
+    new MaterialAlertDialogBuilder(activity, R.style.MwmTheme_AlertDialog)
+        .setTitle(R.string.background_recording_warning_title)
+        .setMessage(R.string.background_recording_warning_message)
+        .setPositiveButton(R.string.settings, (dialog, which) -> openBatteryOptimizationSettings(activity))
+        .setNegativeButton(R.string.not_now, null)
+        .show();
+    prefs.edit().putBoolean("battery_optimization_warning_seen", true).apply();
+  }
+
+  private static void openBatteryOptimizationSettings(@NonNull Activity activity)
+  {
+    final List<Intent> intents = new ArrayList<>();
+    if ("samsung".equalsIgnoreCase(Build.MANUFACTURER))
+    {
+      // https://developer.samsung.com/mobile/app-management.html
+      intents.add(new Intent("com.samsung.android.sm.ACTION_OPEN_CHECKABLE_LISTACTIVITY")
+                      .setPackage("com.samsung.android.lool")
+                      .putExtra("activity_type", 2)); // Never sleeping apps.
+    }
+    intents.add(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+    intents.add(new Intent(Settings.ACTION_SETTINGS));
+    for (final Intent intent : intents)
+    {
+      try
+      {
+        activity.startActivity(intent);
+        return;
+      }
+      catch (ActivityNotFoundException | SecurityException e)
+      {
+        Logger.w(TAG, "Failed to open battery settings: " + intent, e);
+      }
+    }
+  }
 
   /**
    * Enable to keep screen on.
@@ -179,7 +228,7 @@ public class Utils
     }
     catch (ActivityNotFoundException e)
     {
-      Logger.e(TAG, "Failed to start activity", e);
+      Logger.w(TAG, "Failed to start activity", e);
     }
   }
 
@@ -243,7 +292,7 @@ public class Utils
     {
       if (failMessage != null)
         Toast.makeText(context, context.getString(failMessage), Toast.LENGTH_LONG).show();
-      Logger.e(TAG, "ActivityNotFoundException", e);
+      Logger.w(TAG, "ActivityNotFoundException", e);
     }
   }
 
@@ -332,7 +381,7 @@ public class Utils
     }
     catch (ActivityNotFoundException e)
     {
-      Logger.e(TAG, "Failed to call phone", e);
+      Logger.w(TAG, "Failed to call phone", e);
     }
   }
 
@@ -441,30 +490,37 @@ public class Utils
     return manager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags));
   }
 
-  @NonNull
-  public static CharSequence formatRoutingTime(Context context, int seconds, @DimenRes int unitsSize)
+  /**
+   * Nearest minute (half up), with a one-minute minimum, for labels that show hours and minutes separately.
+   * Keep in sync with platform::Duration::GetRoutingString(), which formats the route preview and balloons.
+   */
+  public static long getRoutingMinutes(int seconds)
   {
-    return formatRoutingTime(context, seconds, unitsSize, R.dimen.text_size_routing_number);
+    assert seconds >= 0 : seconds;
+    return Math.max(1, (seconds + 30L) / 60);
   }
 
   @NonNull
-  public static CharSequence formatRoutingTime(Context context, int seconds, @DimenRes int unitsSize,
-                                               @DimenRes int textSize)
+  public static CharSequence formatDuration(Context context, int seconds, @DimenRes int unitsSize)
   {
+    int textSize = R.dimen.text_size_routing_number;
     long minutes = TimeUnit.SECONDS.toMinutes(seconds) % 60;
     long hours = TimeUnit.SECONDS.toHours(seconds);
-    String min = context.getString(R.string.minute);
-    String hour = context.getString(R.string.hour);
-    SpannableStringBuilder displayedH = Utils.formatTime(context, textSize, unitsSize, String.valueOf(hours), hour);
-    SpannableStringBuilder displayedM = Utils.formatTime(context, textSize, unitsSize, String.valueOf(minutes), min);
-    return hours == 0 ? displayedM : TextUtils.concat(displayedH, "\u00A0", displayedM);
+    CharSequence displayedM =
+        formatTime(context, textSize, unitsSize, String.valueOf(minutes), context.getString(R.string.minute));
+    if (hours == 0)
+      return displayedM;
+    return TextUtils.concat(
+        formatTime(context, textSize, unitsSize, String.valueOf(hours), context.getString(R.string.hour)), "\u00A0",
+        displayedM);
   }
 
   @NonNull
-  public static String formatArrivalTime(int seconds)
+  public static String formatArrivalTime(@NonNull Context context, int seconds)
   {
-    final LocalTime time = LocalTime.now().plusSeconds(seconds);
-    return StringUtils.formatUsingUsLocale("%d:%02d", time.getHour(), time.getMinute());
+    // Add elapsed time on the timeline so arrival clocks account for daylight-saving transitions.
+    final Date arrival = Date.from(Instant.now().plusSeconds(seconds));
+    return android.text.format.DateFormat.getTimeFormat(context).format(arrival);
   }
 
   @NonNull

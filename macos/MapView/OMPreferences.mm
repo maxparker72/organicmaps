@@ -214,13 +214,13 @@ namespace
 {
 void SetRoadAvoid(routing::RoutingOptions::Road road, bool avoid)
 {
-  auto opts = routing::RoutingOptions::LoadCarOptionsFromSettings();
+  auto opts = routing::RoutingOptions::LoadFromSettings(routing::VehicleType::Car);
   if (avoid) opts.Add(road); else opts.Remove(road);
-  routing::RoutingOptions::SaveCarOptionsToSettings(opts);
+  routing::RoutingOptions::SaveToSettings(routing::VehicleType::Car, opts);
 }
 bool GetRoadAvoid(routing::RoutingOptions::Road road)
 {
-  return routing::RoutingOptions::LoadCarOptionsFromSettings().Has(road);
+  return routing::RoutingOptions::LoadFromSettings(routing::VehicleType::Car).Has(road);
 }
 }
 

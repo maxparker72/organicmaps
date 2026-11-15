@@ -1,23 +1,19 @@
 final class RoutePointsView: UIView {
-  private enum Constants {
-    static let cellHeight: CGFloat = 44
-    static var bottomContentInset: CGFloat {
-      let bottomActionBartHeight = RouteActionsBottomMenuView.Constants.height +
-        RouteActionsBottomMenuView.Constants.insets.top +
-        RouteActionsBottomMenuView.Constants.insets.bottom
-      let safeAreaInsets = MapsAppDelegate.theApp().window.safeAreaInsets
-      return bottomActionBartHeight + safeAreaInsets.bottom + safeAreaInsets.top
-    }
-  }
-
   private var collectionView: UICollectionView!
   private var routePoints: NavigationDashboard.RoutePoints = .empty
 
   weak var interactor: NavigationDashboard.Interactor?
-  weak var scrollViewDelegate: UIScrollViewDelegate?
 
-  var contentBottom: CGPoint {
-    origin.applying(CGAffineTransform(translationX: .zero, y: collectionView.contentSize.height))
+  private var itemCount: Int {
+    routePoints.hasStartAndFinish ? routePoints.count + 1 : routePoints.count
+  }
+
+  var contentHeight: CGFloat {
+    CGFloat(itemCount) * RoutePointCollectionViewCell.height()
+  }
+
+  override var intrinsicContentSize: CGSize {
+    CGSize(width: UIView.noIntrinsicMetric, height: contentHeight)
   }
 
   init() {
@@ -39,11 +35,10 @@ final class RoutePointsView: UIView {
 
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-    updateCollectionViewInset()
-  }
-
-  private func updateCollectionViewInset() {
-    collectionView.contentInset.bottom = Constants.bottomContentInset
+    if previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory {
+      collectionView.collectionViewLayout.invalidateLayout()
+      invalidateIntrinsicContentSize()
+    }
   }
 
   private func setupView() {
@@ -53,13 +48,13 @@ final class RoutePointsView: UIView {
     collectionView.backgroundColor = .clear
     collectionView.dragInteractionEnabled = true
     collectionView.alwaysBounceVertical = false
-    collectionView.isScrollEnabled = true
+    collectionView.isScrollEnabled = false
+    collectionView.contentInsetAdjustmentBehavior = .never
     collectionView.dragDelegate = self
     collectionView.dropDelegate = self
     collectionView.dataSource = self
     collectionView.delegate = self
     collectionView.register(cell: RoutePointCollectionViewCell.self)
-    updateCollectionViewInset()
   }
 
   private func layout() {
@@ -74,16 +69,27 @@ final class RoutePointsView: UIView {
   }
 
   private func configure(_ cell: RoutePointCollectionViewCell, at indexPath: IndexPath) {
+    let index = indexPath.item
+    let topConnector: RoutePointCollectionViewCell.ConnectorStyle = index == 0 ? .none :
+      (index == routePoints.count ? .threeDots : .solid)
+    let bottomConnector: RoutePointCollectionViewCell.ConnectorStyle
+    if index < routePoints.count - 1 {
+      bottomConnector = .solid
+    } else if index == routePoints.count - 1, routePoints.hasStartAndFinish {
+      bottomConnector = .threeDots
+    } else {
+      bottomConnector = .none
+    }
     switch indexPath.item {
     case routePoints.count:
-      cell.configure(with: .addPoint)
+      cell.configure(with: .addPoint, topConnector: topConnector, bottomConnector: bottomConnector)
     default:
       let viewModel = routePoints.cellViewModel(for: indexPath.item, onCloseHandler: { [weak self] in
         if let point = self?.routePoints[indexPath.item] {
           self?.interactor?.process(.deleteRoutePoint(point))
         }
       })
-      cell.configure(with: viewModel)
+      cell.configure(with: viewModel, topConnector: topConnector, bottomConnector: bottomConnector)
     }
   }
 
@@ -91,14 +97,7 @@ final class RoutePointsView: UIView {
     guard self.routePoints != routePoints else { return }
     self.routePoints = routePoints
     collectionView.reloadData()
-  }
-}
-
-// MARK: - UIScrollViewDelegate
-
-extension RoutePointsView: UIScrollViewDelegate {
-  func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    scrollViewDelegate?.scrollViewDidScroll?(scrollView)
+    invalidateIntrinsicContentSize()
   }
 }
 
@@ -106,7 +105,7 @@ extension RoutePointsView: UIScrollViewDelegate {
 
 extension RoutePointsView: UICollectionViewDataSource, UICollectionViewDelegate {
   func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-    routePoints.hasStartAndFinish ? routePoints.count + 1 : routePoints.count
+    itemCount
   }
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -120,7 +119,10 @@ extension RoutePointsView: UICollectionViewDataSource, UICollectionViewDelegate 
     case routePoints.count:
       interactor?.process(.addRoutePointButtonDidTap)
     default:
-      interactor?.process(.selectRoutePoint(routePoints[indexPath.item]))
+      let selection = MWMRoutePointSelection(point: routePoints[indexPath.item],
+                                             type: routePoints.type(for: indexPath.item),
+                                             shouldAppend: false)
+      interactor?.process(.selectRoutePoint(selection))
     }
   }
 }
@@ -129,7 +131,7 @@ extension RoutePointsView: UICollectionViewDataSource, UICollectionViewDelegate 
 
 extension RoutePointsView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout _: UICollectionViewLayout, sizeForItemAt _: IndexPath) -> CGSize {
-    CGSize(width: collectionView.bounds.width, height: Constants.cellHeight)
+    CGSize(width: collectionView.bounds.width, height: RoutePointCollectionViewCell.height())
   }
 
   func collectionView(_: UICollectionView, layout _: UICollectionViewLayout, minimumLineSpacingForSectionAt _: Int) -> CGFloat {
@@ -178,11 +180,7 @@ extension RoutePointsView: UICollectionViewDragDelegate, UICollectionViewDropDel
           configure(cell, at: indexPath)
         }
         coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
-        if !routePoints.hasStartAndFinish {
-          interactor?.process(.swapStartAndFinishPoints)
-        } else {
-          interactor?.process(.moveRoutePoint(from: sourceIndexPath.row, to: destinationIndexPath.row))
-        }
+        interactor?.process(.moveRoutePoint(from: sourceIndexPath.row, to: destinationIndexPath.row))
       }
     }
   }
@@ -210,6 +208,7 @@ extension RoutePointsView: UICollectionViewDragDelegate, UICollectionViewDropDel
 private extension NavigationDashboard.RoutePoints {
   func cellViewModel(for index: Int, onCloseHandler: (() -> Void)?) -> RoutePointCollectionViewCell.CellType {
     let point = self[index]
+    let usesCurrentPositionIcon = index == 0 && point?.isMyPosition == true
     let maskedCorners: CACornerMask
     switch index {
     case 0:
@@ -219,8 +218,9 @@ private extension NavigationDashboard.RoutePoints {
     }
     let viewModel = RoutePointCollectionViewCell.PointViewModel(
       title: title(for: index),
-      image: image(for: index),
-      showCloseButton: point?.type == .intermediate,
+      image: usesCurrentPositionIcon ? UIImage.icCurrentPosition : defaultImage(for: index),
+      usesCurrentPositionIcon: usesCurrentPositionIcon,
+      showCloseButton: point != nil,
       maskedCorners: maskedCorners,
       isPlaceholder: point == nil,
       showSeparator: hasStartAndFinish ? true : index < points.count,

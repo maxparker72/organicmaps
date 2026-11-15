@@ -4,38 +4,44 @@ on:
   push:
     branches:
       - master
+    # Keep common paths in sync with android-beta.yaml, ios-check.yaml and ios-beta.yaml.
+    # Keep Android paths in sync with android-beta.yaml, except workflow/setup-gradle.
+    paths: &android-paths
+      # Common inputs
+      - .gitattributes
+      - .gitmodules
+      - '*.h'
+      - '*.hpp'
+      - 3party/**
+      - data/**
+      - libs/**
+      # Android inputs
+      - .github/actions/setup-gradle/**
+      - .github/workflows/android-check.yaml
+      - android/**
+      - CMakeLists.txt
+      - cmake/**
+      - tools/unix/version.sh  # Required by Gradle version generation
+      # Common exclusions
+      - '!**/*.md'
+      - '!**/*_tests/**'
+      - '!data/borders/**'
+      - '!data/organic_maps_emoji/**'
+      - '!data/strings/**'
+      - '!data/test_data/**'
+      # Android exclusions
+      - '!android/app/src/*/play/**'
+      - '!libs/platform/*apple*'
+      - '!libs/platform/*_ios*'
+      - '!libs/platform/*_linux*'
+      - '!libs/platform/*_mac*'
+      - '!libs/platform/*qt*'
+      - '!libs/platform/*_win*'
   pull_request:
-    paths-ignore:
-      - .gitignore
-      - .github/**
-      - '!.github/workflows/android-check.yaml'  # Run check on self change
-      - '**/*_tests/**'
-      - CONTRIBUTORS
-      - LICENSE
-      - NOTICE
-      - README.md
-      - android/app/src/fdroid/**
-      - android/app/src/google/**
-      - iphone/**
-      - data/organic_maps_emoji/**
-      - data/strings/**
-      - docs/**
-      - generator/**
-      - packaging/**
-      - platform/*apple*
-      - platform/*_ios*
-      - platform/*_linux*
-      - platform/*_mac*
-      - platform/*qt*
-      - platform/*_win*
-      - qt*/**
-      - skin_generator/**
-      - tools/**
-      - track_generator/**
-      - xcode/**
+    paths: *android-paths
 
 env:
-  JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64  # Java 17 is required for Android Gradle 8 plugin
+  JAVA_HOME: /usr/lib/jvm/temurin-21-jdk-amd64  # Java 21 is required by Android Gradle plugin lint
 
 jobs:
   lint:
@@ -44,6 +50,9 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v6
+
+      - name: Set up Gradle
+        uses: ./.github/actions/setup-gradle
 
       - name: Lint
         shell: bash
@@ -83,9 +92,10 @@ jobs:
           - flavor: FdroidDebug
             arch: arm32
     # Cancels previous jobs if the same branch or PR was updated again.
+    # Only cancel PR runs: master runs must finish to populate the shared ccache.
     concurrency:
       group: ${{ github.workflow }}-${{ matrix.flavor }}-${{ github.event.pull_request.number || github.ref }}
-      cancel-in-progress: true
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
     steps:
       - name: Install build tools and dependencies
@@ -100,26 +110,23 @@ jobs:
           # Needed for versioning script
           fetch-depth: 200 # enough to get all commits for the current day
 
-      - name: Restore Boost submodule from cache
-        uses: actions/cache@v5
+      - name: Set up Gradle
+        uses: ./.github/actions/setup-gradle
         with:
-          path: |
-            3party/boost
-            .git/modules/3party/boost
-          key: boost-submodule
+          # One writer covers the app, Wear and tests without duplicating dependency bundles.
+          cache-read-only: ${{ github.ref != 'refs/heads/master' || matrix.flavor != 'WebDebug' }}
 
       - name: Parallel submodules checkout
         shell: bash
         run: git submodule update --depth 1 --init --recursive --jobs=$(($(nproc) * 20))
 
-      - name: Configure repository
-        shell: bash
-        run: ./configure.sh
-
       - name: Configure ccache
-        uses: hendrikmuhs/ccache-action@v1.2
+        uses: hendrikmuhs/ccache-action@v1.2.24
         with:
           key: ${{ github.workflow }}-${{ matrix.flavor }}
+          # Restore-only on PRs: master populates the shared cache, PRs read it.
+          # Avoids overflowing the 10GB repo limit, which evicts master's caches.
+          save: ${{ github.ref == 'refs/heads/master' }}
 
       - name: Compile ${{ matrix.flavor }}
         shell: bash
@@ -131,6 +138,12 @@ jobs:
           cmake --version
           ninja --version
           ./gradlew -P${{ matrix.arch }} assemble${{ matrix.flavor }}
+
+      - name: Compile Wear Google Debug
+        if: matrix.flavor == 'WebDebug'
+        shell: bash
+        working-directory: android
+        run: ./gradlew :wear:assembleGoogleDebug
 
       - name: Free disk space for emulator
         if: matrix.run-tests == true
@@ -154,8 +167,13 @@ jobs:
           api-level: 35
           arch: x86_64
           target: google_apis
-          script: |
-            cd android && ./gradlew -P${{ matrix.arch }} app:test${{ matrix.flavor }} sdk:testDebug sdk:connectedDebugAndroidTest
+          working-directory: ./android
+          script: >-
+            ./gradlew -P${{ matrix.arch }} app:test${{ matrix.flavor }} sdk:testDebug
+            :wear:testGoogleDebugUnitTest :libs:wear-protocol-gms:testDebugUnitTest
+            :sdk:wear:core:testDebugUnitTest :sdk:wear:gms:testDebugUnitTest :libs:car:testDebugUnitTest
+            :sdk:location:gms:google:testDebugUnitTest :sdk:location:gms:foss:testDebugUnitTest
+            sdk:connectedDebugAndroidTest
 
       - name: Upload ${{ matrix.flavor }} apk
         uses: actions/upload-artifact@v7

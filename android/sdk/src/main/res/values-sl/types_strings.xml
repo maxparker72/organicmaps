@@ -197,6 +197,7 @@
     <string name="type.barrier.city_wall">Mestno obzidje</string>
     <string name="type.barrier.cycle_barrier">Kolesarska zapora</string>
     <string name="type.waterway.ditch">Odvodni jarek</string>
+    <string name="type.waterway.ditch.intermittent">Občasni odvodni jarek</string>
     <string name="type.natural.water.moat">Obrambni jarek</string>
     <string name="type.natural.water.wastewater">Odpadna voda</string>
     <string name="type.barrier.entrance">Vhod</string>
@@ -367,49 +368,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Cesta</string>
     <string name="type.highway.bridleway">Jahalna pot</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Most</string>
     <string name="type.highway.bridleway.permissive">Jahalna pot</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Predor</string>
     <string name="type.highway.busway">Namenska avtobusna cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Predor</string>
     <string name="type.highway.bus_stop">Avtobusno postajališče</string>
     <string name="type.highway.construction">Cesta v gradnji</string>
     <string name="type.highway.cycleway">Kolesarska pot</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Most</string>
     <string name="type.highway.cycleway.permissive">Kolesarska pot</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Predor</string>
     <string name="type.highway.elevator">Dvigalo</string>
     <string name="type.highway.footway">Pešpot</string>
     <string name="type.highway.footway.sidewalk">Pločnik</string>
     <string name="type.highway.footway.crossing">Prehod za pešce</string>
     <string name="type.highway.footway.area">Območje za pešce</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Most za pešce</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Predor za pešce</string>
     <string name="type.highway.ford">Prehod čez vodo</string>
     <string name="type.highway.living_street">Bivalna ulica</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Predor</string>
     <string name="type.highway.motorway">Avtocesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Avtocestni most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Avtocestni predor</string>
     <string name="type.highway.motorway_junction">Izhod s ceste</string>
     <string name="type.highway.motorway_link">Avtocesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Predor</string>
     <string name="type.highway.path">Pot</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -418,103 +419,104 @@
     <string name="type.highway.path.expert">Strokovna ali nerazpoznavna pot</string>
     <string name="type.highway.path.bicycle">Pot</string>
     <string name="type.highway.footway.bicycle">Pot</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Most</string>
     <string name="type.highway.path.horse">Pot</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Predor</string>
     <string name="type.highway.pedestrian">Ulica za pešce</string>
     <string name="type.highway.pedestrian.area">Območje za pešce</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Most za pešce</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Predor za pešce</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.highway.platform">Peron</string>
     <string name="type.highway.primary">Glavna cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Predor</string>
     <string name="type.highway.primary_link">Rampa glavne ceste</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Predor</string>
     <string name="type.highway.raceway">Dirkališče</string>
     <string name="type.highway.residential">Stanovanjska ulica</string>
     <string name="type.highway.residential.area">Stanovanjska ulica</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Predor</string>
     <string name="type.highway.rest_area">Počivališče</string>
     <string name="type.highway.road">Cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Most</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Predor</string>
     <string name="type.highway.secondary">Regionalna cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Predor</string>
     <string name="type.highway.secondary_link">Regionalna cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Predor</string>
     <string name="type.highway.service">Servisna cesta</string>
     <string name="type.highway.service.area">Servisna cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Most</string>
     <string name="type.highway.service.driveway">Dovoz</string>
     <string name="type.highway.service.parking_aisle">Parkirni pas</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Predor</string>
     <string name="type.highway.services">Servisno območje</string>
     <string name="type.highway.speed_camera">Radar</string>
     <string name="type.highway.steps">Stopnice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Predor</string>
     <string name="type.highway.ladder">Lestev</string>
     <string name="type.highway.tertiary">Lokalna cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Predor</string>
     <string name="type.highway.tertiary_link">Rampa lokalne ceste</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Predor</string>
     <string name="type.highway.track">Kolovoz</string>
     <string name="type.highway.track.area">Kolovoz</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Most</string>
     <string name="type.highway.track.grade1">Kolovoz</string>
     <string name="type.highway.track.no.access">Kolovoz</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Predor</string>
     <string name="type.highway.traffic_signals">Semafor</string>
     <string name="type.highway.trunk">Hitra cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Predor</string>
     <string name="type.highway.trunk_link">Rampa hitre ceste</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Predor</string>
     <string name="type.highway.unclassified">Manjša cesta</string>
     <string name="type.highway.unclassified.area">Manjša cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Predor</string>
     <string name="type.area_highway.cycleway">Kolesarska pot</string>
     <string name="type.area_highway.footway">Pešpot</string>
@@ -552,6 +554,7 @@
     <string name="type.historic.castle.shiro">Japonski grad</string>
     <string name="type.historic.castle.stately">Veličasten grad</string>
     <string name="type.historic.city_gate">Mestna vrata</string>
+    <string name="type.man_made.ceremonial_gate">Obredna vrata</string>
     <string name="type.historic.citywalls">Mestno obzidje</string>
     <string name="type.historic.fort">Utrdba</string>
     <string name="type.historic.gallows">Vislice</string>
@@ -582,7 +585,8 @@
     <string name="type.junction.roundabout">Krožišče</string>
     <string name="type.landuse">Raba zemljišč</string>
     <string name="type.landuse.allotments">Vrtički</string>
-    <string name="type.landuse.basin">Bazen</string>
+    <string name="type.landuse.basin">Vodni bazen</string>
+    <string name="type.landuse.basin.intermittent">Občasni vodni bazen</string>
     <string name="type.landuse.brownfield">Degradirano območje</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Pokopališče</string>
@@ -612,7 +616,6 @@
     <string name="type.landuse.quarry">Kamnolom</string>
     <string name="type.landuse.railway">Železniško območje</string>
     <string name="type.landuse.recreation_ground">Rekreacijsko območje</string>
-    <string name="type.landuse.reservoir">Zadrževalnik</string>
     <string name="type.landuse.residential">Stanovanjsko območje</string>
     <string name="type.landuse.retail">Trgovsko območje</string>
     <string name="type.landuse.salt_pond">Solni bazen</string>
@@ -631,6 +634,7 @@
     <string name="type.leisure.golf_course">Igrišče za golf</string>
     <string name="type.leisure.ice_rink">Drsališče</string>
     <string name="type.leisure.nature_reserve">Naravni rezervat</string>
+    <string name="type.leisure.bird_hide">Opazovalnica ptic</string>
     <string name="type.leisure.outdoor_seating">Sedenje na prostem</string>
     <string name="type.leisure.firepit">Kurišče</string>
     <string name="type.leisure.park.no.access">Zasebni park</string>
@@ -662,6 +666,8 @@
     <string name="type.man_made.pier">Pomol</string>
     <string name="type.man_made.pipeline">Cevovod</string>
     <string name="type.man_made.pipeline.overground">Nadzemni cevovod</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Vodohran</string>
     <string name="type.man_made.silo">Silos</string>
     <string name="type.man_made.storage_tank">Rezervoar</string>
     <string name="type.man_made.surveillance">Nadzorna kamera</string>
@@ -680,6 +686,8 @@
     <string name="type.man_made.water_tower">Vodni stolp</string>
     <string name="type.man_made.water_well">Vodnjak</string>
     <string name="type.man_made.water_well.drinking_water_no">Vodnjak</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Vodarna</string>
     <string name="type.man_made.windmill">Mlin na veter</string>
     <string name="type.man_made.works">Industrijski obrat</string>
     <string name="type.military">Vojaški objekt</string>
@@ -711,12 +719,15 @@
     <string name="type.natural.water.lock">Zapornica</string>
     <string name="type.natural.water.pond">Ribnik</string>
     <string name="type.natural.water.reservoir">Zadrževalnik</string>
-    <string name="type.natural.water.basin">Bazen</string>
+    <string name="type.natural.water.basin">Vodni bazen</string>
     <string name="type.natural.water.river">Reka</string>
+    <string name="type.natural.water.intermittent">Občasna vodna površina</string>
     <string name="type.natural.land">Zemljišče</string>
     <string name="type.natural.meadow">Travnik</string>
     <string name="type.natural.orchard">Sadovnjak</string>
     <string name="type.natural.peak">Vrh</string>
+    <string name="type.natural.hill">Hrib</string>
+    <string name="type.natural.arch">Skalni lok</string>
     <string name="type.natural.saddle">Gorsko sedlo</string>
     <string name="type.natural.rock">Skala</string>
     <string name="type.natural.scrub">Grmičevje</string>
@@ -802,6 +813,7 @@
     <!-- A single pole supporting various public utilities, such as lighting or telephony. -->
     <string name="type.man_made.utility_pole">Komunalni drog</string>
     <string name="type.public_transport">Javni prevoz</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.public_transport.platform">Peron</string>
     <string name="type.railway">Železnica</string>
     <string name="type.railway.abandoned">Opuščena železnica</string>
@@ -1158,6 +1170,8 @@
     <string name="type.shop.greengrocer">Zelenjavar</string>
     <string name="type.shop.grocery">Živilska trgovina</string>
     <string name="type.shop.hairdresser">Frizer</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Brivnica</string>
     <string name="type.shop.hardware">Železnina</string>
     <string name="type.shop.health_food">Trgovina z zdravo prehrano</string>
     <string name="type.shop.hearing_aids">Trgovina s slušnimi aparati</string>
@@ -1272,6 +1286,7 @@
     <string name="type.sport.rugby_union">Ragbi</string>
     <string name="type.sport.running">Tek</string>
     <string name="type.sport.softball">Softball</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turizem</string>
     <string name="type.tourism.aquarium">Akvarij</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1322,21 +1337,24 @@
     <string name="type.waterway">Vodotok</string>
     <string name="type.waterway.access_point">Dostopna točka do plovnih poti</string>
     <string name="type.waterway.canal">Kanal</string>
+    <string name="type.waterway.canal.intermittent">Občasni kanal</string>
     <string name="type.waterway.canal.tunnel">Kanalski predor</string>
     <string name="type.waterway.fish_pass">Ribja steza</string>
+    <string name="type.waterway.fish_pass.intermittent">Občasna ribja steza</string>
     <string name="type.waterway.dam">Jez</string>
     <string name="type.barrier.ditch">Jarek</string>
     <string name="type.natural.water.ditch">Odvodni jarek</string>
     <string name="type.waterway.ditch.tunnel">Prepust</string>
     <string name="type.waterway.dock">Pristanišče</string>
     <string name="type.waterway.drain">Odvod</string>
+    <string name="type.waterway.drain.intermittent">Občasni odvod</string>
     <string name="type.natural.water.drain">Odvod</string>
     <string name="type.waterway.drain.tunnel">Prepust</string>
     <string name="type.waterway.lock_gate">Zapornica</string>
     <string name="type.waterway.river">Reka</string>
+    <string name="type.waterway.river.intermittent">Občasna reka</string>
     <string name="type.waterway.river.tunnel">Reka</string>
     <string name="type.waterway.stream">Potok</string>
-    <string name="type.waterway.stream.ephemeral">Začasni potok</string>
     <string name="type.waterway.stream.intermittent">Občasni potok</string>
     <string name="type.waterway.stream.tunnel">Potok</string>
     <string name="type.waterway.waterfall">Slap</string>
@@ -1379,6 +1397,7 @@
     <string name="type.self_service.no">Ni samopostrežbe</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Socialna ustanova</string>
+    <string name="type.amenity.stage">Oder</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Vhod v urgentni oddelek</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:leisure=sports_hall -->
@@ -1391,4 +1410,6 @@
     <string name="type.office.security">Varnostna pisarna</string>
     <string name="type.power.portal">Daljnovodni stolp (portal)</string>
     <string name="type.shop.lighting">Trgovina s svetili</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Izdelava oken</string>
 </resources>

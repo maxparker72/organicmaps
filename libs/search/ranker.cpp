@@ -413,12 +413,13 @@ private:
     center = feature::GetCenter(*ft);
     m_ranker.GetBestMatchName(*ft, name);
 
-    // Use brand instead of empty result name.
+    // Use brand instead of empty result name. If no brand try to use operator.
     if (!m_isViewportMode && name.empty())
     {
-      std::string_view brand = (*ft).GetMetadata(feature::Metadata::FMD_BRAND);
-      if (!brand.empty())
+      if (auto const brand = ft->GetMetadata(feature::Metadata::FMD_BRAND); !brand.empty())
         name = platform::GetLocalizedBrandName(std::string{brand});
+      else if (auto const op = ft->GetMetadata(feature::Metadata::FMD_OPERATOR); !op.empty())
+        name = op;
     }
 
     /// @todo Ensure that we actually need to get and assign address here? Needed for the ranking?
@@ -772,6 +773,10 @@ Result Ranker::MakeResult(RankerResult const & rankerResult, bool needAddress, b
   case RankerResult::Type::Postcode: res.SetType(Result::Type::Postcode); break;
   }
 
+  // Coordinates and postcodes are parsed from the query as is.
+  bool const isFeature = res.GetResultType() == Result::Type::Feature;
+  res.SetErrorsMade(isFeature ? rankerResult.GetRankingInfo().m_errorsMade : ErrorsMade(0));
+
   if (needHighlighting)
     HighlightResult(m_params.m_query.m_tokens, m_params.m_query.m_prefix, res);
 
@@ -980,13 +985,12 @@ void Ranker::MatchForSuggestions(strings::UniString const & token, int8_t locale
 {
   for (auto const & suggest : m_suggests)
   {
-    strings::UniString const & s = suggest.m_name;
+    strings::UniString const & s = suggest.m_normalizedName;
     if (suggest.m_prefixLength <= token.size() && token != s  // do not push suggestion if it already equals to token
         && suggest.m_locale == locale                         // push suggestions only for needed language
         && strings::StartsWith(s, token))
     {
-      std::string const utf8Str = strings::ToUtf8(s);
-      Result r(utf8Str, prologue + utf8Str + " ");
+      Result r(suggest.m_name, prologue + suggest.m_name + " ");
       HighlightResult(m_params.m_query.m_tokens, m_params.m_query.m_prefix, r);
       m_emitter.AddResult(std::move(r));
     }

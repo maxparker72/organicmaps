@@ -42,6 +42,7 @@ std::string_view DebugPrint(Message::Type msgType)
   case Message::Type::BuildSelectionLines: return "BuildSelectionLines";
   case Message::Type::AddSubroute: return "AddSubroute";
   case Message::Type::RemoveSubroute: return "RemoveSubroute";
+  case Message::Type::RemoveAlternativeSubroutes: return "RemoveAlternativeSubroutes";
   case Message::Type::PrepareSubrouteArrows: return "PrepareSubrouteArrows";
   case Message::Type::CacheSubrouteArrows: return "CacheSubrouteArrows";
   case Message::Type::FlushSubroute: return "FlushSubroute";
@@ -58,6 +59,7 @@ std::string_view DebugPrint(Message::Type msgType)
   case Message::Type::Allow3dMode: return "Allow3dMode";
   case Message::Type::Allow3dBuildings: return "Allow3dBuildings";
   case Message::Type::SetMapLangIndex: return "SetMapLangIndex";
+  case Message::Type::SetTerrainLight: return "SetTerrainLight";
   case Message::Type::EnablePerspective: return "EnablePerspective";
   case Message::Type::FlushCirclesPack: return "FlushCirclesPack";
   case Message::Type::CacheCirclesPack: return "CacheCirclesPack";
@@ -105,13 +107,15 @@ std::string_view DebugPrint(Message::Type msgType)
   case Message::Type::ShowDebugInfo: return "ShowDebugInfo";
   case Message::Type::NotifyRenderThread: return "NotifyRenderThread";
   case Message::Type::NotifyGraphicsReady: return "NotifyGraphicsReady";
+  case Message::Type::ScenarioViewport: return "ScenarioViewport";
   case Message::Type::EnableIsolines: return "EnableIsolines";
   case Message::Type::OnEnterBackground: return "OnEnterBackground";
   case Message::Type::Arrow3dRecache: return "Arrow3dRecache";
   case Message::Type::VisualScaleChanged: return "VisualScaleChanged";
+  case Message::Type::AddTileBackgroundImage: return "AddTileBackgroundImage";
   case Message::Type::SetTileBackgroundData: return "SetTileBackgroundData";
   case Message::Type::SetTileBackgroundMode: return "SetTileBackgroundMode";
-  case Message::Type::AssignTileBackgroundTexture: return "AssignTileBackgroundTexture";
+  case Message::Type::AssignTileBackgroundImage: return "AssignTileBackgroundImage";
   }
   UNREACHABLE();
 }

@@ -201,7 +201,8 @@
     <string name="type.barrier.chain">Zincir</string>
     <string name="type.barrier.city_wall">Şehir Duvarı</string>
     <string name="type.barrier.cycle_barrier">Bisiklet Bariyeri</string>
-    <string name="type.waterway.ditch">Drenaj Çukuru</string>
+    <string name="type.waterway.ditch">Drenaj hendeği</string>
+    <string name="type.waterway.ditch.intermittent">Geçici drenaj hendeği</string>
     <string name="type.natural.water.moat">Hendek</string>
     <string name="type.natural.water.wastewater">Atık Su</string>
     <string name="type.barrier.entrance">Giriş</string>
@@ -387,49 +388,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Otoyol</string>
     <string name="type.highway.bridleway">Atlı Yolu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Köprü</string>
     <string name="type.highway.bridleway.permissive">Atlı Yolu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Tünel</string>
     <string name="type.highway.busway">Ayrık Otobüs Yolu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Tünel</string>
     <string name="type.highway.bus_stop">Otobüs Durağı</string>
     <string name="type.highway.construction">Yapım Aşamasında Yol</string>
     <string name="type.highway.cycleway">Bisiklet Yolu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Köprü</string>
     <string name="type.highway.cycleway.permissive">Bisiklet Yolu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Tünel</string>
     <string name="type.highway.elevator">Asansör</string>
     <string name="type.highway.footway">Yaya Yolu</string>
     <string name="type.highway.footway.sidewalk">Kaldırım</string>
     <string name="type.highway.footway.crossing">Yaya Geçidi</string>
     <string name="type.highway.footway.area">Yaya Alanı</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Yaya Köprüsü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Yaya Tüneli</string>
     <string name="type.highway.ford">Sığ Geçit</string>
     <string name="type.highway.living_street">Cadde</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Tünel</string>
     <string name="type.highway.motorway">Otoyol</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Otoyol Köprüsü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Otoyol Tüneli</string>
     <string name="type.highway.motorway_junction">Yol Çıkışı</string>
     <string name="type.highway.motorway_link">Otoyol Rampası</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Tünel</string>
     <string name="type.highway.path">Yol</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -438,103 +439,104 @@
     <string name="type.highway.path.expert">Çok Zor ya da Seçilemez Patika</string>
     <string name="type.highway.path.bicycle">Bisiklet ve Yürüyüş Yolu</string>
     <string name="type.highway.footway.bicycle">Bisiklet ve Yürüyüş Yolu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Köprü</string>
     <string name="type.highway.path.horse">Atlı Yolu</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Tünel</string>
     <string name="type.highway.pedestrian">Yaya Caddesi</string>
     <string name="type.highway.pedestrian.area">Yaya Alanı</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Yaya Köprüsü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Yaya Tüneli</string>
-    <string name="type.highway.platform">Platform</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Peron</string>
     <string name="type.highway.primary">Ana Yol</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Tünel</string>
     <string name="type.highway.primary_link">Ana Yol Rampası</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Tünel</string>
     <string name="type.highway.raceway">Yarış Pisti</string>
     <string name="type.highway.residential">Sokak</string>
     <string name="type.highway.residential.area">Sokak</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Tünel</string>
     <string name="type.highway.rest_area">Dinlenme Alanı</string>
     <string name="type.highway.road">Yol</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Köprü</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Tünel</string>
     <string name="type.highway.secondary">Tali Yol</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Tünel</string>
     <string name="type.highway.secondary_link">Tali Yol Rampası</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Tünel</string>
     <string name="type.highway.service">Servis Yolu</string>
     <string name="type.highway.service.area">Servis Yolu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Köprü</string>
     <string name="type.highway.service.driveway">Servis Yolu</string>
     <string name="type.highway.service.parking_aisle">Park Koridoru</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Tünel</string>
     <string name="type.highway.services">Servis Alanı</string>
     <string name="type.highway.speed_camera">Hız Kamerası</string>
     <string name="type.highway.steps">Merdiven</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Tünel</string>
     <string name="type.highway.ladder">Basamak</string>
     <string name="type.highway.tertiary">Üçüncül Yol</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Tünel</string>
     <string name="type.highway.tertiary_link">Üçüncül Yol Rampası</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Tünel</string>
     <string name="type.highway.track">Pist</string>
     <string name="type.highway.track.area">Pist</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Köprü</string>
     <string name="type.highway.track.grade1">Pist</string>
     <string name="type.highway.track.no.access">Pist</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Tünel</string>
     <string name="type.highway.traffic_signals">Trafik Işıkları</string>
     <string name="type.highway.trunk">Devlet Yolu</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Tünel</string>
     <string name="type.highway.trunk_link">Devlet Yolu Rampası</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Tünel</string>
     <string name="type.highway.unclassified">Tali Yol</string>
     <string name="type.highway.unclassified.area">Tali Yol</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Köprü</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Tünel</string>
     <string name="type.area_highway.cycleway">Bisiklet Yolu</string>
     <string name="type.area_highway.footway">Yaya Yolu</string>
@@ -572,6 +574,7 @@
     <string name="type.historic.castle.shiro">Japon Kalesi</string>
     <string name="type.historic.castle.stately">Görkemli Şato</string>
     <string name="type.historic.city_gate">Şehir Kapısı</string>
+    <string name="type.man_made.ceremonial_gate">Tören Kapısı</string>
     <string name="type.historic.citywalls">Şehir Duvarı</string>
     <string name="type.historic.fort">Kale</string>
     <string name="type.historic.gallows">Darağacı</string>
@@ -605,6 +608,7 @@
     <string name="type.landuse">Arazi Kullanımı</string>
     <string name="type.landuse.allotments">Tahsisler</string>
     <string name="type.landuse.basin">Havza</string>
+    <string name="type.landuse.basin.intermittent">Geçici havza</string>
     <string name="type.landuse.brownfield">Terkedilmiş Endüstri Bölgesi</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Mezarlık</string>
@@ -635,7 +639,6 @@
     <string name="type.landuse.quarry">Taş Ocağı</string>
     <string name="type.landuse.railway">Demiryolu Tesisleri</string>
     <string name="type.landuse.recreation_ground">Dinlenme Alanı</string>
-    <string name="type.landuse.reservoir">Su</string>
     <string name="type.landuse.residential">Yerleşim Alanı</string>
     <string name="type.landuse.retail">Perakende Satış Alanı</string>
     <string name="type.landuse.salt_pond">Tuzla</string>
@@ -657,6 +660,7 @@
     <string name="type.leisure.ice_rink">Buz Pateni Pisti</string>
     <string name="type.leisure.marina">Liman</string>
     <string name="type.leisure.nature_reserve">Doğal Koruma Alanı</string>
+    <string name="type.leisure.bird_hide">Kuş gözlem kulübesi</string>
     <string name="type.leisure.outdoor_seating">Dış Mekan Oturağı</string>
     <string name="type.leisure.firepit">Ateş Çukuru</string>
     <string name="type.leisure.park">Park</string>
@@ -691,6 +695,8 @@
     <string name="type.man_made.pier">İskele</string>
     <string name="type.man_made.pipeline">Boru Hattı</string>
     <string name="type.man_made.pipeline.overground">Yerüstü Boru Hattı</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Kapalı Su Deposu</string>
     <string name="type.man_made.silo">Ambar</string>
     <string name="type.man_made.storage_tank">Depolama Tankı</string>
     <string name="type.man_made.surveillance">Güvenlik Kamerası</string>
@@ -709,6 +715,8 @@
     <string name="type.man_made.water_tower">Su Kulesi</string>
     <string name="type.man_made.water_well">Su Kuyusu</string>
     <string name="type.man_made.water_well.drinking_water_no">Su Kuyusu</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Su Arıtma Tesisi</string>
     <string name="type.man_made.windmill">Yel Değirmeni</string>
     <string name="type.man_made.works">Sanayi İşleri</string>
     <string name="type.military">Askeri</string>
@@ -743,10 +751,13 @@
     <string name="type.natural.water.reservoir">Rezervuar</string>
     <string name="type.natural.water.basin">Havza</string>
     <string name="type.natural.water.river">Nehir</string>
+    <string name="type.natural.water.intermittent">Geçici su</string>
     <string name="type.natural.land">Arazi</string>
     <string name="type.natural.meadow">Çayır</string>
     <string name="type.natural.orchard">Meyve Bahçesi</string>
     <string name="type.natural.peak">Zirve</string>
+    <string name="type.natural.hill">Tepe</string>
+    <string name="type.natural.arch">Kaya Kemeri</string>
     <string name="type.natural.saddle">Dağ Eyeri</string>
     <string name="type.natural.rock">Kaya</string>
     <string name="type.natural.scrub">Çalılık</string>
@@ -838,7 +849,8 @@
     <string name="type.psurface.unpaved_bad">psurface-unpaved_bad</string>
     <string name="type.psurface.unpaved_good">psurface-unpaved_good</string>
     <string name="type.public_transport">Toplu Taşıma</string>
-    <string name="type.public_transport.platform">Platform</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Peron</string>
     <string name="type.railway">Demiryolu</string>
     <string name="type.railway.abandoned">Terk Edilmiş Demir Yolu</string>
     <string name="type.railway.abandoned.bridge">Terk Edilmiş Demir Yolu Köprüsü</string>
@@ -862,7 +874,7 @@
     <string name="type.railway.narrow_gauge">Dar Hat Rayı</string>
     <string name="type.railway.narrow_gauge.bridge">Dar Hat Rayı Köprüsü</string>
     <string name="type.railway.narrow_gauge.tunnel">Dar Hat Rayı Tüneli</string>
-    <string name="type.railway.platform">Demir Yolu Platformu</string>
+    <string name="type.railway.platform">Demiryolu peronu</string>
     <string name="type.railway.preserved">Korunmuş Ray</string>
     <string name="type.railway.preserved.bridge">Korunmuş Ray Köprüsü</string>
     <string name="type.railway.preserved.tunnel">Korunmuş Ray Tüneli</string>
@@ -1195,6 +1207,8 @@
     <string name="type.shop.greengrocer">Manav</string>
     <string name="type.shop.grocery">Market</string>
     <string name="type.shop.hairdresser">Kuaför</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Berber</string>
     <string name="type.shop.hardware">Donanım mağazası</string>
     <string name="type.shop.health_food">Sağlık Gıda Mağazası</string>
     <string name="type.shop.hearing_aids">İşitme cihazı mağazası</string>
@@ -1318,6 +1332,7 @@
     <string name="type.sport.rugby_union">Ragbi</string>
     <string name="type.sport.running">Koşu</string>
     <string name="type.sport.softball">Softbol</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turizm</string>
     <string name="type.tourism.aquarium">Akvaryum</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1371,23 +1386,26 @@
     <string name="type.waterway">Su Yolu</string>
     <string name="type.waterway.access_point">Su Yolu Erişim Noktası</string>
     <string name="type.waterway.canal">Kanal</string>
+    <string name="type.waterway.canal.intermittent">Geçici kanal</string>
     <string name="type.waterway.canal.tunnel">Kanal</string>
     <string name="type.waterway.fish_pass">Balık Geçidi</string>
+    <string name="type.waterway.fish_pass.intermittent">Geçici balık geçidi</string>
     <string name="type.waterway.dam">Baraj</string>
     <string name="type.barrier.ditch">Hendek</string>
-    <string name="type.natural.water.ditch">Drenaj çukuru</string>
+    <string name="type.natural.water.ditch">Drenaj hendeği</string>
     <string name="type.waterway.ditch.tunnel">Menfez</string>
     <string name="type.waterway.dock">Rıhtım</string>
-    <string name="type.waterway.drain">Lağım</string>
-    <string name="type.natural.water.drain">Lağım</string>
+    <string name="type.waterway.drain">Drenaj kanalı</string>
+    <string name="type.waterway.drain.intermittent">Geçici drenaj kanalı</string>
+    <string name="type.natural.water.drain">Drenaj kanalı</string>
     <string name="type.waterway.drain.tunnel">Menfez</string>
     <string name="type.waterway.lock_gate">Eklüz Kapağı</string>
     <string name="type.waterway.river">Nehir</string>
+    <string name="type.waterway.river.intermittent">Geçici nehir</string>
     <string name="type.waterway.river.tunnel">Nehir</string>
-    <string name="type.waterway.stream">Nehir</string>
-    <string name="type.waterway.stream.ephemeral">Nehir</string>
-    <string name="type.waterway.stream.intermittent">Nehir</string>
-    <string name="type.waterway.stream.tunnel">Nehir</string>
+    <string name="type.waterway.stream">Dere</string>
+    <string name="type.waterway.stream.intermittent">Geçici dere</string>
+    <string name="type.waterway.stream.tunnel">Dere</string>
     <string name="type.waterway.waterfall">Şelale</string>
     <string name="type.waterway.weir">Su Bendi</string>
     <string name="type.wheelchair">Tekerlekli sandalye</string>
@@ -1428,6 +1446,7 @@
     <string name="type.self_service.no">Self servis yok</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Sosyal Tesis</string>
+    <string name="type.amenity.stage">Sahne</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Acil Servis Girişi</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1457,6 +1476,8 @@
     <string name="type.man_made.monitoring_station.weather">Hava Durumu İzleme İstasyonu</string>
     <string name="type.amenity.student_accommodation">Öğrenci Konaklama</string>
     <string name="type.craft.watchmaker">Saatçi</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Pencere İmalatı</string>
     <string name="type.xmas_feature.market">Noel Pazarı</string>
     <string name="type.xmas_feature.tree">Noel Ağacı</string>
     <string name="type.amenity.hookah_lounge">Nargile salonu</string>

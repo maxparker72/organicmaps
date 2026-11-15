@@ -26,11 +26,19 @@ constexpr char const * kKindValue = "project";
 constexpr char const * kProjectIdKey = "projectId";
 NSString * const kTagsDelimiter = @";";
 
+// BookmarkManager dropped its getter for these; the setter remains.
+std::string GetCategoryProperty(BookmarkManager const & bm, kml::MarkGroupId groupId, std::string const & key)
+{
+  auto const & properties = bm.GetCategoryData(groupId).m_properties;
+  auto const it = properties.find(key);
+  return it != properties.end() ? it->second : std::string();
+}
+
 bool IsProjectCategory(BookmarkManager const & bm, kml::MarkGroupId groupId)
 {
   if (!bm.HasBmCategory(groupId))
     return false;
-  return bm.GetCategoryCustomProperty(groupId, kKindKey) == kKindValue;
+  return GetCategoryProperty(bm, groupId, kKindKey) == kKindValue;
 }
 
 std::vector<std::string> SplitTagsRaw(std::string const & raw)
@@ -120,7 +128,7 @@ NSString * _Nullable ProjectIdForCategory(BookmarkManager const & bm, kml::MarkG
 {
   if (!IsProjectCategory(bm, groupId))
     return nil;
-  std::string const pid = bm.GetCategoryCustomProperty(groupId, kProjectIdKey);
+  std::string const pid = GetCategoryProperty(bm, groupId, kProjectIdKey);
   return pid.empty() ? nil : @(pid.c_str());
 }
 }  // namespace
@@ -178,7 +186,7 @@ NSString * _Nullable ProjectIdForCategory(BookmarkManager const & bm, kml::MarkG
   auto const & bm = GetFramework().GetBookmarkManager();
   if (!bm.HasBmCategory(categoryId))
     return nil;
-  std::string const v = bm.GetCategoryCustomProperty(categoryId, key.UTF8String);
+  std::string const v = GetCategoryProperty(bm, categoryId, key.UTF8String);
   return v.empty() ? nil : @(v.c_str());
 }
 

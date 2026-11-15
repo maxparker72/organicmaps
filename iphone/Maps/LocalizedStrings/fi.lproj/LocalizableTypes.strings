@@ -209,7 +209,8 @@
 "type.barrier.chain" = "Ketju";
 "type.barrier.city_wall" = "Kaupungin muuri";
 "type.barrier.cycle_barrier" = "Polkupyöräeste";
-"type.waterway.ditch" = "Viemäröinti oja";
+"type.waterway.ditch" = "Kuivatusoja";
+"type.waterway.ditch.intermittent" = "Ajoittainen kuivatusoja";
 "type.natural.water.moat" = "Vallihauta";
 "type.natural.water.wastewater" = "Jätevesi";
 "type.barrier.entrance" = "Sisäänkäynti";
@@ -407,28 +408,28 @@
 "type.highway" = "Valtatie";
 "type.highway.bridleway" = "Ratsastustie";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Silta";
 "type.highway.bridleway.permissive" = "Ratsastustie";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Tunneli";
 "type.highway.busway" = "Busseille varattu tie";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Tunneli";
 "type.highway.bus_stop" = "Bussipysäkki";
 "type.highway.construction" = "Rakenteilla oleva tie";
 "type.highway.cycleway" = "Pyörätie";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Silta";
 "type.highway.cycleway.permissive" = "Pyörätie";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Tunneli";
 "type.highway.elevator" = "Hissi";
 "type.highway.footway" = "Polku";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Jalankulkijoiden ylitys";
 "type.highway.footway.area" = "Jalankulkualue";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Jalankulkusilta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Jalankulkutunneli";
 "type.highway.ford" = "Kahluupaikka";
 "type.highway.living_street" = "Asuinkatu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Tunneli";
 "type.highway.motorway" = "Moottoritie";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Moottoritiesilta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Moottoritietunneli";
 "type.highway.motorway_junction" = "Poistumistie";
 "type.highway.motorway_link" = "Moottoritieramppi";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Tunneli";
 "type.highway.path" = "Polku";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Kevyen liikenteen väylä";
 "type.highway.footway.bicycle" = "Kevyen liikenteen väylä";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Silta";
 "type.highway.path.horse" = "Ratsastuspolku";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Tunneli";
 "type.highway.pedestrian" = "Jalankulkutie";
 "type.highway.pedestrian.area" = "Jalankulkualue";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Jalankulkusilta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Jalankulkutunneli";
-"type.highway.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "Laituri";
 "type.highway.primary" = "Pääkatu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Tunneli";
 "type.highway.primary_link" = "Pääkatu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Tunneli";
 "type.highway.raceway" = "Kilparata";
 "type.highway.residential" = "Katu";
 "type.highway.residential.area" = "Katu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Tunneli";
 "type.highway.rest_area" = "Levähdyspaikka";
 "type.highway.road" = "Katu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Silta";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Tunneli";
 "type.highway.secondary" = "Katu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Tunneli";
 "type.highway.secondary_link" = "Katu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Tunneli";
 "type.highway.service" = "Huoltotie";
 "type.highway.service.area" = "Huoltotie";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Silta";
 "type.highway.service.driveway" = "Ajotie";
 "type.highway.service.parking_aisle" = "Pysäköintikäytävä";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Huoltotunneli";
 "type.highway.services" = "Palvelualue";
 "type.highway.speed_camera" = "Nopeusvalvontakamera";
 "type.highway.steps" = "Portaat";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Tunneli";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "Katu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Tunneli";
 "type.highway.tertiary_link" = "Katu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Tunneli";
 "type.highway.track" = "Katu";
 "type.highway.track.area" = "Katu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Silta";
 "type.highway.track.grade1" = "Katu";
 "type.highway.track.no.access" = "Katu";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Tunneli";
 "type.highway.traffic_signals" = "Liikennevalot";
 "type.highway.trunk" = "Päätie";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Tunneli";
 "type.highway.trunk_link" = "Päätien ramppi";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Tunneli";
 "type.highway.unclassified" = "Katu";
 "type.highway.unclassified.area" = "Katu";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Silta";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Tunneli";
 "type.area_highway.cycleway" = "Pyörätie";
 "type.area_highway.footway" = "Polku";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Japanilainen linna";
 "type.historic.castle.stately" = "Arvokas linna";
 "type.historic.city_gate" = "Kaupungin portti";
+"type.man_made.ceremonial_gate" = "Seremoniallinen portti";
 "type.historic.citywalls" = "Kaupungin muuri";
 "type.historic.fort" = "Linnake";
 "type.historic.gallows" = "Hirsipuu";
@@ -718,6 +722,7 @@
 "type.landuse" = "Maankäyttö";
 "type.landuse.allotments" = "Siirtolapuutarha";
 "type.landuse.basin" = "Vesisäiliö";
+"type.landuse.basin.intermittent" = "Ajoittainen vesisäiliö";
 "type.landuse.brownfield" = "Tuhoalue";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Louhos";
 "type.landuse.railway" = "Rautatierakennukset";
 "type.landuse.recreation_ground" = "Virkistysalue";
-"type.landuse.reservoir" = "Vesiallas";
 "type.landuse.residential" = "Asuinalue";
 "type.landuse.retail" = "Kauppa-alue";
 "type.landuse.salt_pond" = "Suolalampi";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Luistinrata";
 "type.leisure.marina" = "Venesatama";
 "type.leisure.nature_reserve" = "Luonnonsuojelualue";
+"type.leisure.bird_hide" = "Lintupiilo";
 "type.leisure.outdoor_seating" = "Ulkona istuminen";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "Puisto";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Laituri";
 "type.man_made.pipeline" = "Pipeline";
 "type.man_made.pipeline.overground" = "Overground Pipeline";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Katettu vesisäiliö";
 "type.man_made.silo" = "Siilo";
 "type.man_made.storage_tank" = "Storage Tank";
 "type.man_made.surveillance" = "Valvontakamera";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Vesitorni";
 "type.man_made.water_well" = "Kaivo";
 "type.man_made.water_well.drinking_water_no" = "Kaivo";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Vesilaitos";
 "type.man_made.windmill" = "Tuulimylly";
 "type.man_made.works" = "Industrial Works";
 
@@ -868,13 +879,16 @@
 "type.natural.water.lake" = "Järvi";
 "type.natural.water.lock" = "Lukko kammio";
 "type.natural.water.pond" = "Lampi";
-"type.natural.water.reservoir" = "Säiliö";
+"type.natural.water.reservoir" = "Tekojärvi";
 "type.natural.water.basin" = "Vesisäiliö";
 "type.natural.water.river" = "Joki";
+"type.natural.water.intermittent" = "Ajoittainen vesialue";
 "type.natural.land" = "Maa";
 "type.natural.meadow" = "Niitty";
 "type.natural.orchard" = "Hedelmänviljely";
 "type.natural.peak" = "Huippu";
+"type.natural.hill" = "Mäki";
+"type.natural.arch" = "Kivikaari";
 "type.natural.saddle" = "Vuoristo satula";
 "type.natural.rock" = "Kivi";
 "type.natural.scrub" = "Tiheiköt";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "Public Transport";
-"type.public_transport.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "Laituri";
 "type.railway" = "Railway";
 "type.railway.abandoned" = "Abandoned Railway";
 "type.railway.abandoned.bridge" = "Abandoned Railway Bridge";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Vihanneskauppias";
 "type.shop.grocery" = "Päivittäistavarakauppa";
 "type.shop.hairdresser" = "Kampaamo";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Parturi";
 "type.shop.hardware" = "Rautakauppa";
 "type.shop.health_food" = "Terveysruokakauppa";
 "type.shop.hearing_aids" = "Kuulolaitteiden myymälä";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Rugby union";
 "type.sport.running" = "Juoksu";
 "type.sport.softball" = "Softball";
+"type.sport.pilates" = "Pilates";
 "type.tourism" = "Turismi";
 "type.tourism.aquarium" = "Akvaario";
 
@@ -1514,23 +1534,26 @@
 "type.waterway" = "Vesiväylä";
 "type.waterway.access_point" = "Vesiväylän liittymispiste";
 "type.waterway.canal" = "Kanaali";
+"type.waterway.canal.intermittent" = "Ajoittainen kanaali";
 "type.waterway.canal.tunnel" = "Kanaali";
 "type.waterway.fish_pass" = "Kalatikkaat";
+"type.waterway.fish_pass.intermittent" = "Ajoittaiset kalatikkaat";
 "type.waterway.dam" = "Pato";
 "type.barrier.ditch" = "Oja";
-"type.natural.water.ditch" = "Viemäröinti oja";
+"type.natural.water.ditch" = "Kuivatusoja";
 "type.waterway.ditch.tunnel" = "Holvirumpu";
 "type.waterway.dock" = "Telakka";
-"type.waterway.drain" = "Drain";
-"type.natural.water.drain" = "Drain";
+"type.waterway.drain" = "Kuivatuskanava";
+"type.waterway.drain.intermittent" = "Ajoittainen kuivatuskanava";
+"type.natural.water.drain" = "Kuivatuskanava";
 "type.waterway.drain.tunnel" = "Holvirumpu";
 "type.waterway.lock_gate" = "Kanavasulku";
 "type.waterway.river" = "Joki";
+"type.waterway.river.intermittent" = "Ajoittainen joki";
 "type.waterway.river.tunnel" = "Joki";
-"type.waterway.stream" = "Joki";
-"type.waterway.stream.ephemeral" = "Joki";
-"type.waterway.stream.intermittent" = "Joki";
-"type.waterway.stream.tunnel" = "Joki";
+"type.waterway.stream" = "Puro";
+"type.waterway.stream.intermittent" = "Ajoittainen puro";
+"type.waterway.stream.tunnel" = "Puro";
 "type.waterway.waterfall" = "Vesiputous";
 "type.waterway.weir" = "Weir";
 "type.wheelchair" = "Rullatuoli";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Sosiaalinen väline";
+"type.amenity.stage" = "Näyttämö";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Hätäosaston sisäänkäynti";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Sään seuranta-asema";
 "type.amenity.student_accommodation" = "Opiskelijoiden majoitus";
 "type.craft.watchmaker" = "Kelloseppä";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Ikkunoiden valmistus";
 "type.xmas_feature.market" = "Joulumarkkinat";
 "type.xmas_feature.tree" = "Joulukuusi";
 "type.amenity.hookah_lounge" = "Vesipiippubaari";

@@ -2,16 +2,17 @@
 
 #include "drape_frontend/message.hpp"
 
+#ifdef DRAPE_QUEUE_TRACE
+#include "base/logging.hpp"
+
+#include <sstream>
+#endif
+
 namespace df
 {
-MessageAcceptor::MessageAcceptor() : m_infinityWaiting(false) {}
-
 bool MessageAcceptor::ProcessSingleMessage(bool waitForMessage)
 {
-  m_infinityWaiting = waitForMessage;
   drape_ptr<Message> message = m_messageQueue.PopMessage(waitForMessage);
-  m_infinityWaiting = false;
-
   if (message == nullptr)
     return false;
 
@@ -42,7 +43,7 @@ void MessageAcceptor::PostMessage(drape_ptr<Message> && message, MessagePriority
 void MessageAcceptor::CloseQueue()
 {
   m_messageQueue.CancelWait();
-  m_messageQueue.ClearQuery();
+  m_messageQueue.Clear();
 }
 
 void MessageAcceptor::CancelMessageWaiting()
@@ -50,10 +51,50 @@ void MessageAcceptor::CancelMessageWaiting()
   m_messageQueue.CancelWait();
 }
 
-bool MessageAcceptor::IsInInfinityWaiting() const
+#ifdef DRAPE_QUEUE_TRACE
+std::vector<std::string> FormatMessageQueueTrace(MessageQueue::TraceSnapshot const & trace, std::string_view renderer,
+                                                 uint64_t sample)
 {
-  return m_infinityWaiting;
+  // Leave room for the snapshot header and the platform logger's prefix.
+  size_t constexpr kMaxTypeBytes = 2500;
+  std::vector<std::string> parts(1);
+  for (auto const & [type, counts] : trace.m_types)
+  {
+    std::ostringstream entry;
+    entry << '"' << DebugPrint(type) << "\":{\"size\":" << counts.m_size << ",\"peak\":" << counts.m_peak
+          << ",\"enqueued\":" << counts.m_enqueued << ",\"popped\":" << counts.m_popped
+          << ",\"filtered\":" << counts.m_filtered << ",\"rejected\":" << counts.m_rejected
+          << ",\"cleared\":" << counts.m_cleared << '}';
+    auto const value = entry.str();
+    if (!parts.back().empty() && parts.back().size() + value.size() + 1 > kMaxTypeBytes)
+      parts.emplace_back();
+    if (!parts.back().empty())
+      parts.back() += ',';
+    parts.back() += value;
+  }
+
+  for (size_t i = 0; i < parts.size(); ++i)
+  {
+    std::ostringstream out;
+    out << "DrapeQueue {\"renderer\":\"" << renderer << "\",\"size\":" << trace.m_size << ",\"peak\":" << trace.m_peak
+        << ",\"sample\":" << sample << ",\"part\":" << i << ",\"parts\":" << parts.size() << ",\"types\":{" << parts[i]
+        << "}}";
+    parts[i] = out.str();
+    ASSERT_LESS_OR_EQUAL(parts[i].size(), 3000, (renderer));
+  }
+  return parts;
 }
+
+void MessageAcceptor::TraceMessageQueue(std::string_view renderer)
+{
+  if (m_queueTraceTimer.ElapsedSeconds() < 1.0)
+    return;
+  m_queueTraceTimer.Reset();
+
+  for (auto const & record : FormatMessageQueueTrace(m_messageQueue.GetTrace(), renderer, ++m_queueTraceSample))
+    LOG(LINFO, (record));
+}
+#endif
 
 #ifdef DEBUG_MESSAGE_QUEUE
 

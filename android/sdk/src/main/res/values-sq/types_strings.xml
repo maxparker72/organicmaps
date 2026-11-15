@@ -202,6 +202,7 @@
     <string name="type.barrier.city_wall">Muret e qytetit</string>
     <string name="type.barrier.cycle_barrier">Barrierë biçikletash</string>
     <string name="type.waterway.ditch">Kanal kullues</string>
+    <string name="type.waterway.ditch.intermittent">Kanal kullues i përkohshëm</string>
     <string name="type.natural.water.moat">Hendek</string>
     <string name="type.natural.water.wastewater">Ujëra të zeza</string>
     <string name="type.barrier.entrance">Hyrje</string>
@@ -386,49 +387,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Autostradë</string>
     <string name="type.highway.bridleway">Shteg kuajsh</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Urë</string>
     <string name="type.highway.bridleway.permissive">Shteg kuajsh</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Tunel</string>
     <string name="type.highway.busway">Rrugë autobusësh</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Tunel</string>
     <string name="type.highway.bus_stop">Stacion autobusi</string>
     <string name="type.highway.construction">Rrugë në ndërtim</string>
     <string name="type.highway.cycleway">Korsi biçikletash</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Urë</string>
     <string name="type.highway.cycleway.permissive">Korsi biçikletash</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Tunel</string>
     <string name="type.highway.elevator">Ashensor</string>
     <string name="type.highway.footway">Shteg këmbësorësh</string>
     <string name="type.highway.footway.sidewalk">Trotuar</string>
     <string name="type.highway.footway.crossing">Vendkalim këmbësorësh</string>
     <string name="type.highway.footway.area">Zonë këmbësorësh</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Urë këmbësorësh</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Tunel këmbësorësh</string>
     <string name="type.highway.ford">Va</string>
     <string name="type.highway.living_street">Rrugë banimi</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Tunel</string>
     <string name="type.highway.motorway">Autostradë</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Urë autostrade</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Tunel autostrade</string>
     <string name="type.highway.motorway_junction">Dalje rruge</string>
     <string name="type.highway.motorway_link">Hyrje/dalje autostrade</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Tunel</string>
     <string name="type.highway.path">Shteg</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -437,103 +438,104 @@
     <string name="type.highway.path.expert">Shteg për ekspertë</string>
     <string name="type.highway.path.bicycle">Shteg biçikletash dhe këmbësorësh</string>
     <string name="type.highway.footway.bicycle">Shteg biçikletash dhe këmbësorësh</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Urë</string>
     <string name="type.highway.path.horse">Shteg kuajsh</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Tunel</string>
     <string name="type.highway.pedestrian">Rrugë këmbësorësh</string>
     <string name="type.highway.pedestrian.area">Zonë këmbësorësh</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Urë këmbësorësh</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Tunel këmbësorësh</string>
-    <string name="type.highway.platform">Platformë</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">Peron</string>
     <string name="type.highway.primary">Rrugë kryesore</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Tunel</string>
     <string name="type.highway.primary_link">Hyrje/dalje rrugë kryesore</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Tunel</string>
     <string name="type.highway.raceway">Pistë garash</string>
     <string name="type.highway.residential">Rrugë lagjeje</string>
     <string name="type.highway.residential.area">Rrugë lagjeje</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Tunel</string>
     <string name="type.highway.rest_area">Zonë pushimi</string>
     <string name="type.highway.road">Rrugë</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Urë</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Tunel</string>
     <string name="type.highway.secondary">Rrugë dytësore</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Tunel</string>
     <string name="type.highway.secondary_link">Hyrje/dalje rrugë dytësore</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Tunel</string>
     <string name="type.highway.service">Rrugë shërbimi</string>
     <string name="type.highway.service.area">Rrugë shërbimi</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Urë</string>
     <string name="type.highway.service.driveway">Rrugë hyrëse</string>
     <string name="type.highway.service.parking_aisle">Korsi parkimi</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Tunel</string>
     <string name="type.highway.services">Zonë shërbimi</string>
     <string name="type.highway.speed_camera">Kamera shpejtësie</string>
     <string name="type.highway.steps">Shkallë</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Tunel</string>
     <string name="type.highway.ladder">Shkallë dore</string>
     <string name="type.highway.tertiary">Rrugë tretësore</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Tunel</string>
     <string name="type.highway.tertiary_link">Hyrje/dalje rrugë tretësore</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Tunel</string>
     <string name="type.highway.track">Shteg fushe</string>
     <string name="type.highway.track.area">Shteg fushe</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Urë</string>
     <string name="type.highway.track.grade1">Shteg fushe</string>
     <string name="type.highway.track.no.access">Shteg fushe</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Tunel</string>
     <string name="type.highway.traffic_signals">Semaforë</string>
     <string name="type.highway.trunk">Rrugë nacionale</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Tunel</string>
     <string name="type.highway.trunk_link">Hyrje/dalje rrugë nacionale</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Tunel</string>
     <string name="type.highway.unclassified">Rrugë e vogël</string>
     <string name="type.highway.unclassified.area">Rrugë e vogël</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Urë</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Tunel</string>
     <string name="type.area_highway.cycleway">Korsi biçikletash</string>
     <string name="type.area_highway.footway">Shteg këmbësorësh</string>
@@ -571,6 +573,7 @@
     <string name="type.historic.castle.shiro">Kështjellë japoneze</string>
     <string name="type.historic.castle.stately">Kështjellë madhështore</string>
     <string name="type.historic.city_gate">Porta e qytetit</string>
+    <string name="type.man_made.ceremonial_gate">Porta ceremoniale</string>
     <string name="type.historic.citywalls">Muret e qytetit</string>
     <string name="type.historic.fort">Fortesë</string>
     <string name="type.historic.gallows">Gijotinë</string>
@@ -604,6 +607,7 @@
     <string name="type.landuse">Përdorim toke</string>
     <string name="type.landuse.allotments">Kopshte</string>
     <string name="type.landuse.basin">Bazen</string>
+    <string name="type.landuse.basin.intermittent">Bazen i përkohshëm</string>
     <string name="type.landuse.brownfield">Zonë industriale e braktisur</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Varreza</string>
@@ -634,7 +638,6 @@
     <string name="type.landuse.quarry">Gurore</string>
     <string name="type.landuse.railway">Zonë hekurudhore</string>
     <string name="type.landuse.recreation_ground">Zonë rekreative</string>
-    <string name="type.landuse.reservoir">Rezervuar</string>
     <string name="type.landuse.residential">Zonë banimi</string>
     <string name="type.landuse.retail">Zonë shitjesh</string>
     <string name="type.landuse.salt_pond">Kripore</string>
@@ -656,6 +659,7 @@
     <string name="type.leisure.ice_rink">Pistë akulli</string>
     <string name="type.leisure.marina">Marina</string>
     <string name="type.leisure.nature_reserve">Rezervat natyror</string>
+    <string name="type.leisure.bird_hide">Strehë për vëzhgimin e zogjve</string>
     <string name="type.leisure.outdoor_seating">Ndenjëse jashtë</string>
     <string name="type.leisure.firepit">Vatër zjarri</string>
     <string name="type.leisure.park">Park</string>
@@ -690,6 +694,8 @@
     <string name="type.man_made.pier">Mol</string>
     <string name="type.man_made.pipeline">Tubacion</string>
     <string name="type.man_made.pipeline.overground">Tubacion mbitokësor</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Rezervuar uji i mbuluar</string>
     <string name="type.man_made.silo">Silo</string>
     <string name="type.man_made.storage_tank">Depozitë</string>
     <string name="type.man_made.surveillance">Kamera vëzhgimi</string>
@@ -708,6 +714,8 @@
     <string name="type.man_made.water_tower">Kullë uji</string>
     <string name="type.man_made.water_well">Pus uji</string>
     <string name="type.man_made.water_well.drinking_water_no">Pus uji</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Impiant i trajtimit të ujit</string>
     <string name="type.man_made.windmill">Mulli ere</string>
     <string name="type.man_made.works">Uzinë</string>
     <string name="type.military">Ushtria</string>
@@ -742,10 +750,13 @@
     <string name="type.natural.water.reservoir">Rezervuar</string>
     <string name="type.natural.water.basin">Bazen</string>
     <string name="type.natural.water.river">Lumë</string>
+    <string name="type.natural.water.intermittent">Ujë i përkohshëm</string>
     <string name="type.natural.land">Tokë</string>
     <string name="type.natural.meadow">Lëndinë</string>
     <string name="type.natural.orchard">Pemëtore</string>
     <string name="type.natural.peak">Majë</string>
+    <string name="type.natural.hill">Kodra</string>
+    <string name="type.natural.arch">Harku shkëmbor</string>
     <string name="type.natural.saddle">Qafë mali</string>
     <string name="type.natural.rock">Shkëmb</string>
     <string name="type.natural.scrub">Shkurre</string>
@@ -832,7 +843,8 @@
     <!-- A single pole supporting various public utilities, such as lighting or telephony. -->
     <string name="type.man_made.utility_pole">Shtyllë utilitare</string>
     <string name="type.public_transport">Transport Publik</string>
-    <string name="type.public_transport.platform">Platformë</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">Peron</string>
     <string name="type.railway">Hekurudhë</string>
     <string name="type.railway.abandoned">Hekurudhë e braktisur</string>
     <string name="type.railway.abandoned.bridge">Urë hekurudhore e braktisur</string>
@@ -856,7 +868,7 @@
     <string name="type.railway.narrow_gauge">Hekurudhë me binarë të ngushtë</string>
     <string name="type.railway.narrow_gauge.bridge">Urë hekurudhore e ngushtë</string>
     <string name="type.railway.narrow_gauge.tunnel">Tunel hekurudhor i ngushtë</string>
-    <string name="type.railway.platform">Platformë hekurudhore</string>
+    <string name="type.railway.platform">Peron hekurudhor</string>
     <string name="type.railway.preserved">Hekurudhë e ruajtur</string>
     <string name="type.railway.preserved.bridge">Urë hekurudhore e ruajtur</string>
     <string name="type.railway.preserved.tunnel">Tunel hekurudhor i ruajtur</string>
@@ -1188,6 +1200,8 @@
     <string name="type.shop.greengrocer">Dyqan frutash-perimesh</string>
     <string name="type.shop.grocery">Ushqimore</string>
     <string name="type.shop.hairdresser">Parukeri</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Berber</string>
     <string name="type.shop.hardware">Knaluri</string>
     <string name="type.shop.health_food">Ushqim i shëndetshëm</string>
     <string name="type.shop.hearing_aids">Aparate dëgjimi</string>
@@ -1311,6 +1325,7 @@
     <string name="type.sport.rugby_union">Ragbi</string>
     <string name="type.sport.running">Vrapim</string>
     <string name="type.sport.softball">Softball</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turizëm</string>
     <string name="type.tourism.aquarium">Akuarium</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1364,22 +1379,25 @@
     <string name="type.waterway">Rrugë ujore</string>
     <string name="type.waterway.access_point">Pika e aksesit në rrugën ujore</string>
     <string name="type.waterway.canal">Kanal</string>
+    <string name="type.waterway.canal.intermittent">Kanal i përkohshëm</string>
     <string name="type.waterway.canal.tunnel">Tunel kanali</string>
     <string name="type.waterway.fish_pass">Kalim peshqish</string>
+    <string name="type.waterway.fish_pass.intermittent">Kalim peshqish i përkohshëm</string>
     <string name="type.waterway.dam">Diga</string>
     <string name="type.barrier.ditch">Kanal</string>
     <string name="type.natural.water.ditch">Kanal kullues</string>
     <string name="type.waterway.ditch.tunnel">Tombinë</string>
     <string name="type.waterway.dock">Dok</string>
     <string name="type.waterway.drain">Kullues</string>
+    <string name="type.waterway.drain.intermittent">Kullues i përkohshëm</string>
     <string name="type.natural.water.drain">Kullues</string>
     <string name="type.waterway.drain.tunnel">Tombinë</string>
     <string name="type.waterway.lock_gate">Portë bllokimi</string>
     <string name="type.waterway.river">Lumë</string>
+    <string name="type.waterway.river.intermittent">Lumë i përkohshëm</string>
     <string name="type.waterway.river.tunnel">Lumë</string>
     <string name="type.waterway.stream">Përrua</string>
-    <string name="type.waterway.stream.ephemeral">Përrua sezonal</string>
-    <string name="type.waterway.stream.intermittent">Përrua i ndërprerë</string>
+    <string name="type.waterway.stream.intermittent">Përrua i përkohshëm</string>
     <string name="type.waterway.stream.tunnel">Përrua</string>
     <string name="type.waterway.waterfall">Ujëvarë</string>
     <string name="type.waterway.weir">Pendë</string>
@@ -1421,6 +1439,7 @@
     <string name="type.self_service.no">Pa vetë-shërbim</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Objekt social</string>
+    <string name="type.amenity.stage">Skenë</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Hyrje e urgjencës</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1450,6 +1469,8 @@
     <string name="type.man_made.monitoring_station.weather">Stacion meteorologjik</string>
     <string name="type.amenity.student_accommodation">Konvikt</string>
     <string name="type.craft.watchmaker">Orëndreqës</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Prodhim dritaresh</string>
     <string name="type.xmas_feature.market">Treg Krishtlindjesh</string>
     <string name="type.xmas_feature.tree">Pema e Krishtlindjeve</string>
     <string name="type.amenity.hookah_lounge">Shisha bar</string>

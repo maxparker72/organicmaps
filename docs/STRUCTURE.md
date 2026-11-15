@@ -17,7 +17,7 @@
 - `conf/isolines/` - per-country isoline profiles.
 - `vulkan_shaders/` -
 
-- `countries.txt` - map files hierarchy and checksums.
+- `countries.json` - map files hierarchy and checksums.
 - `countries_meta.txt` - country/region languages and driving sides.
 - `hierarchy.txt` - countries/map regions hierarchy, languages used and Wikidata IDs.
 
@@ -46,12 +46,11 @@ Automatically generated:
 - `symbols/` - symbols for different screen DPIs
 - `symbols/default/` - default resources used on all sceen DPIs
 - `symbols-svg/` - social networks icons
-- `search-icons/svg/` - source SVG files for search categories icons
 - `styles/` - map [style files](STYLES.md#files)
 
 Automatically [generated](STYLES.md#technical-details):
 - `symbols/` - icons skin files in various resolutions for `dark` and `light` themes.
-- `drules_proto*` - binary drawing rules files.
+- `drules_*` - binary drawing rules (and text dumps), one file per style family.
 - `colors.txt`,`patterns.txt`,`visibility.txt`
 
 ### Strings and translations
@@ -105,11 +104,12 @@ Automatically [generated](TRANSLATIONS.md#technical-details):
 - `shaders/` - shaders for rendering.
 - `std/` - standard headers wrappers, for Boost, STL, C-rt.
 - `storage/` - map reading function.
+- `terrain/` - terrain (`.twm`) files: TIN and raster reading, decoding, contour tracing.
 - `testing/` - common interfaces for tests.
 - `track_analyzing/` -
 - `tracking/` -
 - `traffic/` - real-time traffic information.
-- `transit/` - experimental GTFS-based public transport support.
+- `transit/` - OSM public transport data structures.
 
 ## Documentation
 

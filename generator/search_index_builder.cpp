@@ -24,6 +24,7 @@
 
 #include "platform/platform.hpp"
 
+#include "coding/file_reader.hpp"
 #include "coding/reader_writer_ops.hpp"
 #include "coding/succinct_mapper.hpp"
 #include "coding/writer.hpp"
@@ -523,7 +524,7 @@ void BuildAddressTable(FilesContainerR & container, std::string const & addressD
 
   // Prepare threads and mwm contexts for each thread.
   std::vector<std::thread> threads;
-  for (size_t i = 0; i < threadsCount; ++i)
+  for (uint32_t i = 0; i < threadsCount; ++i)
   {
     auto handle = dataSource.GetMwmHandleById(mwmId);
     contexts[i] = std::make_unique<search::MwmContext>(std::move(handle));

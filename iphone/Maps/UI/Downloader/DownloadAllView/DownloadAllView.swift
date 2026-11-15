@@ -25,7 +25,6 @@ class DownloadAllView: UIView {
   @IBOutlet private var downloadSizeLabel: UILabel!
   @IBOutlet private var stateWrapper: UIView!
   @IBOutlet private var downloadButton: UIButton!
-  @IBOutlet private var titleCenterConstraint: NSLayoutConstraint!
   private lazy var progress: MWMCircularProgress = {
     let view = MWMCircularProgress.downloaderProgress(forParentView: stateWrapper)
     view.delegate = self
@@ -65,11 +64,18 @@ class DownloadAllView: UIView {
 
   var downloadProgress: CGFloat = 0 {
     didSet {
-      progress.progress = downloadProgress
+      progress.progress = CGFloat(AppConstants.maxProgress) * downloadProgress
     }
   }
 
   weak var delegate: DownloadAllViewDelegate?
+
+  override func awakeFromNib() {
+    super.awakeFromNib()
+    title.adjustsFontForContentSizeCategory = true
+    downloadSizeLabel.adjustsFontForContentSizeCategory = true
+    updateView()
+  }
 
   @IBAction func onDownloadButtonPress(_: Any) {
     if state == .error {
@@ -99,14 +105,13 @@ class DownloadAllView: UIView {
       readyButtonTitle = L("downloader_update_all_button")
     }
 
-    titleCenterConstraint.priority = isSizeHidden ? .defaultHigh : .defaultLow
     downloadSizeLabel.isHidden = isSizeHidden
 
     switch state {
     case .error:
       iconImageView.image = UIImage(named: "ic_download_error")
       title.text = errorTitle
-      title.setFontStyleAndApply(.red)
+      title.setFontStyleAndApply(.regular17, color: .red)
       downloadButton.setTitle(errorButtonTitle, for: .normal)
       downloadButton.isHidden = false
       stateWrapper.isHidden = true
@@ -114,7 +119,7 @@ class DownloadAllView: UIView {
       downloadSizeLabel.isHidden = false
     case .ready:
       title.text = readyTitle
-      title.setFontStyleAndApply(.blackPrimary)
+      title.setFontStyleAndApply(.regular17, color: .blackPrimary)
       downloadButton.setTitle(readyButtonTitle, for: .normal)
       downloadButton.isHidden = false
       stateWrapper.isHidden = true
@@ -122,10 +127,10 @@ class DownloadAllView: UIView {
       downloadSizeLabel.isHidden = false
     case .dowloading:
       title.text = downloadingTitle
-      title.setFontStyleAndApply(.blackPrimary)
+      title.setFontStyleAndApply(.regular17, color: .blackPrimary)
       downloadButton.isHidden = true
       stateWrapper.isHidden = false
-      progress.state = .spinner
+      progress.progress = CGFloat(AppConstants.maxProgress) * downloadProgress
     case .none:
       downloadButton.isHidden = true
       stateWrapper.isHidden = true

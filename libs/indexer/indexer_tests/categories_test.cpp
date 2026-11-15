@@ -3,7 +3,8 @@
 #include "indexer/categories_holder.hpp"
 #include "indexer/categories_index.hpp"
 #include "indexer/classificator.hpp"
-#include "indexer/classificator_loader.hpp"
+
+#include "generator/generator_tests_support/test_with_classificator.hpp"
 
 #include "coding/reader.hpp"
 #include "coding/string_utf8_multilang.hpp"
@@ -16,6 +17,7 @@
 
 namespace categories_test
 {
+using namespace generator::tests_support;
 using namespace indexer;
 using namespace std;
 
@@ -94,15 +96,24 @@ struct Checker
   size_t & m_count;
 };
 
-UNIT_TEST(LoadCategories)
+UNIT_CLASS_TEST(TestWithClassificator, LoadCategories)
 {
-  classificator::Load();
-
   CategoriesHolder h(make_unique<MemReader>(g_testCategoriesTxt, sizeof(g_testCategoriesTxt) - 1));
   size_t count = 0;
   Checker f(count);
   h.ForEachCategory(f);
   TEST_EQUAL(count, 3, ());
+}
+
+UNIT_TEST(CategoriesHolder_NorwegianBokmal)
+{
+  auto const bokmal = CategoriesHolder::MapLocaleToInteger("nb");
+  TEST_NOT_EQUAL(bokmal, CategoriesHolder::kUnsupportedLocaleCode, ());
+  for (auto const locale : {"nb-NO", "nb_NO.UTF-8", "no", "no-NO", "no_NO"})
+    TEST_EQUAL(CategoriesHolder::MapLocaleToInteger(locale), bokmal, (locale));
+  TEST_EQUAL(CategoriesHolder::MapIntegerToLocale(bokmal), "nb", ());
+  for (auto const locale : {"nn", "nn-NO", "non", "nog"})
+    TEST_EQUAL(CategoriesHolder::MapLocaleToInteger(locale), CategoriesHolder::kUnsupportedLocaleCode, (locale));
 }
 
 UNIT_TEST(CategoriesHolder_Smoke)
@@ -117,10 +128,50 @@ UNIT_TEST(CategoriesHolder_Smoke)
   }
 }
 
-UNIT_TEST(CategoriesHolder_LoadDefault)
+// Android 14+ appends regional preferences to the locale as Unicode extensions, e.g.
+// Locale.toString() == "zh_CN_#Hans-u-fw-mon" when the user picks Monday as the first day of the
+// week. The "mon" value must not be matched as the Macau ("mo") region subtag, which would show
+// Traditional Chinese categories to a Simplified Chinese user.
+UNIT_TEST(CategoriesHolder_LocaleExtensions)
 {
-  classificator::Load();
+  auto const simplified = CategoriesHolder::kSimplifiedChineseCode;
+  auto const traditional = CategoriesHolder::kTraditionalChineseCode;
 
+  for (char const * locale : {"zh_CN_#u-fw-mon", "zh_CN_#Hans-u-fw-mon", "zh_CN_#Hans-u-fw-sun",
+                              "zh_CN_#u-fw-mon-ms-metric-mu-celsius", "zh_CN_#Hans"})
+    TEST_EQUAL(CategoriesHolder::MapLocaleToInteger(locale), simplified, (locale));
+
+  for (char const * locale : {"zh_TW_#Hant-u-fw-mon", "zh_HK_#u-fw-mon", "zh_MO_#u-fw-sun"})
+    TEST_EQUAL(CategoriesHolder::MapLocaleToInteger(locale), traditional, (locale));
+
+  // Non-Chinese locales are unaffected by their extensions.
+  TEST_EQUAL(CategoriesHolder::MapLocaleToInteger("en_UA_#u-fw-mon-ms-metric-mu-celsius"),
+             CategoriesHolder::kEnglishCode, ());
+
+  // Chinese variants are matched case-insensitively.
+  TEST_EQUAL(CategoriesHolder::MapLocaleToInteger("ZH_TW"), traditional, ());
+  TEST_EQUAL(CategoriesHolder::MapLocaleToInteger("ZH_CN"), simplified, ());
+
+  // POSIX $LANG on Linux/Qt carries a charset suffix.
+  TEST_EQUAL(CategoriesHolder::MapLocaleToInteger("zh_TW.UTF-8"), traditional, ());
+  TEST_EQUAL(CategoriesHolder::MapLocaleToInteger("zh_CN.UTF-8"), simplified, ());
+}
+
+// Locales are matched by whole subtags, so a three-letter language is never mistaken for a
+// two-letter one it happens to start with: Filipino ("fil") is not Finnish ("fi").
+UNIT_TEST(CategoriesHolder_ThreeLetterLanguages)
+{
+  for (char const * locale : {"fil", "fil_PH", "fil-PH", "bem_ZM", "rof_TZ", "bgc_IN"})
+    TEST_EQUAL(CategoriesHolder::MapLocaleToInteger(locale), CategoriesHolder::kUnsupportedLocaleCode, (locale));
+
+  // The two-letter languages they shadow still resolve.
+  TEST_EQUAL(CategoriesHolder::MapLocaleToInteger("fi"), CategoriesHolder::MapLocaleToInteger("fi_FI"), ());
+  TEST_NOT_EQUAL(CategoriesHolder::MapLocaleToInteger("fi"), CategoriesHolder::kUnsupportedLocaleCode, ());
+  TEST_NOT_EQUAL(CategoriesHolder::MapLocaleToInteger("be_BY"), CategoriesHolder::kUnsupportedLocaleCode, ());
+}
+
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesHolder_LoadDefault)
+{
   uint32_t counter = 0;
   auto const count = [&counter](CategoriesHolder::Category const &) { ++counter; };
 
@@ -134,7 +185,30 @@ UNIT_TEST(CategoriesHolder_LoadDefault)
   TEST_GREATER(counter, 0, ());
 }
 
-UNIT_TEST(CategoriesHolder_ForEach)
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesHolder_BarberKeepsHairdresserTerms)
+{
+  auto const & holder = GetDefaultCategories();
+  auto const getTypes = [&holder](char const * name)
+  {
+    vector<uint32_t> types;
+    holder.ForEachTypeByName(CategoriesHolder::kEnglishCode, strings::MakeUniString(name),
+                             [&types](uint32_t type) { types.push_back(type); });
+    return types;
+  };
+
+  auto const hairdresser = classif().GetTypeByPath({"shop", "hairdresser"});
+  auto const barber = classif().GetTypeByPath({"shop", "hairdresser", "barber"});
+
+  auto const hairdresserTypes = getTypes("hairdresser");
+  TEST(base::IsExist(hairdresserTypes, hairdresser), ());
+  TEST(base::IsExist(hairdresserTypes, barber), ());
+
+  auto const barberTypes = getTypes("barber");
+  TEST(base::IsExist(barberTypes, barber), ());
+  TEST(!base::IsExist(barberTypes, hairdresser), ());
+}
+
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesHolder_ForEach)
 {
   char const kCategories[] =
       "amenity-bar\n"
@@ -151,7 +225,6 @@ UNIT_TEST(CategoriesHolder_ForEach)
       "\n"
       "";
 
-  classificator::Load();
   CategoriesHolder holder(make_unique<MemReader>(kCategories, ARRAY_SIZE(kCategories) - 1));
 
   {
@@ -176,10 +249,54 @@ UNIT_TEST(CategoriesHolder_ForEach)
   }
 }
 
-UNIT_TEST(CategoriesIndex_Smoke)
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesHolder_RepeatedType)
 {
-  classificator::Load();
+  char const kCategories[] =
+      "amenity-bench\n"
+      "en:bench\n"
+      "de:bank\n"
+      "\n"
+      "amenity-bench\n"
+      "en:seat\n"
+      "de:sitz\n";
 
+  CategoriesHolder holder(make_unique<MemReader>(kCategories, sizeof(kCategories) - 1));
+  auto const type = classif().GetTypeByPath({"amenity", "bench"});
+
+  vector<string> names;
+  holder.ForEachNameByType(type, [&](CategoriesHolder::Category::Name const & name) { names.push_back(name.m_name); });
+  sort(names.begin(), names.end());
+  TEST_EQUAL(names, (vector<string>{"bank", "bench", "seat", "sitz"}), ());
+
+  holder.ForEachNameByType(classif().GetTypeByPath({"place", "village"}),
+                           [&](CategoriesHolder::Category::Name const &) { TEST(false, ("Type has no records")); });
+
+  auto check = [type](CategoriesIndex const & index, string const & query, bool matches)
+  {
+    vector<uint32_t> result;
+    index.GetAssociatedTypes(query, result);
+    TEST_EQUAL(result, (matches ? vector<uint32_t>{type} : vector<uint32_t>{}), (query));
+  };
+
+  CategoriesIndex index(holder);
+  index.AddCategoryByTypeAndLang(type, CategoriesHolder::kEnglishCode);
+  for (auto const query : {"bench", "seat"})
+    check(index, query, true);
+  for (auto const query : {"bank", "sitz"})
+    check(index, query, false);
+
+  index.AddCategoryByTypeAndLang(type, CategoriesHolder::MapLocaleToInteger("de"));
+  for (auto const query : {"bank", "sitz"})
+    check(index, query, true);
+
+  CategoriesIndex allLanguages(holder);
+  allLanguages.AddCategoryByTypeAllLangs(type);
+  for (auto const query : {"bench", "seat", "bank", "sitz"})
+    check(allLanguages, query, true);
+}
+
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesIndex_Smoke)
+{
   CategoriesHolder holder(make_unique<MemReader>(g_testCategoriesTxt, sizeof(g_testCategoriesTxt) - 1));
   CategoriesIndex index(holder);
 
@@ -230,7 +347,35 @@ UNIT_TEST(CategoriesIndex_Smoke)
   TEST_EQUAL(cats[1].m_synonyms[0].m_name, "village", ());
 }
 
-UNIT_TEST(CategoriesIndex_MultipleTokens)
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesIndex_SubstringsInMultiwordName)
+{
+  // No standalone synonym or category group can mask a failure to match the second word.
+  char const kCategories[] =
+      "shop-convenience\n"
+      "ru:продуктовый магазин\n";
+
+  CategoriesHolder holder(make_unique<MemReader>(kCategories, sizeof(kCategories) - 1));
+  CategoriesIndex index(holder);
+  auto const type = classif().GetTypeByPath({"shop", "convenience"});
+  index.AddCategoryByTypeAndLang(type, CategoriesHolder::MapLocaleToInteger("ru"));
+
+  for (auto const query :
+       {"магазин", "МАГАЗИН", "маг", "гази", "зин", "продуктовый магазин", "прод маг", "магазин продуктовый"})
+  {
+    vector<uint32_t> result;
+    index.GetAssociatedTypes(query, result);
+    TEST_EQUAL(result, (vector<uint32_t>{type}), (query));
+  }
+
+  for (auto const query : {"магазинчик", "магазин одежды"})
+  {
+    vector<uint32_t> result;
+    index.GetAssociatedTypes(query, result);
+    TEST(result.empty(), (query, result));
+  }
+}
+
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesIndex_MultipleTokens)
 {
   char const kCategories[] =
       "shop-bakery\n"
@@ -239,7 +384,6 @@ UNIT_TEST(CategoriesIndex_MultipleTokens)
       "shop-butcher\n"
       "en:shop of meat";
 
-  classificator::Load();
   CategoriesHolder holder(make_unique<MemReader>(kCategories, sizeof(kCategories) - 1));
   CategoriesIndex index(holder);
 
@@ -261,7 +405,7 @@ UNIT_TEST(CategoriesIndex_MultipleTokens)
   testTypes("shop meat", {type2});
 }
 
-UNIT_TEST(CategoriesIndex_Groups)
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesIndex_Groups)
 {
   char const kCategories[] =
       "@shop\n"
@@ -278,7 +422,6 @@ UNIT_TEST(CategoriesIndex_Groups)
       "en:butcher\n"
       "";
 
-  classificator::Load();
   CategoriesHolder holder(make_unique<MemReader>(kCategories, sizeof(kCategories) - 1));
   CategoriesIndex index(holder);
 
@@ -305,27 +448,22 @@ UNIT_TEST(CategoriesIndex_Groups)
 
 #ifdef DEBUG
 // A check that this data structure is not too heavy.
-UNIT_TEST(CategoriesIndex_AllCategories)
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesIndex_AllCategories)
 {
-  classificator::Load();
-
   CategoriesIndex index;
 
   index.AddAllCategoriesInAllLangs();
-  // Consider deprecating this method if this bound rises as high as a million.
   LOG(LINFO, ("Number of nodes in the CategoriesIndex trie:", index.GetNumTrieNodes()));
-  TEST_LESS(index.GetNumTrieNodes(), 900000, ());
+  TEST_LESS(index.GetNumTrieNodes(), 300000, ());
 }
 
 // A check that this data structure is not too heavy.
-UNIT_TEST(CategoriesIndex_AllCategoriesEnglishName)
+UNIT_CLASS_TEST(TestWithClassificator, CategoriesIndex_AllCategoriesEnglishName)
 {
-  classificator::Load();
-
   CategoriesIndex index;
 
   index.AddAllCategoriesInLang(CategoriesHolder::MapLocaleToInteger("en"));
-  TEST_LESS(index.GetNumTrieNodes(), 15000, ());
+  TEST_LESS(index.GetNumTrieNodes(), 7500, ());
 }
 #endif
 }  // namespace categories_test

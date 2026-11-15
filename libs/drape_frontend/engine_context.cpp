@@ -10,7 +10,7 @@ namespace df
 EngineContext::EngineContext(TileKey tileKey, ref_ptr<ThreadsCommutator> commutator, ref_ptr<dp::TextureManager> texMng,
                              ref_ptr<MetalineManager> metalineMng, CustomFeaturesContextWeakPtr customFeaturesContext,
                              bool is3dBuildingsEnabled, bool isTrafficEnabled, bool isolinesEnabled,
-                             int8_t mapLangIndex, dp::BackgroundMode backgroundMode)
+                             int8_t mapLangIndex, dp::BackgroundMode backgroundMode, float areaOpacity)
   : m_tileKey(tileKey)
   , m_commutator(commutator)
   , m_texMng(texMng)
@@ -21,6 +21,7 @@ EngineContext::EngineContext(TileKey tileKey, ref_ptr<ThreadsCommutator> commuta
   , m_isolinesEnabled(isolinesEnabled)
   , m_mapLangIndex(mapLangIndex)
   , m_backgroundMode(backgroundMode)
+  , m_areaOpacity(areaOpacity)
 {}
 
 ref_ptr<dp::TextureManager> EngineContext::GetTextureManager() const
@@ -40,12 +41,36 @@ void EngineContext::BeginReadTile()
 
 void EngineContext::Flush(TMapShapes && shapes)
 {
-  PostMessage(make_unique_dp<MapShapeReadedMessage>(m_tileKey, std::move(shapes)));
+  // Bound each upload operation while coalescing the small per-feature flushes.
+  size_t constexpr kShapesPerBatch = 64;
+  for (auto & shape : shapes)
+  {
+    if (m_geometry.empty())
+      m_geometry.reserve(kShapesPerBatch);
+    m_geometry.push_back(std::move(shape));
+    if (m_geometry.size() == kShapesPerBatch)
+      FlushGeometry();
+  }
+  shapes.clear();
+}
+
+void EngineContext::FlushGeometry()
+{
+  if (IsCancelled())
+    m_geometry.clear();
+  if (!m_geometry.empty())
+    PostMessage(make_unique_dp<MapShapeReadedMessage>(m_tileKey, std::exchange(m_geometry, {}), m_readCancelled));
 }
 
 void EngineContext::FlushOverlays(TMapShapes && shapes)
 {
-  PostMessage(make_unique_dp<OverlayMapShapeReadedMessage>(m_tileKey, std::move(shapes)));
+  FlushGeometry();
+  if (IsCancelled())
+  {
+    shapes.clear();
+    return;
+  }
+  PostMessage(make_unique_dp<OverlayMapShapeReadedMessage>(m_tileKey, std::move(shapes), m_readCancelled));
 }
 
 void EngineContext::FlushTrafficGeometry(TrafficSegmentsGeometry && geometry)
@@ -57,6 +82,7 @@ void EngineContext::FlushTrafficGeometry(TrafficSegmentsGeometry && geometry)
 
 void EngineContext::EndReadTile()
 {
+  FlushGeometry();
   PostMessage(make_unique_dp<TileReadEndMessage>(m_tileKey));
 }
 

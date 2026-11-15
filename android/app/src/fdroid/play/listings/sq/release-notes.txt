@@ -1,8 +1,9 @@
-• Zgjidhni rrugët e ecjes dhe çiklizmit për të parë grafikët e tyre të lartësisë
-• Përkulje e duhur e hartës në antimeridian (gjatësia ±180°)
-• Ndryshoni të gjitha ngjyrat e shënimeve dhe shtigjeve në një kategori njëherësh
-• Kërkim më i mirë për numrat e shtëpive, mbulohen më shumë adresa në SHBA
-• Të dhënat e OSM-së deri më 4 prill
-• Modaliteti i shfaqjes së planifikuar në Cilësime
-• Rregulluar ndarjen e shënimeve/shtigjeve me aplikacione të tjera
+• OSM: 28 shtator; Wikipedia: 21 shtator
+• Rrugë alternative më të mira dhe vlerësime të mbërritjes
+• Caktim i ri optimizon renditjen e ndalesave
+• Butonat e rinj shtojnë ose zëvendësojnë ndalesat në rrugët e planifikuara
+• Rruga alternative e zgjedhur ruhet gjatë navigimit
+• Korrigjime dhe përmirësime në regjistrimin e gjurmëve
+• Importi i KMB-së është rregulluar
+• Rregullime dhe përmirësime të ndërfaqes
 …më shumë në omaps.org/news

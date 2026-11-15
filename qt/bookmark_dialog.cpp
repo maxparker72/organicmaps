@@ -1,4 +1,6 @@
 #include "qt/bookmark_dialog.hpp"
+#include "qt/bookmark_export.hpp"
+#include "qt/qt_common/translations.hpp"
 
 #include "map/bookmark_helpers.hpp"
 #include "map/bookmark_manager.hpp"
@@ -6,7 +8,7 @@
 
 #include "platform/measurement_utils.hpp"
 
-#include <QtCore/QFile>
+#include <QtCore/QPointer>
 
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QHBoxLayout>
@@ -27,33 +29,32 @@ BookmarkDialog::BookmarkDialog(QWidget * parent, Framework & framework)
 {
   setWindowModality(Qt::WindowModal);
 
-  QPushButton * closeButton = new QPushButton(tr("Close"), this);
+  QPushButton * closeButton = new QPushButton(Tr("close"), this);
   closeButton->setDefault(true);
   connect(closeButton, &QAbstractButton::clicked, this, &BookmarkDialog::OnCloseClick);
 
-  QPushButton * deleteButton = new QPushButton(tr("Delete"), this);
+  QPushButton * deleteButton = new QPushButton(Tr("delete"), this);
   connect(deleteButton, &QAbstractButton::clicked, this, &BookmarkDialog::OnDeleteClick);
 
-  QPushButton * importButton = new QPushButton(tr("Import KML, KMZ, GPX"), this);
+  QPushButton * importButton = new QPushButton(Tr("bookmarks_import"), this);
   connect(importButton, &QAbstractButton::clicked, this, &BookmarkDialog::OnImportClick);
 
-  QPushButton * exportKmzButton = new QPushButton(tr("Export KMZ"), this);
+  QPushButton * exportKmzButton = new QPushButton(Tr("export_file"), this);
   connect(exportKmzButton, &QAbstractButton::clicked, this, [this] { OnExportClick(FileType::Kml); });
 
-  QPushButton * exportGpxButton = new QPushButton(tr("Export GPX"), this);
+  QPushButton * exportGpxButton = new QPushButton(Tr("export_file_gpx"), this);
   connect(exportGpxButton, &QAbstractButton::clicked, this, [this] { OnExportClick(FileType::Gpx); });
 
-  QPushButton * exportGeoJsonButton = new QPushButton(tr("Export GeoJSON"), this);
+  QPushButton * exportGeoJsonButton = new QPushButton(Tr("export_file_geojson"), this);
   connect(exportGeoJsonButton, &QAbstractButton::clicked, this, [this] { OnExportClick(FileType::GeoJson); });
 
   m_tree = new QTreeWidget(this);
   m_tree->setColumnCount(2);
   QStringList columnLabels;
-  columnLabels << tr("Bookmarks and tracks") << "";
+  columnLabels << Tr("bookmarks_and_tracks") << "";
   m_tree->setHeaderLabels(columnLabels);
   m_tree->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
   connect(m_tree, &QTreeWidget::itemClicked, this, &BookmarkDialog::OnItemClick);
-
   QHBoxLayout * horizontalLayout = new QHBoxLayout();
   horizontalLayout->addStretch();
   horizontalLayout->addWidget(importButton);
@@ -68,7 +69,7 @@ BookmarkDialog::BookmarkDialog(QWidget * parent, Framework & framework)
   verticalLayout->addLayout(horizontalLayout);
   setLayout(verticalLayout);
 
-  setWindowTitle(tr("Bookmarks and tracks"));
+  setWindowTitle(Tr("bookmarks_and_tracks"));
   resize(700, 600);
 
   BookmarkManager::AsyncLoadingCallbacks callbacks;
@@ -77,6 +78,12 @@ BookmarkDialog::BookmarkDialog(QWidget * parent, Framework & framework)
   callbacks.m_onFileSuccess = std::bind(&BookmarkDialog::OnAsyncLoadingFileSuccess, this, _1, _2);
   callbacks.m_onFileError = std::bind(&BookmarkDialog::OnAsyncLoadingFileError, this, _1, _2);
   m_framework.GetBookmarkManager().SetAsyncLoadingCallbacks(std::move(callbacks));
+}
+
+BookmarkDialog::~BookmarkDialog()
+{
+  // Loading notifications read these callbacks when they reach the GUI thread.
+  m_framework.GetBookmarkManager().SetAsyncLoadingCallbacks({});
 }
 
 void BookmarkDialog::OnAsyncLoadingStarted()
@@ -136,9 +143,8 @@ void BookmarkDialog::OnCloseClick()
 
 void BookmarkDialog::OnImportClick()
 {
-  auto const files = QFileDialog::getOpenFileNames(
-      this /* parent */, tr("Open KML, KMZ, GPX, JSON, GeoJSON..."), QString() /* dir */,
-      "KML, KMZ, GPX, JSON, GeoJSON files (*.kml *.KML *.kmz *.KMZ *.gpx *.GPX *.json *.JSON *.geojson *.GEOJSON)");
+  auto const files = QFileDialog::getOpenFileNames(this /* parent */, Tr("bookmarks_import"), QString() /* dir */,
+                                                   Tr("bookmark_files_filter"));
 
   for (auto const & name : files)
   {
@@ -157,8 +163,8 @@ void BookmarkDialog::OnExportClick(FileType exportedFileType)
   {
     QMessageBox ask(this);
     ask.setIcon(QMessageBox::Information);
-    ask.setText(tr("Select one of the bookmark categories to export."));
-    ask.addButton(tr("OK"), QMessageBox::NoRole);
+    ask.setText(Tr("select_bookmark_category_to_export"));
+    ask.addButton(Tr("ok"), QMessageBox::NoRole);
     ask.exec();
     return;
   }
@@ -168,51 +174,48 @@ void BookmarkDialog::OnExportClick(FileType exportedFileType)
   {
     QMessageBox ask(this);
     ask.setIcon(QMessageBox::Warning);
-    ask.setText(tr("Selected item is not a bookmark category."));
-    ask.addButton(tr("OK"), QMessageBox::NoRole);
+    ask.setText(Tr("selected_item_not_bookmark_category"));
+    ask.addButton(Tr("ok"), QMessageBox::NoRole);
     ask.exec();
     return;
   }
 
+  // The save dialog runs an event loop that can rebuild the category tree.
+  auto const categoryId = categoryIt->second;
   QString caption, filter;
   switch (exportedFileType)
   {
   case FileType::Gpx:
-    caption = tr("Export GPX...");
-    filter = tr("GPX files (*.gpx)");
+    caption = Tr("export_file_gpx");
+    filter = Tr("gpx_filter");
     break;
   case FileType::GeoJson:
-    caption = tr("Export GeoJSON...");
-    filter = tr("GeoJSON files (*.geojson);JSON files (*.json)");
+    caption = Tr("export_file_geojson");
+    filter = Tr("geojson_filter");
     break;
-  default: caption = tr("Export KMZ..."); filter = tr("KMZ files (*.kmz)");
+  default: caption = Tr("export_file"); filter = Tr("kmz_filter");
   }
 
   auto const name = QFileDialog::getSaveFileName(this /* parent */, caption, QString() /* dir */, filter);
   if (name.isEmpty())
     return;
 
-  m_framework.GetBookmarkManager().PrepareFileForSharing({categoryIt->second},
-                                                         [this, name](BookmarkManager::SharingResult const & result)
+  m_framework.GetBookmarkManager().PrepareFileForSharing(
+      {categoryId}, [self = QPointer<BookmarkDialog>(this), name](BookmarkManager::SharingResult const & result)
   {
-    if (result.m_code == BookmarkManager::SharingResult::Code::Success)
-    {
-      QFile::rename(QString(result.m_sharingPath.c_str()), name);
+    auto const success = result.m_code == BookmarkManager::SharingResult::Code::Success &&
+                         SaveExportedFile(QString::fromStdString(result.m_sharingPath), name);
+    if (!self)
+      return;
 
-      QMessageBox ask(this);
-      ask.setIcon(QMessageBox::Information);
-      ask.setText(tr("Bookmarks successfully exported."));
-      ask.addButton(tr("OK"), QMessageBox::NoRole);
-      ask.exec();
-    }
-    else
-    {
-      QMessageBox ask(this);
-      ask.setIcon(QMessageBox::Critical);
-      ask.setText(tr("Could not export bookmarks: ") + result.m_errorString.c_str());
-      ask.addButton(tr("OK"), QMessageBox::NoRole);
-      ask.exec();
-    }
+    QMessageBox ask(self.data());
+    ask.setIcon(success ? QMessageBox::Information : QMessageBox::Critical);
+    ask.setText(success ? Tr("bookmarks_exported")
+                        : Tr("bookmarks_export_error")
+                              .arg(result.m_errorString.empty() ? Tr("cannot_save_selected_file")
+                                                                : QString::fromStdString(result.m_errorString)));
+    ask.addButton(Tr("ok"), QMessageBox::NoRole);
+    ask.exec();
   }, exportedFileType);
 }
 
@@ -228,8 +231,8 @@ void BookmarkDialog::OnDeleteClick()
       {
         QMessageBox ask(this);
         ask.setIcon(QMessageBox::Information);
-        ask.setText(tr("Could not delete the last category."));
-        ask.addButton(tr("OK"), QMessageBox::NoRole);
+        ask.setText(Tr("cannot_delete_last_bookmark_category"));
+        ask.addButton(Tr("ok"), QMessageBox::NoRole);
         ask.exec();
       }
       else
@@ -259,15 +262,15 @@ void BookmarkDialog::OnDeleteClick()
 
   QMessageBox ask(this);
   ask.setIcon(QMessageBox::Warning);
-  ask.setText(tr("Select category, bookmark or track to delete."));
-  ask.addButton(tr("OK"), QMessageBox::NoRole);
+  ask.setText(Tr("select_bookmark_item_to_delete"));
+  ask.addButton(Tr("ok"), QMessageBox::NoRole);
   ask.exec();
 }
 
-QTreeWidgetItem * BookmarkDialog::CreateTreeItem(std::string const & title, QTreeWidgetItem * parent)
+QTreeWidgetItem * BookmarkDialog::CreateTreeItem(QString const & title, QTreeWidgetItem * parent)
 {
   QStringList labels;
-  labels << QString::fromStdString(title) << tr(parent != nullptr ? "Show on the map" : "");
+  labels << title << (parent != nullptr ? Tr("zoom_to_country") : QString());
 
   QTreeWidgetItem * item = new QTreeWidgetItem(labels);
   if (parent)
@@ -284,7 +287,7 @@ void BookmarkDialog::FillTree()
   m_bookmarks.clear();
   m_tracks.clear();
 
-  auto categoriesItem = CreateTreeItem("Categories", nullptr);
+  auto categoriesItem = CreateTreeItem(Tr("categories"), nullptr);
 
   auto const & bm = m_framework.GetBookmarkManager();
 
@@ -292,7 +295,7 @@ void BookmarkDialog::FillTree()
   {
     for (auto catId : bm.GetUnsortedBmGroupsIdList())
     {
-      auto categoryItem = CreateTreeItem(bm.GetCategoryName(catId), categoriesItem);
+      auto categoryItem = CreateTreeItem(QString::fromStdString(bm.GetCategoryName(catId)), categoriesItem);
       m_categories[categoryItem] = catId;
 
       for (auto bookmarkId : bm.GetUserMarkIds(catId))
@@ -304,25 +307,35 @@ void BookmarkDialog::FillTree()
           name = measurement_utils::FormatLatLon(mercator::YToLat(bookmark->GetPivot().y),
                                                  mercator::XToLon(bookmark->GetPivot().x), true /* withComma */);
         }
-        auto bookmarkItem = CreateTreeItem(name + " (Bookmark)", categoryItem);
+        auto bookmarkItem =
+            CreateTreeItem(Tr("bookmark_title_with_type").arg(QString::fromStdString(name)), categoryItem);
         m_bookmarks[bookmarkItem] = bookmarkId;
       }
 
       for (auto trackId : bm.GetTrackIds(catId))
       {
         auto const track = bm.GetTrack(trackId);
-        auto name = track->GetName();
-        if (name.empty())
-          name = "No name";
-        auto trackItem = CreateTreeItem(name + " (Track)", categoryItem);
+        auto const name = track->GetName().empty() ? Tr("unnamed_track") : QString::fromStdString(track->GetName());
+        auto trackItem = CreateTreeItem(Tr("track_title_with_type").arg(name), categoryItem);
         trackItem->setForeground(0, Qt::darkGreen);
         m_tracks[trackItem] = trackId;
+      }
+      for (auto areaId : bm.GetAreaIds(catId))
+      {
+        auto const & area = *bm.GetArea(areaId);
+        auto name = QString::fromStdString(GetPreferredBookmarkStr(area.m_name));
+        if (name.isEmpty())
+          name = Tr("unnamed_area");
+        auto * areaItem = CreateTreeItem(Tr("area_title_with_type").arg(name), categoryItem);
+        // Areas have category controls but no individual show/delete actions.
+        areaItem->setText(1, {});
+        areaItem->setFlags(areaItem->flags() & ~Qt::ItemIsSelectable);
       }
     }
   }
   else
   {
-    CreateTreeItem("Loading in progress...", categoriesItem);
+    CreateTreeItem(Tr("please_wait"), categoriesItem);
   }
 
   m_tree->addTopLevelItem(categoriesItem);

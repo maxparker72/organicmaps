@@ -16,7 +16,7 @@
 /* Choose measurement on first launch alert - choose metric system button */
 "kilometres" = "Kilometer";
 
-/* Choose measurement on first launch alert - choose imperial system button */
+/* Imperial measurement option: 1 mile = 1609.344 m; Swedish/Norwegian "mil" = 10 km */
 "miles" = "Meilen";
 
 /* Update maps later button text */
@@ -107,7 +107,7 @@
 "category_shopping" = "Einkaufen";
 
 /* Search category for second_hand/charity/antique/auction shops; any changes should be duplicated in categories.txt @category_secondhand! */
-"category_secondhand" = "Second-hand";
+"category_secondhand" = "Second-Hand";
 
 /* Search category for places to stay; any changes should be duplicated in categories.txt @category_hotel! */
 "category_hotel" = "Hotel";
@@ -115,7 +115,7 @@
 /* Search category sight seeings and touristic attractions; any changes should be duplicated in categories.txt @category_tourism! */
 "category_tourism" = "Sehenswürdigkeit";
 
-/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! */
+/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! Also a bookmarks list group header when sorting by type. */
 "category_entertainment" = "Unterhaltung";
 
 /* Search category for ATMs; any changes should be duplicated in categories.txt @category_atm! */
@@ -125,7 +125,7 @@
 "category_nightlife" = "Nachtleben";
 
 /* Search category for water park/disneyland/playground/toys store; any changes should be duplicated in categories.txt @category_children! */
-"category_children" = "Freizeit mit Kindern";
+"category_children" = "Freizeit mit Familie";
 
 /* Search category for banks; any changes should be duplicated in categories.txt @category_bank! */
 "category_bank" = "Bank";
@@ -143,12 +143,12 @@
 "category_post" = "Post";
 
 /* Search category for police; any changes should be duplicated in categories.txt @category_police! */
-"category_police" = "Polizeistation";
+"category_police" = "Polizei";
 
 /* Search category for recycling; any changes should be duplicated in categories.txt @category_recycling! */
 "category_recycling" = "Recycling";
 
-/* Search category for water; any changes should be duplicated in categories.txt @category_water! also used to sort bookmarks by type */
+/* Search category for water; any changes should be duplicated in categories.txt @category_water! Also a bookmarks list group header when sorting by type. */
 "category_water" = "Wasser";
 
 /* Search category for RV facilities; any changes should be duplicated in categories.txt @category_rv! */
@@ -157,7 +157,7 @@
 
 /********** Other translations **********/
 
-"share_bookmarks_email_body" = "Hallo!\n\nIm Anhang sind meine Lesezeichen der Organic Maps App. Du kannst sie mit Organic Maps öffnen. Wenn du die App nicht installiert hast, kannst du sie von https://omaps.app/get?kmz herunterladen.\n\nViel Spaß beim Reisen mit Organic Maps!";
+"share_bookmarks_email_body" = "Hallo!\n\nIm Anhang sind meine Lesezeichen der „Organic Maps“-App. Du kannst sie mit Organic Maps öffnen. Wenn du die App nicht installiert hast, kannst du sie von https://omaps.app/get?kmz herunterladen.\n\nViel Spaß beim Reisen mit Organic Maps!";
 
 /* message title of loading file */
 "load_kmz_title" = "Lesezeichen werden geladen";
@@ -174,11 +174,23 @@
 /* Warning message when doing search around current position */
 "unknown_current_position" = "Dein Standort konnte noch nicht ermittelt werden";
 
-/* Subject for emailed bookmark */
-"bookmark_share_email_subject" = "Hey, sieh dir meine Stecknadel auf der Organic Maps-Karte an!";
+/* Text shown before a shared "my position" link, and the email subject when sharing the current location. */
+"share_my_position" = "Ich bin hier in Organic Maps";
 
-/* Subject for emailed position */
-"my_position_share_email_subject" = "Hey, sieh dir meinen aktuellen Standort auf der Organic Maps-Karte an!";
+/* Email subject when sharing a place. %1$@ is the place name or address. */
+"share_place_subject" = "%1$@ in Organic Maps";
+
+/* Email subject when sharing a place that has no name or address. */
+"share_place_subject_default" = "Ein Ort in Organic Maps";
+
+/* Shared email link text; opens the shared place in Organic Maps or in a web browser. */
+"share_open_in_om_or_browser" = "In Organic Maps oder im Browser öffnen";
+
+/* Shared email link text; leads to the Organic Maps download page. */
+"share_get_om" = "Organic Maps herunterladen";
+
+/* Title for the "Open in Another App" button on the PlacePage; also shared email link text: opens the shared place in another (geo:) maps app. */
+"open_in_app" = "In einer anderen App öffnen";
 
 /* Share by email button text, also used in editor and About. */
 "email" = "E-Mail";
@@ -195,10 +207,11 @@
 /* Length of track in cell that describes route */
 "length" = "Länge";
 "share_my_location" = "Meinen Standort teilen";
+"prefs_group_network" = "Netzwerk";
 "prefs_group_route" = "Navigation";
 
 /* Setting name which enables or disables zoom buttons on the map screen. */
-"pref_zoom_title" = "„+“ und „-“ Knöpfe auf der Karte";
+"pref_zoom_title" = "Plus- und Minusknöpfe auf der Karte";
 
 /* Generic «Off» string */
 "off" = "Aus";
@@ -218,6 +231,24 @@
 /* A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled */
 "pref_map_3d_buildings_disabled_summary" = "3D-Gebäude werden im Energiesparmodus ausgeschaltet";
 
+/* Settings: title of the satellite imagery (custom raster tiles) screen */
+"pref_bg_tiles_title" = "Satellitenbilder";
+
+/* Settings «Satellite Imagery»: title of the tile server URL input field */
+"pref_bg_tiles_url_title" = "Server-URL";
+
+/* Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) */
+"pref_bg_tiles_url_error" = "Gültige URL mit {z}/{x}/{y} eingeben";
+
+/* Settings «Satellite Imagery»: title of the on-disk tile cache size limit (in megabytes) */
+"pref_bg_tiles_size_title" = "Cache-Größe (MB)";
+
+/* Settings «Satellite Imagery»: opacity of vector area objects drawn over the imagery (0% hides them) */
+"pref_bg_tiles_opacity_title" = "Deckkraft von Flächenobjekten";
+
+/* Settings «Satellite Imagery»: legal note that the user is responsible for the custom tile source they configure */
+"pref_bg_tiles_disclaimer" = "Eigene Kachelquellen werden von Ihnen bereitgestellt. Verwenden Sie nur Dienste, auf die Sie zugreifen dürfen. Sie sind verantwortlich für Namensnennung, Lizenzbedingungen, API-Schlüssel, Kontingente und Nutzungslimits.";
+
 /* Settings «Route» category: «Tts enabled» title */
 "pref_tts_enable_title" = "Sprachanweisungen";
 
@@ -231,10 +262,16 @@
 "pref_tts_language_title" = "Sprache für Sprachanweisungen";
 
 /* Settings «Navigation» category: «Voice language» footer */
-"pref_tts_download_voices_description" = "Um eine Stimme mit höherer Qualität zu laden, öffne die App Einstellungen und gehe zu Bedienungshilfen → VoiceOver → Sprachausgabe → Stimme.";
+"pref_tts_download_voices_description" = "Um eine Stimme mit höherer Qualität zu laden, öffne die App „Einstellungen“ und geh zu Bedienungshilfen → VoiceOver → Sprachausgabe → Stimme.";
 
-/* Settings «Route» category: «Test Voice Directions» title */
-"pref_tts_test_voice_title" = "Sprachanweisungen testen (TTS, Text-To-Speech)";
+/* Header above Apple's group of novelty text-to-speech voices (Bells, Bubbles, Zarvox...), shown after the regional voice sections and Eloquence group. Use Apple's term for this group from Settings > Accessibility > VoiceOver > Speech. */
+"pref_tts_voice_group_novelty" = "Novelty";
+
+/* Accessibility label of the button that plays a sample of a text-to-speech voice. */
+"pref_tts_voice_preview_play" = "Play sample";
+
+/* Accessibility label of the button that stops the sample of a text-to-speech voice being played. */
+"pref_tts_voice_preview_stop" = "Stop sample";
 "pref_map_auto_zoom" = "Auto-Zoom";
 "placepage_distance" = "Entfernung";
 "search_show_on_map" = "Auf der Karte ansehen";
@@ -355,11 +392,8 @@
 /* blue gray color */
 "blue_gray" = "Graublau";
 
-/* place preview title */
-"info" = "Infos";
-
 /* Prints version number in About dialog */
-"version" = "Organic Maps Version: %@";
+"version" = "„Organic Maps“-Version: %@";
 
 /* Settings «Map» category: «Appearance» title */
 "pref_appearance_title" = "Erscheinungsbild";
@@ -369,9 +403,6 @@
 
 /* Settings "Appearance" category: "Dark" title, should be consistent with the pref_appearance_title translation. */
 "pref_appearance_dark" = "Dunkel";
-
-/* Title for "Other" section in TTS settings. */
-"pref_tts_other_section_title" = "Weitere";
 
 /* Tex label above the Donate button */
 "donate_description" = "Schenke Millionen von Nutzern kostenlose und werbefreie Karten!";
@@ -391,9 +422,6 @@
 /* Alert title */
 "email_error_title" = "Fehler beim E-Mail-Versand";
 
-/* Settings item title */
-"pref_calibration_title" = "Kompass-Kalibrierung";
-
 /* Downloaded maps category */
 "downloader_available_maps" = "Verfügbar";
 "downloader_search_results" = "Gefunden";
@@ -411,10 +439,10 @@
 /********** Routing dialogs strings **********/
 
 "dialog_routing_disclaimer_title" = "Wenn du der Route folgst, beachte bitte:";
-"dialog_routing_disclaimer_priority" = "— Zustand der Straßen, die Verkehrsordnung und Straßenschilder haben stets Vorrang vor Navigationsanweisungen;";
-"dialog_routing_disclaimer_precision" = "— Die Karte kann ungenau sein, und die vorgeschlagene Route ist möglicherweise nicht der optimale Weg, um das Ziel zu erreichen;";
-"dialog_routing_disclaimer_recommendations" = "— Die vorgeschlagenen Routen sind als Empfehlungen zu verstehen;";
-"dialog_routing_disclaimer_borders" = "— Bitte sei vorsichtig bei Routen in Grenzgebieten: die Routen, die unsere App erstellt, können manchmal Landesgrenzen in gesperrten Gebieten überschreiten.";
+"dialog_routing_disclaimer_priority" = "– Zustand der Straßen, die Verkehrsordnung und Straßenschilder haben stets Vorrang vor Navigationsanweisungen;";
+"dialog_routing_disclaimer_precision" = "– Die Karte kann ungenau sein, und die vorgeschlagene Route ist möglicherweise nicht der optimale Weg, um das Ziel zu erreichen;";
+"dialog_routing_disclaimer_recommendations" = "– Die vorgeschlagenen Routen sind als Empfehlungen zu verstehen;";
+"dialog_routing_disclaimer_borders" = "– Bitte sei vorsichtig bei Routen in Grenzgebieten: die Routen, die unsere App erstellt, können manchmal Landesgrenzen in gesperrten Gebieten überschreiten.";
 "dialog_routing_disclaimer_beware" = "Bitte fahre aufmerksam und sicher!";
 "dialog_routing_check_gps" = "GPS-Signal prüfen";
 "dialog_routing_error_location_not_found" = "Route kann nicht erstellt werden. Aktuelle GPS-Koordinaten konnten nicht ermittelt werden.";
@@ -491,6 +519,8 @@
 "twentyfour_seven" = "24/7";
 "day_off_today" = "Heute geschlossen";
 "day_off" = "Geschlossen";
+"midnight" = "Mitternacht";
+"noon" = "Mittag";
 "today" = "Heute";
 "opens_in" = "Öffnet in %@";
 "closes_in" = "Schließt in %@";
@@ -568,15 +598,22 @@
 
 /* abbreviation for kilometers per hour */
 "kilometers_per_hour" = "km/h";
+
+/* Short label for miles per hour (1 mile = 1609.344 m), placed after a number; e.g. mph or mi/h */
 "miles_per_hour" = "mph";
+
+/* Short label for hours (time unit), placed after a number */
 "hour" = "h";
+
+/* Short label for minutes (time unit), placed after a number */
 "minute" = "min";
+
+/* Short label for days (time unit), placed after a number */
 "day" = "d";
+
+/* Short label for seconds (time unit), placed after a number */
 "second" = "s";
 "placepage_more_button" = "Mehr";
-
-/* A disable button text in the explanation dialog that opens hotel details page on Kayak website. */
-"placepage_edit_bookmark_button" = "Lesezeichen bearbeiten";
 "placepage_personal_notes_hint" = "Persönliche Notizen (Text oder HTML)";
 "editor_comment_hint" = "Kommentar…";
 "editor_reset_edits_message" = "Alle lokalen Korrekturen verwerfen?";
@@ -620,12 +657,14 @@
 /* "traffic" as in "road congestion" */
 "traffic_data_unavailable" = "Verkehrsdaten sind nicht verfügbar";
 "enable_logging" = "Protokollierung aktivieren";
-"transliteration_title" = "Transliteration ins Lateinische";
-"planning_route_manage_route" = "Route verwalten";
-"button_plan" = "Planen";
+"transliteration_title" = "Transliteration ins lateinische Alphabet";
 "placepage_remove_stop" = "Stopp entfernen";
+
+/* Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. */
+"route_add_destination" = "Ziel hinzufügen";
+
+/* Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. */
 "placepage_add_stop" = "Stopp einfügen";
-"saved" = "Gespeichert";
 "error_enter_correct_name" = "Bitte gib einen korrekten Namen ein";
 "bookmark_lists" = "Listen";
 
@@ -643,6 +682,9 @@
 "bookmarks_error_title_list_name_already_taken" = "Dieser Name ist bereits vergeben";
 "profile" = "OpenStreetMap-Profil";
 "restore" = "Wiederherstellen";
+
+/* Settings privacy group in settings screen */
+"privacy" = "Privatsphäre";
 "privacy_policy" = "Datenschutzerklärung";
 "terms_of_use" = "Nutzungsbedingungen";
 
@@ -651,6 +693,11 @@
 
 /* Cycling routes layer name in the Styles and Layers dialog */
 "button_layer_cycling" = "Fahrradrouten";
+
+/* Map layers menu: toggle button for the satellite imagery layer */
+"button_layer_satellite" = "Satellit";
+
+/* Subway map layer button; also the spoken name of the subway (metro, underground) transport type, read by screen readers before a line number on transit line badges. */
 "button_layer_subway" = "U-Bahn";
 "layers_title" = "Kartenstile und Ebenen";
 
@@ -681,7 +728,7 @@
 /* Speed camera settings menu option - Never warn (about speedcams) */
 "pref_tts_speedcams_never" = "Niemals warnen";
 "power_managment_title" = "Stromsparmodus";
-"power_managment_description" = "Versucht den Stromverbrauch auf Kosten einiger Funktionen zu reduzieren.";
+"power_managment_description" = "Versucht, den Stromverbrauch auf Kosten einiger Funktionen zu reduzieren.";
 "power_managment_setting_never" = "Niemals";
 "power_managment_setting_auto" = "Auto";
 "power_managment_setting_manual_max" = "Immer";
@@ -691,8 +738,26 @@
 "bookmarks_text_placement_description" = "Wenn du zu viele Lesezeichen hast, kann es sein, dass die App langsamer wird, wenn die Namen auf der Karte angezeigt werden.";
 "show_to_the_right" = "Rechts anzeigen";
 "show_at_the_bottom" = "Unten anzeigen";
-"enable_logging_warning_message" = "Aktivieren, um Diagnoseprotokolle aufzuzeichnen. Sollte ein App-Fehler auftreten, reproduziere das Problem und sende uns die Protokolle über die Schaltfläche \"App-Fehler melden\" unter \"Hilfe\". Protokolle können Standortformationen enthalten.";
+"enable_logging_warning_message" = "Aktivieren, um Diagnoseprotokolle aufzuzeichnen. Sollte ein App-Fehler auftreten, reproduziere das Problem und sende uns die Protokolle über die Schaltfläche „App-Fehler melden“ unter „Hilfe“. Protokolle können Standortformationen enthalten.";
+
+/* Driving profile in routing options settings. */
+"routing_options_driving" = "Auto";
+
+/* Cycling profile in routing options settings. */
+"routing_options_cycling" = "Fahrrad";
+
+/* Walking profile in routing options settings; also the label of a walking leg in transit route details. */
+"routing_options_walking" = "Zu Fuß";
+
+/* Section heading for routing settings shared by every routing mode. */
+"routing_options_all_modes" = "Alle Fortbewegungsarten";
 "driving_options_title" = "Routenbeschränkungen";
+
+/* Routing setting that automatically reorders intermediate stops */
+"route_optimization" = "Routenoptimierung";
+
+/* Explains that route optimization automatically reorders intermediate stops */
+"route_optimization_description" = "Ordnet Zwischenstopps automatisch neu, um eine effizientere Route zu erstellen.";
 
 /* Recommended length for CarPlay and Android Auto is around 25-27 characters */
 "avoid_tolls" = "Mautstraßen vermeiden";
@@ -705,11 +770,18 @@
 "avoid_motorways" = "Autobahnen vermeiden";
 "unable_to_calc_alert_title" = "Route kann nicht berechnet werden";
 "unable_to_calc_alert_subtitle" = "Eine Route konnte nicht gefunden werden. Dies kann an deinen Routenbeschränkungen oder an unvollständigen OpenStreetMap-Daten liegen. Bitte ändere deine Routenbeschränkungen und versuche es erneut.";
-"define_to_avoid_btn" = "Routenbeschränkung einstellen";
-"change_driving_options_btn" = "Routenbeschränkungen aktiv";
 "toll_road" = "Mautstraße";
 "unpaved_road" = "Unbefestigte Straße";
 "ferry_crossing" = "Fährstelle";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_steps" = "Treppe";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_gate" = "Tor";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_lift_gate" = "Schranke";
 
 /* A generic "Yes" button in dialogs */
 "yes" = "Ja";
@@ -743,9 +815,6 @@
 /* Failed planning route message in navigation view */
 "routing_planning_error" = "Routenplanung fehlgeschlagen";
 
-/* Arrive routing message in navigation view */
-"routing_arrive" = "Ankunft: %@";
-
 /* Text for routing::RouterResultCode::FileTooOld dialog. */
 "dialog_routing_download_and_update_maps" = "Lade alle Karten entlang der geplanten Route herunter und aktualisiere sie, um die Route zu berechnen.";
 "editor_done_dialog_1" = "Du hast die Weltkarte geändert. Behalte das nicht für dich! Erzähle deine Freunden davon und bearbeitet sie zusammen.";
@@ -760,7 +829,7 @@
 "add_opening_hours" = "Öffnungszeiten hinzufügen";
 "password_8_chars_min" = "Passwort (mindestens 8 Zeichen)";
 "invalid_username_or_password" = "Ungültiger Benutzername oder Passwort.";
-"osm_account" = "OSM Konto";
+"osm_account" = "OSM-Konto";
 
 /* Information text: "Last upload 11.01.2016" */
 "last_upload" = "Zuletzt hochgeladen";
@@ -770,14 +839,13 @@
 "please_note" = "Bitte beachten";
 "migration_download_error_dialog" = "Fehler beim Herunterladen";
 "editor_add_select_category" = "Kategorie auswählen";
-"editor_add_select_category_popular_subtitle" = "Beliebt";
 "editor_add_select_category_all_subtitle" = "Alle Kategorien";
 "whatsnew_editor_message_1" = "Füge auf der Karte einen neuen Ort hinzu und bearbeite existierende Orte direkt in der App.";
 "dialog_incorrect_feature_position" = "Standort wechseln";
 
 /* Error dialog no space */
 "migration_no_space_message" = "Zum Herunterladen benötigst du mehr Speicherplatz. Bitte lösche unnötige Daten.";
-"editor_sharing_title" = "Ich habe die Organic Maps-Karten verbessert";
+"editor_sharing_title" = "Ich habe die „Organic Maps“-Karten verbessert";
 "editor_detailed_description_hint" = "Ausführlicher Kommentar";
 "editor_detailed_description" = "Dein Änderungsvorschläge für die Karte werden an OpenStreetMap gesendet: Beschreibe die Details der Objekte, die du in Organic Maps nicht bearbeiten kannst.";
 "current_location_unknown_error_message" = "Bei der Standortsuche ist ein unbekannter Fehler aufgetreten. Prüfe die Funktionstüchtigkeit deines Geräts und versuche es etwas später erneut.";
@@ -792,7 +860,6 @@
 "location_services_disabled_on_device_3" = "3. Standortdienste auswählen";
 "location_services_disabled_on_device_4" = "4. Standortdienste einschalten";
 "location_services_disabled_on_device_additional_message" = "Oder verwende Organic Maps weiterhin ohne Standort";
-"book_button" = "Buchen";
 "placepage_call_button" = "Anrufen";
 "placepage_bookmark_name_hint" = "Name des Lesezeichens";
 "placepage_delete_bookmark_button" = "Lesezeichen löschen";
@@ -803,18 +870,13 @@
 /* iOS dialog for the case when recent track recording is on and the app comes back from background */
 "recent_track_background_dialog_title" = "Aufzeichnung deiner kürzlich gefahrenen Route deaktivieren?";
 "off_recent_track_background_button" = "Deaktivieren";
-
-/* For sharing via SMS and so on */
-"sharing_call_action_look" = "Nachsehen";
 "recent_track_background_dialog_message" = "Organic Maps verwendet deinen Standort im Hintergrund, um deine kürzlich gefahrene Route aufzunehmen.";
 "general_settings" = "Allgemeine Einstellungen";
 
 /* "traffic" as in road congestion */
 "traffic_update_app_message" = "Zum Anzeigen von Verkehrsdaten muss die Anwendung aktualisiert werden.";
 "log_file_size" = "Größe der Protokolldatei: %@";
-"planning_route_remove_title" = "Hierher ziehen zum Entfernen";
 "placepage_replace_stop" = "Stopp ersetzen";
-"start_from_my_position" = "Starten von";
 
 /* For iOS message 'alert_reauth_message' should be splitted in two parts: message + link. Here's first part */
 "alert_reauth_message_ios" = "Bitte melde dich bei OpenStreetMap an, um alle deine Kartenbearbeitungen automatisch hochzuladen. Erfahre mehr";
@@ -834,22 +896,15 @@
 "popular_place" = "Beliebt";
 "hide_from_map" = "Auf der Karte ausblenden";
 "tags_loading_error_subtitle" = "Während dem Laden der Tags ist ein Fehler aufgetreten, bitte versuche es erneut";
-
-/* Position of the name label on the map relative to the bookmark pin (on the right) */
-"right" = "Rechts";
-
-/* Position of the name label on the map relative to the bookmark pin (at the bottom) */
-"bottom" = "Unten";
-"trip_start" = "Losfahren";
+"trip_start" = "Los";
 "pick_destination" = "Ziel";
-"follow_my_position" = "Zentrieren";
 "search_results" = "Suchergebnisse";
 "then_turn" = "Danach";
 "redirect_route_alert" = "Möchtest du die Route neu erstellen?";
 "keyboard_availability_alert" = "Die Tastatur ist während der Fahrt nicht verfügbar";
 "dialog_routing_change_start_carplay" = "Vom aktuellen Standort aus kann keine Route erstellt werden";
 "dialog_routing_change_end_carplay" = "Zu diesem Ziel kann keine Route erstellt werden. Bitte wähle einen anderes Ziel";
-"dialog_routing_check_gps_carplay" = "Kein GPS-Signal. Gehe in das offene Gelände";
+"dialog_routing_check_gps_carplay" = "Kein GPS-Signal. Geh in das offene Gelände";
 "dialog_routing_unable_locate_route_carplay" = "Es kann keine Route erstellt werden. Bitte wähle andere Routenpunkte";
 "dialog_routing_download_files_carplay" = "Lade die fehlenden Karten herunter, um die Route zu erstellen";
 "dialog_routing_system_error_carplay" = "Es ist ein Fehler aufgetreten. Bitte starte die App neu";
@@ -888,21 +943,34 @@
 "medicine" = "Medizin";
 "search_in_the_list" = "In der Liste suchen";
 "religious_places" = "Religiöse Orte";
+
+/* Button that starts multi-selection in a bookmark list. */
+"select" = "Auswählen";
+
+/* Action that selects every bookmark and track in a bookmark list. */
+"select_all" = "Alle auswählen";
+
+/* Action that clears the multi-selection in a bookmark list. */
+"deselect_all" = "Auswahl aufheben";
 "transit_not_found" = "Die U-Bahn-Navigation ist in dieser Region noch nicht verfügbar";
 "dialog_pedestrian_route_is_long_header" = "Keine U-Bahn-Route gefunden";
 "dialog_pedestrian_route_is_long_message" = "Bitte wähle einen Start- oder Zielpunkt, der näher an einer U-Bahn-Station liegt";
-"button_layer_isolines" = "Höhenlinien";
-"isolines_activation_error_dialog" = "Um die Höhenlinien nutzen zu können, aktualisiere die Karte des betreffenden Gebiets oder lade diese herunter";
-"isolines_location_error_dialog" = "Höhenlinien sind für dieses Gebiet noch nicht verfügbar";
+
+/* Layers menu: label of the 3D terrain layer button */
+"button_layer_terrain" = "3D-Gelände";
+"isolines_location_error_dialog" = "Aktualisiere diese Region, um Höhenlinien zu sehen";
 "elevation_profile_ascent" = "Bergauf";
 "elevation_profile_descent" = "Bergab";
 "elevation_profile_min_elevation" = "Min. Höhe";
 "elevation_profile_max_elevation" = "Max. Höhe";
+
+/* Displayed in the elevation profile chart while track recording has fewer than two points. */
+"elevation_profile_placeholder" = "Bewege dich, um das Höhenprofil zu sehen";
 "isolines_toast_zooms_1_10" = "Karte vergrößern, um Höhenlinien sichtbar zu machen";
 "downloader_loading_ios" = "Herunterladen";
 
 /* Telegram group url for the "?" About page */
-"telegram_url" = "https://t.me/OrganicMapsApp";
+"telegram_url" = "https://t.me/OrganicMapsDeutsch";
 
 /* Instagram account url for the "?" About page */
 "instagram_url" = "https://www.instagram.com/organicmaps.app";
@@ -920,7 +988,7 @@
 "app_tip_01" = "Mit deinen Spenden und deiner Unterstützung können wir die besten Karten der Welt erstellen!";
 
 /* App tip #02 */
-"app_tip_02" = "Gefällt dir unsere App? Bitte spende, um die Entwicklung zu unterstützen! Gefällt sie dir noch nicht? Bitte lass uns wissen warum und wir werden das Problem beheben!";
+"app_tip_02" = "Gefällt dir unsere App? Bitte spende, um die Entwicklung zu unterstützen! Gefällt sie dir noch nicht? Bitte lass uns den Grund dafür wissen, damit wir das Problem beheben können!";
 
 /* App tip #03 */
 "app_tip_03" = "Wenn du einen Softwareentwickler kennst, kannst du ihn oder sie bitten, eine Funktion zu implementieren, die du benötigst.";
@@ -962,11 +1030,14 @@
 "bookmarks_export" = "Alle Lesezeichen und Tracks exportieren";
 "drive_through" = "Drive-through";
 
+/* Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_in" = "Vergrößern";
+
+/* Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_out" = "Verkleinern";
+
 /* Restaurant or other food place's menu URL field in the Editor */
 "website_menu" = "Link zur Speisekarte";
-
-/* Title for the "Open in Another App" button on the PlacePage. */
-"open_in_app" = "In einer anderen App öffnen";
 
 /* To indicate if the place proposed self service… */
 "self_service" = "Selbstbedienung";
@@ -981,12 +1052,7 @@
 "stop_track_recording" = "Aufnahme des Tracks stoppen";
 
 /* Message for the toast when saving the track recording is finished but nothing to save. */
-"track_recording_toast_nothing_to_save" = "Track ist leer - nichts zu speichern";
-"edit_track" = "Track bearbeiten";
-"elevation_profile_diff_level" = "Anspruchsniveau";
-"elevation_profile_diff_level_easy" = "Leicht";
-"elevation_profile_diff_level_moderate" = "Mittel";
-"elevation_profile_diff_level_hard" = "Schwer";
+"track_recording_toast_nothing_to_save" = "Track ist leer – nichts zu speichern";
 "downloader_updating_ios" = "Aktualisierung";
 
 /* Autoupdate dialog on start */
@@ -1019,6 +1085,12 @@
 /* Text for the editing the Track's color button. */
 "change_color" = "Farbe ändern";
 
+/* Text for the hiding track. */
+"hide_track" = "Track ausblenden";
+
+/* Text for the showing track. */
+"show_track" = "Track anzeigen";
+
 /* Main screen title "Map" displayed in the navigation back button's menu. */
 "map" = "Karte";
 
@@ -1037,7 +1109,7 @@
 /* Message for the "iCloud is Disabled" alert. */
 "icloud_disabled_message" = "Bitte aktiviere iCloud in den Einstellungen deines Geräts, um diese Funktion zu nutzen.";
 
-/* Title for the "Enable iCloud Syncronization" alert's "Enable" action button. */
+/* Action button that enables a disabled feature, such as iCloud synchronization or location services. */
 "enable" = "Aktivieren";
 
 /* Title for the "Enable iCloud Syncronization" alert's "Backup" action button. */
@@ -1099,10 +1171,10 @@
 /* abbreviation for kilometers */
 "km" = "km";
 
-/* abbreviation for mile(s) */
+/* Short label for miles (length unit, 1 mi = 1609.344 m), placed after a number */
 "mi" = "mi";
 
-/* A unit of measure */
+/* Short label for feet (1 ft = 0.3048 m), after numbers; local abbreviations and uninflected unit names are allowed */
 "ft" = "ft";
 
 /* Toast text when the maps version should be updated to display the OSM hiking and cycling routes */
@@ -1111,7 +1183,7 @@
 /* Subway exits for public transport marks on the map */
 "core_exit" = "Ausgang";
 "core_entrance" = "Eingang";
-"subway_data_unavailable" = "Die U-Bahnkarte steht nicht zur Verfügung";
+"subway_data_unavailable" = "Die U-Bahn-Karte steht nicht zur Verfügung";
 
 /* Settings/Highlight downloaded regions on the map */
 "show_downloaded_regions" = "Heruntergeladene Regionen farblich markieren";
@@ -1134,3 +1206,30 @@
 
 /* Toast message shown when track colors are changed in category settings */
 "toast_tracks_color_changed" = "Trackfarbe geändert";
+
+/* Accessibility label of the icon-only button beside the search field, shown while choosing or replacing a route point; it opens a full-screen map picker with a crosshair */
+"choose_on_map" = "Auf der Karte auswählen";
+
+/* Search field hint and full-screen map point picker title shown while choosing the starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_start_location" = "Startpunkt";
+
+/* Search field hint and full-screen map point picker title shown while choosing the destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_destination" = "Ziel";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_start_location" = "Start ändern";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_destination" = "Ziel ändern";
+
+/* Search field hint and full-screen map point picker title shown while replacing an already added intermediate stop of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_stop_along_route" = "Stopp ändern";
+
+/* Toast shown when the user tries to add one more intermediate stop to a route that already holds the maximum allowed number */
+"routing_max_stops_reached" = "Die maximale Anzahl an Stopps wurde erreicht";
+
+/* Hint under the title of the full-screen route point picker: a crosshair stays fixed in the centre of the screen while the user moves the map under it */
+"choose_point_on_map_hint" = "Verschiebe und zoome die Karte, um das Kreuz zu platzieren";
+
+/* Accessibility label for the button that reverses the complete planned route, including intermediate stops. */
+"reverse_route" = "Route umkehren";

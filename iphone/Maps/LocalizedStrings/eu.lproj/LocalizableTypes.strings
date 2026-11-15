@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "Hiri harresia";
 "type.barrier.cycle_barrier" = "Bizikleta-hesia";
 "type.waterway.ditch" = "Drainatze Zanga";
+"type.waterway.ditch.intermittent" = "Aldizkako drainatze-zanga";
 "type.natural.water.moat" = "Lubanarroa";
 "type.natural.water.wastewater" = "Hondakin-urak";
 "type.barrier.entrance" = "Sarrera";
@@ -407,28 +408,28 @@
 "type.highway" = "Errepidea";
 "type.highway.bridleway" = "Zaldi-bidea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Zubia";
 "type.highway.bridleway.permissive" = "Zaldi-bidea";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Tunela";
 "type.highway.busway" = "Autobusentzat errepidea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Tunela";
 "type.highway.bus_stop" = "Autobus geltokia";
 "type.highway.construction" = "Eraikitzen ari diren errepidea";
 "type.highway.cycleway" = "Bidegorri edo bizikleta-bidea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Zubia";
 "type.highway.cycleway.permissive" = "Bizikletabidea";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Tunela";
 "type.highway.elevator" = "Igogailua";
 "type.highway.footway" = "Bidea";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Oinezkoen pasabidea";
 "type.highway.footway.area" = "Bidea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Oinezkoen tunela";
 "type.highway.ford" = "Ibia";
 "type.highway.living_street" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Tunela";
 "type.highway.motorway" = "Autobidea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Autobideko zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Autobideko tunela";
 "type.highway.motorway_junction" = "Autobideko irteera";
 "type.highway.motorway_link" = "Autobiderako sarrera bidea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Tunela";
 "type.highway.path" = "Bidea";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Bidea";
 "type.highway.footway.bicycle" = "Bidea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Zubia";
 "type.highway.path.horse" = "Bidea";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Tunela";
 "type.highway.pedestrian" = "Oinezkoen kalea";
 "type.highway.pedestrian.area" = "Oinezkoen eremua";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Oinezkoen zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Oinezkoen tunela";
-"type.highway.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "Nasa";
 "type.highway.primary" = "Errepide nagusia";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Tunel";
 "type.highway.primary_link" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Tunel";
 "type.highway.raceway" = "Zirkuitua";
 "type.highway.residential" = "Kalea";
 "type.highway.residential.area" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Tunel";
 "type.highway.rest_area" = "Atseden gunea";
 "type.highway.road" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Zubia";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Tunel";
 "type.highway.secondary" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Tunel";
 "type.highway.secondary_link" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Tunel";
 "type.highway.service" = "Kalea";
 "type.highway.service.area" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Zubia";
 "type.highway.service.driveway" = "Kalea";
 "type.highway.service.parking_aisle" = "Kalea";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Tunel";
 "type.highway.services" = "Zerbitzugunea";
 "type.highway.speed_camera" = "Abiadura kamera";
 "type.highway.steps" = "Bidea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Tunel";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Tunel";
 "type.highway.tertiary_link" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Tunel";
 "type.highway.track" = "Kalea";
 "type.highway.track.area" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Zubia";
 "type.highway.track.grade1" = "Kalea";
 "type.highway.track.no.access" = "Kalea";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Tunel";
 "type.highway.traffic_signals" = "Semaforoak";
 "type.highway.trunk" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Tunel";
 "type.highway.trunk_link" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Tunel";
 "type.highway.unclassified" = "Kalea";
 "type.highway.unclassified.area" = "Kalea";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Zubia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Tunel";
 "type.area_highway.cycleway" = "Bidegorri edo bizikleta-bidea";
 "type.area_highway.footway" = "Bidea";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Japoniar gaztelu";
 "type.historic.castle.stately" = "Gaztelua";
 "type.historic.city_gate" = "Portale";
+"type.man_made.ceremonial_gate" = "Ekitaldi-ate";
 "type.historic.citywalls" = "Hiri harresia";
 "type.historic.fort" = "Gotorlekua";
 "type.historic.gallows" = "Urkamendia";
@@ -718,6 +722,7 @@
 "type.landuse" = "Lurzoruaren erabilera";
 "type.landuse.allotments" = "Baratze komunitatea";
 "type.landuse.basin" = "Arroa";
+"type.landuse.basin.intermittent" = "Aldizkako arroa";
 "type.landuse.brownfield" = "Industrialde ohia";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Harrobia";
 "type.landuse.railway" = "Trenbide instalazioak";
 "type.landuse.recreation_ground" = "Zelaia";
-"type.landuse.reservoir" = "Arroa";
 "type.landuse.residential" = "Bizitegi-eremua";
 "type.landuse.retail" = "Merkataritza-gunea";
 "type.landuse.salt_pond" = "Gatzaga";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Izotz-pista";
 "type.leisure.marina" = "Kirol-portua";
 "type.leisure.nature_reserve" = "Erreserbatutako lurraldea";
+"type.leisure.bird_hide" = "Hegaztiak behatzeko ezkutalekua";
 "type.leisure.outdoor_seating" = "Kanpoko eserlekuak";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "Parkea";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Pier";
 "type.man_made.pipeline" = "Pipeline";
 "type.man_made.pipeline.overground" = "Overground Pipeline";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Ur depositu estalia";
 "type.man_made.silo" = "Siloa";
 "type.man_made.storage_tank" = "Storage Tank";
 "type.man_made.surveillance" = "Zaintza Kamera";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Ur depositua";
 "type.man_made.water_well" = "Ur putzua";
 "type.man_made.water_well.drinking_water_no" = "Ur putzua";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Ur-araztegia";
 "type.man_made.windmill" = "Haize-errota";
 "type.man_made.works" = "Industrial Works";
 
@@ -871,10 +882,13 @@
 "type.natural.water.reservoir" = "Urtegia";
 "type.natural.water.basin" = "Arroa";
 "type.natural.water.river" = "Ibai";
+"type.natural.water.intermittent" = "Aldizkako ur-masa";
 "type.natural.land" = "Lur lehor";
 "type.natural.meadow" = "Belardi";
 "type.natural.orchard" = "Baratzea";
 "type.natural.peak" = "Goiena";
+"type.natural.hill" = "Muino";
+"type.natural.arch" = "Harri-arku";
 "type.natural.saddle" = "Mendiko jarlekua";
 "type.natural.rock" = "Arroka";
 "type.natural.scrub" = "Sastrakak";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "Garraio publikoa";
-"type.public_transport.platform" = "Platform";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "Nasa";
 "type.railway" = "Railway";
 "type.railway.abandoned" = "Abandoned Railway";
 "type.railway.abandoned.bridge" = "Abandoned Railway Bridge";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Barazki eta fruta-denda";
 "type.shop.grocery" = "Janariak";
 "type.shop.hairdresser" = "Ile-apaindegia";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Bizargina";
 "type.shop.hardware" = "Burdindegia";
 "type.shop.health_food" = "Elikagai osasungarrien denda";
 "type.shop.hearing_aids" = "Audiofono denda";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Errugbia";
 "type.sport.running" = "Korrika";
 "type.sport.softball" = "Softball";
+"type.sport.pilates" = "Pilates";
 "type.tourism" = "Turismoa";
 "type.tourism.aquarium" = "Aquariuma";
 
@@ -1513,24 +1533,27 @@
 "type.traffic_calming.hump" = "Traffic Hump";
 "type.waterway" = "Waterway";
 "type.waterway.access_point" = "Ur-bideetarako sarbide-puntu";
-"type.waterway.canal" = "Canal";
+"type.waterway.canal" = "Kanala";
+"type.waterway.canal.intermittent" = "Aldizkako kanala";
 "type.waterway.canal.tunnel" = "Canal Tunnel";
 "type.waterway.fish_pass" = "Arrainen eskailera";
+"type.waterway.fish_pass.intermittent" = "Aldizkako arrainen eskailera";
 "type.waterway.dam" = "Dam";
 "type.barrier.ditch" = "Ditch";
 "type.natural.water.ditch" = "Drainatze Zanga";
 "type.waterway.ditch.tunnel" = "Zuloa";
 "type.waterway.dock" = "Waterway Dock";
-"type.waterway.drain" = "Drain";
-"type.natural.water.drain" = "Drain";
+"type.waterway.drain" = "Drainatze-kanala";
+"type.waterway.drain.intermittent" = "Aldizkako drainatze-kanala";
+"type.natural.water.drain" = "Drainatze-kanala";
 "type.waterway.drain.tunnel" = "Zuloa";
 "type.waterway.lock_gate" = "Atea";
 "type.waterway.river" = "Ibai";
+"type.waterway.river.intermittent" = "Aldizkako ibai";
 "type.waterway.river.tunnel" = "Ibai";
-"type.waterway.stream" = "Ibai";
-"type.waterway.stream.ephemeral" = "Ibai";
-"type.waterway.stream.intermittent" = "Ibai";
-"type.waterway.stream.tunnel" = "Ibai";
+"type.waterway.stream" = "Erreka";
+"type.waterway.stream.intermittent" = "Aldizkako erreka";
+"type.waterway.stream.tunnel" = "Erreka";
 "type.waterway.waterfall" = "Ur-jauzia";
 "type.waterway.weir" = "Weir";
 "type.wheelchair" = "Gurpil-aulkia";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Gizarte-ekipamendua";
+"type.amenity.stage" = "Eszenatokia";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Larrialdietarako Sarrera";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Eguraldia Begiratzeko Estazioa";
 "type.amenity.student_accommodation" = "Ikasleentzako ostatua";
 "type.craft.watchmaker" = "Erlojugilea";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Leihogintza";
 "type.xmas_feature.market" = "Gabonetako Merkatua";
 "type.xmas_feature.tree" = "Gabonetako zuhaitza";
 "type.amenity.hookah_lounge" = "Nargile-taberna";

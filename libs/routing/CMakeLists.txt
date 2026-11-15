@@ -61,6 +61,7 @@ set(SRC
   features_road_graph.cpp
   features_road_graph.hpp
   following_info.hpp
+  gate_access.hpp
   geometry.cpp
   geometry.hpp
   guides_connections.cpp
@@ -163,6 +164,10 @@ set(SRC
   speed_camera_prohibition.hpp
   speed_camera_ser_des.cpp
   speed_camera_ser_des.hpp
+  track_matcher.cpp
+  track_matcher.hpp
+  track_router.cpp
+  track_router.hpp
   traffic_stash.cpp
   traffic_stash.hpp
   transit_graph.cpp

@@ -1,10 +1,14 @@
 #include "testing/testing.hpp"
 
 #include "coding/file_writer.hpp"
+#include "coding/zip_creator.hpp"
 #include "coding/zip_reader.hpp"
 
 #include "base/logging.hpp"
 #include "base/macros.hpp"
+#include "base/scope_guard.hpp"
+
+#include "3party/minizip/minizip.hpp"
 
 #include <exception>
 #include <string>
@@ -76,6 +80,59 @@ UNIT_TEST(ZipReaderSmoke)
   FileWriter::DeleteFileX(ZIPFILE);
 }
 
+// Locating an entry must be an exact, case-sensitive match. minizip-ng's compat
+// unzLocateFile() treats the stored name as a wildcard pattern, so the wrapper
+// iterates and compares names directly.
+UNIT_TEST(ZipReaderExactNameMatch)
+{
+  string const ZIPFILE = "exact_match_test.zip";
+  {
+    FileWriter f(ZIPFILE);
+    f.Write(zipBytes, ARRAY_SIZE(zipBytes) - 1);  // A single entry named "test.txt".
+  }
+
+  TEST_NO_THROW({ ZipFileReader const r(ZIPFILE, "test.txt"); }, ());
+  // A different-case name must not resolve to "test.txt" (throws LocateZipException).
+  TEST_ANY_THROW({ ZipFileReader const r(ZIPFILE, "Test.txt"); }, ());
+
+  FileWriter::DeleteFileX(ZIPFILE);
+}
+
+UNIT_TEST(ZipReaderWildcardNameMatch)
+{
+  string const FILE = "wildcard_name_source.txt";
+  string const ZIPFILE = "wildcard_name_test.zip";
+  {
+    FileWriter f(FILE);
+    f.Write("Test\n", 5);
+  }
+
+  TEST(CreateZipFromFiles({FILE}, {"test.*"}, ZIPFILE), ());
+
+  TEST_NO_THROW({ ZipFileReader const r(ZIPFILE, "test.*"); }, ());
+  TEST_ANY_THROW({ ZipFileReader const r(ZIPFILE, "test.txt"); }, ());
+
+  FileWriter::DeleteFileX(ZIPFILE);
+  FileWriter::DeleteFileX(FILE);
+}
+
+UNIT_TEST(ZipReaderLongNameMatch)
+{
+  string const FILE = "long_name_source.txt";
+  string const ZIPFILE = "long_name_test.zip";
+  string const FILE_IN_ZIP(300, 'a');
+  {
+    FileWriter f(FILE);
+    f.Write("Test\n", 5);
+  }
+
+  TEST(CreateZipFromFiles({FILE}, {FILE_IN_ZIP}, ZIPFILE), ());
+  TEST_NO_THROW({ ZipFileReader const r(ZIPFILE, FILE_IN_ZIP); }, ());
+
+  FileWriter::DeleteFileX(ZIPFILE);
+  FileWriter::DeleteFileX(FILE);
+}
+
 /// zip file with 3 files inside: 1.txt, 2.txt, 3.ttt
 static char const zipBytes2[] =
     "\x50\x4b\x3\x4\xa\x0\x0\x0\x0\x0\x92\x6b\xf6\x3e\x53\xfc\x51\x67\x2\x0\x0"
@@ -142,6 +199,30 @@ UNIT_TEST(ZipFilesList)
   FileWriter::DeleteFileX(ZIPFILE);
 }
 
+UNIT_TEST(ZipFilesListPreservesZip64Size)
+{
+  string const ZIPFILE = "list_zip64_test.zip";
+  SCOPE_GUARD(fileGuard, [&] { FileWriter::DeleteFileX(ZIPFILE); });
+  uint64_t constexpr kUncompressedSize = (uint64_t{1} << 32) + 5;
+  {
+    auto const zip = zipOpen64(ZIPFILE.c_str(), APPEND_STATUS_CREATE);
+    TEST(zip != nullptr, ());
+    SCOPE_GUARD(zipGuard, [&] { zipClose(zip, nullptr); });
+    // Raw mode lets us declare a size of 4 GiB + 5 bytes without writing the payload.
+    // Only the directory listing is tested; this synthetic entry cannot be extracted.
+    TEST_EQUAL(zipOpenNewFileInZip2_64(zip, "large.bin", nullptr, nullptr, 0, nullptr, 0, nullptr,
+                                       0 /* compression method */, 0 /* level */, 1 /* raw */, 1 /* zip64 */),
+               ZIP_OK, ());
+    TEST_EQUAL(zipCloseFileInZipRaw64(zip, kUncompressedSize, 0 /* crc */), ZIP_OK, ());
+  }
+
+  ZipFileReader::FileList files;
+  ZipFileReader::FilesList(ZIPFILE, files);
+  TEST_EQUAL(files.size(), 1, ());
+  TEST_EQUAL(files[0].first, "large.bin", ());
+  TEST_EQUAL(files[0].second, kUncompressedSize, ("A 32-bit FileList size would truncate this to 5 bytes"));
+}
+
 /// Compressed zip file with 2 files in assets folder:
 /// assets/aaaaaaaaaa.txt (contains text "aaaaaaaaaa\x0A")
 /// assets/holalala.txt (contains text "Holalala\x0A")
@@ -165,6 +246,18 @@ static char const zipBytes3[] =
     "\x6C\x61\x2E\x74\x78\x74\x55\x54\x05\x00\x03\xDF\x0F\x45\x4F\x75\x78\x0B\x00\x01"
     "\x04\xF5\x01\x00\x00\x04\x14\x00\x00\x00\x50\x4B\x05\x06\x00\x00\x00\x00\x02\x00"
     "\x02\x00\xB4\x00\x00\x00\xAA\x00\x00\x00\x00\x00";
+
+// A deflated "equal.txt" whose compressed size (8) equals its uncompressed size (8), yet whose raw
+// deflate bytes differ from the inflated content. Guards CreateModelReader against treating an entry
+// as stored just because the sizes match.
+static char const zipBytesEqualSizeDeflate[] =
+    "\x50\x4B\x03\x04\x14\x00\x00\x00\x08\x00\x00\x00\x21\x00\x13\x3D\xCF\x7B\x08\x00"
+    "\x00\x00\x08\x00\x00\x00\x09\x00\x00\x00\x65\x71\x75\x61\x6C\x2E\x74\x78\x74\x63"
+    "\x64\x60\x64\x60\x00\x62\x00\x50\x4B\x01\x02\x14\x00\x14\x00\x00\x00\x08\x00\x00"
+    "\x00\x21\x00\x13\x3D\xCF\x7B\x08\x00\x00\x00\x08\x00\x00\x00\x09\x00\x00\x00\x00"
+    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x65\x71\x75\x61\x6C\x2E\x74"
+    "\x78\x74\x50\x4B\x05\x06\x00\x00\x00\x00\x01\x00\x01\x00\x37\x00\x00\x00\x2F\x00"
+    "\x00\x00\x00\x00";
 
 UNIT_TEST(ZipExtract)
 {
@@ -220,6 +313,72 @@ UNIT_TEST(ZipFileSizes)
     ZipFileReader file(ZIPFILE, files[1].first);
     TEST_EQUAL(file.Size(), 8, ());
     TEST_EQUAL(file.UncompressedSize(), 9, ());
+  }
+
+  FileWriter::DeleteFileX(ZIPFILE);
+}
+
+UNIT_TEST(ZipReaderCreateModelReader)
+{
+  string const ZIPFILE = "create_model_reader_test.zip";
+
+  // Stored (uncompressed) entry: served in place, Size() equals the file size.
+  {
+    FileWriter f(ZIPFILE);
+    f.Write(zipBytes, ARRAY_SIZE(zipBytes) - 1);
+  }
+  {
+    auto reader = ZipFileReader::CreateModelReader(ZIPFILE, "test.txt");
+    string s;
+    reader->ReadAsString(s);
+    TEST_EQUAL(s, "Test\n", ());
+    TEST_EQUAL(reader->Size(), 5, ());
+  }
+
+  // Deflated entry: inflated into memory, so reads return the decompressed content and Size() is the
+  // uncompressed size (the on-disk entry is only 6 bytes, the content is 11).
+  {
+    FileWriter f(ZIPFILE);
+    f.Write(zipBytes3, ARRAY_SIZE(zipBytes3));
+  }
+  {
+    auto reader = ZipFileReader::CreateModelReader(ZIPFILE, "assets/aaaaaaaaaa.txt");
+    string s;
+    reader->ReadAsString(s);
+    TEST_EQUAL(s, "aaaaaaaaaa\n", ());
+    TEST_EQUAL(reader->Size(), 11, ());
+
+    // A sub-reader keeps the inflated buffer alive after the parent reader is destroyed.
+    auto sub = reader->CreateSubReader(2, 4);
+    reader.reset();
+    string s2;
+    sub->ReadAsString(s2);
+    TEST_EQUAL(s2, "aaaa", ());
+
+    // SubReader via ModelReaderPtr must yield a valid ModelReader: it static_casts the underlying
+    // reader to ModelReader and exposes its name, so the sub-reader must itself be a ModelReader.
+    ModelReaderPtr modelPtr(ZipFileReader::CreateModelReader(ZIPFILE, "assets/aaaaaaaaaa.txt"));
+    auto const subPtr = modelPtr.SubReader(2, 4);
+    string s3;
+    subPtr.ReadAsString(s3);
+    TEST_EQUAL(s3, "aaaa", ());
+    TEST_EQUAL(subPtr.GetName(), "assets/aaaaaaaaaa.txt", ());
+  }
+
+  // Deflated entry whose compressed size equals its uncompressed size: it must still be inflated, not
+  // read in place. Detection keys on the zip compression method, not on a compressed/uncompressed size
+  // comparison.
+  {
+    FileWriter f(ZIPFILE);
+    f.Write(zipBytesEqualSizeDeflate, ARRAY_SIZE(zipBytesEqualSizeDeflate) - 1);
+  }
+  {
+    auto reader = ZipFileReader::CreateModelReader(ZIPFILE, "equal.txt");
+    string s;
+    reader->ReadAsString(s);
+    string const expected("\x01\x00\x01\x00\x00\x00\x01\x00", 8);
+    TEST_EQUAL(s, expected, ("Deflated entry with equal sizes must be inflated, not read raw"));
+    TEST_EQUAL(reader->Size(), 8, ());
   }
 
   FileWriter::DeleteFileX(ZIPFILE);

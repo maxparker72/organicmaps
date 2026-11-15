@@ -209,7 +209,8 @@
 "type.barrier.chain" = "سلسلة";
 "type.barrier.city_wall" = "جدار المدينة";
 "type.barrier.cycle_barrier" = "حاجز دراجات هوائية";
-"type.waterway.ditch" = "حفرة الصرف الصحي";
+"type.waterway.ditch" = "خندق تصريف";
+"type.waterway.ditch.intermittent" = "خندق تصريف متقطع";
 "type.natural.water.moat" = "خندق";
 "type.natural.water.wastewater" = "مياه الصرف";
 "type.barrier.entrance" = "مدخل";
@@ -407,28 +408,28 @@
 "type.highway" = "طريق السريع";
 "type.highway.bridleway" = "طريق خيول";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "جسر";
 "type.highway.bridleway.permissive" = "طريق خيول";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "نفق";
 "type.highway.busway" = "طريق حافلات مخصص";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "نفق";
 "type.highway.bus_stop" = "موقف حافلات";
 "type.highway.construction" = "طريق تحت الإنشاء";
 "type.highway.cycleway" = "مسار للدراجات";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "جسر";
 "type.highway.cycleway.permissive" = "مسار للدراجات";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "نفق";
 "type.highway.elevator" = "مِصعَد";
 "type.highway.footway" = "مسار للمشاة";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "عبور المشاة";
 "type.highway.footway.area" = "منطقة مشاة";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "جسر للمشاة";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "نفق للمشاة";
 "type.highway.ford" = "مخاضة";
 "type.highway.living_street" = "شارع";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "نفق";
 "type.highway.motorway" = "طريق سريع";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "نفق";
 "type.highway.motorway_junction" = "مخرج";
 "type.highway.motorway_link" = "طريق سريع";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "نفق";
 "type.highway.path" = "مسار";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "مسار للمشاة والدراجات معاً";
 "type.highway.footway.bicycle" = "مسار للمشاة والدراجات معاً";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "جسر";
 "type.highway.path.horse" = "مسار";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "نفق";
 "type.highway.pedestrian" = "شارع للمشاة";
 "type.highway.pedestrian.area" = "شارع للمشاة";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "نفق";
-"type.highway.platform" = "منصة";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "رصيف الركوب";
 "type.highway.primary" = "شارع رئيسي";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "نفق";
 "type.highway.primary_link" = "شارع رئيسي";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "نفق";
 "type.highway.raceway" = "مسار سباق";
 "type.highway.residential" = "شارع سكني";
 "type.highway.residential.area" = "شارع سكني";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "نفق";
 "type.highway.rest_area" = "استراحة";
 "type.highway.road" = "طريق";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "جسر";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "نفق";
 "type.highway.secondary" = "شارع ثانوي";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "نفق";
 "type.highway.secondary_link" = "شارع ثانوي";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "نفق";
 "type.highway.service" = "شارع خدمي";
 "type.highway.service.area" = "شارع خدمي";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "جسر";
 "type.highway.service.driveway" = "شارع خدمي";
 "type.highway.service.parking_aisle" = "شارع خدمي";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "نفق";
 "type.highway.services" = "موقف الراحة";
 "type.highway.speed_camera" = "كاميرا لرصد السرعة";
 "type.highway.steps" = "درج";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "نفق";
 "type.highway.ladder" = "ﺳُﻠﻢ";
 "type.highway.tertiary" = "شارع";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "نفق";
 "type.highway.tertiary_link" = "شارع";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "نفق";
 "type.highway.track" = "شارع";
 "type.highway.track.area" = "شارع";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "جسر";
 "type.highway.track.grade1" = "شارع";
 "type.highway.track.no.access" = "شارع";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "نفق";
 "type.highway.traffic_signals" = "إشارات مرورية";
 "type.highway.trunk" = "شارع وطني";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "نفق";
 "type.highway.trunk_link" = "شارع وطني";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "نفق";
 "type.highway.unclassified" = "شارع صغير";
 "type.highway.unclassified.area" = "شارع صغير";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "جسر";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "نفق";
 "type.area_highway.cycleway" = "مسار للدراجات";
 "type.area_highway.footway" = "مسار للمشاة";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "قلعة يابانية";
 "type.historic.castle.stately" = "شاتو";
 "type.historic.city_gate" = "بوابة المدينة";
+"type.man_made.ceremonial_gate" = "بوابة الاحتفالات";
 "type.historic.citywalls" = "جدار المدينة";
 "type.historic.fort" = "حصن";
 "type.historic.gallows" = "مشنقة";
@@ -718,6 +722,7 @@
 "type.landuse" = "استخدام الارض";
 "type.landuse.allotments" = "حصص الحدائق";
 "type.landuse.basin" = "حوض مياه";
+"type.landuse.basin.intermittent" = "حوض مياه متقطع";
 "type.landuse.brownfield" = "أرض صناعية مهجورة";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "مقلع";
 "type.landuse.railway" = "موقع سكك حديد";
 "type.landuse.recreation_ground" = "أراضي ترفيهية";
-"type.landuse.reservoir" = "بحيرة لخزن المياه";
 "type.landuse.residential" = "منطقة سكنية";
 "type.landuse.retail" = "منطقة تجارية";
 "type.landuse.salt_pond" = "ملّاحة";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "حلبة تزلج على الجليد";
 "type.leisure.marina" = "مرسى";
 "type.leisure.nature_reserve" = "محمية طبيعية";
+"type.leisure.bird_hide" = "مخبأ لمراقبة الطيور";
 "type.leisure.outdoor_seating" = "جلوس في الهواء الطلق";
 "type.leisure.firepit" = "موقد نار";
 "type.leisure.park" = "متنزه";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "رصيف بحري";
 "type.man_made.pipeline" = "خط أنبوب";
 "type.man_made.pipeline.overground" = "خط أنبوب فوق الارض";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "خزان مياه مغطى";
 "type.man_made.silo" = "صومعة";
 "type.man_made.storage_tank" = "خزان";
 "type.man_made.surveillance" = "كاميرا مراقبة";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "برج مياه";
 "type.man_made.water_well" = "بئر ماء";
 "type.man_made.water_well.drinking_water_no" = "بئر ماء";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "محطة تنقية المياه";
 "type.man_made.windmill" = "طاحونة هواء";
 "type.man_made.works" = "مُنشأة صناعية";
 
@@ -871,10 +882,13 @@
 "type.natural.water.reservoir" = "بحيرة لخزن المياه";
 "type.natural.water.basin" = "حوض مياه";
 "type.natural.water.river" = "نهر";
+"type.natural.water.intermittent" = "مسطح مائي متقطع";
 "type.natural.land" = "بر";
 "type.natural.meadow" = "مرج";
 "type.natural.orchard" = "بستان";
 "type.natural.peak" = "قمة";
+"type.natural.hill" = "تل";
+"type.natural.arch" = "قوس الصخرة";
 "type.natural.saddle" = "سرج الجبل";
 "type.natural.rock" = "صخر";
 "type.natural.scrub" = "أَيْكَة";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "النقل العام";
-"type.public_transport.platform" = "منصة";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "رصيف الركوب";
 "type.railway" = "سكك حديدية";
 "type.railway.abandoned" = "سكك حديدية مهجورة";
 "type.railway.abandoned.bridge" = "جسر سكة حديد مهجور";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "محل خضار";
 "type.shop.grocery" = "محل بقالة";
 "type.shop.hairdresser" = "حلاق";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "حلاق رجالي";
 "type.shop.hardware" = "محل معدات";
 "type.shop.health_food" = "متجر أغذية صحية";
 "type.shop.hearing_aids" = "متجر المعينات السمعية";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "رغبي الاتحاد";
 "type.sport.running" = "الجري";
 "type.sport.softball" = "الكرة اللينة";
+"type.sport.pilates" = "بيلاتس";
 "type.tourism" = "Tourism";
 "type.tourism.aquarium" = "حوض سمك";
 
@@ -1514,21 +1534,24 @@
 "type.waterway" = "Waterway";
 "type.waterway.access_point" = "نقطة وصول الممر المائي";
 "type.waterway.canal" = "قناة";
+"type.waterway.canal.intermittent" = "قناة متقطعة";
 "type.waterway.canal.tunnel" = "نفق قناة";
 "type.waterway.fish_pass" = "سلم سمك";
+"type.waterway.fish_pass.intermittent" = "سلم سمك متقطع";
 "type.waterway.dam" = "سد";
 "type.barrier.ditch" = "Ditch";
-"type.natural.water.ditch" = "حفرة الصرف الصحي";
+"type.natural.water.ditch" = "خندق تصريف";
 "type.waterway.ditch.tunnel" = "بربخ";
 "type.waterway.dock" = "Waterway Dock";
 "type.waterway.drain" = "قناة تصريف المياه";
+"type.waterway.drain.intermittent" = "قناة تصريف مياه متقطعة";
 "type.natural.water.drain" = "قناة تصريف المياه";
 "type.waterway.drain.tunnel" = "بربخ";
 "type.waterway.lock_gate" = "بوابة هويس";
 "type.waterway.river" = "نهر";
+"type.waterway.river.intermittent" = "نهر متقطع";
 "type.waterway.river.tunnel" = "نهر";
 "type.waterway.stream" = "تيار مائي";
-"type.waterway.stream.ephemeral" = "نهر";
 "type.waterway.stream.intermittent" = "تيار مائي متقطع";
 "type.waterway.stream.tunnel" = "تيار مائي";
 "type.waterway.waterfall" = "شلّال";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "المرفق الاجتماعي";
+"type.amenity.stage" = "خشبة المسرح";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "مدخل جناح الطوارئ";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "محطة مراقبة الطقس";
 "type.amenity.student_accommodation" = "سكن الطلاب";
 "type.craft.watchmaker" = "صانع الساعات";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "تصنيع النوافذ";
 "type.xmas_feature.market" = "سوق الكريسماس";
 "type.xmas_feature.tree" = "شجرة الكريسماس";
 "type.amenity.hookah_lounge" = "مقهى شيشة";

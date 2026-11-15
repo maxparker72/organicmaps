@@ -6,6 +6,7 @@
 #include "routing/fake_feature_ids.hpp"
 #include "routing/fake_graph.hpp"
 #include "routing/fake_vertex.hpp"
+#include "routing/gate_access.hpp"
 #include "routing/guides_graph.hpp"
 #include "routing/index_graph.hpp"
 #include "routing/latlon_with_altitude.hpp"
@@ -89,12 +90,15 @@ public:
 
   uint32_t GetNumFakeSegments() const { return base::checked_cast<uint32_t>(m_fake.GetSize()); }
 
+  // Connects nearby transit gate snapping candidates to their transit board/alight segments. The
+  // corresponding gate projections must already be present in the start/finish endings used to
+  // construct this starter.
+  void ConnectGateAccessesToTransit(GateAccessesT const & gates, bool isStart);
+
   std::set<NumMwmId> GetMwms() const;
   std::set<NumMwmId> const & GetStartMwms() const { return m_start.m_mwmIds; }
   std::set<NumMwmId> const & GetFinishMwms() const { return m_finish.m_mwmIds; }
 
-  // Checks whether |weight| meets non-pass-through crossing restrictions according to placement of
-  // start and finish in pass-through/non-pass-through area and number of non-pass-through crosses.
   bool CheckLength(RouteWeight const & weight);
 
   void GetEdgeList(astar::VertexData<JointSegment, Weight> const & parentVertexData, Segment const & segment,
@@ -145,6 +149,9 @@ public:
   }
 
   RouteWeight CalcSegmentWeight(Segment const & segment, EdgeEstimator::Purpose purpose) const;
+  /// \returns the weight of the |from| -> |to| edge as the forward wave gets it: the |to| weight with
+  /// the transition penalties, or the |to| weight only if the wave has no such edge.
+  RouteWeight CalcRouteEdgeWeight(Segment const & from, Segment const & to) const;
   RouteWeight CalcGuidesSegmentWeight(Segment const & segment, EdgeEstimator::Purpose purpose) const;
   double CalculateETA(Segment const & from, Segment const & to, time_t arrivalTime) const;
   double CalculateETAWithoutPenalty(Segment const & segment) const;
@@ -223,9 +230,6 @@ private:
   // Adds fake edges of type PartOfReal which correspond real edges from |edges| and are connected
   // to |segment|
   void AddFakeEdges(Segment const & segment, bool isOutgoing, EdgeListT & edges) const;
-
-  // Checks whether ending belongs to non-pass-through zone (service, living street, etc).
-  bool HasNoPassThroughAllowed(Ending const & ending) const;
 
   WorldGraph & m_graph;
   // Start segment id

@@ -2,30 +2,47 @@
 
 #include "map/bookmark_helpers.hpp"
 #include "map/framework.hpp"
+#include "map/track_mark.hpp"
 
-#include "drape_frontend/visual_params.hpp"
+#include "generator/generator_tests_support/test_feature.hpp"
+#include "generator/generator_tests_support/test_mwm_builder.hpp"
+
+#include "drape_frontend/drape_engine.hpp"
+#include "drape_frontend/drape_frontend_tests/visual_params_fixture.hpp"
+
+#include "search/bookmarks/processor.hpp"
+#include "search/emitter.hpp"
 
 #include "indexer/classificator_loader.hpp"
 #include "indexer/feature_utils.hpp"
 #include "indexer/mwm_set.hpp"
 
+#include "platform/gui_thread.hpp"
+#include "platform/localization.hpp"
 #include "platform/platform.hpp"
+#include "platform/platform_tests_support/scoped_dir.hpp"
 #include "platform/preferred_languages.hpp"
 
 #include "coding/internal/file_data.hpp"
 #include "coding/string_utf8_multilang.hpp"
+#include "coding/zip_creator.hpp"
 #include "coding/zip_reader.hpp"
 
+#include "base/cancellable.hpp"
 #include "base/file_name_utils.hpp"
 #include "base/scope_guard.hpp"
+#include "base/thread_safe_queue.hpp"
 #include "base/timer.hpp"
 
 #include "std/target_os.hpp"
 
 #include <utf8.h>  // utf8::is_valid
 
+#include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstring>  // strlen
+#include <ctime>
 #include <map>
 #include <numeric>  // std::reduce
 #include <set>
@@ -35,6 +52,7 @@
 namespace bookmarks_test
 {
 using namespace std;
+using df::test_support::VisualParamsFixture;
 
 static FrameworkParams const kFrameworkParams(false /* m_enableDiffs */);
 
@@ -63,7 +81,9 @@ private:
   string m_testSettingsDir;
 };
 
-class BookmarksTestFixture : public Platform::ThreadRunner
+class BookmarksTestFixture
+  : public Platform::ThreadRunner
+  , public VisualParamsFixture
 {
   ScopedBookmarksDir m_dir;
 };
@@ -226,6 +246,347 @@ FileType GetActiveFileType()
   return FileType::Kml;
 }
 
+class AreasTestFixture : public Runner
+{
+  class GuiQueue final : public base::TaskLoop
+  {
+  public:
+    PushResult Push(Task && task) override
+    {
+      m_tasks.Push(std::move(task));
+      return {true, kNoId};
+    }
+    PushResult Push(Task const & task) override { return Push(Task(task)); }
+    void RunNext()
+    {
+      Task task;
+      m_tasks.WaitAndPop(task);
+      task();
+    }
+
+  private:
+    threads::ThreadSafeQueue<Task> m_tasks;
+  };
+
+public:
+  AreasTestFixture()
+  {
+    // Pump only this fixture's callbacks, leaving unrelated Qt callbacks untouched.
+    auto queue = std::make_unique<GuiQueue>();
+    m_gui = queue.get();
+    GetPlatform().SetGuiThread(std::move(queue));
+  }
+
+  ~AreasTestFixture() { GetPlatform().SetGuiThread(std::make_unique<platform::GuiThread>()); }
+
+  void RunNextGuiTask() { m_gui->RunNext(); }
+
+private:
+  GuiQueue * m_gui;
+};
+
+UNIT_CLASS_TEST(AreasTestFixture, Bookmarks_AreasImportSaveRestartAndDelete)
+{
+  std::string const input = R"(<kml><Document><name>Survey areas</name>
+    <Placemark><name>First</name><Polygon><outerBoundaryIs><LinearRing>
+      <coordinates>1,1 5,1 5,5 1,5 1,1</coordinates>
+    </LinearRing></outerBoundaryIs><innerBoundaryIs><LinearRing>
+      <coordinates>2,2 3,2 3,3 2,3 2,2</coordinates>
+    </LinearRing></innerBoundaryIs></Polygon></Placemark>
+    <Placemark><name>Second</name><Polygon><outerBoundaryIs><LinearRing>
+      <coordinates>10,1 12,1 10,3 10,1</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon></Placemark>
+  </Document></kml>)";
+  for (auto const fileType : {FileType::Kml, FileType::GeoJson})
+  {
+    auto parsed = LoadKmlData(MemReader(input.data(), input.size()), FileType::Kml);
+    TEST(parsed != nullptr, ());
+    TEST_EQUAL(parsed->m_areasData.size(), 2, ());
+    auto const sourcePath = base::JoinPath(GetPlatform().SettingsDir(),
+                                           fileType == FileType::Kml ? "Survey areas.kml" : "Survey areas.geojson");
+    auto const expected = parsed->m_areasData;
+    TEST(SaveKmlFileSafe(*parsed, sourcePath, fileType), ());
+
+    {
+      BookmarkManager manager(BM_CALLBACKS);
+      manager.EnableTestMode(true);
+      bool imported = false;
+      bool finished = false;
+      BookmarkManager::AsyncLoadingCallbacks callbacks;
+      callbacks.m_onFileSuccess = [&](std::string const &, bool) { imported = true; };
+      callbacks.m_onFinished = [&] { finished = true; };
+      manager.SetAsyncLoadingCallbacks(std::move(callbacks));
+      manager.LoadBookmark(sourcePath, false);
+      manager.LoadBookmarks();
+      while (!finished)
+        RunNextGuiTask();
+      TEST(imported, ());
+      auto const group = manager.GetCategoryId("Survey areas");
+      TEST_NOT_EQUAL(group, kml::kInvalidMarkGroupId, ());
+      TEST(!manager.IsCategoryEmpty(group), ());
+      auto const & ids = manager.GetAreaIds(group);
+      TEST_EQUAL(ids.size(), 2, ());
+      TEST_NOT_EQUAL(*ids.begin(), kml::kInvalidAreaId, ());
+      TEST(manager.GetCategoryRect(group, false).IsPointInside(mercator::FromLatLon(5, 5)), ());
+
+      auto edit = manager.GetEditSession();
+      edit.SetCategoryName(group, "Saved survey areas");
+      edit.SetIsVisible(group, false);
+    }
+
+    {
+      BookmarkManager manager(BM_CALLBACKS);
+      manager.EnableTestMode(true);
+      bool finished = false;
+      BookmarkManager::AsyncLoadingCallbacks callbacks;
+      callbacks.m_onFinished = [&] { finished = true; };
+      manager.SetAsyncLoadingCallbacks(std::move(callbacks));
+      manager.LoadBookmarks();
+      while (!finished)
+        RunNextGuiTask();
+      auto const group = manager.GetCategoryId("Saved survey areas");
+      TEST_NOT_EQUAL(group, kml::kInvalidMarkGroupId, ());
+      TEST(!manager.IsVisible(group), ());
+      auto const ids = manager.GetAreaIds(group);
+      TEST_EQUAL(ids.size(), 2, ());
+      size_t i = 0;
+      for (auto id : ids)
+      {
+        auto area = *manager.GetArea(id);
+        area.m_id = kml::kInvalidAreaId;
+        TEST_EQUAL(area, expected[i++], ());
+      }
+
+      std::string output;
+      MemWriter writer(output);
+      TEST(manager.SaveBookmarkCategory(group, writer, FileType::Kml), ());
+      auto exported = LoadKmlData(MemReader(output.data(), output.size()), FileType::Kml);
+      TEST(exported != nullptr, ());
+      TEST_EQUAL(exported->m_areasData, expected, ());
+      manager.GetEditSession().DeleteBmCategory(group, true);
+      for (auto id : ids)
+        TEST(manager.GetArea(id) == nullptr, ());
+    }
+    TEST(base::DeleteFileX(sourcePath), ());
+  }
+}
+
+UNIT_CLASS_TEST(AreasTestFixture, Bookmarks_AreaChangesForDrape)
+{
+  std::string const input = R"(<kml><Document><name>Pending areas</name>
+    <Placemark><Polygon><outerBoundaryIs><LinearRing>
+      <coordinates>1,1 5,1 5,5 1,5 1,1</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon></Placemark>
+  </Document></kml>)";
+  auto parsed = LoadKmlData(MemReader(input.data(), input.size()), FileType::Kml);
+  TEST(parsed != nullptr, ());
+  auto const sourcePath = base::JoinPath(GetPlatform().SettingsDir(), "Pending areas.kml");
+  TEST(SaveKmlFileSafe(*parsed, sourcePath, FileType::Kml), ());
+
+  BookmarkManager manager(BM_CALLBACKS);
+  manager.EnableTestMode(true);
+  bool finished = false;
+  BookmarkManager::AsyncLoadingCallbacks callbacks;
+  callbacks.m_onFinished = [&] { finished = true; };
+  manager.SetAsyncLoadingCallbacks(std::move(callbacks));
+  manager.LoadBookmark(sourcePath, false);
+  manager.LoadBookmarks();
+  while (!finished)
+    RunNextGuiTask();
+  TEST(base::DeleteFileX(sourcePath), ());
+
+  // Without a drape engine, all changes stay pending in one notification.
+  auto const group = manager.GetCategoryId("Pending areas");
+  auto const & changes = manager.GetDrapeChangesForTests();
+  TEST_EQUAL(changes.GetCreatedAreaIds(), manager.GetAreaIds(group), ());
+
+  TEST(changes.GetBecameVisibleGroupIds().contains(group), ());
+  manager.GetEditSession().SetIsVisible(group, false);
+  TEST(!changes.GetBecameVisibleGroupIds().contains(group), ("Never shown"));
+  TEST(!changes.GetBecameInvisibleGroupIds().contains(group), ("Never shown"));
+  manager.GetEditSession().SetIsVisible(group, true);
+  TEST(changes.GetBecameVisibleGroupIds().contains(group), ());
+
+  // A category reloaded as hidden stays pending as shown, but its areas must wait until it is shown.
+  auto const filePath = manager.GetCategoryFileName(group);
+  auto data = LoadKmlFile(filePath, FileType::Kml);
+  TEST(data != nullptr, ());
+  data->m_categoryData.m_visible = false;
+  TEST(SaveKmlFileSafe(*data, filePath, FileType::Kml), ());
+  finished = false;
+  manager.ReloadBookmark(filePath);
+  while (!finished)
+    RunNextGuiTask();
+  TEST(!manager.IsVisible(group), ());
+  TEST(changes.GetBecameVisibleGroupIds().contains(group), ());
+  auto const update = df::DrapeEngine::CollectUserMarksUpdate(&changes, df::DrapeEngine::UserMarksUpdateMode::Changes,
+                                                              settings::Placement::None);
+  TEST(update.m_areas->empty(), ());
+
+  manager.GetEditSession().DeleteBmCategory(group, true);
+  TEST(changes.GetCreatedAreaIds().empty() && changes.GetRemovedAreaIds().empty(), ("Never reached the drape engine"));
+}
+
+UNIT_CLASS_TEST(AreasTestFixture, Bookmarks_AreaExportCapabilitiesAndSnapshots)
+{
+  std::string const input = R"(<kml><Document><name>Sharing areas</name>
+    <Placemark><name>Point</name><Point><coordinates>2,2</coordinates></Point></Placemark>
+    <Placemark><name>Line</name><LineString><coordinates>1,1 3,3</coordinates></LineString></Placemark>
+    <Placemark><name>Zone</name><Polygon><outerBoundaryIs><LinearRing>
+      <coordinates>1,1 4,1 4,4 1,4 1,1</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon></Placemark>
+    </Document></kml>)";
+  auto data = LoadKmlData(MemReader(input.data(), input.size()), FileType::Kml);
+  TEST(data != nullptr, ());
+  auto const expectedAreas = data->m_areasData;
+  BookmarkManager manager(BM_CALLBACKS);
+  manager.EnableTestMode(true);
+  BookmarkManager::KMLDataCollection collection;
+  collection.emplace_back("", std::move(data));
+  manager.CreateCategories(std::move(collection));
+  auto const group = manager.GetCategoryId("Sharing areas");
+  TEST_NOT_EQUAL(group, kml::kInvalidMarkGroupId, ());
+  TEST(manager.GetCategoryFileName(group).empty(), ());
+
+  bool finished = false;
+  manager.PrepareFileForSharing({group}, [&](BookmarkManager::SharingResult const & result)
+  {
+    TEST(result.m_code == BookmarkManager::SharingResult::Code::FileError, ());
+    TEST(result.m_sharingPath.empty(), ());
+    finished = true;
+  }, FileType::Gpx);
+  while (!finished)
+    RunNextGuiTask();
+  // Preparing a snapshot assigns a file name, so this also detects work before rejection.
+  TEST(manager.GetCategoryFileName(group).empty(), ());
+
+  auto const trackId = *manager.GetTrackIds(group).begin();
+  for (auto const type : {FileType::Kml, FileType::Gpx, FileType::GeoJson})
+  {
+    bool finished = false;
+    manager.PrepareTrackFileForSharing(trackId, [&](BookmarkManager::SharingResult const & result)
+    {
+      TEST(result.m_code == BookmarkManager::SharingResult::Code::Success, (result.m_errorString));
+      TEST(base::DeleteFileX(result.m_sharingPath), ());
+      finished = true;
+    }, type);
+    while (!finished)
+      RunNextGuiTask();
+  }
+
+  finished = false;
+  manager.PrepareFileForSharing({group}, [&](BookmarkManager::SharingResult const & result)
+  {
+    TEST(result.m_code == BookmarkManager::SharingResult::Code::Success, (result.m_errorString));
+    SCOPE_GUARD(deleteFile, [&] { base::DeleteFileX(result.m_sharingPath); });
+    auto const loaded = LoadKmlFile(result.m_sharingPath, FileType::GeoJson);
+    TEST(loaded != nullptr, ());
+    TEST_EQUAL(loaded->m_areasData, expectedAreas, ());
+    TEST_EQUAL(loaded->m_bookmarksData.size(), 1, ());
+    TEST_EQUAL(loaded->m_tracksData.size(), 1, ());
+    finished = true;
+  }, FileType::GeoJson);
+  while (!finished)
+    RunNextGuiTask();
+
+  finished = false;
+  manager.PrepareFileForSharing({group}, [&](BookmarkManager::SharingResult const & result)
+  {
+    TEST(result.m_code == BookmarkManager::SharingResult::Code::Success, (result.m_errorString));
+    SCOPE_GUARD(deleteArchive, [&] { base::DeleteFileX(result.m_sharingPath); });
+    ZipFileReader::FileList files;
+    ZipFileReader::FilesList(result.m_sharingPath, files);
+    TEST_EQUAL(files.size(), 1, ());
+    auto const path = base::JoinPath(GetPlatform().SettingsDir(), "exported-areas.kml");
+    SCOPE_GUARD(deleteFile, [&] { base::DeleteFileX(path); });
+    ZipFileReader::UnzipFile(result.m_sharingPath, files.front().first, path);
+    auto const loaded = LoadKmlFile(path, FileType::Kml);
+    TEST(loaded != nullptr, ());
+    TEST_EQUAL(loaded->m_areasData, expectedAreas, ());
+    TEST_EQUAL(loaded->m_bookmarksData.size(), 1, ());
+    TEST_EQUAL(loaded->m_tracksData.size(), 1, ());
+    finished = true;
+  }, FileType::Kml);
+  while (!finished)
+    RunNextGuiTask();
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_AreaCategoryBoundsPreservePolygonFootprints)
+{
+  std::string const narrow = R"(<Placemark><MultiGeometry>
+    <Polygon><outerBoundaryIs><LinearRing>
+      <coordinates>179,-10 180,-10 180,10 179,10 179,-10</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon>
+    <Polygon><outerBoundaryIs><LinearRing>
+      <coordinates>-180,-10 -179,-10 -179,10 -180,10 -180,-10</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon>
+    </MultiGeometry></Placemark>)";
+  std::string const mixed = R"(
+    <Placemark><Point><coordinates>179.5,0</coordinates></Point></Placemark>
+    <Placemark><Point><coordinates>-179.5,0</coordinates></Point></Placemark>
+    <Placemark><LineString><coordinates>-179.75,0 -179.5,1</coordinates></LineString></Placemark>)";
+  std::string const wide = R"(<Placemark><Polygon><outerBoundaryIs><LinearRing>
+    <coordinates>-170,-10 170,-10 170,10 -170,10 -170,-10</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon></Placemark>)";
+  std::string const wideWithMidpoints = R"(<Placemark><Polygon><outerBoundaryIs><LinearRing>
+    <coordinates>-170,-10 0,-10 170,-10 170,10 0,10 -170,10 -170,-10</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon></Placemark>
+    <Placemark><Point><coordinates>160,0</coordinates></Point></Placemark>)";
+  std::string const wholeWorld = R"(<Placemark><Polygon><outerBoundaryIs><LinearRing>
+    <coordinates>-180,-10 180,-10 180,10 -180,10 -180,-10</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon></Placemark>)";
+  std::string const independent = narrow + R"(<Placemark><Polygon><outerBoundaryIs><LinearRing>
+    <coordinates>-177,-5 -176,-5 -176,5 -177,5 -177,-5</coordinates>
+    </LinearRing></outerBoundaryIs></Polygon></Placemark>)";
+  std::string const areaFree = R"(
+    <Placemark><Point><coordinates>-10,0</coordinates></Point></Placemark>
+    <Placemark><Point><coordinates>10,0</coordinates></Point></Placemark>
+    <Placemark><LineString><coordinates>-5,0 5,1</coordinates></LineString></Placemark>)";
+  std::string const outsideHole = R"(<Placemark><Polygon>
+    <outerBoundaryIs><LinearRing><coordinates>0,0 4,0 4,4 0,4 0,0</coordinates></LinearRing></outerBoundaryIs>
+    <innerBoundaryIs><LinearRing><coordinates>10,0 12,0 12,2 10,2 10,0</coordinates></LinearRing></innerBoundaryIs>
+    </Polygon></Placemark>)";
+  std::string const seamBookmarks = R"(
+    <Placemark><Point><coordinates>-179.5,0</coordinates></Point></Placemark>
+    <Placemark><Point><coordinates>179.5,0</coordinates></Point></Placemark>)";
+  auto const rectangle = [](int lon)
+  {
+    auto const west = std::to_string(lon);
+    auto const east = std::to_string(lon + 1);
+    return "<Placemark><Polygon><outerBoundaryIs><LinearRing><coordinates>" + west + ",0 " + east + ",0 " + east +
+           ",1 " + west + ",1 " + west + ",0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>";
+  };
+  std::vector<std::pair<std::string, double>> const cases = {{narrow, 360},
+                                                             {narrow + mixed, 360},
+                                                             {wide, 340},
+                                                             {wideWithMidpoints, 340},
+                                                             {wide + mixed, 359.25},
+                                                             {wholeWorld, 360},
+                                                             {independent, 360},
+                                                             {areaFree, 20},
+                                                             {outsideHole, 12},
+                                                             {seamBookmarks, 359},
+                                                             {seamBookmarks + rectangle(170), 359},
+                                                             {rectangle(-101) + rectangle(100) + rectangle(0), 202},
+                                                             {rectangle(-101) + rectangle(0) + rectangle(100), 202}};
+  for (auto const & [geometry, width] : cases)
+  {
+    BookmarkManager manager(BM_CALLBACKS);
+    manager.EnableTestMode(true);
+    auto const input = "<kml><Document><name>Bounds</name>" + geometry + "</Document></kml>";
+    auto data = LoadKmlData(MemReader(input.data(), input.size()), FileType::Kml);
+    TEST(data != nullptr, ());
+    BookmarkManager::KMLDataCollection collection;
+    collection.emplace_back("", std::move(data));
+    manager.CreateCategories(std::move(collection));
+    auto const group = manager.GetCategoryId("Bounds");
+    auto const rect = manager.GetCategoryRect(group, false);
+    TEST_ALMOST_EQUAL_ABS(rect.SizeX(), width, 1e-8, (geometry));
+    TEST_GREATER_OR_EQUAL(rect.Center().x, -180, ());
+    TEST_LESS(rect.Center().x, 180, ());
+  }
+}
+
 UNIT_CLASS_TEST(Runner, Bookmarks_ImportKML)
 {
   BookmarkManager bmManager(BM_CALLBACKS);
@@ -245,6 +606,46 @@ UNIT_CLASS_TEST(Runner, Bookmarks_ImportKML)
   // Name should be overridden from the KML
   TEST_EQUAL(bmManager.GetCategoryName(groupId), "MapName", ());
   TEST_EQUAL(bmManager.IsVisible(groupId), false, ());
+}
+
+UNIT_TEST(BookmarkImport_CreatesDirectory)
+{
+  auto & platform = GetPlatform();
+  auto const originalSettingsDir = platform.SettingsDir();
+  SCOPE_GUARD(restoreSettingsDir, [&] { platform.SetSettingsDir(originalSettingsDir); });
+
+  kml::FileData data;
+  kml::SetDefaultStr(data.m_categoryData.m_name, "Cold import");
+  auto & bookmark = data.m_bookmarksData.emplace_back();
+  kml::SetDefaultStr(bookmark.m_name, "Test point");
+  bookmark.m_point = {1.0, 2.0};
+
+  for (auto const fileType :
+       {FileType::Kml, FileType::Gpx, FileType::GeoJson, FileType::Json, FileType::Kmz, FileType::Kmb})
+  {
+    auto const testDir =
+        base::JoinPath(platform.WritableDir(), "bookmark_import" + std::string(GetFileTypeExtension(fileType)));
+    platform::tests_support::ScopedDirCleanup const cleanup(testDir);
+    platform.SetSettingsDir(testDir);
+    auto const sourcePath = base::JoinPath(testDir, "input" + std::string(GetFileTypeExtension(fileType)));
+    if (fileType == FileType::Kmz)
+    {
+      auto const kmlPath = base::JoinPath(testDir, "input.kml");
+      TEST(SaveKmlFileSafe(data, kmlPath, FileType::Kml), ());
+      TEST(CreateZipFromFiles({kmlPath}, sourcePath), ());
+    }
+    else
+      TEST(SaveKmlFileSafe(data, sourcePath, fileType), (fileType));
+
+    TEST(!Platform::IsFileExistsByFullPath(GetBookmarksDirectory()), (fileType));
+    auto const paths = GetKMLOrGPXFilesPathsToLoad(sourcePath);
+    TEST_EQUAL(paths.size(), 1, (fileType));
+    auto const importedType = fileType == FileType::Kmz || fileType == FileType::Kmb ? FileType::Kml : fileType;
+    auto const imported = LoadKmlFile(paths[0], importedType);
+    TEST(imported != nullptr, (fileType));
+    TEST_EQUAL(imported->m_bookmarksData.size(), 1, (fileType));
+    TEST_EQUAL(kml::GetDefaultStr(imported->m_bookmarksData[0].m_name), "Test point", (fileType));
+  }
 }
 
 UNIT_CLASS_TEST(Runner, Bookmarks_ExportKML)
@@ -314,6 +715,508 @@ UNIT_CLASS_TEST(Runner, Bookmarks_ExportKML)
 
 namespace
 {
+double constexpr kTrackDistance = 10.0;
+m2::PointD constexpr kTrackPoint(0.5, 0.0);
+
+kml::TrackData MakeLineTrackData()
+{
+  kml::TrackData trackData;
+  trackData.m_layers.push_back(kml::TrackLayer());
+  trackData.m_geometry.AddLine({{{0.0, 0.0}, 1}, {{1.0, 0.0}, 2}});
+  trackData.m_geometry.AddTimestamps({});
+  return trackData;
+}
+
+kml::TrackId CreateLineTrack(BookmarkManager & manager, kml::MarkGroupId category)
+{
+  auto session = manager.GetEditSession();
+  auto const id = session.CreateTrack(MakeLineTrackData())->GetId();
+  session.AttachTrack(id, category);
+  return id;
+}
+
+void SelectTrack(BookmarkManager & manager, kml::TrackId trackId)
+{
+  manager.SetTrackSelectionInfo({trackId, kTrackPoint, kTrackDistance}, false /* notifyListeners */);
+  manager.OnTrackSelected(trackId);
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_ReloadPreservesCategoryIdentityAndMetadata)
+{
+  auto const filePath = base::JoinPath(GetBookmarksDirectory(), "reload_metadata.kml");
+  SCOPE_GUARD(fileDeleter, [&]() { (void)base::DeleteFileX(filePath); });
+  auto makeFileData =
+      [](std::string const & name, std::string const & description, std::time_t modified, size_t bookmarkCount)
+  {
+    auto data = LoadKmlData(MemReader(kmlString, std::strlen(kmlString)), FileType::Kml);
+    TEST(data, ());
+    kml::SetDefaultStr(data->m_categoryData.m_name, name);
+    kml::SetDefaultStr(data->m_categoryData.m_description, description);
+    data->m_categoryData.m_lastModified = kml::TimestampClock::from_time_t(modified);
+    data->m_bookmarksData.resize(bookmarkCount);
+    data->m_tracksData.push_back(MakeLineTrackData());
+    return data;
+  };
+
+  auto initialData = makeFileData("MapName", "initial", 1000, 2);
+  TEST(SaveKmlFileSafe(*initialData, filePath, FileType::Kml), ());
+
+  BookmarkManager bmManager(BM_CALLBACKS);
+  bmManager.EnableTestMode(true);
+  auto loadFile = [&](bool autoSave)
+  {
+    auto data = LoadKmlData(FileReader(filePath), FileType::Kml);
+    TEST(data, ());
+    BookmarkManager::KMLDataCollection collection;
+    collection.emplace_back(filePath, std::move(data));
+    bmManager.CreateCategories(std::move(collection), autoSave);
+  };
+  loadFile(false /* autoSave */);
+
+  auto const groupId = bmManager.GetCategoryByFileName(filePath);
+  TEST_NOT_EQUAL(groupId, kml::kInvalidMarkGroupId, ());
+  TEST_EQUAL(bmManager.GetUserMarkIds(groupId).size(), 2, ());
+  TEST_EQUAL(bmManager.GetTrackIds(groupId).size(), 1, ());
+  auto oldBookmarkId = *bmManager.GetUserMarkIds(groupId).begin();
+  auto oldTrackId = *bmManager.GetTrackIds(groupId).begin();
+
+  auto reload =
+      [&](std::string const & name, std::string const & description, std::time_t modified, size_t bookmarkCount)
+  {
+    SelectTrack(bmManager, oldTrackId);
+    TEST(bmManager.GetTrack(oldTrackId)->IsSelected(), ());
+    auto data = makeFileData(name, description, modified, bookmarkCount);
+    TEST(SaveKmlFileSafe(*data, filePath, FileType::Kml), ());
+    TEST(Platform::SetFileModificationTime(filePath, 5000), ());
+
+    loadFile(true /* autoSave */);
+
+    auto const & categoryData = bmManager.GetCategoryData(groupId);
+    TEST_EQUAL(bmManager.GetBmGroupsCount(), 1, ());
+    TEST_EQUAL(categoryData.m_id, groupId, ());
+    TEST_EQUAL(bmManager.GetCategoryByFileName(filePath), groupId, ());
+    TEST_EQUAL(bmManager.GetCategoryName(groupId), name, ());
+    TEST_EQUAL(kml::GetDefaultStr(categoryData.m_description), description, ());
+    TEST_EQUAL(categoryData.m_lastModified, kml::TimestampClock::from_time_t(modified), ());
+    TEST_EQUAL(bmManager.GetUserMarkIds(groupId).size(), bookmarkCount, ());
+    TEST_EQUAL(bmManager.GetTrackIds(groupId).size(), 1, ());
+    TEST(!bmManager.HasBookmark(oldBookmarkId), ());
+    TEST(!bmManager.HasTrack(oldTrackId), ());
+
+    TEST_EQUAL(Platform::GetFileModificationTime(filePath), 5000, ());
+    oldBookmarkId = *bmManager.GetUserMarkIds(groupId).begin();
+    oldTrackId = *bmManager.GetTrackIds(groupId).begin();
+    TEST(!bmManager.GetTrack(oldTrackId)->IsSelected(), ("Reloaded tracks do not inherit a stale selection"));
+    bmManager.OnTrackDeselected();
+  };
+
+  reload("MapName", "same name", 2000, 1);
+  reload("Renamed", "new name", 3000, 2);
+
+  auto const otherId = bmManager.CreateBookmarkCategory("Taken", false /* autoSave */);
+  auto conflictingData = makeFileData("Taken", "conflicting name", 4000, 1);
+  TEST(SaveKmlFileSafe(*conflictingData, filePath, FileType::Kml), ());
+  TEST(Platform::SetFileModificationTime(filePath, 5000), ());
+
+  loadFile(true /* autoSave */);
+  TEST_EQUAL(bmManager.GetBmGroupsCount(), 2, ());
+  TEST_EQUAL(bmManager.GetCategoryName(groupId), "Taken1", ());
+  TEST_EQUAL(bmManager.GetCategoryName(otherId), "Taken", ());
+  TEST_EQUAL(Platform::GetFileModificationTime(filePath), 5000, ());
+}
+
+kml::MarkId FindTrackSelectionMark(BookmarkManager const & bm, kml::TrackId trackId)
+{
+  for (auto markId : bm.GetUserMarkIds(UserMark::Type::TRACK_SELECTION))
+    if (bm.GetMark<TrackSelectionMark>(markId)->GetTrackId() == trackId)
+      return markId;
+  return kml::kInvalidMarkId;
+}
+
+// Emulates a tap on an already rendered user mark: Drape hit-tests it on the renderer thread and
+// posts only its id to the GUI thread, exactly like place_page::BuildInfo(df::TapInfo const &).
+void TapUserMark(Framework & fm, kml::MarkId markId)
+{
+  place_page::BuildInfo buildInfo;
+  buildInfo.m_source = place_page::BuildInfo::Source::User;
+  buildInfo.m_mercator = kTrackPoint;
+  buildInfo.m_userMarkId = markId;
+  fm.BuildAndSetPlacePageInfo(buildInfo);
+}
+}  // namespace
+
+UNIT_CLASS_TEST(Runner, Bookmarks_ClearTempRelationTrackDeletesSelectionMark)
+{
+  BookmarkManager bmManager(BM_CALLBACKS);
+  bmManager.EnableTestMode(true);
+
+  TEST_EQUAL(bmManager.SetTempRelationTrack(MakeLineTrackData()), kml::kTempRelationTrackId, ());
+  TEST_NOT_EQUAL(bmManager.GetTrack(kml::kTempRelationTrackId), nullptr, ());
+
+  bmManager.SetTrackSelectionInfo({kml::kTempRelationTrackId, kTrackPoint, kTrackDistance},
+                                  false /* notifyListeners */);
+
+  auto const selectionInfo = bmManager.GetTrackSelectionInfo(kml::kTempRelationTrackId);
+  TEST_EQUAL(selectionInfo.m_trackId, kml::kTempRelationTrackId, ());
+  TEST(selectionInfo.m_trackPoint.EqualDxDy(kTrackPoint, 1e-10), ());
+  TEST_EQUAL(selectionInfo.m_distFromBegM, kTrackDistance, ());
+
+  bmManager.OnTrackSelected(kml::kTempRelationTrackId);
+  TEST(bmManager.GetTrack(kml::kTempRelationTrackId)->IsSelected(), ());
+  TEST_EQUAL(bmManager.GetTrack(kml::kTempRelationTrackId)->GetGroupId(), UserMark::TRACK_SELECTION, ());
+  TEST_EQUAL(bmManager.GetTrackIds(UserMark::TRACK_SELECTION).count(kml::kTempRelationTrackId), 1, ());
+
+  bmManager.ClearTempRelationTrack();
+
+  TEST_EQUAL(bmManager.GetTrack(kml::kTempRelationTrackId), nullptr, ());
+  TEST_EQUAL(bmManager.GetTrackSelectionInfo(kml::kTempRelationTrackId).m_trackId, kml::kInvalidTrackId, ());
+  TEST(bmManager.GetTrackIds(UserMark::TRACK_SELECTION).empty(), ());
+  bmManager.OnTrackDeselected();
+}
+
+// A selection mark stores the track id only, so a tap on the mark of the current temp relation track
+// comes back without a relation id and can't be rebuilt from it. Such a tap must reuse the already
+// built track instead of clearing it - it used to leave BuildTrackPlacePage with a null Track.
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_TapSelectionMarkOfTempRelationTrack)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams);
+
+  auto & bmManager = fm.GetBookmarkManager();
+  bmManager.EnableTestMode(true);
+
+  TEST_EQUAL(bmManager.SetTempRelationTrack(MakeLineTrackData()), kml::kTempRelationTrackId, ());
+  bmManager.SetTrackSelectionInfo({kml::kTempRelationTrackId, kTrackPoint, kTrackDistance},
+                                  false /* notifyListeners */);
+
+  auto const markId = FindTrackSelectionMark(bmManager, kml::kTempRelationTrackId);
+  TEST_NOT_EQUAL(markId, kml::kInvalidMarkId, ());
+
+  TapUserMark(fm, markId);
+
+  TEST_NOT_EQUAL(bmManager.GetTrack(kml::kTempRelationTrackId), nullptr, ("The tapped track was cleared"));
+  TEST(fm.HasPlacePageInfo(), ());
+  auto const & info = fm.GetCurrentPlacePageInfo();
+  TEST(info.IsRelationTrack(), ());
+  TEST_EQUAL(info.GetSelectedObject(), df::SelectionShape::OBJECT_TRACK, ());
+  TEST_EQUAL(info.GetBookmarkCategoryId(), kml::kInvalidMarkGroupId, ());
+  TEST(info.GetBookmarkCategoryName().empty(), ("A runtime rendering group is not a bookmark category"));
+  TEST(bmManager.GetTrack(kml::kTempRelationTrackId)->IsSelected(), ());
+  TapUserMark(fm, markId);
+  TEST(bmManager.GetTrack(kml::kTempRelationTrackId)->IsSelected(), ("Retapping a temp track keeps its highlight"));
+}
+
+// The counterpart: selecting any other track still drops the temp relation track.
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_TapSelectionMarkClearsTempRelationTrack)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams);
+
+  auto & bmManager = fm.GetBookmarkManager();
+  bmManager.EnableTestMode(true);
+
+  auto const catId = bmManager.CreateBookmarkCategory("cat", false /* autoSave */);
+  kml::TrackId trackId;
+  {
+    auto es = bmManager.GetEditSession();
+    trackId = es.CreateTrack(MakeLineTrackData())->GetId();
+    es.AttachTrack(trackId, catId);
+  }
+  bmManager.SetTrackSelectionInfo({trackId, kTrackPoint, kTrackDistance}, false /* notifyListeners */);
+  TEST_EQUAL(bmManager.SetTempRelationTrack(MakeLineTrackData()), kml::kTempRelationTrackId, ());
+  SelectTrack(bmManager, kml::kTempRelationTrackId);
+
+  auto const markId = FindTrackSelectionMark(bmManager, trackId);
+  TEST_NOT_EQUAL(markId, kml::kInvalidMarkId, ());
+
+  TapUserMark(fm, markId);
+
+  TEST_EQUAL(bmManager.GetTrack(kml::kTempRelationTrackId), nullptr, ());
+  TEST(fm.HasPlacePageInfo(), ());
+  TEST_EQUAL(fm.GetCurrentPlacePageInfo().GetTrackId(), trackId, ());
+  TEST_EQUAL(fm.GetCurrentPlacePageInfo().GetBookmarkCategoryId(), catId, ());
+  TEST_EQUAL(fm.GetCurrentPlacePageInfo().GetBookmarkCategoryName(), "cat", ());
+  TEST(bmManager.GetTrack(trackId)->IsSelected(), ());
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_TapBookmarkClearsTempRelationTrack)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams);
+  auto & bmManager = fm.GetBookmarkManager();
+  bmManager.EnableTestMode(true);
+
+  auto const catId = bmManager.CreateBookmarkCategory("cat", false /* autoSave */);
+  kml::BookmarkData bookmarkData;
+  bookmarkData.m_point = {3.0, 3.0};
+  auto const bookmarkId = bmManager.GetEditSession().CreateBookmark(std::move(bookmarkData), catId)->GetId();
+
+  bmManager.SetTempRelationTrack(MakeLineTrackData());
+  bmManager.SetTrackSelectionInfo({kml::kTempRelationTrackId, kTrackPoint, kTrackDistance},
+                                  false /* notifyListeners */);
+  auto const selectionMark = FindTrackSelectionMark(bmManager, kml::kTempRelationTrackId);
+  TapUserMark(fm, selectionMark);
+  TEST(bmManager.GetTrack(kml::kTempRelationTrackId)->IsSelected(), ());
+
+  TapUserMark(fm, bookmarkId);
+
+  TEST(fm.GetCurrentPlacePageInfo().IsBookmark(), ());
+  TEST_EQUAL(bmManager.GetTrack(kml::kTempRelationTrackId), nullptr, ());
+  TEST(bmManager.GetTrackIds(UserMark::TRACK_SELECTION).empty(), ());
+  TEST_EQUAL(FindTrackSelectionMark(bmManager, kml::kTempRelationTrackId), kml::kInvalidMarkId, ());
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_SelectedTrackSwitchAndEdit)
+{
+  BookmarkManager manager(BM_CALLBACKS);
+  manager.EnableTestMode(true);
+  auto const category = manager.CreateBookmarkCategory("tracks", false /* autoSave */);
+  std::array<kml::TrackId, 2> const ids = {CreateLineTrack(manager, category), CreateLineTrack(manager, category)};
+  auto const original = manager.GetTrack(ids[0])->GetData();
+  SelectTrack(manager, ids[0]);
+  TEST(manager.GetTrack(ids[0])->IsSelected(), ());
+  TEST(!manager.GetTrack(ids[1])->IsSelected(), ());
+  TEST_EQUAL(manager.GetTrack(ids[0])->GetDepthLayer(), df::DepthLayer::SelectedUserLineLayer, ());
+  TEST_EQUAL(manager.GetTrack(ids[1])->GetDepthLayer(), df::DepthLayer::UserLineLayer, ());
+  TEST(!manager.GetTrack(ids[0])->IsDirty(), ("Selection does not dirty saved track data"));
+
+  manager.OnTrackSelected(ids[0]);
+  TEST(manager.GetTrack(ids[0])->IsSelected(), ("Selecting the same track is idempotent"));
+  SelectTrack(manager, ids[1]);
+  TEST(!manager.GetTrack(ids[0])->IsSelected(), ());
+  TEST(manager.GetTrack(ids[1])->IsSelected(), ());
+  TEST_EQUAL(manager.GetTrack(ids[0])->GetDepthLayer(), df::DepthLayer::UserLineLayer, ());
+  TEST_EQUAL(manager.GetTrack(ids[0])->GetData(), original, ());
+
+  auto edited = manager.GetTrack(ids[1])->GetData();
+  kml::SetDefaultStr(edited.m_name, "edited selection");
+  edited.m_geometry.m_lines.front().back().SetPoint({2.0, 0.0});
+  manager.GetEditSession().UpdateTrack(ids[1], edited);
+  TEST(manager.GetTrack(ids[1])->IsSelected(), ("Editing keeps the current selection on the updated geometry"));
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_SelectedTrackRemovalClearsSelection)
+{
+  BookmarkManager manager(BM_CALLBACKS);
+  manager.EnableTestMode(true);
+  auto const category = manager.CreateBookmarkCategory("tracks", false /* autoSave */);
+  auto const id = CreateLineTrack(manager, category);
+  SelectTrack(manager, id);
+  {
+    auto session = manager.GetEditSession();
+    session.ChangeTrackColor(id, dp::Color(10, 20, 30, 255));
+    session.DeleteTrack(id);
+  }
+  // Removal already cleared the selection; a stale ID would CHECK on the deleted mark.
+  manager.OnTrackDeselected();
+  TEST(!manager.HasTrack(id), ());
+
+  SelectTrack(manager, CreateLineTrack(manager, category));
+  manager.GetEditSession().ClearGroup(category);
+  manager.OnTrackDeselected();
+  TEST(manager.GetTrackIds(category).empty(), ());
+
+  auto const otherCategory = manager.CreateBookmarkCategory("other tracks", false /* autoSave */);
+  auto const otherId = CreateLineTrack(manager, otherCategory);
+  SelectTrack(manager, otherId);
+  manager.GetEditSession().DeleteBmCategory(otherCategory, true /* permanently */);
+  manager.OnTrackDeselected();
+  TEST(!manager.HasTrack(otherId), ());
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_SelectedTrackPendingCreationRemoval)
+{
+  BookmarkManager manager(BM_CALLBACKS);
+  manager.EnableTestMode(true);
+  auto const category = manager.CreateBookmarkCategory("tracks", false /* autoSave */);
+  kml::TrackId pendingId;
+  {
+    auto session = manager.GetEditSession();
+    pendingId = session.CreateTrack(MakeLineTrackData())->GetId();
+    session.AttachTrack(pendingId, category);
+    SelectTrack(manager, pendingId);
+    TEST(manager.GetTrack(pendingId)->IsSelected(), ());
+    session.DeleteTrack(pendingId);
+  }
+  // The cancelled creation must not leave a selected ID referencing its removed mark.
+  manager.OnTrackDeselected();
+  TEST(!manager.HasTrack(pendingId), ());
+  TEST(manager.GetTrackIds(category).empty(), ("A pending creation removed in the same transaction leaves no line"));
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_SelectedTrackVisibilityAndMove)
+{
+  BookmarkManager manager(BM_CALLBACKS);
+  manager.EnableTestMode(true);
+  auto const visibleCategory = manager.CreateBookmarkCategory("visible", false /* autoSave */);
+  auto const hiddenCategory = manager.CreateBookmarkCategory("hidden", false /* autoSave */);
+  kml::TrackId id;
+  {
+    auto session = manager.GetEditSession();
+    id = session.CreateTrack(MakeLineTrackData())->GetId();
+    session.AttachTrack(id, visibleCategory);
+    session.SetIsVisible(hiddenCategory, false);
+  }
+  SelectTrack(manager, id);
+  manager.GetEditSession().SetTrackVisibility(id, false);
+  TEST(manager.GetTrack(id)->IsSelected(), ("Direct visibility changes retain the active selection"));
+  TEST(!manager.GetTrack(id)->IsVisible(), ());
+  manager.GetEditSession().SetTrackVisibility(id, true);
+  manager.GetEditSession().SetIsVisible(visibleCategory, false);
+  TEST(manager.GetTrack(id)->IsSelected(), ());
+  TEST(!manager.IsVisible(visibleCategory), ());
+  manager.GetEditSession().SetIsVisible(visibleCategory, true);
+
+  manager.GetEditSession().MoveTrack(id, visibleCategory, hiddenCategory);
+  TEST_EQUAL(manager.GetTrack(id)->GetGroupId(), hiddenCategory, ());
+  TEST(manager.GetTrack(id)->IsSelected(), ());
+  TEST(!manager.IsVisible(hiddenCategory), ());
+  TEST_EQUAL(manager.GetTrackIds(visibleCategory).count(id), 0, ());
+  TEST_EQUAL(manager.GetTrackIds(hiddenCategory).count(id), 1, ());
+  manager.OnTrackDeselected();
+  manager.GetEditSession().SetIsVisible(hiddenCategory, true);
+  TEST(!manager.GetTrack(id)->IsSelected(), ("Showing a category must not resurrect a closed selection"));
+  SelectTrack(manager, id);
+  manager.GetEditSession().MoveTrack(id, hiddenCategory, visibleCategory);
+  TEST(manager.GetTrack(id)->IsSelected(), ());
+  TEST_EQUAL(manager.GetTrack(id)->GetGroupId(), visibleCategory, ());
+  manager.OnTrackDeselected();
+  TEST_EQUAL(manager.GetTrack(id)->GetDepthLayer(), df::DepthLayer::UserLineLayer, ());
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_SelectedTrackDoesNotSaveOrNotify)
+{
+  BookmarkManager manager(BM_CALLBACKS);
+  manager.EnableTestMode(true);
+  auto const category = manager.CreateBookmarkCategory("saved selection", true /* autoSave */);
+  std::array<kml::TrackId, 2> ids;
+  {
+    auto session = manager.GetEditSession();
+    for (auto & id : ids)
+    {
+      id = session.CreateTrack(MakeLineTrackData())->GetId();
+      session.AttachTrack(id, category);
+    }
+  }
+  auto const filePath = manager.GetCategoryFileName(category);
+  TEST(!filePath.empty(), ());
+  TEST(Platform::SetFileModificationTime(filePath, 5000), ());
+  auto const exportCategory = [&]
+  {
+    std::string result;
+    MemWriter writer(result);
+    TEST(manager.SaveBookmarkCategory(category, writer, FileType::Kml), ());
+    return result;
+  };
+  auto const originalExport = exportCategory();
+  size_t changes = 0;
+  manager.SetBookmarksChangedCallback([&] { ++changes; });
+  manager.SetNotificationsEnabled(false);
+  SelectTrack(manager, ids[0]);
+  manager.OnTrackSelected(ids[0]);
+  SelectTrack(manager, ids[1]);
+  manager.OnTrackDeselected();
+  manager.SetNotificationsEnabled(true);
+  TEST_EQUAL(changes, 0, ("Selection is a rendering change, not a bookmark edit"));
+  TEST_EQUAL(Platform::GetFileModificationTime(filePath), 5000, ());
+  TEST_EQUAL(exportCategory(), originalExport, ("Highlight state is not serialized"));
+
+  // A rendering update in the same outer transaction must not consume a real edit's dirty bit.
+  {
+    auto session = manager.GetEditSession();
+    session.ChangeTrackColor(ids[0], dp::Color(100, 150, 200, 255));
+    SelectTrack(manager, ids[0]);
+    manager.OnTrackDeselected();
+    TEST(manager.GetTrack(ids[0])->IsDirty(), ());
+  }
+  TEST_EQUAL(changes, 1, ());
+  auto const saved = LoadKmlFile(filePath, FileType::Kml);
+  TEST(saved && !saved->m_tracksData.empty(), ());
+  auto const changedColors =
+      std::count_if(saved->m_tracksData.begin(), saved->m_tracksData.end(), [](auto const & track)
+  { return track.m_layers.front().m_color.m_rgba == dp::Color(100, 150, 200, 255).GetRGBA(); });
+  TEST_EQUAL(changedColors, 1, ("The real edit remains eligible for saving"));
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_SelectedTempTrackReplacement)
+{
+  BookmarkManager manager(BM_CALLBACKS);
+  manager.EnableTestMode(true);
+  manager.SetTempRelationTrack(MakeLineTrackData());
+  SelectTrack(manager, kml::kTempRelationTrackId);
+  TEST(manager.GetTrack(kml::kTempRelationTrackId)->IsSelected(), ());
+  TEST(!manager.GetTrack(kml::kTempRelationTrackId)->HasDirection(), ());
+  auto replacement = MakeLineTrackData();
+  kml::SetDefaultStr(replacement.m_name, "replacement relation");
+  manager.SetTempRelationTrack(std::move(replacement));
+  TEST_EQUAL(manager.GetTrackIds(UserMark::TRACK_SELECTION).count(kml::kTempRelationTrackId), 1, ());
+  TEST(!manager.GetTrack(kml::kTempRelationTrackId)->IsSelected(), ("A reused temp ID is a new track object"));
+  TEST_EQUAL(manager.GetTrackSelectionInfo(kml::kTempRelationTrackId).m_trackId, kml::kInvalidTrackId, ());
+  // Replacement already cleared the selection; this must be a no-op, not cleanup.
+  manager.OnTrackDeselected();
+  SelectTrack(manager, kml::kTempRelationTrackId);
+  manager.ClearTempRelationTrack();
+  TEST(manager.GetTrackIds(UserMark::TRACK_SELECTION).empty(), ());
+  TEST_EQUAL(manager.GetTrack(kml::kTempRelationTrackId), nullptr, ());
+  manager.OnTrackDeselected();
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_FrameworkTrackHideAndDeleteDeselect)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework framework(kFrameworkParams);
+  auto & manager = framework.GetBookmarkManager();
+  manager.EnableTestMode(true);
+  auto const category = manager.CreateBookmarkCategory("selection", false /* autoSave */);
+  kml::TrackId id;
+  {
+    auto session = manager.GetEditSession();
+    id = session.CreateTrack(MakeLineTrackData())->GetId();
+    session.AttachTrack(id, category);
+  }
+  manager.SetTrackSelectionInfo({id, kTrackPoint, kTrackDistance}, false /* notifyListeners */);
+  auto const markId = FindTrackSelectionMark(manager, id);
+  TapUserMark(framework, markId);
+  TEST(manager.GetTrack(id)->IsSelected(), ());
+  framework.SetTrackVisibility(id, false);
+  TEST(!manager.GetTrack(id)->IsSelected(), ());
+  TEST(!framework.HasPlacePageInfo(), ());
+  manager.GetEditSession().SetTrackVisibility(id, true);
+  TEST(!manager.GetTrack(id)->IsSelected(), ());
+  TapUserMark(framework, markId);
+  TEST(manager.GetTrack(id)->IsSelected(), ());
+  framework.DeleteTrack(id);
+  TEST(!manager.HasTrack(id), ());
+  TEST(!framework.HasPlacePageInfo(), ());
+  // Framework deletion must also clear the manager's private selection identity.
+  manager.OnTrackDeselected();
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_DeleteEditedTrack)
+{
+  BookmarkManager bmManager(BM_CALLBACKS);
+  bmManager.EnableTestMode(true);
+
+  auto const catId = bmManager.CreateBookmarkCategory("cat", false /* autoSave */);
+  kml::TrackId trackId;
+  {
+    auto es = bmManager.GetEditSession();
+    trackId = es.CreateTrack(MakeLineTrackData())->GetId();
+    es.AttachTrack(trackId, catId);
+  }
+
+  // The pending update of a deleted track must be dropped, not applied when the session ends.
+  {
+    auto es = bmManager.GetEditSession();
+    es.GetTrackForEdit(trackId)->SetName("edited");
+    es.DeleteTrack(trackId);
+  }
+  TEST(bmManager.GetTrack(trackId) == nullptr, ());
+  TEST(bmManager.GetTrackIds(catId).empty(), ());
+}
+
+namespace
+{
 // Same as in Framework::BuildPlacePageInfo.
 UserMark const * GetMark(Framework & fm, m2::PointD const & pt)
 {
@@ -333,15 +1236,14 @@ Bookmark const * GetBookmark(Framework & fm, m2::PointD const & pt)
 bool IsValidBookmark(Framework & fm, m2::PointD const & pt)
 {
   auto const * mark = GetMark(fm, pt);
-  return (mark != nullptr) && (mark->GetMarkType() == UserMark::BOOKMARK);
+  return (mark && mark->GetMarkType() == UserMark::BOOKMARK);
 }
 }  // namespace
 
-UNIT_TEST(Bookmarks_Timestamp)
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_Timestamp)
 {
   ScopedBookmarksDir scopedDir;
   Framework fm(kFrameworkParams);
-  df::VisualParams::Init(1.0, 1024);
 
   BookmarkManager & bmManager = fm.GetBookmarkManager();
   bmManager.EnableTestMode(true);
@@ -386,7 +1288,7 @@ UNIT_TEST(Bookmarks_Timestamp)
   TEST_EQUAL(bmManager.GetUserMarkIds(cat2).size(), 1, ());
 }
 
-UNIT_TEST(Bookmarks_ChangeColorForImportedBookmark)
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_ChangeColorForImportedBookmark)
 {
   ScopedBookmarksDir scopedDir;
   Framework fm(kFrameworkParams);
@@ -397,22 +1299,191 @@ UNIT_TEST(Bookmarks_ChangeColorForImportedBookmark)
   kml::BookmarkData bm1;
   kml::SetDefaultStr(bm1.m_name, "1");
   bm1.m_point = m2::PointD(38, 20);
+  // Imported "mixed" data (a predefined color plus a real rgba) is normalized to an explicit
+  // custom color: the rgba is preserved and the predefined color is cleared.
   bm1.m_color.m_predefinedColor = kml::PredefinedColor::Blue;
   bm1.m_color.m_rgba = 0x0066CCFF;
   auto const * pBm1 = bmManager.GetEditSession().CreateBookmark(std::move(bm1), cat1);
-  bm1.m_color.m_predefinedColor = kml::PredefinedColor::Orange;
-  bmManager.GetEditSession().UpdateBookmark(pBm1->GetId(), bm1);
+  TEST_EQUAL(pBm1->GetData().m_color.m_predefinedColor, kml::PredefinedColor::None, ());
+  TEST_EQUAL(pBm1->GetData().m_color.m_rgba, 0x0066CCFFu, ());
+
+  // Switching to a preset color must clear the stale custom rgba.
+  kml::BookmarkData bm1upd = pBm1->GetData();
+  bm1upd.m_color = {kml::PredefinedColor::Orange, 0};
+  bmManager.GetEditSession().UpdateBookmark(pBm1->GetId(), bm1upd);
   bmManager.SaveBookmarkCategory(cat1);
   pBm1 = bmManager.GetBookmark(pBm1->GetId());
   TEST_EQUAL(pBm1->GetData().m_color.m_predefinedColor, kml::PredefinedColor::Orange, ());
-  TEST_EQUAL(pBm1->GetData().m_color.m_rgba, 0, ());
+  TEST_EQUAL(pBm1->GetData().m_color.m_rgba, 0u, ());
 }
 
-UNIT_TEST(Bookmarks_Getting)
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_CustomColorAndLastEdited)
 {
   ScopedBookmarksDir scopedDir;
   Framework fm(kFrameworkParams);
-  df::VisualParams::Init(1.0, 1024);
+  BookmarkManager & bmManager = fm.GetBookmarkManager();
+  bmManager.EnableTestMode(true);
+
+  auto const cat = bmManager.CreateBookmarkCategory("cat", false /* autoSave */);
+
+  kml::BookmarkData bmData;
+  bmData.m_point = m2::PointD(27, 53);
+  auto const markId = bmManager.GetEditSession().CreateBookmark(std::move(bmData), cat)->GetId();
+
+  // SetColor(dp::Color) stores an opaque custom color and clears the preset.
+  auto const customA = dp::Color(123, 45, 200, 255);
+  bmManager.GetEditSession().GetBookmarkForEdit(markId)->SetColor(customA);
+  auto const * bm = bmManager.GetBookmark(markId);
+  TEST_EQUAL(bm->GetData().m_color.m_predefinedColor, kml::PredefinedColor::None, ());
+  TEST_EQUAL(bm->GetData().m_color.m_rgba, customA.GetRGBA(), ());
+  TEST(bm->GetCustomColor().has_value(), ());
+  TEST_EQUAL(*bm->GetCustomColor(), customA, ());
+
+  // A custom->custom edit is detected via the full ColorData and updates the last-edited color.
+  auto const customB = dp::Color(10, 20, 30, 255);
+  kml::BookmarkData upd = bm->GetData();
+  upd.m_color = kml::MakeCustomBookmarkColorData(customB);
+  bmManager.GetEditSession().UpdateBookmark(markId, upd);
+  TEST_EQUAL(bmManager.LastEditedBMColor().m_predefinedColor, kml::PredefinedColor::None, ());
+  TEST_EQUAL(bmManager.LastEditedBMColor().m_rgba, customB.GetRGBA(), ());
+
+  // A new bookmark that seeds its color from the last-edited color (as every platform's
+  // new-bookmark path does) carries the full custom color through creation.
+  kml::BookmarkData bmData2;
+  bmData2.m_point = m2::PointD(28, 54);
+  bmData2.m_color = bmManager.LastEditedBMColor();
+  auto const * bm2 = bmManager.GetEditSession().CreateBookmark(std::move(bmData2), cat);
+  TEST_EQUAL(bm2->GetData().m_color.m_predefinedColor, kml::PredefinedColor::None, ());
+  TEST_EQUAL(bm2->GetData().m_color.m_rgba, customB.GetRGBA(), ());
+}
+
+// Creates a bookmark at a unique point so several of them can coexist in one category.
+kml::MarkId AddBookmark(BookmarkManager & bmManager, kml::MarkGroupId groupId, double x)
+{
+  kml::BookmarkData bmData;
+  bmData.m_point = m2::PointD(x, x);
+  return bmManager.GetEditSession().CreateBookmark(std::move(bmData), groupId)->GetId();
+}
+
+kml::TrackId AddTrack(BookmarkManager & bmManager, kml::MarkGroupId groupId)
+{
+  auto es = bmManager.GetEditSession();
+  auto const trackId = es.CreateTrack(MakeLineTrackData())->GetId();
+  es.AttachTrack(trackId, groupId);
+  return trackId;
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_BatchDelete)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams);
+  BookmarkManager & bmManager = fm.GetBookmarkManager();
+  bmManager.EnableTestMode(true);
+
+  auto const cat = bmManager.CreateBookmarkCategory("cat", false /* autoSave */);
+  auto const bm1 = AddBookmark(bmManager, cat, 10);
+  auto const bm2 = AddBookmark(bmManager, cat, 20);
+  auto const bm3 = AddBookmark(bmManager, cat, 30);
+  auto const trk1 = AddTrack(bmManager, cat);
+  auto const trk2 = AddTrack(bmManager, cat);
+
+  // A stale id - the UI acts on a snapshot that can lag the core - must be skipped, not crash.
+  bmManager.GetEditSession().DeleteBookmark(bm3);
+  TEST(bmManager.HasRecentlyDeletedBookmark(), ("A single deletion stashes its undo"));
+
+  // Tracks only: the unrelated single-deletion undo above must survive.
+  bmManager.GetEditSession().DeleteBookmarksAndTracks({} /* bookmarkIds */, {trk1});
+  TEST_EQUAL(bmManager.GetTrackIds(cat).size(), 1, ());
+  TEST(bmManager.HasRecentlyDeletedBookmark(), ("A tracks-only batch must not drop the Place Page undo"));
+
+  // Bookmark ids that are all stale: still nothing was stashed by this batch.
+  bmManager.GetEditSession().DeleteBookmarksAndTracks({bm3}, {} /* trackIds */);
+  TEST(bmManager.HasRecentlyDeletedBookmark(), ("An all-stale batch must not drop the undo either"));
+
+  // A batch that really deletes a bookmark has no undo of its own, so the stash is dropped.
+  bmManager.GetEditSession().DeleteBookmarksAndTracks({bm1, bm3}, {trk2});
+  TEST_EQUAL(bmManager.GetUserMarkIds(cat).size(), 1, ());
+  TEST_EQUAL(bmManager.GetTrackIds(cat).size(), 0, ());
+  TEST(bmManager.HasBookmark(bm2), ("Only the listed bookmarks are deleted"));
+  TEST(!bmManager.HasRecentlyDeletedBookmark(), ());
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_BatchMove)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams);
+  BookmarkManager & bmManager = fm.GetBookmarkManager();
+  bmManager.EnableTestMode(true);
+
+  auto const cat1 = bmManager.CreateBookmarkCategory("cat1", false /* autoSave */);
+  auto const cat2 = bmManager.CreateBookmarkCategory("cat2", false /* autoSave */);
+  auto const bm1 = AddBookmark(bmManager, cat1, 10);
+  auto const bm2 = AddBookmark(bmManager, cat1, 20);
+  auto const trk = AddTrack(bmManager, cat1);
+  auto const staleBm = AddBookmark(bmManager, cat1, 30);
+  bmManager.GetEditSession().DeleteBookmark(staleBm);
+
+  bmManager.GetEditSession().MoveBookmarksAndTracks({bm1, staleBm}, {trk}, cat2);
+  TEST_EQUAL(bmManager.GetUserMarkIds(cat1).size(), 1, ("bm2 stays behind"));
+  TEST_EQUAL(bmManager.GetUserMarkIds(cat2).size(), 1, ());
+  TEST_EQUAL(bmManager.GetTrackIds(cat1).size(), 0, ());
+  TEST_EQUAL(bmManager.GetTrackIds(cat2).size(), 1, ());
+  TEST_EQUAL(bmManager.GetBookmark(bm1)->GetGroupId(), cat2, ());
+  // A move is a real change of the last edited category, so the SetLastEditedBmCategory() guard must not swallow it.
+  TEST_EQUAL(bmManager.LastEditedBMCategory(), cat2, ());
+
+  // Moving into the category the items already belong to is the no-op the chooser hands back when the current
+  // list is picked; it must not detach anything.
+  bmManager.GetEditSession().MoveBookmarksAndTracks({bm1}, {trk}, cat2);
+  TEST_EQUAL(bmManager.GetUserMarkIds(cat2).size(), 1, ());
+  TEST_EQUAL(bmManager.GetTrackIds(cat2).size(), 1, ());
+
+  // A destination that disappeared between snapshot and tap leaves everything where it was.
+  bmManager.GetEditSession().DeleteBmCategory(cat2, true /* permanently */);
+  bmManager.GetEditSession().MoveBookmarksAndTracks({bm2}, {} /* trackIds */, cat2);
+  TEST_EQUAL(bmManager.GetUserMarkIds(cat1).size(), 1, ());
+  TEST_EQUAL(bmManager.GetBookmark(bm2)->GetGroupId(), cat1, ());
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_BatchColor)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams);
+  BookmarkManager & bmManager = fm.GetBookmarkManager();
+  bmManager.EnableTestMode(true);
+
+  auto const cat = bmManager.CreateBookmarkCategory("cat", false /* autoSave */);
+  auto const bm = AddBookmark(bmManager, cat, 10);
+  auto const trk = AddTrack(bmManager, cat);
+  auto const staleBm = AddBookmark(bmManager, cat, 20);
+  bmManager.GetEditSession().DeleteBookmark(staleBm);
+
+  auto const seed = dp::Color(1, 2, 3, 255);
+  bmManager.SetLastEditedBmColor(kml::MakeCustomBookmarkColorData(seed));
+
+  // Tracks only: the color the next new bookmark gets must not move.
+  auto const trackColor = dp::Color(200, 100, 50, 255);
+  bmManager.GetEditSession().SetBookmarksAndTracksColor({} /* bookmarkIds */, {trk}, trackColor);
+  TEST_EQUAL(bmManager.GetTrack(trk)->GetColor(0), trackColor, ());
+  TEST_EQUAL(bmManager.LastEditedBMColor().m_rgba, seed.GetRGBA(), ());
+
+  // Bookmark ids that are all stale must be treated as a tracks-only batch.
+  bmManager.GetEditSession().SetBookmarksAndTracksColor({staleBm}, {trk}, dp::Color(9, 9, 9, 255));
+  TEST_EQUAL(bmManager.LastEditedBMColor().m_rgba, seed.GetRGBA(), ());
+
+  // Reaching a live bookmark does move it, and the color is stored as an explicit custom one.
+  auto const newColor = dp::Color(10, 20, 30, 255);
+  bmManager.GetEditSession().SetBookmarksAndTracksColor({bm, staleBm}, {trk}, newColor);
+  TEST_EQUAL(bmManager.GetBookmark(bm)->GetData().m_color.m_rgba, newColor.GetRGBA(), ());
+  TEST_EQUAL(bmManager.GetBookmark(bm)->GetData().m_color.m_predefinedColor, kml::PredefinedColor::None, ());
+  TEST_EQUAL(bmManager.GetTrack(trk)->GetColor(0), newColor, ());
+  TEST_EQUAL(bmManager.LastEditedBMColor().m_rgba, newColor.GetRGBA(), ());
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_Getting)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams);
   fm.OnSize(800, 400);
   fm.ShowRect(m2::RectD(0, 0, 80, 40));
 
@@ -508,13 +1579,199 @@ UNIT_TEST(Bookmarks_AddressInfo)
   TEST(mwmInfo != nullptr, ());
 
   StringUtf8Multilang streetNames;
-  streetNames.AddString("default", "улица Карла Маркса");
+  streetNames.AddString("default", "вуліца Карла Маркса");
   streetNames.AddString("int_name", "vulica Karla Marksa");
   streetNames.AddString("be", "вуліца Карла Маркса");
   streetNames.AddString("ru", "улица Карла Маркса");
 
   CheckPlace(fm, mwmInfo, 53.8964918, 27.555559, streetNames, "10" /* houseNumber */);
   CheckPlace(fm, mwmInfo, 53.8964365, 27.5554007, streetNames, "10" /* houseNumber */);
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_NamedLink)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams, false /* loadMaps */);
+  TEST_EQUAL(fm.RegisterMap(platform::LocalCountryFile::MakeForTesting("minsk-pass")).second,
+             MwmSet::RegResult::Success, ());
+  fm.OnSize(800, 600);
+
+  auto & manager = fm.GetBookmarkManager();
+  manager.EnableTestMode(true);
+  struct Case
+  {
+    char const * m_url;
+    char const * m_customName;
+    bool m_isFeature;
+  };
+  for (auto const & test :
+       {Case{"geo:0,0?q=53.89395,27.567365(Meetingpoint)", "Meetingpoint", true},
+        Case{"om://map?ll=53.89395,27.567365&n=Meetingpoint", "Meetingpoint", true},
+        Case{"geo:53.89395,27.567365", "", true},
+        Case{"geo:0,0?q=53.893603,27.567032(Meetingpoint)", "Meetingpoint", true},
+        Case{"geo:53.893603,27.567032", "", true}, Case{"geo:0,0?q=0,0(Meetingpoint)", "Meetingpoint", false}})
+  {
+    TEST_EQUAL(fm.ParseAndSetApiURL(test.m_url), url_scheme::ParsedMapApi::UrlType::Map, (test.m_url));
+    fm.ExecuteMapApiRequest();
+    auto const info = fm.GetCurrentPlacePageInfo();
+    TEST_EQUAL(info.IsFeature(), test.m_isFeature, (test.m_url));
+    auto data = info.MakeBookmarkData();
+    auto const title = test.m_customName[0] != '\0' ? string(test.m_customName) : GetPreferredBookmarkName(data);
+    auto const names = data.m_name;
+    auto const types = data.m_featureTypes;
+    auto const icon = data.m_icon;
+    TEST_EQUAL(kml::GetDefaultStr(data.m_customName), test.m_customName, (test.m_url));
+    if (info.IsFeature())
+    {
+      TEST_EQUAL(kml::GetDefaultStr(names),
+                 info.GetDefaultName().empty() ? info.GetAddress() : string(info.GetDefaultName()), ());
+      info.GetNameMultilang().ForEach([&](int8_t lang, std::string_view name)
+      { TEST_EQUAL(names.at(lang), name, (lang)); });
+      TEST_EQUAL(types.size(), info.GetTypes().Size(), ());
+      for (auto type : info.GetTypes())
+        TEST(base::IsExist(types, type), (type));
+      if (!info.IsBuilding())
+      {
+        TEST_EQUAL(info.GetDefaultName(), "Родны Кут", ());
+        TEST_EQUAL(icon, kml::BookmarkIcon::Food, ());
+      }
+    }
+    else
+    {
+      TEST_EQUAL(kml::GetDefaultStr(names), title, ());
+      TEST(types.empty(), ());
+    }
+    data.m_point = info.GetMercator();
+    data.m_color = fm.LastEditedBMColor();
+    auto const category = manager.CreateBookmarkCategory("Linked places", false /* autoSave */);
+    auto const id = manager.GetEditSession().CreateBookmark(std::move(data), category)->GetId();
+    TEST_EQUAL(manager.GetBookmark(id)->GetPreferredName(), title, ());
+
+    string saved;
+    MemWriter writer(saved);
+    TEST(manager.SaveBookmarkCategory(category, writer, FileType::Kml), ());
+    if (test.m_customName[0] != '\0')
+      TEST(saved.find("<name>" + title + "</name>") != string::npos, (saved));
+    manager.GetEditSession().DeleteBmCategory(category, true /* permanently */);
+
+    BookmarkManager::KMLDataCollection collection;
+    collection.emplace_back("", LoadKmlData(MemReader(saved.data(), saved.size()), FileType::Kml));
+    TEST(collection.back().second, ());
+    manager.CreateCategories(std::move(collection));
+    auto const reloadedCategory = manager.GetCategoryId("Linked places");
+    auto const & ids = manager.GetUserMarkIds(reloadedCategory);
+    TEST_EQUAL(ids.size(), 1, ());
+    auto const * bookmark = manager.GetBookmark(*ids.begin());
+    auto const & reloaded = bookmark->GetData();
+    TEST_EQUAL(reloaded.m_name, names, ());
+    TEST_EQUAL(kml::GetDefaultStr(reloaded.m_customName), test.m_customName, ());
+    TEST_EQUAL(reloaded.m_featureTypes, types, ());
+    TEST_EQUAL(reloaded.m_icon, icon, ());
+
+    place_page::BuildInfo buildInfo;
+    buildInfo.m_userMarkId = bookmark->GetId();
+    fm.BuildAndSetPlacePageInfo(buildInfo);
+    TEST_EQUAL(fm.GetCurrentPlacePageInfo().GetTitle(), title, ());
+
+    search::Emitter emitter;
+    base::Cancellable cancellable;
+    search::bookmarks::Processor processor(emitter, cancellable);
+    processor.Add(bookmark->GetId(), search::bookmarks::Doc(reloaded, "en"));
+    processor.AttachToGroup(bookmark->GetId(), reloadedCategory);
+    processor.EnableIndexingOfBookmarkGroup(reloadedCategory, true /* enable */);
+    for (auto const & query : {title, string(info.GetDefaultName())})
+    {
+      if (query.empty())
+        continue;
+      emitter.Init([](search::Results const &) {});
+      vector<strings::UniString> tokens;
+      auto const isPrefix = search::TokenizeStringAndCheckIfLastTokenIsPrefix(query, tokens);
+      search::bookmarks::Processor::Params params;
+      params.Init(query, tokens, isPrefix);
+      processor.Search(params);
+      auto const & results = emitter.GetResults().GetBookmarksResults();
+      TEST_EQUAL(results.size(), 1, (query));
+      TEST_EQUAL(results.front().m_id, bookmark->GetId(), (query));
+    }
+    manager.GetEditSession().DeleteBmCategory(reloadedCategory, true /* permanently */);
+  }
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_TransitCustomNames)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams, false /* loadMaps */);
+  platform::LocalCountryFile country(GetPlatform().SettingsDir(), platform::CountryFile("BookmarkTransitNames"), 0);
+  {
+    generator::tests_support::TestMwmBuilder builder(country, feature::DataHeader::MapType::Country);
+    builder.SetMwmLanguages({"en"});
+    generator::tests_support::TestPOI stop(mercator::FromLatLon(1, 1), "Station", "en");
+    stop.SetTypes({{"highway", "bus_stop"}});
+    generator::tests_support::TestPOI entrance(mercator::FromLatLon(2, 2), "Station", "en");
+    entrance.SetTypes({{"railway", "subway_entrance"}});
+    for (auto * poi : {&stop, &entrance})
+    {
+      poi->GetMetadata().Set(feature::Metadata::FMD_LOCAL_REF, "2");
+      builder.Add(*poi);
+    }
+  }
+  TEST_EQUAL(fm.RegisterMap(country).second, MwmSet::RegResult::Success, ());
+  fm.OnSize(800, 600);
+  auto & manager = fm.GetBookmarkManager();
+  manager.EnableTestMode(true);
+  auto const category = manager.CreateBookmarkCategory("Transit names", false /* autoSave */);
+
+  for (auto const & [url, defaultTitle] : {pair{"om://map?ll=1,1&n=Meetingpoint%20%282%29", "Station (2)"},
+                                           pair{"om://map?ll=2,2&n=Meetingpoint%20%282%29", "2 (Station)"}})
+  {
+    TEST_EQUAL(fm.ParseAndSetApiURL(url), url_scheme::ParsedMapApi::UrlType::Map, (url));
+    fm.ExecuteMapApiRequest();
+    auto const & info = fm.GetCurrentPlacePageInfo();
+    TEST(info.IsFeature(), (url));
+    TEST_EQUAL(info.GetTitle(), "Meetingpoint (2)", (url));
+    auto data = info.MakeBookmarkData();
+    data.m_point = info.GetMercator();
+    auto const * bookmark = manager.GetEditSession().CreateBookmark(std::move(data), category);
+    auto const id = bookmark->GetId();
+    place_page::BuildInfo buildInfo;
+    buildInfo.m_userMarkId = id;
+    fm.BuildAndSetPlacePageInfo(buildInfo);
+    TEST_EQUAL(bookmark->GetPreferredName(), "Meetingpoint (2)", (url));
+    TEST_EQUAL(fm.GetCurrentPlacePageInfo().GetTitle(), "Meetingpoint (2)", (url));
+
+    for (auto const * name : {"Meetingpoint", ""})
+    {
+      manager.GetEditSession().GetBookmarkForEdit(id)->SetCustomName(name);
+      fm.BuildAndSetPlacePageInfo(buildInfo);
+      TEST_EQUAL(bookmark->GetPreferredName(), name[0] != '\0' ? name : "Station", (url));
+      TEST_EQUAL(fm.GetCurrentPlacePageInfo().GetTitle(), name[0] != '\0' ? name : defaultTitle, (url));
+    }
+  }
+}
+
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_MyPositionName)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm(kFrameworkParams, false /* loadMaps */);
+  fm.AddString("core_my_position", "My Position");
+  fm.GetBookmarkManager().MyPositionMark().SetUserPosition(mercator::FromLatLon(53.89395, 27.567365),
+                                                           true /* hasPosition */);
+  place_page::BuildInfo buildInfo;
+  buildInfo.m_isMyPosition = true;
+  buildInfo.m_match = place_page::BuildInfo::Match::Nothing;
+  fm.BuildAndSetPlacePageInfo(buildInfo);
+  auto const & info = fm.GetCurrentPlacePageInfo();
+  TEST(info.IsMyPosition(), ());
+  TEST_EQUAL(info.GetTitle(), "My Position", ());
+
+  auto const nameBefore = platform::GetLocalizedMyPositionBookmarkName();
+  auto const data = info.MakeBookmarkData();
+  auto const nameAfter = platform::GetLocalizedMyPositionBookmarkName();
+  auto const & name = kml::GetDefaultStr(data.m_name);
+  TEST(!name.empty(), ());
+  TEST(name == nameBefore || name == nameAfter, (name));
+  TEST(data.m_customName.empty(), ());
+  TEST(data.m_featureTypes.empty(), ());
 }
 
 UNIT_TEST(Bookmarks_IllegalFileName)
@@ -529,7 +1786,7 @@ UNIT_TEST(Bookmarks_IllegalFileName)
 UNIT_TEST(Bookmarks_UniqueFileName)
 {
   string const BASE = "SomeUniqueFileName";
-  string const FILEBASE = "./" + BASE;
+  string const FILEBASE = base::JoinPath(".", BASE);
   string const FILENAME = FILEBASE + string{kKmlExtension};
 
   {
@@ -936,7 +2193,7 @@ UNIT_TEST(Bookmarks_LongName_FullNamePreservedInExportFormats)
   }
 }
 
-UNIT_TEST(Bookmarks_AddingMoving)
+UNIT_CLASS_TEST(VisualParamsFixture, Bookmarks_AddingMoving)
 {
   ScopedBookmarksDir scopedDir;
   Framework fm(kFrameworkParams);
@@ -1330,6 +2587,57 @@ UNIT_TEST(Bookmarks_Sorting)
   }
 }
 
+UNIT_TEST(Bookmarks_NameSortUsesPolishLocale)
+{
+  ScopedBookmarksDir scopedDir;
+  Framework fm({} /* params */, false /* loadMaps */);
+  fm.RegisterMap(platform::LocalCountryFile::MakeForTesting("World"));
+
+  BookmarkManager & bmManager = fm.GetBookmarkManager();
+  bmManager.EnableTestMode(true);
+  auto const categoryId = bmManager.CreateBookmarkCategory("Polish sort", false /* autoSave */);
+
+  std::array<kml::MarkId, 3> bookmarkIds;
+  std::array<kml::TrackId, 3> trackIds;
+  {
+    auto session = bmManager.GetEditSession();
+    std::array<std::string, 3> const names = {"Łódź", "Mazury", "Lublin"};
+    for (size_t i = 0; i < names.size(); ++i)
+    {
+      kml::BookmarkData bookmark;
+      bookmark.m_point = m2::PointD(0.0, 0.0);
+      kml::SetDefaultStr(bookmark.m_name, names[i]);
+      bookmarkIds[i] = session.CreateBookmark(std::move(bookmark))->GetId();
+      session.AttachBookmark(bookmarkIds[i], categoryId);
+
+      kml::TrackData track;
+      kml::SetDefaultStr(track.m_name, names[i]);
+      track.m_geometry.AddLine({{{0.0, 0.0}, 1}, {{1.0, 0.0}, 2}});
+      track.m_geometry.AddTimestamps({});
+      trackIds[i] = session.CreateTrack(std::move(track))->GetId();
+      session.AttachTrack(trackIds[i], categoryId);
+    }
+  }
+
+  BookmarkManager::SortedBlocksCollection sortedBlocks;
+  BookmarkManager::SortParams params;
+  params.m_groupId = categoryId;
+  params.m_sortingType = BookmarkManager::SortingType::ByName;
+  params.m_locale = "pl";
+  params.m_onResults =
+      [&sortedBlocks](BookmarkManager::SortedBlocksCollection && results, BookmarkManager::SortParams::Status status)
+  {
+    TEST(status == BookmarkManager::SortParams::Status::Completed, ());
+    sortedBlocks = std::move(results);
+  };
+  bmManager.GetSortedCategory(params);
+
+  BookmarkManager::SortedBlocksCollection const expected = {
+      {BookmarkManager::GetTracksSortedBlockName(), {}, {trackIds[2], trackIds[0], trackIds[1]}},
+      {BookmarkManager::GetBookmarksSortedBlockName(), {bookmarkIds[2], bookmarkIds[0], bookmarkIds[1]}, {}}};
+  TEST(sortedBlocks == expected, ());
+}
+
 UNIT_TEST(Bookmarks_GetBookmarkMatchInfo)
 {
   classificator::Load();
@@ -1539,14 +2847,21 @@ UNIT_CLASS_TEST(Runner, FillEmptyTrackNames)
   BookmarkManager bmManager(BM_CALLBACKS);
   bmManager.EnableTestMode(true);
 
-  string const kmlFile1 = GetPlatform().TestsDataPathForFile("test_data/gpx/empty_names1.gpx");
+  // Copy fixtures to paths with native separators, including backslashes on Windows.
+  string const kmlFile1 = base::JoinPath(GetPlatform().SettingsDir(), "empty_names1.gpx");
+  TEST(base::CopyFileX(GetPlatform().TestsDataPathForFile("test_data/gpx/empty_names1.gpx"), kmlFile1), ());
+  SCOPE_GUARD(deleteFile1, [&] { base::DeleteFileX(kmlFile1); });
   auto fileData1 = LoadKmlFile(kmlFile1, FileType::Gpx);
+  TEST(fileData1 != nullptr, ());
   TEST_EQUAL(fileData1->m_categoryData.m_name[kml::kDefaultLangCode], "empty_names1", ());
   TEST_EQUAL(fileData1->m_tracksData[0].m_name[kml::kDefaultLangCode], "empty_names1 1", ());
   TEST_EQUAL(fileData1->m_tracksData[1].m_name[kml::kDefaultLangCode], "empty_names1 2", ());
 
-  string const kmlFile2 = GetPlatform().TestsDataPathForFile("test_data/gpx/empty_names2.gpx");
+  string const kmlFile2 = base::JoinPath(GetPlatform().SettingsDir(), "empty_names2.gpx");
+  TEST(base::CopyFileX(GetPlatform().TestsDataPathForFile("test_data/gpx/empty_names2.gpx"), kmlFile2), ());
+  SCOPE_GUARD(deleteFile2, [&] { base::DeleteFileX(kmlFile2); });
   auto fileData2 = LoadKmlFile(kmlFile2, FileType::Gpx);
+  TEST(fileData2 != nullptr, ());
   TEST_EQUAL(fileData2->m_categoryData.m_name[kml::kDefaultLangCode], "empty_names2", ());
   TEST_EQUAL(fileData2->m_tracksData[0].m_name[kml::kDefaultLangCode], "empty_names2", ());
 }
@@ -1653,6 +2968,7 @@ UNIT_CLASS_TEST(Runner, Bookmarks_Listeners)
 
     kml::BookmarkData data1;
     kml::SetDefaultStr(data1.m_name, "name 1");
+    data1.m_point = m2::PointD(1.0, 1.0);
     auto * bookmark1 = editSession.CreateBookmark(std::move(data1));
     editSession.AttachBookmark(bookmark1->GetId(), catId);
 
@@ -1746,16 +3062,19 @@ UNIT_CLASS_TEST(Runner, Bookmarks_AutoSave)
     editSession.GetBookmarkForEdit(bmId0)->SetName("name 0 renamed", kml::kDefaultLangCode);
 
     kml::BookmarkData data1;
+    data1.m_point = m2::PointD(1.0, 1.0);
     kml::SetDefaultStr(data1.m_name, "name 1");
     auto bmId = editSession.CreateBookmark(std::move(data1))->GetId();
     editSession.AttachBookmark(bmId, catId);
 
     kml::BookmarkData data2;
+    data2.m_point = m2::PointD(2.0, 2.0);
     kml::SetDefaultStr(data2.m_name, "name 2");
     bmId = editSession.CreateBookmark(std::move(data2))->GetId();
     editSession.AttachBookmark(bmId, catId);
 
     kml::BookmarkData data3;
+    data3.m_point = m2::PointD(3.0, 3.0);
     kml::SetDefaultStr(data3.m_name, "name 3");
     bmId = editSession.CreateBookmark(std::move(data3))->GetId();
     editSession.AttachBookmark(bmId, catId);
@@ -1866,6 +3185,30 @@ UNIT_CLASS_TEST(Runner, ExportSingleUnicode)
     TEST(base::DeleteFileX(tmpPath), ());
   };
   bmManager.PrepareFileForSharing(std::move(categories), checker, FileType::Kml);
+}
+
+UNIT_CLASS_TEST(Runner, ExportSingleMultilingualCategoryName)
+{
+  BookmarkManager bmManager(BM_CALLBACKS);
+  bmManager.EnableTestMode(true);
+
+  kml::CategoryData category;
+  category.m_name[StringUtf8Multilang::GetLangIndex("ru")] = "Категория";
+  category.m_name[StringUtf8Multilang::GetLangIndex("de")] = "Kategorie";
+  auto const categoryId = bmManager.CreateBookmarkCategory(std::move(category), false /* autoSave */);
+
+  kml::BookmarkData bookmark;
+  bookmark.m_point = m2::PointD(0.0, 0.0);
+  kml::SetDefaultStr(bookmark.m_name, "Bookmark");
+  bmManager.GetEditSession().CreateBookmark(std::move(bookmark), categoryId);
+
+  auto const checker = [](BookmarkManager::SharingResult const & result)
+  {
+    TEST(result.m_code == BookmarkManager::SharingResult::Code::Success, (result.m_errorString));
+    TEST_EQUAL(base::FileNameFromFullPath(result.m_sharingPath), "Kategorie.geojson", ());
+    TEST(base::DeleteFileX(result.m_sharingPath), ());
+  };
+  bmManager.PrepareFileForSharing(kml::GroupIdCollection{categoryId}, checker, FileType::GeoJson);
 }
 
 UNIT_CLASS_TEST(Runner, ExportSingleTrackKmz)
@@ -2013,8 +3356,8 @@ UNIT_CLASS_TEST(Runner, Bookmarks_RecentlyDeleted)
   BookmarkManager::KMLDataCollection kmlDataCollection;
   kmlDataCollection.emplace_back(filePath, LoadKmlData(MemReader(kmlString, std::strlen(kmlString)), FileType::Kml));
 
-  FileWriter w(filePath);
-  w.Write(kmlDataCollection.data(), kmlDataCollection.size());
+  // Closed before the manager moves the file, Windows refuses to move open files.
+  FileWriter(filePath).Write(kmlString, std::strlen(kmlString));
 
   TEST(kmlDataCollection.back().second, ());
   bmManager.CreateCategories(std::move(kmlDataCollection));
@@ -2048,13 +3391,17 @@ UNIT_CLASS_TEST(Runner, Bookmarks_TestSaveRoute)
   BookmarkManager bmManager(BM_CALLBACKS);
   bmManager.EnableTestMode(true);
   auto const points = {geometry::PointWithAltitude({0.0, 0.0}, 0.0), geometry::PointWithAltitude({0.001, 0.001}, 0)};
-  auto const trackId = bmManager.SaveRoute(points, "London", "Paris");
+  auto const trackId =
+      bmManager.SaveRoute(points, "London", "Paris", {{m2::PointD(0.0005, 0.0005), "Calais"}}, "bicycle");
   auto const * track = bmManager.GetTrack(trackId);
   TEST_EQUAL(track->GetName(), "London - Paris", ());
-  auto const line = track->GetData().m_geometry.m_lines[0];
+  auto const & trackData = track->GetData();
+  auto const line = trackData.m_geometry.m_lines[0];
   std::vector const expectedLine = {{geometry::PointWithAltitude(m2::PointD(0.0, 0.0), 0.0),
                                      geometry::PointWithAltitude(m2::PointD(0.001, 0.001), 0)}};
   TEST_EQUAL(line, expectedLine, ());
+  TEST_EQUAL(trackData.m_stops, (std::vector<kml::TrackStopData>{{m2::PointD(0.0005, 0.0005), "Calais"}}), ());
+  TEST_EQUAL(trackData.m_routerType, "bicycle", ());
 }
 
 // Regression test for the iOS crash in MWMPlacePageManager addBookmark: when adding a bookmark on
@@ -2074,6 +3421,183 @@ UNIT_TEST(Bookmarks_LastEditedCategoryIsAlwaysValid)
 
   auto const lastEdited = fm.LastEditedBMCategory();
   TEST(bmManager.HasBmCategory(lastEdited), ("LastEditedBMCategory must always return a valid category"));
+}
+
+UNIT_CLASS_TEST(Runner, Bookmarks_TrackVisibilityPersistence)
+{
+  string const dir = GetBookmarksDirectory();
+  bool const delDirOnExit = Platform::MkDir(dir) == Platform::ERR_OK;
+  SCOPE_GUARD(dirDeleter, [&]()
+  {
+    if (delDirOnExit)
+      (void)Platform::RmDir(dir);
+  });
+  string const fileName = base::JoinPath(dir, "UnitTestBookmarks.kml");
+  SCOPE_GUARD(fileDeleter, [&]() { (void)base::DeleteFileX(fileName); });
+
+  BookmarkManager bmManager(BM_CALLBACKS);
+  bmManager.EnableTestMode(true);
+
+  // Import file with a single visible track
+
+  string const kmlFile = GetPlatform().TestsDataPathForFile("test_data/kml/single_track.kml");
+  BookmarkManager::KMLDataCollection kmlDataCollection1;
+  kmlDataCollection1.emplace_back("", LoadKmlData(FileReader(kmlFile), GetActiveFileType()));
+  bmManager.CreateCategories(std::move(kmlDataCollection1));
+
+  auto const groupId1 = bmManager.GetUnsortedBmGroupsIdList().front();
+  auto const trackId1 = *bmManager.GetTrackIds(groupId1).begin();
+
+  TEST_EQUAL(true, bmManager.GetTrack(trackId1)->IsVisible(), ());
+
+  // Change visibility and save
+  kml::TrackData trackData = bmManager.GetTrack(trackId1)->GetData();
+  trackData.m_visible = false;
+  bmManager.GetEditSession().UpdateTrack(trackId1, trackData);
+
+  {
+    FileWriter writer(fileName);
+    bmManager.SaveBookmarkCategory(groupId1, writer, GetActiveFileType());
+  }
+
+  // Reload file and verify track visibility
+  bmManager.GetEditSession().DeleteBmCategory(groupId1, true);
+
+  BookmarkManager::KMLDataCollection kmlDataCollection2;
+  kmlDataCollection2.emplace_back("", LoadKmlData(FileReader(fileName), GetActiveFileType()));
+
+  bmManager.CreateCategories(std::move(kmlDataCollection2));
+
+  auto const groupId2 = bmManager.GetUnsortedBmGroupsIdList().front();
+  auto const trackId2 = *bmManager.GetTrackIds(groupId2).begin();
+  TEST_EQUAL(false, bmManager.GetTrack(trackId2)->IsVisible(), ());
+}
+
+// Verify SetTrackVisibility via EditSession toggles individual track visibility
+// and that the change survives a save/load round-trip.
+UNIT_CLASS_TEST(Runner, Bookmarks_SetTrackVisibilityRoundTrip)
+{
+  string const dir = GetBookmarksDirectory();
+  bool const delDirOnExit = Platform::MkDir(dir) == Platform::ERR_OK;
+  SCOPE_GUARD(dirDeleter, [&]()
+  {
+    if (delDirOnExit)
+      (void)Platform::RmDir(dir);
+  });
+  string const fileName = base::JoinPath(dir, "UnitTestTrackVisibility.kml");
+  SCOPE_GUARD(fileDeleter, [&]() { (void)base::DeleteFileX(fileName); });
+
+  BookmarkManager bmManager(BM_CALLBACKS);
+  bmManager.EnableTestMode(true);
+
+  string const kmlFile = GetPlatform().TestsDataPathForFile("test_data/kml/single_track.kml");
+  BookmarkManager::KMLDataCollection kmlDataCollection1;
+  kmlDataCollection1.emplace_back("", LoadKmlData(FileReader(kmlFile), GetActiveFileType()));
+  bmManager.CreateCategories(std::move(kmlDataCollection1));
+
+  auto const groupId = bmManager.GetUnsortedBmGroupsIdList().front();
+  auto const trackId = *bmManager.GetTrackIds(groupId).begin();
+
+  TEST(bmManager.GetTrack(trackId)->IsVisible(), ());
+
+  bmManager.GetEditSession().SetTrackVisibility(trackId, false);
+  TEST(!bmManager.GetTrack(trackId)->IsVisible(), ());
+
+  bmManager.GetEditSession().SetTrackVisibility(trackId, true);
+  TEST(bmManager.GetTrack(trackId)->IsVisible(), ());
+
+  // Hide and save.
+  bmManager.GetEditSession().SetTrackVisibility(trackId, false);
+  {
+    FileWriter writer(fileName);
+    bmManager.SaveBookmarkCategory(groupId, writer, GetActiveFileType());
+  }
+
+  // Reload and verify hidden state persisted.
+  bmManager.GetEditSession().DeleteBmCategory(groupId, true);
+
+  BookmarkManager::KMLDataCollection kmlDataCollection2;
+  kmlDataCollection2.emplace_back("", LoadKmlData(FileReader(fileName), GetActiveFileType()));
+  bmManager.CreateCategories(std::move(kmlDataCollection2));
+
+  auto const groupId2 = bmManager.GetUnsortedBmGroupsIdList().front();
+  auto const trackId2 = *bmManager.GetTrackIds(groupId2).begin();
+  TEST(!bmManager.GetTrack(trackId2)->IsVisible(), ());
+}
+
+// Verify that FindTracksInRect skips hidden tracks.
+UNIT_CLASS_TEST(Runner, Bookmarks_FindTracksInRectFiltersHidden)
+{
+  BookmarkManager bmManager(BM_CALLBACKS);
+  bmManager.EnableTestMode(true);
+
+  string const kmlFile = GetPlatform().TestsDataPathForFile("test_data/kml/single_track.kml");
+  BookmarkManager::KMLDataCollection kmlDataCollection;
+  kmlDataCollection.emplace_back("", LoadKmlData(FileReader(kmlFile), GetActiveFileType()));
+  bmManager.CreateCategories(std::move(kmlDataCollection));
+
+  auto const groupId = bmManager.GetUnsortedBmGroupsIdList().front();
+  auto const trackId = *bmManager.GetTrackIds(groupId).begin();
+
+  // Make the group visible so tracks can be found.
+  bmManager.GetEditSession().SetIsVisible(groupId, true);
+
+  // Build a large touch rect that should include the track.
+  auto const trackRect = bmManager.GetTrack(trackId)->GetLimitRect();
+  auto const bigRect = mercator::RectByCenterXYAndSizeInMeters(trackRect.Center(), 1e5);
+
+  // Visible track should be findable.
+  auto const tracks1 = bmManager.FindTracksInRect(bigRect);
+  TEST(!tracks1.empty(), ());
+  TEST_EQUAL(tracks1.front().m_trackId, trackId, ());
+
+  // Hide the track.
+  bmManager.GetEditSession().SetTrackVisibility(trackId, false);
+
+  // Hidden track should NOT be findable.
+  auto const tracks2 = bmManager.FindTracksInRect(bigRect);
+  TEST(tracks2.empty(), ());
+}
+
+// Verify that group visibility and individual track visibility are independent.
+// Hiding a group does not change individual track m_visible flags.
+UNIT_CLASS_TEST(Runner, Bookmarks_GroupAndIndividualVisibilityIndependent)
+{
+  BookmarkManager bmManager(BM_CALLBACKS);
+  bmManager.EnableTestMode(true);
+
+  string const kmlFile = GetPlatform().TestsDataPathForFile("test_data/kml/single_track.kml");
+  BookmarkManager::KMLDataCollection kmlDataCollection;
+  kmlDataCollection.emplace_back("", LoadKmlData(FileReader(kmlFile), GetActiveFileType()));
+  bmManager.CreateCategories(std::move(kmlDataCollection));
+
+  auto const groupId = bmManager.GetUnsortedBmGroupsIdList().front();
+  auto const trackId = *bmManager.GetTrackIds(groupId).begin();
+
+  // Initially both group and track are visible.
+  TEST(bmManager.IsVisible(groupId), ());
+  TEST(bmManager.GetTrack(trackId)->IsVisible(), ());
+
+  // Hide the group — individual track m_visible should remain true.
+  bmManager.GetEditSession().SetIsVisible(groupId, false);
+  TEST(!bmManager.IsVisible(groupId), ());
+  TEST(bmManager.GetTrack(trackId)->IsVisible(), ("Group hide must not change individual track visibility"));
+
+  // Show the group — track should still be individually visible.
+  bmManager.GetEditSession().SetIsVisible(groupId, true);
+  TEST(bmManager.IsVisible(groupId), ());
+  TEST(bmManager.GetTrack(trackId)->IsVisible(), ());
+
+  // Now hide the individual track — group should remain visible.
+  bmManager.GetEditSession().SetTrackVisibility(trackId, false);
+  TEST(bmManager.IsVisible(groupId), ("Individual track hide must not change group visibility"));
+  TEST(!bmManager.GetTrack(trackId)->IsVisible(), ());
+
+  // Show the group again after hiding it — individually hidden track should stay hidden.
+  bmManager.GetEditSession().SetIsVisible(groupId, false);
+  bmManager.GetEditSession().SetIsVisible(groupId, true);
+  TEST(!bmManager.GetTrack(trackId)->IsVisible(),
+       ("Individually hidden track must stay hidden after group show/hide cycle"));
 }
 
 }  // namespace bookmarks_test

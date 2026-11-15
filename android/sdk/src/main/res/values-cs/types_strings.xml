@@ -202,6 +202,7 @@
     <string name="type.barrier.city_wall">Městská zeď</string>
     <string name="type.barrier.cycle_barrier">Cyklistická bariéra</string>
     <string name="type.waterway.ditch">Drenážní příkop</string>
+    <string name="type.waterway.ditch.intermittent">Občasný drenážní příkop</string>
     <string name="type.natural.water.moat">Hradní příkop</string>
     <string name="type.natural.water.wastewater">Odpadní voda</string>
     <string name="type.barrier.entrance">Vstup</string>
@@ -387,49 +388,49 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">Dálnice</string>
     <string name="type.highway.bridleway">Hipostezka</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">Most</string>
     <string name="type.highway.bridleway.permissive">Hipostezka</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">Tunel</string>
     <string name="type.highway.busway">Vyhrazená autobusová silnice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">Tunel</string>
     <string name="type.highway.bus_stop">Autobusová zastávka</string>
     <string name="type.highway.construction">Silnice v rekonstrukci</string>
     <string name="type.highway.cycleway">Cyklostezka</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">Most</string>
     <string name="type.highway.cycleway.permissive">Cyklostezka</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">Tunel</string>
     <string name="type.highway.elevator">Výtah</string>
     <string name="type.highway.footway">Cesta</string>
     <string name="type.highway.footway.sidewalk">Chodník</string>
     <string name="type.highway.footway.crossing">Přechod pro chodce</string>
     <string name="type.highway.footway.area">Cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">Tunel pro pěší</string>
     <string name="type.highway.ford">Brod</string>
     <string name="type.highway.living_street">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">Tunel</string>
     <string name="type.highway.motorway">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">Silniční tunel</string>
     <string name="type.highway.motorway_junction">Dopravní uzel</string>
     <string name="type.highway.motorway_link">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">Tunel</string>
     <string name="type.highway.path">Cesta</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -438,103 +439,104 @@
     <string name="type.highway.path.expert">Velmi obtížná nebo nezřetelná stopa</string>
     <string name="type.highway.path.bicycle">Cesta</string>
     <string name="type.highway.footway.bicycle">Cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">Most</string>
     <string name="type.highway.path.horse">Cesta</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">Tunel</string>
     <string name="type.highway.pedestrian">Ulice</string>
     <string name="type.highway.pedestrian.area">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">Tunel pro pěší</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.highway.platform">Nástupiště</string>
     <string name="type.highway.primary">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">Tunel</string>
     <string name="type.highway.primary_link">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">Tunel</string>
     <string name="type.highway.raceway">Závodiště</string>
     <string name="type.highway.residential">Ulice</string>
     <string name="type.highway.residential.area">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">Tunel</string>
     <string name="type.highway.rest_area">Odpočívadlo</string>
     <string name="type.highway.road">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">Most</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">Tunel</string>
     <string name="type.highway.secondary">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">Tunel</string>
     <string name="type.highway.secondary_link">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">Tunel</string>
     <string name="type.highway.service">Ulice</string>
     <string name="type.highway.service.area">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">Most</string>
     <string name="type.highway.service.driveway">Ulice</string>
     <string name="type.highway.service.parking_aisle">Ulice</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">Tunel</string>
     <string name="type.highway.services">Odpočívadlo se službami</string>
     <string name="type.highway.speed_camera">Rychlostní kamera</string>
     <string name="type.highway.steps">Cesta</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">Tunel</string>
     <string name="type.highway.ladder">Žebřík</string>
     <string name="type.highway.tertiary">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">Tunel</string>
     <string name="type.highway.tertiary_link">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">Tunel</string>
     <string name="type.highway.track">Ulice</string>
     <string name="type.highway.track.area">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">Most</string>
     <string name="type.highway.track.grade1">Ulice</string>
     <string name="type.highway.track.no.access">Ulice</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">Tunel</string>
     <string name="type.highway.traffic_signals">Semafor</string>
     <string name="type.highway.trunk">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">Tunel</string>
     <string name="type.highway.trunk_link">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">Tunel</string>
     <string name="type.highway.unclassified">Ulice</string>
     <string name="type.highway.unclassified.area">Ulice</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">Most</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">Tunel</string>
     <string name="type.area_highway.cycleway">Cyklostezka</string>
     <string name="type.area_highway.footway">Cesta</string>
@@ -572,6 +574,7 @@
     <string name="type.historic.castle.shiro">Japonský hrad</string>
     <string name="type.historic.castle.stately">Zámek</string>
     <string name="type.historic.city_gate">Městská brána</string>
+    <string name="type.man_made.ceremonial_gate">Obřadní brána</string>
     <string name="type.historic.citywalls">Městská zeď</string>
     <string name="type.historic.fort">Fort</string>
     <string name="type.historic.gallows">Šibenice</string>
@@ -605,6 +608,7 @@
     <string name="type.landuse">Využití území</string>
     <string name="type.landuse.allotments">Zahrádkářská kolonie</string>
     <string name="type.landuse.basin">Vodní nádrž</string>
+    <string name="type.landuse.basin.intermittent">Občasná vodní nádrž</string>
     <string name="type.landuse.brownfield">Brownfield</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">Hřbitov</string>
@@ -635,7 +639,6 @@
     <string name="type.landuse.quarry">Lom</string>
     <string name="type.landuse.railway">Areál železnice</string>
     <string name="type.landuse.recreation_ground">Rekreační areál</string>
-    <string name="type.landuse.reservoir">Voda</string>
     <string name="type.landuse.residential">Obytná oblast</string>
     <string name="type.landuse.retail">Nákupní oblast</string>
     <string name="type.landuse.salt_pond">Solné jezírko</string>
@@ -657,6 +660,7 @@
     <string name="type.leisure.ice_rink">Ledové kluziště</string>
     <string name="type.leisure.marina">Přístav</string>
     <string name="type.leisure.nature_reserve">Rezervace</string>
+    <string name="type.leisure.bird_hide">Pozorovatelna ptáků</string>
     <string name="type.leisure.outdoor_seating">Venkovní posezení</string>
     <string name="type.leisure.firepit">Ohniště</string>
     <string name="type.leisure.park">Park</string>
@@ -691,6 +695,8 @@
     <string name="type.man_made.pier">Molo</string>
     <string name="type.man_made.pipeline">Potrubí</string>
     <string name="type.man_made.pipeline.overground">Povrchové potrubí</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">Zemní vodojem</string>
     <string name="type.man_made.silo">Silo</string>
     <string name="type.man_made.storage_tank">Cisterna</string>
     <string name="type.man_made.surveillance">Bezpečnostní kamera</string>
@@ -709,6 +715,8 @@
     <string name="type.man_made.water_tower">Vodárna</string>
     <string name="type.man_made.water_well">Studna</string>
     <string name="type.man_made.water_well.drinking_water_no">Studna</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">Úpravna vody</string>
     <string name="type.man_made.windmill">Větrný mlýn</string>
     <string name="type.man_made.works">Průmysl</string>
     <string name="type.military">Armáda</string>
@@ -740,13 +748,16 @@
     <string name="type.natural.water.lake">Jezero</string>
     <string name="type.natural.water.lock">Zámková komora</string>
     <string name="type.natural.water.pond">Rybník</string>
-    <string name="type.natural.water.reservoir">Nádrž</string>
+    <string name="type.natural.water.reservoir">Přehradní nádrž</string>
     <string name="type.natural.water.basin">Vodní nádrž</string>
     <string name="type.natural.water.river">Řeka</string>
+    <string name="type.natural.water.intermittent">Občasná vodní plocha</string>
     <string name="type.natural.land">Země</string>
     <string name="type.natural.meadow">Louka</string>
     <string name="type.natural.orchard">Sad</string>
     <string name="type.natural.peak">Hora</string>
+    <string name="type.natural.hill">Kopec</string>
+    <string name="type.natural.arch">Skalní oblouk</string>
     <string name="type.natural.saddle">Sedlo</string>
     <string name="type.natural.rock">Hornina</string>
     <string name="type.natural.scrub">Křoviny</string>
@@ -838,6 +849,7 @@
     <string name="type.psurface.unpaved_bad">psurface-unpaved_bad</string>
     <string name="type.psurface.unpaved_good">psurface-unpaved_good</string>
     <string name="type.public_transport">Veřejná doprava</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
     <string name="type.public_transport.platform">Nástupiště</string>
     <string name="type.railway">Železnice</string>
     <string name="type.railway.abandoned">Zaniklá železnice</string>
@@ -851,7 +863,7 @@
     <string name="type.railway.funicular">Pozemní lanová dráha</string>
     <string name="type.railway.funicular.bridge">Most pozemní lanové dráhy</string>
     <string name="type.railway.funicular.tunnel">Tunel pozemní lanové dráhy</string>
-    <string name="type.railway.halt">Železniční stanice</string>
+    <string name="type.railway.halt">Železniční zastávka</string>
     <string name="type.railway.level_crossing">Přejezd</string>
     <string name="type.railway.light_rail">Lehká železnice</string>
     <string name="type.railway.light_rail.bridge">Most lehké železnice</string>
@@ -1195,6 +1207,8 @@
     <string name="type.shop.greengrocer">Ovoce a zelenina</string>
     <string name="type.shop.grocery">Potraviny</string>
     <string name="type.shop.hairdresser">Kadeřnictví</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">Holičství</string>
     <string name="type.shop.hardware">Železářství</string>
     <string name="type.shop.health_food">Prodejna zdravé výživy</string>
     <string name="type.shop.hearing_aids">Obchod se sluchadly</string>
@@ -1206,7 +1220,7 @@
     <string name="type.shop.kitchen">Prodejna kuchyní</string>
     <string name="type.shop.laundry">Prádelna</string>
     <string name="type.shop.leather">Obchod s koženým zbožím</string>
-    <string name="type.shop.mall">Obchoďák</string>
+    <string name="type.shop.mall">Obchodní centrum</string>
     <string name="type.shop.massage">Masážní salon</string>
     <string name="type.shop.mobile_phone">Mobily</string>
     <string name="type.shop.money_lender">Půjčovatel peněz</string>
@@ -1318,6 +1332,7 @@
     <string name="type.sport.rugby_union">Ragby</string>
     <string name="type.sport.running">Běh</string>
     <string name="type.sport.softball">Softbal</string>
+    <string name="type.sport.pilates">Pilates</string>
     <string name="type.tourism">Turistika</string>
     <string name="type.tourism.aquarium">Akvárium</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1371,23 +1386,26 @@
     <string name="type.waterway">Vodní cesta</string>
     <string name="type.waterway.access_point">Přístupový bod k vodním cestám</string>
     <string name="type.waterway.canal">Kanál</string>
+    <string name="type.waterway.canal.intermittent">Občasný kanál</string>
     <string name="type.waterway.canal.tunnel">Kanál</string>
     <string name="type.waterway.fish_pass">Žebřík pro ryby</string>
+    <string name="type.waterway.fish_pass.intermittent">Občasný žebřík pro ryby</string>
     <string name="type.waterway.dam">Přehrada</string>
     <string name="type.barrier.ditch">Příkop</string>
     <string name="type.natural.water.ditch">Drenážní příkop</string>
     <string name="type.waterway.ditch.tunnel">Propustek</string>
     <string name="type.waterway.dock">Dok</string>
     <string name="type.waterway.drain">Odvodnění</string>
+    <string name="type.waterway.drain.intermittent">Občasné odvodnění</string>
     <string name="type.natural.water.drain">Odvodnění</string>
     <string name="type.waterway.drain.tunnel">Propustek</string>
     <string name="type.waterway.lock_gate">Stavidlo</string>
     <string name="type.waterway.river">Řeka</string>
+    <string name="type.waterway.river.intermittent">Občasná řeka</string>
     <string name="type.waterway.river.tunnel">Řeka</string>
-    <string name="type.waterway.stream">Řeka</string>
-    <string name="type.waterway.stream.ephemeral">Řeka</string>
-    <string name="type.waterway.stream.intermittent">Řeka</string>
-    <string name="type.waterway.stream.tunnel">Řeka</string>
+    <string name="type.waterway.stream">Potok</string>
+    <string name="type.waterway.stream.intermittent">Občasný potok</string>
+    <string name="type.waterway.stream.tunnel">Potok</string>
     <string name="type.waterway.waterfall">Vodopád</string>
     <string name="type.waterway.weir">Jez</string>
     <string name="type.wheelchair">Invalidní vozík</string>
@@ -1428,6 +1446,7 @@
     <string name="type.self_service.no">Žádná samoobsluha</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">Sociální zařízení</string>
+    <string name="type.amenity.stage">Jeviště</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">Vchod do pohotovostního oddělení</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1457,6 +1476,8 @@
     <string name="type.man_made.monitoring_station.weather">Stanice pro sledování počasí</string>
     <string name="type.amenity.student_accommodation">Ubytování studentů</string>
     <string name="type.craft.watchmaker">Hodinář</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">Výroba oken</string>
     <string name="type.xmas_feature.market">Vánoční trh</string>
     <string name="type.xmas_feature.tree">Vánoční stromek</string>
     <string name="type.amenity.hookah_lounge">Shisha bar</string>

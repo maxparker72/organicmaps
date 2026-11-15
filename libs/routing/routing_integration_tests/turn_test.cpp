@@ -58,21 +58,26 @@ UNIT_TEST(Russia_Moscow_SalameiNerisUturn_TurnTest)
   RouterResultCode const result = routeResult.second;
 
   TEST_EQUAL(result, RouterResultCode::NoError, ());
-  integration::TestTurnCount(route, 5 /* expectedTurnCount */);
+  integration::TestTurnCount(route, 6 /* expectedTurnCount */);
   integration::GetNthTurn(route, 0)
       .TestValid()
       .TestPoint({37.38848, 67.63338}, 20.)
       .TestDirection(CarDirection::TurnSlightRight);
+  /// @todo Redundant TurnSlightLeft 5 m before the TurnLeft below.
   integration::GetNthTurn(route, 1)
       .TestValid()
-      .TestPoint({37.38711, 67.63336}, 20.)
-      .TestDirection(CarDirection::TurnLeft);
+      .TestPoint({37.38719, 67.63325}, 20.)
+      .TestDirection(CarDirection::TurnSlightLeft);
   integration::GetNthTurn(route, 2)
+      .TestValid()
+      .TestPoint({37.38714, 67.63318}, 20.)
+      .TestDirection(CarDirection::TurnLeft);
+  integration::GetNthTurn(route, 3)
       .TestValid()
       .TestPoint({37.38738, 67.63278}, 20.)
       .TestDirection(CarDirection::TurnLeft);
-  integration::GetNthTurn(route, 3).TestValid().TestDirection(CarDirection::TurnSlightRight);
-  integration::GetNthTurn(route, 4)
+  integration::GetNthTurn(route, 4).TestValid().TestDirection(CarDirection::TurnSlightRight);
+  integration::GetNthTurn(route, 5)
       .TestValid()
       .TestPoint({37.39052, 67.63310}, 20.)
       .TestDirection(CarDirection::TurnRight);
@@ -706,6 +711,41 @@ UNIT_TEST(England_London_ExitToLeft_TurnTest)
   integration::GetNthTurn(route, 0).TestValid().TestDirection(CarDirection::ExitHighwayToLeft);
 }
 
+// Test on a straight one-way road (N 20 / D 2020) which crosses mwm borders
+// (Loiret <-> Eure-et-Loir) several times. No maneuvers should be generated.
+// https://github.com/organicmaps/organicmaps/issues/5804
+UNIT_TEST(France_CrossMwm_N20_NoDummyTurns_TurnTest)
+{
+  TRouteResult const routeResult = integration::CalculateRoute(integration::GetVehicleComponents(VehicleType::Car),
+                                                               mercator::FromLatLon(48.0980, 1.8846), {0.0, 0.0},
+                                                               mercator::FromLatLon(48.1676143, 1.9176601));
+
+  Route const & route = *routeResult.first;
+  RouterResultCode const result = routeResult.second;
+
+  TEST_EQUAL(result, RouterResultCode::NoError, ());
+  integration::TestTurnCount(route, 0 /* expectedTurnCount */);
+}
+
+// Exit from A6 highway (exit 13, Milly-la-Foret) and the right turn at the end of the exit ramp.
+// The turn at the end of the ramp was not generated because a smoothed route angle (49.9 degrees)
+// was slightly less than the TurnRight threshold, while the local turn angle is 62.6 degrees.
+// https://github.com/organicmaps/organicmaps/issues/9615
+UNIT_TEST(France_A6_ExitToRight_TurnTest)
+{
+  TRouteResult const routeResult = integration::CalculateRoute(integration::GetVehicleComponents(VehicleType::Car),
+                                                               mercator::FromLatLon(48.4732126, 2.5163615), {0.0, 0.0},
+                                                               mercator::FromLatLon(48.45631, 2.518932));
+
+  Route const & route = *routeResult.first;
+  RouterResultCode const result = routeResult.second;
+
+  TEST_EQUAL(result, RouterResultCode::NoError, ());
+  integration::TestTurnCount(route, 2 /* expectedTurnCount */);
+  integration::GetNthTurn(route, 0).TestValid().TestDirection(CarDirection::ExitHighwayToRight);
+  integration::GetNthTurn(route, 1).TestValid().TestDirection(CarDirection::TurnRight);
+}
+
 // Test on the route from Leninsky prospect to its frontage road and turns generated on the route.
 UNIT_TEST(Russia_Moscow_LeninskyProsp_TurnTest)
 {
@@ -718,7 +758,7 @@ UNIT_TEST(Russia_Moscow_LeninskyProsp_TurnTest)
 
   TEST_EQUAL(result, RouterResultCode::NoError, ());
 
-  integration::TestTurnCount(route, 5 /* expectedTurnCount */);
+  integration::TestTurnCount(route, 6 /* expectedTurnCount */);
 }
 
 // Test on the route from TTK (primary) to a link.
@@ -812,6 +852,39 @@ UNIT_TEST(USA_Tampa_TurnTest)
       {CarDirection::TurnSlightRight, CarDirection::TurnRight});
 }
 
+// Test on no turn generation at a driveway junction while the route follows a residential road
+// which gently curves there. The only alternative is a driveway (two highway classes below),
+// so no direction should be given. See https://github.com/organicmaps/organicmaps/issues/13152
+UNIT_TEST(USA_Connecticut_WestHartford_NoTurnAtDriveway_TurnTest)
+{
+  TRouteResult const routeResult = integration::CalculateRoute(integration::GetVehicleComponents(VehicleType::Car),
+                                                               mercator::FromLatLon(41.780262, -72.943726), {0., 0.},
+                                                               mercator::FromLatLon(41.778837, -72.937728));
+
+  Route const & route = *routeResult.first;
+  RouterResultCode const result = routeResult.second;
+
+  TEST_EQUAL(result, RouterResultCode::NoError, ());
+  integration::TestTurnCount(route, 0 /* expectedTurnCount */);
+}
+
+// Control test for the previous one: a real turn from Vineyard Road to a same-class
+// residential road (Deer Field Trace) a few hundred meters to the west must be kept.
+UNIT_TEST(USA_Connecticut_WestHartford_TurnToDeerField_TurnTest)
+{
+  TRouteResult const routeResult = integration::CalculateRoute(integration::GetVehicleComponents(VehicleType::Car),
+                                                               mercator::FromLatLon(41.780262, -72.943726), {0., 0.},
+                                                               mercator::FromLatLon(41.7800312, -72.9419313));
+
+  Route const & route = *routeResult.first;
+  RouterResultCode const result = routeResult.second;
+
+  TEST_EQUAL(result, RouterResultCode::NoError, ());
+  integration::TestTurnCount(route, 1 /* expectedTurnCount */);
+  integration::GetNthTurn(route, 0).TestValid().TestOneOfDirections(
+      {CarDirection::TurnSlightLeft, CarDirection::TurnLeft});
+}
+
 // Test on go straight direction if it's possible to go through a roundabout.
 UNIT_TEST(Russia_Moscow_Minskia1_TurnTest)
 {
@@ -899,25 +972,15 @@ UNIT_TEST(Russia_MoscowLeninskyProsp2_TurnTest)
   integration::GetNthTurn(route, 0).TestValid().TestDirection(CarDirection::TurnSlightRight);
 }
 
-UNIT_TEST(Germany_ShuttleTrain_TurnTest)
+UNIT_TEST(Germany_ShuttleTrain_Boarding)
 {
-  TRouteResult const routeResult = integration::CalculateRoute(integration::GetVehicleComponents(VehicleType::Car),
-                                                               mercator::FromLatLon(54.78152, 8.83952), {0., 0.},
-                                                               mercator::FromLatLon(54.79281, 8.83466));
-
-  Route const & route = *routeResult.first;
-  RouterResultCode const result = routeResult.second;
-
-  // No turns on shutte train road.
-  TEST_EQUAL(result, RouterResultCode::NoError, ());
-  integration::TestTurnCount(route, 3 /* expectedTurnCount */);
-  integration::GetNthTurn(route, 0).TestValid().TestDirection(CarDirection::TurnSlightLeft);
-  integration::GetNthTurn(route, 1).TestValid().TestOneOfDirections(
-      {CarDirection::GoStraight, CarDirection::TurnSlightRight});
-  integration::GetNthTurn(route, 2).TestValid().TestDirection(CarDirection::TurnSlightLeft);
+  // Check that graph continues on railway-shuttle.
+  integration::CalculateRouteAndTestRouteLength(integration::GetVehicleComponents(VehicleType::Car),
+                                                mercator::FromLatLon(54.78152, 8.83952), {0., 0.},
+                                                mercator::FromLatLon(54.79281, 8.83466), 1340.39);
 }
 
-UNIT_TEST(Germany_ShuttleTrain2_TurnTest)
+UNIT_TEST(Germany_ShuttleTrain_Landing)
 {
   TRouteResult const routeResult = integration::CalculateRoute(integration::GetVehicleComponents(VehicleType::Car),
                                                                mercator::FromLatLon(54.90181, 8.32472), {0., 0.},
@@ -929,7 +992,9 @@ UNIT_TEST(Germany_ShuttleTrain2_TurnTest)
   // No turns on shutte train road.
   TEST_EQUAL(result, RouterResultCode::NoError, ());
   integration::TestTurnCount(route, 4 /* expectedTurnCount */);
-  integration::GetNthTurn(route, 0).TestValid().TestDirection(CarDirection::TurnSharpRight);
+  // Borderline 144 degrees angle from the shuttle landing to the service road (TurnSharpRight is from 145).
+  integration::GetNthTurn(route, 0).TestValid().TestOneOfDirections(
+      {CarDirection::TurnSharpRight, CarDirection::TurnRight});
   integration::GetNthTurn(route, 1).TestValid().TestDirection(CarDirection::TurnLeft);
   integration::GetNthTurn(route, 2).TestValid().TestDirection(CarDirection::TurnLeft);
   integration::GetNthTurn(route, 3).TestValid().TestDirection(CarDirection::TurnRight);
@@ -1071,6 +1136,8 @@ UNIT_TEST(Crimea_Roundabout_test)
   integration::GetNthTurn(route, 1).TestValid().TestRoundAboutExitNum(3);
 }
 
+// By the service road from проспект Мельникова to улица Родионова, like OSRM, GraphHopper and Valhalla:
+// the way around with the U-turn is 2497 m.
 UNIT_TEST(Russia_Moscow_OnlyUTurnTest1_TurnTest)
 {
   TRouteResult const routeResult = integration::CalculateRoute(integration::GetVehicleComponents(VehicleType::Car),
@@ -1081,14 +1148,12 @@ UNIT_TEST(Russia_Moscow_OnlyUTurnTest1_TurnTest)
   RouterResultCode const result = routeResult.second;
 
   TEST_EQUAL(result, RouterResultCode::NoError, ());
-  integration::TestRouteLength(route, 2496.61);
+  integration::TestRouteLength(route, 432.879);
 
-  integration::TestTurnCount(route, 5 /* expectedTurnCount */);
-  integration::GetNthTurn(route, 0).TestValid().TestDirection(CarDirection::TurnLeft);
-  integration::GetNthTurn(route, 1).TestValid().TestDirection(CarDirection::TurnLeft);
-  integration::GetNthTurn(route, 2).TestValid().TestDirection(CarDirection::TurnLeft);
-  integration::GetNthTurn(route, 3).TestValid().TestDirection(CarDirection::EnterRoundAbout);
-  integration::GetNthTurn(route, 4).TestValid().TestDirection(CarDirection::LeaveRoundAbout);
+  integration::TestTurnCount(route, 3 /* expectedTurnCount */);
+  integration::GetNthTurn(route, 0).TestValid().TestDirection(CarDirection::TurnRight);
+  integration::GetNthTurn(route, 1).TestValid().TestDirection(CarDirection::TurnRight);
+  integration::GetNthTurn(route, 2).TestValid().TestDirection(CarDirection::TurnRight);
 }
 /*
 UNIT_TEST(Russia_Moscow_OnlyUTurnTest1WithDirection_TurnTest)
@@ -1385,6 +1450,105 @@ UNIT_TEST(Segregated_MergeLeftRightTurns)
 
     TestTurns(route, {CarDirection::TurnSlightLeft});
   }
+}
+
+// Zemlyanoy Val street (northbound) in Moscow: turn:lanes = through|through|through|through|right|reverse,
+// where the last (right side) lane is a dedicated U-turn loop to the opposite carriageway.
+// After the U-turn fork there is a short (~20m) segment with turn:lanes = through|through|through|through|right
+// before the right turn to Staraya Basmannaya street. Both maneuvers should show the six approach lanes.
+// The U-turn selects ReverseLeft in the last lane; the right turn keeps its reverse direction ambiguous.
+UNIT_TEST(Russia_Moscow_ZemlyanoyVal_LanesTest)
+{
+  using namespace integration;
+  using namespace routing::turns::lanes;
+
+  LaneInfo const through = {{LaneWay::Through}, LaneWay::None};
+
+  // Turn right to Staraya Basmannaya street.
+  {
+    TRouteResult const res = CalculateRoute(GetVehicleComponents(VehicleType::Car), FromLatLon(55.763544, 37.6567575),
+                                            {0., 0.}, FromLatLon(55.7642684, 37.6569801));
+
+    TEST_EQUAL(res.second, RouterResultCode::NoError, ());
+    Route const & route = *res.first;
+
+    TestTurnCount(route, 1 /* expectedTurnCount */);
+    GetNthTurn(route, 0)
+        .TestValid()
+        .TestDirection(CarDirection::TurnRight)
+        .TestLanes({through,
+                    through,
+                    through,
+                    through,
+                    {{LaneWay::Right}, LaneWay::Right},
+                    // The "reverse" tag does not specify the U-turn side, so the lane is parsed into both
+                    // ReverseLeft and ReverseRight. It is disambiguated by FixRecommendedReverseLane only
+                    // when a U-turn maneuver recommends this lane (see the U-turn case below).
+                    {{LaneWay::ReverseLeft, LaneWay::ReverseRight}, LaneWay::None}});
+  }
+
+  // U-turn to the southbound carriageway of Zemlyanoy Val.
+  {
+    TRouteResult const res = CalculateRoute(GetVehicleComponents(VehicleType::Car), FromLatLon(55.763544, 37.6567575),
+                                            {0., 0.}, FromLatLon(55.7635125, 37.6564447));
+
+    TEST_EQUAL(res.second, RouterResultCode::NoError, ());
+    Route const & route = *res.first;
+
+    TestTurnCount(route, 1 /* expectedTurnCount */);
+    GetNthTurn(route, 0)
+        .TestValid()
+        .TestDirection(CarDirection::UTurnLeft)
+        .TestLanes({through,
+                    through,
+                    through,
+                    through,
+                    {{LaneWay::Right}, LaneWay::None},
+                    {{LaneWay::ReverseLeft}, LaneWay::ReverseLeft}});
+  }
+}
+
+// https://github.com/organicmaps/organicmaps/issues/9429
+// P. Luksio street: turn:lanes:backward = left;through|right. The combined left;through lane must be kept as is.
+UNIT_TEST(Lithuania_Vilnius_LuksioKalvariju_LanesTest)
+{
+  using namespace integration;
+  using namespace routing::turns::lanes;
+
+  TRouteResult const res = CalculateRoute(GetVehicleComponents(VehicleType::Car), FromLatLon(54.71331, 25.28847),
+                                          {0., 0.}, FromLatLon(54.71400, 25.28690));
+
+  TEST_EQUAL(res.second, RouterResultCode::NoError, ());
+  Route const & route = *res.first;
+
+  TestTurnCount(route, 1 /* expectedTurnCount */);
+  GetNthTurn(route, 0)
+      .TestValid()
+      .TestDirection(CarDirection::TurnRight)
+      .TestLanes({{{LaneWay::Left, LaneWay::Through}, LaneWay::None}, {{LaneWay::Right}, LaneWay::Right}});
+}
+
+// https://github.com/organicmaps/organicmaps/issues/10327
+// Golovec tunnel: turn:lanes = slight_left|slight_left;slight_right|slight_right on 4 consecutive ways
+// before the fork. Exit to the left link recommends both slight_left lanes.
+UNIT_TEST(Slovenia_Ljubljana_GolovecTunnelExit_LanesTest)
+{
+  using namespace integration;
+  using namespace routing::turns::lanes;
+
+  TRouteResult const res = CalculateRoute(GetVehicleComponents(VehicleType::Car), FromLatLon(46.02200, 14.56335),
+                                          {0., 0.}, FromLatLon(46.01511, 14.55709));
+
+  TEST_EQUAL(res.second, RouterResultCode::NoError, ());
+  Route const & route = *res.first;
+
+  TestTurnCount(route, 1 /* expectedTurnCount */);
+  GetNthTurn(route, 0)
+      .TestValid()
+      .TestDirection(CarDirection::ExitHighwayToLeft)
+      .TestLanes({{{LaneWay::SlightLeft}, LaneWay::SlightLeft},
+                  {{LaneWay::SlightLeft, LaneWay::SlightRight}, LaneWay::SlightLeft},
+                  {{LaneWay::SlightRight}, LaneWay::None}});
 }
 
 }  // namespace turn_test

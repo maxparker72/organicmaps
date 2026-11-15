@@ -25,9 +25,9 @@
     <attr name="android:textColor"/>
     <attr name="android:text"/>
     <attr name="android:drawable"/>
+    <!-- Ellipsize the text to the width the parent allows. Off where MultilineLayoutManager wraps or squeezes. -->
+    <attr name="fitParentWidth" format="boolean"/>
   </declare-styleable>
-
-  <bool name="tabletLayout">false</bool>
 
   <declare-styleable name="PlaceholderView">
     <attr name="imgSrcDefault" format="reference"/>

@@ -442,11 +442,7 @@ std::string const kDefaultBookmarksFileName = "Bookmarks";
 // to file name to build names for all unnamed tracks
 void FillEmptyNames(std::unique_ptr<kml::FileData> & kmlData, std::string const & file)
 {
-  auto start = file.find_last_of('/') + 1;
-  auto end = file.find_last_of('.');
-  if (end == std::string::npos)
-    end = file.size();
-  auto const name = file.substr(start, end - start);
+  auto const name = base::GetNameFromFullPathWithoutExt(file);
 
   if (kmlData->m_categoryData.m_name.empty())
     kmlData->m_categoryData.m_name[kml::kDefaultLang] = name;
@@ -550,6 +546,10 @@ std::vector<std::string> GetKMLOrGPXFilesPathsToLoad(std::string const & filePat
   // Copy or convert or unpack (kmz) file from 'filePath' to GetBookmarksDirectory folder.
   if (auto const fileType = GetFileType(filePath))
   {
+    // An import can arrive before a bookmark save creates the directory.
+    if (!Platform::MkDirChecked(GetBookmarksDirectory()))
+      return {};
+
     switch (*fileType)
     {
     case FileType::Kml:
@@ -737,8 +737,6 @@ void ResetIds(kml::FileData & kmlData)
     bmData.m_id = kml::kInvalidMarkId;
   for (auto & trackData : kmlData.m_tracksData)
     trackData.m_id = kml::kInvalidTrackId;
-  for (auto & compilationData : kmlData.m_compilationsData)
-    compilationData.m_id = kml::kInvalidMarkGroupId;
 }
 
 static bool TruncType(std::string_view & type)
@@ -798,7 +796,8 @@ std::string GetLocalizedBookmarkBaseType(BookmarkBaseType type)
   case BookmarkBaseType::Hotel: return platform::GetLocalizedString("hotels");
   case BookmarkBaseType::Animals: return platform::GetLocalizedString("animals");
   case BookmarkBaseType::Building: return platform::GetLocalizedString("buildings");
-  case BookmarkBaseType::Entertainment: return platform::GetLocalizedString("entertainment");
+  // No dedicated string; the search category name matches exactly.
+  case BookmarkBaseType::Entertainment: return platform::GetLocalizedString("category_entertainment");
   case BookmarkBaseType::Exchange: return platform::GetLocalizedString("money");
   case BookmarkBaseType::Food: return platform::GetLocalizedString("food_places");
   case BookmarkBaseType::Gas: return platform::GetLocalizedString("fuel_places");
@@ -811,7 +810,8 @@ std::string GetLocalizedBookmarkBaseType(BookmarkBaseType type)
   case BookmarkBaseType::Shop: return platform::GetLocalizedString("shops");
   case BookmarkBaseType::Sights: return platform::GetLocalizedString("tourist_places");
   case BookmarkBaseType::Swim: return platform::GetLocalizedString("swim_places");
-  case BookmarkBaseType::Water: return platform::GetLocalizedString("water");
+  // No dedicated string; the search category name matches exactly.
+  case BookmarkBaseType::Water: return platform::GetLocalizedString("category_water");
   case BookmarkBaseType::Count: CHECK(false, ("Invalid bookmark base type")); return {};
   }
   UNREACHABLE();

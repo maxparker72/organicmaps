@@ -79,7 +79,9 @@
   auto const vs = self.visualScale;
   auto const viewHeight = [MapViewController sharedController].mapView.height;
   auto const viewWidth = [MapViewController sharedController].mapView.width;
-  auto const rulerOffset = m2::PointF(frame.origin.x * vs, (frame.origin.y + frame.size.height - viewHeight) * vs);
+  auto const kRulerAdditionalYOffset = 4.0;
+  auto const rulerOffset =
+      m2::PointF(frame.origin.x * vs, (frame.origin.y + frame.size.height - viewHeight - kRulerAdditionalYOffset) * vs);
   auto const kCompassAdditionalYOffset = [TrackRecordingManager.shared isActive] ? 50 : 0;
   auto const compassOffset = m2::PointF((frame.origin.x + frame.size.width - viewWidth) * vs,
                                         (frame.origin.y + kCompassAdditionalYOffset) * vs);
@@ -90,7 +92,13 @@
     {
     case gui::WIDGET_RULER:
     case gui::WIDGET_COPYRIGHT: pivot += rulerOffset; break;
-    case gui::WIDGET_COMPASS: pivot += compassOffset; break;
+    case gui::WIDGET_COMPASS:
+      pivot += compassOffset;
+      if (![MWMCarPlayService shared].isCarplayActivated &&
+          [MapViewController sharedController].mapView.effectiveUserInterfaceLayoutDirection ==
+              UIUserInterfaceLayoutDirectionRightToLeft)
+        pivot.x = m_skin->GetWidth() - pos.m_pixelPivot.x + frame.origin.x * vs;
+      break;
     case gui::WIDGET_SCALE_FPS_LABEL:
     case gui::WIDGET_CHOOSE_POSITION_MARK: break;
     }

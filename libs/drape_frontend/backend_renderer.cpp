@@ -41,7 +41,7 @@ BackendRenderer::BackendRenderer(Params && params)
   , m_model(params.m_model)
   , m_readManager(make_unique_dp<ReadManager>(params.m_commutator, m_model, params.m_allow3dBuildings,
                                               params.m_trafficEnabled, params.m_isolinesEnabled,
-                                              params.m_backgroundMode))
+                                              params.m_backgroundMode, params.m_satelliteAreaOpacity))
   , m_transitBuilder(
         make_unique_dp<TransitSchemeBuilder>(std::bind(&BackendRenderer::FlushTransitRenderData, this, _1)))
   , m_trafficGenerator(make_unique_dp<TrafficGenerator>(std::bind(&BackendRenderer::FlushTrafficRenderData, this, _1)))
@@ -133,6 +133,10 @@ void BackendRenderer::ClearRouteTransitData()
 
 void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
 {
+  // A producer may enqueue its last payload after the cancellation sweep.
+  if (MapShapeReadedMessage::IsCancelledMessage(message))
+    return;
+
   switch (message->GetType())
   {
   case Message::Type::UpdateReadManager:
@@ -234,23 +238,20 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
   {
     ref_ptr<MapShapeReadedMessage> msg = message;
     auto const & tileKey = msg->GetKey();
-    if (m_requestedTiles->CheckTileKey(tileKey) && m_readManager->CheckTileKey(tileKey))
+    CHECK(m_context != nullptr, ());
+    ref_ptr<dp::Batcher> batcher = m_batchersPool->GetBatcher(tileKey);
+    batcher->SetBatcherHash(tileKey.GetHashValue(BatcherBucket::Default));
+#if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
+    DrapeMeasurer::Instance().StartShapesGeneration();
+#endif
+    for (drape_ptr<MapShape> const & shape : msg->GetShapes())
     {
-      CHECK(m_context != nullptr, ());
-      ref_ptr<dp::Batcher> batcher = m_batchersPool->GetBatcher(tileKey);
-      batcher->SetBatcherHash(tileKey.GetHashValue(BatcherBucket::Default));
-#if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
-      DrapeMeasurer::Instance().StartShapesGeneration();
-#endif
-      for (drape_ptr<MapShape> const & shape : msg->GetShapes())
-      {
-        batcher->SetFeatureMinZoom(shape->GetFeatureMinZoom());
-        shape->Draw(m_context, batcher, m_texMng);
-      }
-#if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
-      DrapeMeasurer::Instance().EndShapesGeneration(static_cast<uint32_t>(msg->GetShapes().size()));
-#endif
+      batcher->SetFeatureMinZoom(shape->GetFeatureMinZoom());
+      shape->Draw(m_context, batcher, m_texMng);
     }
+#if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
+    DrapeMeasurer::Instance().EndShapesGeneration(static_cast<uint32_t>(msg->GetShapes().size()));
+#endif
     break;
   }
 
@@ -258,30 +259,27 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
   {
     ref_ptr<OverlayMapShapeReadedMessage> msg = message;
     auto const & tileKey = msg->GetKey();
-    if (m_requestedTiles->CheckTileKey(tileKey) && m_readManager->CheckTileKey(tileKey))
+    CHECK(m_context != nullptr, ());
+    CleanupOverlays(tileKey);
+
+#if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
+    DrapeMeasurer::Instance().StartOverlayShapesGeneration();
+#endif
+    OverlayBatcher batcher(tileKey);
+    for (drape_ptr<MapShape> const & shape : msg->GetShapes())
+      batcher.Batch(m_context, shape, m_texMng);
+
+    TOverlaysRenderData renderData;
+    batcher.Finish(m_context, renderData);
+    if (!renderData.empty())
     {
-      CHECK(m_context != nullptr, ());
-      CleanupOverlays(tileKey);
-
-#if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
-      DrapeMeasurer::Instance().StartOverlayShapesGeneration();
-#endif
-      OverlayBatcher batcher(tileKey);
-      for (drape_ptr<MapShape> const & shape : msg->GetShapes())
-        batcher.Batch(m_context, shape, m_texMng);
-
-      TOverlaysRenderData renderData;
-      batcher.Finish(m_context, renderData);
-      if (!renderData.empty())
-      {
-        m_overlays.reserve(m_overlays.size() + renderData.size());
-        std::move(renderData.begin(), renderData.end(), back_inserter(m_overlays));
-      }
-
-#if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
-      DrapeMeasurer::Instance().EndOverlayShapesGeneration(static_cast<uint32_t>(msg->GetShapes().size()));
-#endif
+      m_overlays.reserve(m_overlays.size() + renderData.size());
+      std::move(renderData.begin(), renderData.end(), back_inserter(m_overlays));
     }
+
+#if defined(DRAPE_MEASURER_BENCHMARK) && defined(GENERATING_STATISTIC)
+    DrapeMeasurer::Instance().EndOverlayShapesGeneration(static_cast<uint32_t>(msg->GetShapes().size()));
+#endif
     break;
   }
 
@@ -298,6 +296,7 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
     m_userMarkGenerator->SetRemovedUserMarks(msg->AcceptRemovedIds());
     m_userMarkGenerator->SetUserMarks(msg->AcceptMarkRenderParams());
     m_userMarkGenerator->SetUserLines(msg->AcceptLineRenderParams());
+    m_userMarkGenerator->SetUserAreas(msg->AcceptAreaRenderParams());
     m_userMarkGenerator->SetJustCreatedUserMarks(msg->AcceptJustCreatedIds());
     break;
   }
@@ -458,7 +457,7 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
   {
     ref_ptr<FlushTrafficGeometryMessage> msg = message;
     auto const & tileKey = msg->GetKey();
-    if (m_requestedTiles->CheckTileKey(tileKey) && m_readManager->CheckTileKey(tileKey))
+    if (m_readManager->CheckTileKey(tileKey))
     {
       CHECK(m_context != nullptr, ());
       m_trafficGenerator->FlushSegmentsGeometry(m_context, tileKey, msg->GetSegments(), m_texMng);
@@ -709,6 +708,27 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
     break;
   }
 
+#ifdef SCENARIO_ENABLE
+  case Message::Type::ScenarioViewport:
+  {
+    ref_ptr<ScenarioViewportMessage> msg = message;
+    if (msg->GetRevision() < m_pendingScenarioViewportRevision)
+      break;
+    m_pendingScenarioViewportRevision = msg->GetRevision();
+    if (!msg->IsAfterReads() || !m_readManager->IsReadingFinished())
+    {
+      m_pendingScenarioViewport = msg->GetRequest();
+      break;
+    }
+    // The normal continuation also follows FinishReading, which flushes overlays.
+    m_commutator->PostMessage(
+        ThreadsCommutator::RenderThread,
+        make_unique_dp<ScenarioViewportMessage>(msg->GetRequest(), true /* fence */, msg->GetRevision()),
+        MessagePriority::Normal);
+    break;
+  }
+#endif
+
 #if defined(OMIM_OS_DESKTOP)
   case Message::Type::NotifyGraphicsReady:
   {
@@ -723,15 +743,17 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
   case Message::Type::SetTileBackgroundMode:
   {
     ref_ptr<SetTileBackgroundModeMessage> msg = message;
-    m_readManager->SetBackgroundMode(msg->GetMode());
+    m_readManager->SetBackgroundMode(msg->GetMode(), msg->GetAreaOpacity());
     m_commutator->PostMessage(ThreadsCommutator::RenderThread,
-                              make_unique_dp<SetTileBackgroundModeMessage>(msg->GetMode()), MessagePriority::Normal);
+                              make_unique_dp<SetTileBackgroundModeMessage>(msg->GetMode(), msg->GetAreaOpacity(),
+                                                                           m_readManager->IsModeChanged()),
+                              MessagePriority::Normal);
     break;
   }
 
-  case Message::Type::SetTileBackgroundData:
+  case Message::Type::AddTileBackgroundImage:
   {
-    ref_ptr<SetTileBackgroundDataMessage> msg = message;
+    ref_ptr<AddTileBackgroundImageMessage> msg = message;
 
     dp::TexturePoolDesc const desc{.m_maxTextureCount = gpu::kTileBackgroundMaxCount,
                                    .m_textureWidth = msg->GetWidth(),
@@ -752,15 +774,26 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
       texturePool->UpdateTextureData(m_context, textureId, 0, 0, msg->GetWidth(), msg->GetHeight(), make_ref(data));
     }
 
-    m_commutator->PostMessage(ThreadsCommutator::RenderThread,
-                              m_context->GetApiVersion() == dp::ApiVersion::OpenGLES3
-                                  ? make_unique_dp<AssignTileBackgroundTextureMessage>(
-                                        m_context, msg->GetTileKey(), texturePool, textureId, msg->GetMode(),
-                                        std::move(msg->GetBytes()), msg->GetWidth(), msg->GetHeight())
-                                  : make_unique_dp<AssignTileBackgroundTextureMessage>(
-                                        m_context, msg->GetTileKey(), texturePool, textureId, msg->GetMode()),
-                              MessagePriority::Normal);
+    m_commutator->PostMessage(
+        ThreadsCommutator::RenderThread,
+        m_context->GetApiVersion() == dp::ApiVersion::OpenGLES3
+            ? make_unique_dp<AssignTileBackgroundImageMessage>(m_context, msg->GetTileKey(), msg->GetUid(), texturePool,
+                                                               textureId, msg->GetMode(), std::move(msg->GetBytes()),
+                                                               msg->GetWidth(), msg->GetHeight())
+            : make_unique_dp<AssignTileBackgroundImageMessage>(m_context, msg->GetTileKey(), msg->GetUid(), texturePool,
+                                                               textureId, msg->GetMode()),
+        MessagePriority::Normal);
 
+    break;
+  }
+
+  case Message::Type::SetTileBackgroundData:
+  {
+    ref_ptr<SetTileBackgroundDataMessage> msg = message;
+    m_commutator->PostMessage(
+        ThreadsCommutator::RenderThread,
+        make_unique_dp<SetTileBackgroundDataMessage>(msg->GetTileKey(), msg->GetImageUid(), msg->GetRect()),
+        MessagePriority::Normal);
     break;
   }
 
@@ -834,7 +867,24 @@ void BackendRenderer::RenderFrame()
   if (!m_context->Validate())
     return;
 
+  auto const cancellationRevision = m_readManager->GetCancellationRevision();
   ProcessSingleMessage();
+#ifdef SCENARIO_ENABLE
+  if (m_pendingScenarioViewport && m_readManager->IsReadingFinished())
+  {
+    // The counter and final worker posts share a lock; enqueue behind all of those payloads.
+    m_commutator->PostMessage(
+        ThreadsCommutator::ResourceUploadThread,
+        make_unique_dp<ScenarioViewportMessage>(std::move(m_pendingScenarioViewport), true /* fence */,
+                                                m_pendingScenarioViewportRevision, true /* afterReads */),
+        MessagePriority::Normal);
+  }
+#endif
+  if (cancellationRevision != m_readManager->GetCancellationRevision())
+    InstantMessageFilter(MapShapeReadedMessage::IsCancelledMessage);
+#ifdef DRAPE_QUEUE_TRACE
+  TraceMessageQueue("backend");
+#endif
   m_context->CollectMemory();
 }
 
@@ -844,7 +894,7 @@ void BackendRenderer::InitContextDependentResources()
   uint32_t constexpr kBatchSize = 5000;
 
   m_batchersPool = make_unique_dp<BatchersPool<TileKey, TileKeyStrictComparator>>(
-      kReadingThreadsCount, std::bind(&BackendRenderer::FlushGeometry, this, _1, _2, _3), kBatchSize, kBatchSize);
+      GetReadingThreadsCount(), std::bind(&BackendRenderer::FlushGeometry, this, _1, _2, _3), kBatchSize, kBatchSize);
   m_trafficGenerator->Init();
 
   dp::TextureManager::Params params;

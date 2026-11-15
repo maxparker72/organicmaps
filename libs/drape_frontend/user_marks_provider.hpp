@@ -14,7 +14,13 @@
 
 #include "platform/placement_settings.hpp"
 
+#include <optional>
 #include <vector>
+
+namespace kml
+{
+struct AreaData;
+}  // namespace kml
 
 namespace df
 {
@@ -22,13 +28,15 @@ struct IDCollections
 {
   kml::MarkIdCollection m_markIds;
   kml::TrackIdCollection m_lineIds;
+  kml::AreaIdCollection m_areaIds;
 
-  bool IsEmpty() { return m_markIds.empty() && m_lineIds.empty(); }
+  bool IsEmpty() { return m_markIds.empty() && m_lineIds.empty() && m_areaIds.empty(); }
 
   void Clear()
   {
     m_markIds.clear();
     m_lineIds.clear();
+    m_areaIds.clear();
   }
 };
 
@@ -88,10 +96,12 @@ public:
   virtual FeatureID GetFeatureID() const = 0;
   virtual bool HasCreationAnimation() const = 0;
   virtual df::ColorConstant GetColorConstant() const = 0;
+  /// Explicit theme-independent color; only Bookmark overrides it for custom (non-preset) colors.
+  virtual std::optional<dp::Color> GetCustomColor() const { return std::nullopt; }
   virtual bool IsMarkAboveText() const = 0;
   virtual float GetSymbolOpacity() const = 0;
 
-  /// Used in CreateSymbolOverlayHandle only.
+  /// Non-POI sprites need an overlay handle to participate in hit testing.
   virtual bool IsSymbolSelectable() const = 0;
 
 private:
@@ -109,7 +119,6 @@ public:
 
   virtual kml::TrackId GetId() const { return m_id; }
   virtual kml::MarkGroupId GetGroupId() const = 0;
-  virtual bool IsVisible() const { return true; }
 
   virtual int GetMinZoom() const = 0;
   virtual DepthLayer GetDepthLayer() const = 0;
@@ -117,6 +126,8 @@ public:
   virtual dp::Color GetColor(size_t layerIndex) const = 0;
   virtual float GetWidth(size_t layerIndex) const = 0;
   virtual float GetDepth(size_t layerIndex) const = 0;
+  virtual bool IsVisible() const = 0;
+  virtual bool HasDirection() const = 0;
 
   using GeometryFnT = std::function<void(std::vector<m2::PointD> &&)>;
   virtual void ForEachGeometry(GeometryFnT && fn) const = 0;
@@ -147,5 +158,9 @@ public:
   virtual UserPointMark const * GetUserPointMark(kml::MarkId markId) const = 0;
   /// Never store UserLineMark reference.
   virtual UserLineMark const * GetUserLineMark(kml::TrackId lineId) const = 0;
+  virtual kml::AreaIdSet const & GetGroupAreaIds(kml::MarkGroupId groupId) const = 0;
+  virtual kml::AreaIdSet const & GetCreatedAreaIds() const = 0;
+  virtual kml::AreaIdSet const & GetRemovedAreaIds() const = 0;
+  virtual kml::AreaData const * GetUserArea(kml::AreaId areaId) const = 0;
 };
 }  // namespace df

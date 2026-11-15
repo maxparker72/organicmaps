@@ -15,7 +15,7 @@
     <string name="downloading">Downloaden…</string>
     <!-- Choose measurement on first launch alert - choose metric system button -->
     <string name="kilometres">Kilometers</string>
-    <!-- Choose measurement on first launch alert - choose imperial system button -->
+    <!-- Imperial measurement option: 1 mile = 1609.344 m; Swedish/Norwegian "mil" = 10 km -->
     <string name="miles">Mijlen</string>
     <!-- Update maps later button text -->
     <string name="later">Later</string>
@@ -120,7 +120,7 @@
     <string name="category_hotel">Hotel</string>
     <!-- Search category sight seeings and touristic attractions; any changes should be duplicated in categories.txt @category_tourism! -->
     <string name="category_tourism">Bezienswaardigheden</string>
-    <!-- Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! -->
+    <!-- Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! Also a bookmarks list group header when sorting by type. -->
     <string name="category_entertainment">Amusement</string>
     <!-- Search category for ATMs; any changes should be duplicated in categories.txt @category_atm! -->
     <string name="category_atm">Geldautomaat</string>
@@ -142,7 +142,7 @@
     <string name="category_police">Politie</string>
     <!-- Search category for recycling; any changes should be duplicated in categories.txt @category_recycling! -->
     <string name="category_recycling">Recycling</string>
-    <!-- Search category for water; any changes should be duplicated in categories.txt @category_water! also used to sort bookmarks by type -->
+    <!-- Search category for water; any changes should be duplicated in categories.txt @category_water! Also a bookmarks list group header when sorting by type. -->
     <string name="category_water">Water</string>
     <!-- Search category for RV facilities; any changes should be duplicated in categories.txt @category_rv! -->
     <string name="category_rv">Caravan Faciliteiten</string>
@@ -171,16 +171,12 @@
     <string name="cant_change_this_setting">Sorry, instellingen voor kaartopslag zijn momenteel uitgeschakeld.</string>
     <!-- Alert message that downloading is in progress. -->
     <string name="downloading_is_active">De kaart wordt nu gedownload.</string>
-    <!-- Share my position using SMS, %1$@ contains om:// and %2$@ https://omaps.app link WITHOUT NAME. @NOTE non-ascii symbols in the link will result in max 70 characters SMS instead of 140. -->
-    <string name="my_position_share_sms">Hey, kijk naar mijn huidige locatie op Organic Maps! %1$s of %2$s Heeft u geen offline-kaarten? Download ze hier: https://omaps.app/get</string>
-    <!-- Subject for emailed bookmark -->
-    <string name="bookmark_share_email_subject">Hey, bekijk mijn pin op Organic Maps!</string>
-    <!-- Subject for emailed position -->
-    <string name="my_position_share_email_subject">Hey, bekijk mijn huidige locatie op Organic Maps!</string>
-    <!-- Share my position using EMail, %1$@ is om:// and %2$@ is https://omaps.app link WITHOUT NAME -->
-    <string name="my_position_share_email">Hoi,\n\nMomenteel ben ik hier: %1$s. Klik op deze %2$s link of deze %3$s link om de plaats op de kaart te zien.\n\nBedankt.</string>
     <!-- Share button text which opens menu with more buttons, like Message, EMail, Facebook etc. -->
     <string name="share">Deel</string>
+    <!-- Email subject when sharing a place. %1$@ is the place name or address. -->
+    <string name="share_place_subject">%1$s op Organic Maps</string>
+    <!-- Email subject when sharing a place that has no name or address. -->
+    <string name="share_place_subject_default">Een plaats op Organic Maps</string>
     <!-- Share by email button text, also used in editor and About. -->
     <string name="email">E-mail</string>
     <!-- Text for message when used successfully copied something -->
@@ -219,6 +215,18 @@
     <string name="pref_map_3d_buildings_title">3D-gebouwen</string>
     <!-- A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled -->
     <string name="pref_map_3d_buildings_disabled_summary">3D-gebouwen worden uitgeschakeld in de energiebesparende modus</string>
+    <!-- Settings: title of the satellite imagery (custom raster tiles) screen -->
+    <string name="pref_bg_tiles_title">Satellietbeelden</string>
+    <!-- Settings «Satellite Imagery»: title of the tile server URL input field -->
+    <string name="pref_bg_tiles_url_title">Server-URL</string>
+    <!-- Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) -->
+    <string name="pref_bg_tiles_url_error">Voer een geldige URL in met {z}/{x}/{y}</string>
+    <!-- Settings «Satellite Imagery»: title of the on-disk tile cache size limit (in megabytes) -->
+    <string name="pref_bg_tiles_size_title">Cachegrootte (MB)</string>
+    <!-- Settings «Satellite Imagery»: opacity of vector area objects drawn over the imagery (0% hides them) -->
+    <string name="pref_bg_tiles_opacity_title">Dekking van vlakobjecten</string>
+    <!-- Settings «Satellite Imagery»: legal note that the user is responsible for the custom tile source they configure -->
+    <string name="pref_bg_tiles_disclaimer">Aangepaste tegelbronnen worden door u aangeleverd. Gebruik alleen diensten waartoe u toegang mag hebben. U bent verantwoordelijk voor naamsvermelding, licentievoorwaarden, API-sleutels, quota en gebruikslimieten.</string>
     <!-- Settings «Route» category: «Tts enabled» title -->
     <string name="pref_tts_enable_title">Gesproken instructies</string>
     <!-- Settings «Route» category: «Tts announce street names» title -->
@@ -231,7 +239,7 @@
     <string name="pref_tts_test_voice_title">Test gesproken aanwijzingen (TTS, Text-To-Speech)</string>
     <!-- Settings «Route» category: Pop-up message when clicking «Test Voice Directions» -->
     <string name="pref_tts_playing_test_voice">Controleer het volume of de tekst-naar-spraak instellingen van het systeem als je de stem nu niet hoort.</string>
-    <!-- Settings «Route» category: «Tts unavailable» subtitle -->
+    <!-- Settings «Route» category: «Tts unavailable» subtitle. Also used as a CarToast in Android Auto when the user taps the muted voice icon. -->
     <string name="pref_tts_unavailable">Niet beschikbaar</string>
     <string name="pref_map_auto_zoom">Automatisch zoomen</string>
     <string name="placepage_distance">Afstand</string>
@@ -300,38 +308,6 @@
     <string name="enable_location_services">Schakel locatiediensten in</string>
     <string name="save">Bewaar</string>
     <string name="create">aanmaken</string>
-    <!-- red color -->
-    <string name="red">Rood</string>
-    <!-- yellow color -->
-    <string name="yellow">Geel</string>
-    <!-- blue color -->
-    <string name="blue">Blauw</string>
-    <!-- green color -->
-    <string name="green">Groen</string>
-    <!-- purple color -->
-    <string name="purple">Paars</string>
-    <!-- orange color -->
-    <string name="orange">Oranje</string>
-    <!-- brown color -->
-    <string name="brown">Bruin</string>
-    <!-- pink color -->
-    <string name="pink">Roze</string>
-    <!-- deep purple color -->
-    <string name="deep_purple">Donkerpaars</string>
-    <!-- light blue color -->
-    <string name="light_blue">Lichtblauw</string>
-    <!-- cyan color -->
-    <string name="cyan">Blauwgroen</string>
-    <!-- teal color -->
-    <string name="teal">Smaragdgroen</string>
-    <!-- lime color -->
-    <string name="lime">Limoen</string>
-    <!-- deep orange color -->
-    <string name="deep_orange">Donkeroranje</string>
-    <!-- gray color -->
-    <string name="gray">Grijs</string>
-    <!-- blue gray color -->
-    <string name="blue_gray">Grijsblauw</string>
     <!-- Settings «Map» category: «Appearance» title -->
     <string name="pref_appearance_title">Weergave</string>
     <!-- Settings "Appearance" category: "Light" title, should be consistent with the pref_appearance_title translation. -->
@@ -367,6 +343,10 @@
     <!-- The message when user did not find anything in the search. -->
     <string name="search_not_found_query">Download de regio waar u zoekt of probeer een nabijgelegen stad/dorpnaam toe te voegen.</string>
     <string name="search_history_title">Zoekgeschiedenis</string>
+    <!-- Tracks are recorded or imported GPS paths. -->
+    <string name="bookmarks_backup_title">Back-up van bladwijzers en tracks</string>
+    <!-- Tracks are recorded or imported GPS paths. -->
+    <string name="bookmarks_backup_description">Bladwijzers en tracks kunnen worden opgenomen in Android-systeemback-ups als back-up op dit apparaat is ingeschakeld en ze de maximale grootte ervan niet overschrijden.</string>
     <string name="search_history_text">Snel toegang tot recente zoekopdrachten.</string>
     <string name="clear_search">Wis zoekgeschiedenis</string>
     <!-- Place Page link to Wikipedia article (if map object has it). -->
@@ -401,20 +381,15 @@
     <string name="editor_example_values">Voorbeeldwaarden</string>
     <string name="editor_correct_mistake">Corrigeer fout</string>
     <string name="editor_add_select_location">Locatie selecteren</string>
-    <string name="editor_report_problem_desription_1">Beschrijf het probleem gedetailleerd, zodat de OpenStreetMap-community de fout kan oplossen.</string>
-    <string name="editor_report_problem_desription_2">Of doe het zelf op https://www.openstreetmap.org/</string>
     <string name="editor_report_problem_send_button">Verzend</string>
-    <string name="editor_report_problem_title">Probleem</string>
-    <string name="editor_report_problem_no_place_title">Deze plaats bestaat niet</string>
-    <string name="editor_report_problem_under_construction_title">Gesloten voor onderhoud</string>
-    <string name="editor_report_problem_duplicate_place_title">Dubbele plaats</string>
     <string name="autodownload">Download kaarten automatisch</string>
     <!-- Place Page opening hours text -->
     <string name="daily">Dagelijks</string>
     <string name="twentyfour_seven">24/7</string>
     <string name="day_off_today">Vandaag gesloten</string>
     <string name="day_off">Gesloten</string>
-    <string name="today">Vandaag</string>
+    <string name="midnight">Middernacht</string>
+    <string name="noon">Middaguur</string>
     <string name="opens_in">Opent over %s</string>
     <string name="closes_in">Sluit over %s</string>
     <string name="closed">Gesloten</string>
@@ -457,7 +432,6 @@
     <string name="downloader_no_space_title">Niet genoeg ruimte</string>
     <!-- Message shown when there is not enough space to download maps -->
     <string name="downloader_no_space_message">Verwijder overbodige gegevens</string>
-    <string name="editor_login_error_dialog">Inlogfout.</string>
     <string name="editor_profile_changes">Gecontroleerde wijzigingen</string>
     <string name="editor_focus_map_on_location">Sleep de kaart om het kruis op de locatie van de plaats of het bedrijf te plaatsen.</string>
     <string name="editor_edit_place_title">Bewerken</string>
@@ -466,8 +440,6 @@
     <!-- The second part of the editor_edit_place_name_hint to explain that name should be entered in a local language, see https://wiki.openstreetmap.org/wiki/Key:name -->
     <string name="editor_default_language_hint">Zoals het in de plaatselijke taal geschreven staat</string>
     <string name="editor_edit_place_category_title">Categorie</string>
-    <string name="detailed_problem_description">Gedetailleerde probleemomschrijving</string>
-    <string name="editor_report_problem_other_title">Een ander probleem</string>
     <string name="placepage_add_business_button">Voeg een organisatie toe</string>
     <string name="message_invalid_feature_position">Hier kan geen object worden geplaatst</string>
     <!-- Text in About and OSM Login screens. First %@ is replaced by a local, human readable date. -->
@@ -504,13 +476,18 @@
     <string name="current_location_unknown_error_title">Huidige locatie is onbekend.</string>
     <!-- abbreviation for kilometers per hour -->
     <string name="kilometers_per_hour">km/h</string>
+    <!-- Short label for miles per hour (1 mile = 1609.344 m), placed after a number; e.g. mph or mi/h -->
     <string name="miles_per_hour">mph</string>
+    <!-- Short label for hours (time unit), placed after a number -->
     <string name="hour">u</string>
+    <!-- Short label for minutes (time unit), placed after a number -->
     <string name="minute">min</string>
+    <!-- Short label for days (time unit), placed after a number -->
     <string name="day">d</string>
+    <!-- Short label for seconds (time unit), placed after a number -->
     <string name="second">s</string>
     <string name="placepage_more_button">Meer</string>
-    <!-- A disable button text in the explanation dialog that opens hotel details page on Kayak website. -->
+    <!-- Toolbar title of the Edit Bookmark screen. -->
     <string name="placepage_edit_bookmark_button">Bewerk bladwijzer</string>
     <string name="placepage_personal_notes_hint">Persoonlijke aantekeningen (tekst of html)</string>
     <string name="editor_comment_hint">Reactie…</string>
@@ -539,7 +516,7 @@
     <string name="editor_share_to_all_dialog_message_1">Controleer dat je geen persoonlijke gegevens hebt ingevoerd.</string>
     <string name="editor_share_to_all_dialog_message_2">OpenStreetMap-editors zullen de wijzigingen controleren en contact met u opnemen als ze vragen hebben.</string>
     <string name="navigation_stop_button">Stop</string>
-    <!-- Shown as toast when starting the recent track recording -->
+    <!-- Shown while a track is being recorded: the start toast, the notification title and the home screen widget status. -->
     <string name="track_recording">Het spoor opnemen</string>
     <!-- For the first routing -->
     <string name="accept">Accepteer</string>
@@ -554,11 +531,7 @@
     <string name="mobile_data_description">Mobiel internet is vereist voor het weergeven van gedetailleerde informatie over plaatsen, zoals foto\'s, prijzen en beoordelingen.</string>
     <string name="mobile_data_option_never">Gebruik nooit</string>
     <string name="mobile_data_option_ask">Vraag altijd</string>
-    <string name="traffic_update_maps_text">Om verkeersgegevens weer te geven, moeten de kaarten bijgewerkt worden.</string>
     <string name="big_font">Vergroot lettergrootte op de kaart</string>
-    <string name="traffic_update_app">Gelieve Organic Maps bij te werken</string>
-    <!-- "traffic" as in "road congestion" -->
-    <string name="traffic_data_unavailable">Verkeersgegevens zijn niet beschikbaar</string>
     <string name="enable_logging">Logboekregistratie inschakelen</string>
     <!-- Settings: "Send general feedback" button -->
     <string name="feedback_general">Algemene feedback</string>
@@ -567,15 +540,12 @@
     <string name="prefs_languages_information_off_link">Gelieve deze handleiding te lezen voor meer informatie.</string>
     <string name="transliteration_title">Transliteratie in het Latijnse alfabet</string>
     <string name="learn_more">Meer informatie</string>
-    <!-- User selected the destination by pressing Route To, but the current position is unknown. User needs to select a starting point of a route using search or by tapping on the map and then pressing "Route From". -->
-    <string name="routing_add_start_point">Gebruik zoeken of tik op de kaart om een startpunt voor de route toe te voegen</string>
-    <!-- User selected the start of a route by pressing Route From. Now the destination of a route should be selected using search or by tapping on the map and then pressing "Route To". -->
-    <string name="routing_add_finish_point">Gebruik zoeken of tik op de kaart om een bestemmingspunt toe te voegen</string>
-    <string name="planning_route_manage_route">Beheer route</string>
-    <string name="button_plan">Plan</string>
     <string name="placepage_remove_stop">Verwijder tussenstop</string>
-    <string name="placepage_add_stop">Voeg tussenstop toe</string>
-    <string name="saved">Opgeslagen</string>
+    <!-- Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. -->
+    <string name="route_add_destination">Bestemming toevoegen</string>
+    <!-- Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. -->
+    <string name="placepage_add_stop">Stop toevoegen</string>
+    <string name="drag_to_reorder">Herschikken</string>
     <!-- Alert to ask user relogin to OpenStreetMap with OAuth2 flow after OAuth1 authentication is deprecated. -->
     <string name="alert_reauth_message">Log in op OpenStreetMap om al je kaartbewerkingen automatisch te uploaden. Meer informatie <a href="https://github.com/organicmaps/organicmaps/issues/6144">hier</a>.</string>
     <string name="dialog_error_storage_title">Probleem met opslagtoegang</string>
@@ -611,6 +581,11 @@
         <item quantity="other">%d bestanden gevonden. Je zult ze na de conversie zien.</item>
     </plurals>
     <string name="restore">Zet terug</string>
+    <!-- Number of imported polygon areas (zones or regions) saved in a bookmark list, not their surface size. -->
+    <plurals name="areas">
+        <item quantity="one">%d gebied</item>
+        <item quantity="other">%d gebieden</item>
+    </plurals>
     <plurals name="tracks">
         <item quantity="zero">%d tracks</item>
         <item quantity="one">%d track</item>
@@ -625,6 +600,9 @@
     <string name="button_layer_hiking">Wandel</string>
     <!-- Cycling routes layer name in the Styles and Layers dialog -->
     <string name="button_layer_cycling">Fiets</string>
+    <!-- Map layers menu: toggle button for the satellite imagery layer -->
+    <string name="button_layer_satellite">Satelliet</string>
+    <!-- Subway map layer button; also the spoken name of the subway (metro, underground) transport type, read by screen readers before a line number on transit line badges. -->
     <string name="button_layer_subway">Metro</string>
     <string name="layers_title">Kaartstijlen en -lagen</string>
     <string name="bookmarks_empty_list_title">Deze lijst is leeg</string>
@@ -662,7 +640,19 @@
     <string name="show_to_the_right">Rechts weergeven</string>
     <string name="show_at_the_bottom">Onderaan weergeven</string>
     <string name="enable_logging_warning_message">Schakel deze optie tijdelijk in om gedetailleerde logboekregistraties omtrent jouw probleem op te slaan en te verzenden tijdens \" Rapporteer een probleem\" in het help menu. Schakel deze optie alleen in op verzoek van Organic Maps ondersteuning.</string>
+    <!-- Driving profile in routing options settings. -->
+    <string name="routing_options_driving">Auto</string>
+    <!-- Cycling profile in routing options settings. -->
+    <string name="routing_options_cycling">Fiets</string>
+    <!-- Walking profile in routing options settings; also the label of a walking leg in transit route details. -->
+    <string name="routing_options_walking">Lopen</string>
+    <!-- Section heading for routing settings shared by every routing mode. -->
+    <string name="routing_options_all_modes">Alle vervoerswijzen</string>
     <string name="driving_options_title">Route instellingen</string>
+    <!-- Routing setting that automatically reorders intermediate stops -->
+    <string name="route_optimization">Routeoptimalisatie</string>
+    <!-- Explains that route optimization automatically reorders intermediate stops -->
+    <string name="route_optimization_description">Rangschikt tussenstops automatisch opnieuw om een efficiëntere route te maken.</string>
     <!-- Recommended length for CarPlay and Android Auto is around 25-27 characters -->
     <string name="avoid_tolls">Vermijd tolwegen</string>
     <!-- Recommended length for CarPlay and Android Auto is around 25-27 characters -->
@@ -672,11 +662,15 @@
     <string name="avoid_motorways">Vermijd snelwegen</string>
     <string name="unable_to_calc_alert_title">Kan route niet berekenen</string>
     <string name="unable_to_calc_alert_subtitle">Helaas konden we geen route berekenen. Dit kan komen door uw gekozen opties of door incomplete OpenStreetMap-data. Wijzig de instellingen en probeer het opnieuw.</string>
-    <string name="define_to_avoid_btn">Definieer wegen om te vermijden</string>
-    <string name="change_driving_options_btn">Route-instellingen ingeschakeld</string>
     <string name="toll_road">Tolweg</string>
     <string name="unpaved_road">Onverharde weg</string>
     <string name="ferry_crossing">Veerbootverbinding</string>
+    <!-- Route warning shown on the map for this obstacle type. -->
+    <string name="road_warning_steps">Trap</string>
+    <!-- Route warning shown on the map for this obstacle type. -->
+    <string name="road_warning_gate">Poort</string>
+    <!-- Route warning shown on the map for this obstacle type. -->
+    <string name="road_warning_lift_gate">Slagboom</string>
     <!-- A generic "Yes" button in dialogs -->
     <string name="yes">Ja</string>
     <!-- A generic "No" button in dialogs -->
@@ -718,6 +712,7 @@
     <string name="opens_at">Opent om %s</string>
     <string name="closes_at">Sluit om %s</string>
     <string name="editor_add_select_category_all_subtitle">Alle categorieën</string>
+    <string name="placepage_replace_stop">Vervang Stop</string>
 
     <!-- SECTION: Bookmark types used for sorting -->
     <string name="food_places">Voedsel</string>
@@ -736,17 +731,21 @@
     <string name="medicine">Geneeskunde</string>
     <string name="search_in_the_list">Zoek in de lijst</string>
     <string name="religious_places">Religieuze plaatsen</string>
+    <!-- Button that starts multi-selection in a bookmark list. -->
+    <string name="select">Selecteren</string>
+    <!-- Action that selects every bookmark and track in a bookmark list. -->
+    <string name="select_all">Alles selecteren</string>
+    <!-- Action that clears the multi-selection in a bookmark list. -->
+    <string name="deselect_all">Selectie opheffen</string>
     <string name="select_list">Kies een lijst</string>
-    <string name="button_layer_isolines">Contourlijnen</string>
-    <string name="isolines_activation_error_dialog">Als u gebruik wilt maken van hoogtelijnen, moet u de kaart van het gewenste gebied bijwerken of downloaden</string>
-    <string name="isolines_location_error_dialog">Hoogtelijnen zijn nog niet beschikbaar in deze regio</string>
+    <!-- Layers menu: label of the 3D terrain layer button -->
+    <string name="button_layer_terrain">3D-terrein</string>
+    <string name="isolines_location_error_dialog">Werk deze regio bij om hoogtelijnen te zien</string>
     <string name="elevation_profile_ascent">Stijging</string>
     <string name="elevation_profile_descent">Daling</string>
     <string name="elevation_profile_min_elevation">Min. hoogte</string>
     <string name="elevation_profile_max_elevation">Max. hoogte</string>
     <string name="elevation_profile_difficulty">Moeilijkheid</string>
-    <string name="elevation_profile_distance">Afst.:</string>
-    <string name="elevation_profile_time">Tijd:</string>
     <string name="isolines_toast_zooms_1_10">Zoom in om hoogte/dal lijnen te bekijken</string>
     <string name="downloader_loading_ios">Downloaden</string>
     <string name="download_map_title">Download de wereldoverzichtskaart</string>
@@ -830,15 +829,14 @@
     <string name="pref_tts_no_system_tts">Instellingen voor spraaksynthese zijn niet gevonden, weet je zeker dat je apparaat dit ondersteunt?</string>
     <string name="drive_through">Drive-through</string>
     <string name="clear_the_search">Wis de zoekopdracht</string>
+    <!-- Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. -->
     <string name="zoom_in">Inzoomen</string>
-    <!-- Accessibility text for the zoom-out button on the map -->
-    <string name="zoom_out">Zoom uit</string>
+    <!-- Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. -->
+    <string name="zoom_out">Uitzoomen</string>
     <!-- Restaurant or other food place's menu URL field in the Editor -->
     <string name="website_menu">Menulink</string>
     <!-- Button in the Place Page which opens a restaurant or other food place's menu in a browser -->
     <string name="view_menu">Bekijk menu</string>
-    <!-- Title for the "Open in Another App" button on the PlacePage. -->
-    <string name="open_in_app">Openen in een andere applicatie</string>
     <!-- To indicate if the place proposed self service… -->
     <string name="self_service">Zelfbediening</string>
     <string name="select_option">Selecteer optie</string>
@@ -846,18 +844,16 @@
     <string name="outdoor_seating">Zitplaatsen buiten</string>
     <!-- Disclaimer summary shown when Power Saving Mode is enabled -->
     <string name="power_save_dialog_summary">Voor de meest nauwkeurige navigatie raden we aan om de energiebesparende modus uit te schakelen in de batterij-instellingen van de telefoon.</string>
+    <!-- Title of the one-time warning about battery optimization when starting track recording on Android. -->
+    <string name="background_recording_warning_title">Waarschuwing voor trackopname op de achtergrond</string>
+    <!-- One-time warning when starting track recording on Android. "Never sleeping apps" is a Samsung setting. The Settings button opens Samsung's list when available, with fallbacks to Android battery optimization settings or general settings. -->
+    <string name="background_recording_warning_message">Om te voorkomen dat de trackopname stopt als het scherm uit is, sluit u Organic Maps uit van batterijoptimalisatie. Voeg de app op Samsung-toestellen toe aan de lijst ‘Apps die nooit sluimeren’.</string>
     <!-- Prompt to start recording a track. -->
     <string name="start_track_recording">Route opnemen</string>
     <!-- Prompt for stopping a track recording. -->
     <string name="stop_track_recording">Stop opname van route</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
+    <!-- Subtitle of the place page of the track being recorded, and the name and title of the home screen widget. -->
     <string name="track_recording_title">Track-opname</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
-    <string name="stop_without_saving">Stoppen zonder op te slaan</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
-    <string name="continue_recording">Opname voortzetten</string>
-    <!-- Title for the alert when saving a track recording. -->
-    <string name="track_recording_alert_title">Opname opslaan in bladwijzers en tracks?</string>
     <!-- Message for the toast when saving the track recording is finished but nothing to save. -->
     <string name="track_recording_toast_nothing_to_save">Route is leeg - niets om op te slaan</string>
     <!-- Error message when there are no File Manager apps installed to select a folder when importing Bookmarks and Tracks -->
@@ -865,20 +861,38 @@
     <string name="choose_color">Kies een kleur</string>
     <string name="edit_track">Route bewerken</string>
     <string name="uri_open_location_failed">Geen app geïnstalleerd die de locatie kan openen</string>
-    <!-- preference string for using auto theme only in navigation mode -->
-    <string name="nav_auto">Auto tijdens navigatie</string>
     <!-- Setting option to sync the app's theme with the operating system's dark/light mode -->
     <string name="follow_system">Systeem volgen</string>
     <!-- Title of the bottom sheet when sharing the track -->
     <string name="share_track">Titel van het onderste blad bij delen van het spoor</string>
     <!-- Title for the dialog when deleting a track with the track name passed in %@ -->
     <string name="delete_track_dialog_title">Verwijder %s?</string>
+    <!-- Bookmark list title in multi-selection mode. %d is the number of selected bookmarks and tracks. -->
+    <plurals name="n_items_selected">
+        <item quantity="zero">%d geselecteerd</item>
+        <item quantity="one">%d geselecteerd</item>
+        <item quantity="other">%d geselecteerd</item>
+    </plurals>
+    <!-- Title for the dialog when deleting several bookmarks and tracks at once. %d is their number. -->
+    <plurals name="delete_n_items_dialog_title">
+        <item quantity="zero">%d items verwijderen?</item>
+        <item quantity="one">%d item verwijderen?</item>
+        <item quantity="other">%d items verwijderen?</item>
+    </plurals>
+    <!-- move track or bookmark from the list button text -->
+    <string name="move">Verplaats</string>
+    <!-- Text for the editing the Track's color button. -->
+    <string name="change_color">Verander kleur</string>
+    <!-- Text for the hiding track. -->
+    <string name="hide_track">Route verbergen</string>
+    <!-- Text for the showing track. -->
+    <string name="show_track">Route tonen</string>
+
+    <!-- SECTION: Uncategorized -->
+    <!-- Short label of the user's position marker on the elevation profile chart. Where a bare pronoun would be unnatural or gendered, a location noun ("My location") is preferred. -->
+    <string name="you">Jij</string>
 
     <!-- SECTION: gps strings -->
-    <!-- Login to OSM button text -->
-    <string name="login_osm_credentials">Inloggen met wachtwoord</string>
-    <!-- Login to OSM button text -->
-    <string name="login_osm_browser">Inloggen met browser</string>
     <!-- Editor section title that shows recently used categories (types of objects) when adding a place on the map -->
     <string name="editor_add_select_category_recent_subtitle">Onlangs gebruikt</string>
     <!-- Toast message shown when bookmark colors are changed in category settings -->
@@ -899,4 +913,43 @@
     <string name="color_picker_hex_label">sRGB hexadecimale kleur #</string>
     <!-- Tab label for the grid color picker mode -->
     <string name="color_picker_grid">Raster</string>
+    <!-- Accessibility label for the voice-search mic button in the search bar -->
+    <string name="voice_search">Zoeken met spraak</string>
+    <!-- Accessibility label of the icon-only button beside the search field, shown while choosing or replacing a route point; it opens a full-screen map picker with a crosshair -->
+    <string name="choose_on_map">Kies op de kaart</string>
+    <!-- Search field hint and full-screen map point picker title shown while choosing the starting point of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="choose_start_location">Startpunt</string>
+    <!-- Search field hint and full-screen map point picker title shown while choosing the destination of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="choose_destination">Bestemming</string>
+    <!-- Search field hint and full-screen map point picker title shown while replacing the already set starting point of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="change_start_location">Startpunt wijzigen</string>
+    <!-- Search field hint and full-screen map point picker title shown while replacing the already set destination of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="change_destination">Bestemming wijzigen</string>
+    <!-- Search field hint and full-screen map point picker title shown while replacing an already added intermediate stop of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="change_stop_along_route">Stop wijzigen</string>
+    <!-- Toast shown when the user tries to add one more intermediate stop to a route that already holds the maximum allowed number -->
+    <string name="routing_max_stops_reached">Het maximale aantal stops is bereikt</string>
+    <!-- Hint under the title of the full-screen route point picker: a crosshair stays fixed in the centre of the screen while the user moves the map under it -->
+    <string name="choose_point_on_map_hint">Verplaats en zoom in of uit op de kaart om het kruis te plaatsen</string>
+    <!-- Track recording notification button: stops the recording and saves the recorded track. -->
+    <string name="track_recording_stop_and_save">Stoppen en opslaan</string>
+    <!-- Track recording home screen widget button: opens the app to save or delete the recorded track. -->
+    <string name="track_recording_finish">Beëindigen</string>
+    <!-- Accessibility label for the button that reverses the complete planned route, including intermediate stops. -->
+    <string name="reverse_route">Route omkeren</string>
+    <!-- Title of the transit route details screen, shown when the user taps the public transport summary tile. -->
+    <string name="transit_details_title">Reisdetails</string>
+    <!-- Heading for a user-added intermediate point (Add Stop) in the transit details breakdown (%1$d = its order in the route, starting at 1). -->
+    <string name="transit_waypoint_label">Tussenstop %1$d</string>
+    <!-- Number of stops ridden on a single transit line. -->
+    <plurals name="transit_stops_count">
+        <item quantity="one">%d halte</item>
+        <item quantity="other">%d haltes</item>
+    </plurals>
+    <!-- Spoken name of the bus transport type, read by screen readers before a line number on transit line badges (route summary and details). -->
+    <string name="transit_type_bus">Bus</string>
+    <!-- Spoken name of the train transport type, read by screen readers before a line number on transit line badges (route summary and details). -->
+    <string name="transit_type_train">Trein</string>
+    <!-- Spoken name of the tram (streetcar) transport type, read by screen readers before a line number on transit line badges (route summary and details). -->
+    <string name="transit_type_tram">Tram</string>
 </resources>

@@ -4,7 +4,7 @@
 #import "PlacePagePreviewData+Core.h"
 #import "TrackInfo.h"
 
-#include "3party/opening_hours/opening_hours.hpp"
+#include "opening_hours/opening_hours.hpp"
 
 static PlacePageDataSchedule convertOpeningHours(std::string_view rawOH)
 {
@@ -16,8 +16,7 @@ static PlacePageDataSchedule convertOpeningHours(std::string_view rawOH)
     return schedule;
   }
 
-  /// @todo Avoid temporary string when OpeningHours (boost::spirit) will allow string_view.
-  osmoh::OpeningHours oh((std::string(rawOH)));
+  osmoh::OpeningHours oh(rawOH);
   if (!oh.IsValid())
   {
     schedule.state = PlacePageDataOpeningHoursUnknown;
@@ -74,7 +73,9 @@ static PlacePageDataSchedule convertOpeningHours(std::string_view rawOH)
   {
     _title = rawData.GetTitle().empty() ? nil : @(rawData.GetTitle().c_str());
     _secondaryTitle = rawData.GetSecondaryTitle().empty() ? nil : @(rawData.GetSecondaryTitle().c_str());
-    _subtitle = rawData.GetSubtitle().empty() ? nil : @(rawData.GetSubtitle().c_str());
+    auto const previewSubtitle = rawData.GetPreviewSubtitle();
+    _subtitle = previewSubtitle.empty() ? nil : @(previewSubtitle.c_str());
+    _routeSubtitle = rawData.GetSubtitle().empty() ? nil : @(rawData.GetSubtitle().c_str());
     _secondarySubtitle = rawData.GetSecondarySubtitle().empty() ? nil : @(rawData.GetSecondarySubtitle().c_str());
 
     if (!rawData.IsTrack())

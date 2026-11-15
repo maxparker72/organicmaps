@@ -4,7 +4,6 @@
 #include "platform/local_country_file_utils.hpp"
 #include "platform/mwm_version.hpp"
 #include "platform/platform.hpp"
-#include "platform/servers_list.hpp"
 
 #include "base/file_name_utils.hpp"
 
@@ -40,7 +39,26 @@ UNIT_TEST(Downloader_GetFilePathByUrl)
   }
 
   TEST_EQUAL(downloader::GetFilePathByUrl("/maps/220314/Belarus_Brest Region.mwm"),
-             base::JoinPath(GetPlatform().WritableDir(), "220314/Belarus_Brest Region.mwm.ready"), ());
+             base::JoinPath(GetPlatform().WritableDir(), "220314", "Belarus_Brest Region.mwm.ready"), ());
+
+  {
+    // The terrain blocks: terrain/<version>/<name>.twm -> <writable>/terrain/<version>/<name>.twm.ready.
+    auto const url = downloader::GetTerrainDownloadUrl(260728, "N40E040.twm");
+    TEST_EQUAL(url, "terrain/260728/N40E040.twm", ());
+    TEST_EQUAL(downloader::GetFilePathByUrl(url),
+               base::JoinPath(GetPlatform().WritableDir(), "terrain", "260728", "N40E040.twm.ready"), ());
+  }
+}
+
+UNIT_TEST(Downloader_TerrainDataDir)
+{
+  auto const path = base::JoinPath(GetPlatform().WritableDir(), "custom", "terrain", "260728", "N40E040.twm");
+  TEST_EQUAL(platform::GetFilePath(260728, "custom", "N40E040", MapFileType::Terrain), path, ());
+  TEST_EQUAL(platform::GetFileDownloadPath(260728, "custom", "N40E040", MapFileType::Terrain), path + ".ready", ());
+  TEST_EQUAL(platform::GetFileDownloadPath(260728, "N40E040", MapFileType::Terrain),
+             downloader::GetFilePathByUrl("terrain/260728/N40E040.twm"), ());
+  TEST_EQUAL(platform::GetFilePath(0, "custom", "N40E040", MapFileType::Terrain),
+             base::JoinPath(GetPlatform().WritableDir(), "custom", "terrain", "0", "N40E040.twm"), ());
 }
 
 UNIT_TEST(Downloader_IsUrlSupported)
@@ -58,6 +76,12 @@ UNIT_TEST(Downloader_IsUrlSupported)
   TEST(!downloader::IsUrlSupported("maps/x/Luna.mwm"), ());
   TEST(!downloader::IsUrlSupported("macarena/0/Luna.mwm"), ());
   TEST(!downloader::IsUrlSupported("/hack/maps/0/Luna.mwm"), ());
+
+  TEST(downloader::IsUrlSupported("terrain/260728/N40E040.twm"), ());
+  TEST(!downloader::IsUrlSupported("terrain/abc/N40E040.twm"), ());
+  TEST(!downloader::IsUrlSupported("terrain/-1/N40E040.twm"), ());
+  TEST(!downloader::IsUrlSupported("terrain/260728/N40E040.mwm"), ());
+  TEST(!downloader::IsUrlSupported("terrain/N40E040.twm"), ());
   TEST(!downloader::IsUrlSupported("0/Luna.mwm"), ());
   TEST(!downloader::IsUrlSupported("maps/0/Luna"), ());
   TEST(!downloader::IsUrlSupported("0/Luna.mwm"), ());
@@ -86,41 +110,22 @@ UNIT_TEST(Downloader_IsUrlSupported)
   TEST(!downloader::IsUrlSupported("Luna"), ());
 }
 
-UNIT_TEST(Downloader_ParseMetaConfig)
+UNIT_TEST(Downloader_RejectsInvalidFileNames)
 {
-  auto cfg = downloader::ParseMetaConfig(R"({"servers":[ "https://url1/", "https://url2/" ]})");
-
-  TEST(cfg, ());
-  TEST_EQUAL(cfg->servers.size(), 2, ());
-  TEST_EQUAL(cfg->servers[0], "https://url1/", ());
-  TEST_EQUAL(cfg->servers[1], "https://url2/", ());
-
-  cfg = downloader::ParseMetaConfig(R"(
+  for (auto const & path : {"maps/260728/", "diffs/260728/260727/", "terrain/260728/"})
+  {
+    auto const extension = std::string(path).starts_with("terrain/") ? ".twm"
+                         : std::string(path).starts_with("diffs/")   ? ".mwmdiff"
+                                                                     : ".mwm";
+    for (auto const & name : {"../N40E040", "%2E%2E%2FN40E040", "%2fN40E040", "N40E040%2FN40E041", "N40E040%5CN40E041",
+                              "N40E040%00", "N40E040.extra", ".N40E040", "N40E040.", ""})
     {
-      "servers": [ "https://url1/", "https://url2/" ],
-      "settings": {
-        "DonateUrl": "value1",
-        "NY": "value2",
-        "key3": "value3"
-      }
+      auto const url = std::string(path) + name + extension;
+      TEST(!downloader::IsUrlSupported(url), (url));
     }
-  )");
-  TEST(cfg, ());
-  TEST_EQUAL(cfg->servers.size(), 2, ());
-  TEST_EQUAL(cfg->servers[0], "https://url1/", ());
-  TEST_EQUAL(cfg->servers[1], "https://url2/", ());
-  TEST_EQUAL(cfg->settings.size(), 3, ());
-  TEST_EQUAL(cfg->settings["DonateUrl"], "value1", ());
-  TEST_EQUAL(cfg->settings["NY"], "value2", ());
-  TEST_EQUAL(cfg->settings["key3"], "value3", ());
 
-  TEST(!downloader::ParseMetaConfig("Broken JSON"), ());
-
-  TEST(!downloader::ParseMetaConfig("[]"), ("Empty array"));
-
-  TEST(!downloader::ParseMetaConfig("{}"), ("Empty object"));
-
-  TEST(!downloader::ParseMetaConfig(R"({"no_servers": "invalid"})"), ());
-
-  TEST(!downloader::ParseMetaConfig(R"({"servers": "invalid"})"), ());
+    auto const url = std::string(path) + "N40E040" + extension;
+    TEST(downloader::IsUrlSupported(url), (url));
+  }
+  TEST(downloader::IsUrlSupported("terrain/260728/N40E040%2Etwm"), ());
 }

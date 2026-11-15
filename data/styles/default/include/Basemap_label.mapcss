@@ -509,17 +509,12 @@ line|z18-[historic=citywalls],
 line|z18-[man_made=embankment],
 {font-size: 10;}
 
-/* 6.WATER
-  Treat landuse=reservoir same as natural=water.
-  It is deprectated and will be replaced with natural=water=reservoir.
-*/
+/* 6.WATER */
 
 node|z1-[place=ocean],
 node|z4-[place=sea],
-area|z10-13[landuse=reservoir][bbox_area>=4000000],
 area|z8-9[natural=water][water=lake],
 area|z10-13[natural=water][!tunnel][bbox_area>=4000000],
-area|z14-[landuse=reservoir],
 area|z14-[natural=water][!tunnel],
 line|z11-[waterway=river],
 line|z13-[waterway=stream],
@@ -530,9 +525,8 @@ node|z14-[natural=strait],
 node|z14-[natural=bay],
 node|z16-[natural=wetland],
 area|z16-[natural=wetland],
-{text: name; text-color: @water_label;}
+{text: name; text-color: @water_label; text-halo-radius: 1; text-halo-opacity: 0.2; text-halo-color: @water_label_halo;}
 
-area|z10-13[landuse=reservoir][bbox_area<4000000],
 area|z10-13[natural=water][!tunnel][bbox_area<4000000],
 {text: none;}
 
@@ -550,7 +544,6 @@ node|z5-[place=ocean]
 node|z4-[place=sea]
 {font-size: 12;}
 
-area|z10-[landuse=reservoir],
 area|z8-9[natural=water][water=lake],
 area|z10-[natural=water][!tunnel],
 {font-size: 9;}
@@ -565,14 +558,12 @@ area|z10-16[natural=water][water=wastewater],
 node|z14-15[natural=bay],
 node|z14-15[natural=strait],
 area|z14-15[natural=water][!tunnel],
-area|z14-15[landuse=reservoir],
 {font-size: 10;}
 
 node|z16-[natural=bay],
 node|z16-[natural=strait],
 area|z16-[natural=wetland],
 area|z16-[natural=water][!tunnel],
-area|z16-[landuse=reservoir],
 {font-size: 11;}
 
 /* 6.2 Line water(river,canal etc.) Do not draw tunnel waterways */
@@ -582,18 +573,18 @@ line|z13-14[waterway=stream],
 line|z13-14[waterway=canal],
 line|z13-14[waterway=fish_pass],
 line|z13-14[natural=strait],
-{font-size: 10;text:name;text-color: @water_label;}
+{font-size: 10; text:name; text-color: @water_label; text-halo-radius: 1; text-halo-opacity: 0.2; text-halo-color: @water_label_halo;}
 line|z15-17[waterway=stream],
 line|z15-17[waterway=canal],
 line|z15-17[waterway=fish_pass],
 line|z15-17[natural=strait],
-{font-size: 11;text:name;text-color: @water_label;}
+{font-size: 11; text:name; text-color: @water_label; text-halo-radius: 1; text-halo-opacity: 0.2; text-halo-color: @water_label_halo;}
 line|z15-[waterway=river],
 line|z18-[waterway=stream],
 line|z18-[waterway=canal],
 line|z18-[waterway=fish_pass],
 line|z18-[natural=strait],
-{font-size: 12;text:name;text-color: @water_label;}
+{font-size: 12; text:name; text-color: @water_label; text-halo-radius: 1; text-halo-opacity: 0.2; text-halo-color: @water_label_halo;}
 
 line[waterway]
 {text-position: line;}
@@ -764,7 +755,7 @@ line|z14-[isoline=step_100],
 {text:name;font-size: 9;fill-opacity: 0.7;text-color: @label_isoline100;}
 
 line|z16-[isoline=step_50],
-line|z17-[isoline=zero],
+line|z15-[isoline=zero],
 {text:name;font-size: 9;fill-opacity: 0.7;text-color: @label_isoline50;}
 
 line|z17-[isoline=step_10],

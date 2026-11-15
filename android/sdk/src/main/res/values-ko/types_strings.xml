@@ -161,7 +161,8 @@
     <string name="type.barrier.bollard">기둥</string>
     <string name="type.barrier.border_control">국경통제소</string>
     <string name="type.barrier.city_wall">도시의 벽</string>
-    <string name="type.waterway.ditch">배수구</string>
+    <string name="type.waterway.ditch">배수 도랑</string>
+    <string name="type.waterway.ditch.intermittent">간헐적 배수 도랑</string>
     <string name="type.natural.water.moat">해자</string>
     <string name="type.natural.water.wastewater">폐수</string>
     <string name="type.barrier.entrance">입구</string>
@@ -328,44 +329,44 @@
     <string name="type.healthcare.speech_therapist">대화 요법</string>
 
     <!-- SECTION: Types: Roads -->
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">터널</string>
     <string name="type.highway.busway">버스전용도로</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">터널</string>
     <string name="type.highway.bus_stop">버스 정류장</string>
     <string name="type.highway.construction">공사 중 도로</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">터널</string>
     <string name="type.highway.footway">길</string>
     <string name="type.highway.footway.sidewalk">보도</string>
     <string name="type.highway.footway.crossing">횡단보도</string>
     <string name="type.highway.footway.area">길</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">터널</string>
     <string name="type.highway.ford">여울</string>
     <string name="type.highway.living_street">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">터널</string>
     <string name="type.highway.motorway">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">터널</string>
     <string name="type.highway.motorway_link">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">터널</string>
     <string name="type.highway.path">길</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -374,100 +375,102 @@
     <string name="type.highway.path.expert">매우 어렵거나 구별하기 어려운 흔적</string>
     <string name="type.highway.path.bicycle">길</string>
     <string name="type.highway.footway.bicycle">길</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">다리</string>
     <string name="type.highway.path.horse">길</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">터널</string>
     <string name="type.highway.pedestrian">거리</string>
     <string name="type.highway.pedestrian.area">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">터널</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">승강장</string>
     <string name="type.highway.primary">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">터널</string>
     <string name="type.highway.primary_link">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">터널</string>
     <string name="type.highway.raceway">경마장</string>
     <string name="type.highway.residential">거리</string>
     <string name="type.highway.residential.area">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">터널</string>
     <string name="type.highway.rest_area">휴게소</string>
     <string name="type.highway.road">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">다리</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">터널</string>
     <string name="type.highway.secondary">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">터널</string>
     <string name="type.highway.secondary_link">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">터널</string>
     <string name="type.highway.service">거리</string>
     <string name="type.highway.service.area">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">다리</string>
     <string name="type.highway.service.driveway">거리</string>
     <string name="type.highway.service.parking_aisle">거리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">터널</string>
     <string name="type.highway.speed_camera">스피드 카메라</string>
     <string name="type.highway.steps">길</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">터널</string>
     <string name="type.highway.tertiary">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">터널</string>
     <string name="type.highway.tertiary_link">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">터널</string>
     <string name="type.highway.track">거리</string>
     <string name="type.highway.track.area">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">다리</string>
     <string name="type.highway.track.grade1">거리</string>
     <string name="type.highway.track.no.access">거리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">터널</string>
     <string name="type.highway.traffic_signals">신호등</string>
     <string name="type.highway.trunk">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">터널</string>
     <string name="type.highway.trunk_link">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">터널</string>
     <string name="type.highway.unclassified">거리</string>
     <string name="type.highway.unclassified.area">거리</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">다리</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">터널</string>
     <string name="type.area_highway.footway">길</string>
     <string name="type.area_highway.living_street">거리</string>
@@ -504,6 +507,7 @@
     <string name="type.historic.castle.shiro">일본의 성</string>
     <string name="type.historic.castle.stately">성</string>
     <string name="type.historic.city_gate">성문</string>
+    <string name="type.man_made.ceremonial_gate">의식의 문</string>
     <string name="type.historic.citywalls">도시의 벽</string>
     <string name="type.historic.fort">요새</string>
     <string name="type.historic.gallows">교수대</string>
@@ -531,7 +535,8 @@
     <string name="type.historic.wreck">난파선</string>
     <string name="type.internet_access">인터넷</string>
     <string name="type.internet_access.wlan">인터넷</string>
-    <string name="type.landuse.basin">저수지</string>
+    <string name="type.landuse.basin">유수지</string>
+    <string name="type.landuse.basin.intermittent">간헐적 유수지</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">묘소</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
@@ -547,7 +552,6 @@
     <string name="type.landuse.grass">잔디</string>
     <string name="type.landuse.landfill">쓰레기 매립지</string>
     <string name="type.landuse.railway">차량 기지</string>
-    <string name="type.landuse.reservoir">저수지</string>
     <string name="type.leisure.dog_park">애완견 지역</string>
     <string name="type.leisure.fitness_centre">피트니스센터</string>
     <string name="type.leisure.fitness_station">피트니스 스테이션</string>
@@ -558,6 +562,7 @@
     <string name="type.leisure.miniature_golf">미니골프</string>
     <string name="type.leisure.hackerspace">해커스 스페이스</string>
     <string name="type.leisure.nature_reserve">천연보호구역</string>
+    <string name="type.leisure.bird_hide">조류 관찰 은신처</string>
     <string name="type.leisure.outdoor_seating">야외 좌석</string>
     <string name="type.leisure.park">공원</string>
     <string name="type.leisure.park.no.access">공원</string>
@@ -578,6 +583,8 @@
     <string name="type.leisure.water_park">워터파크</string>
     <string name="type.man_made.chimney">공장 굴뚝</string>
     <string name="type.man_made.lighthouse">등대</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">배수지</string>
     <string name="type.man_made.surveillance">감시 카메라</string>
     <string name="type.man_made.tower">타워</string>
     <!-- A huge telecommunications tower. Often a local monument or a landmark. -->
@@ -593,6 +600,8 @@
     <string name="type.man_made.water_tower">급수탑</string>
     <string name="type.man_made.water_well">우물</string>
     <string name="type.man_made.water_well.drinking_water_no">우물</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">정수장</string>
     <string name="type.man_made.windmill">풍차</string>
     <string name="type.military.bunker">벙커</string>
     <string name="type.natural">자연</string>
@@ -620,14 +629,17 @@
     <string name="type.natural.hot_spring">온천</string>
     <string name="type.natural.water.lake">호수</string>
     <string name="type.natural.water.lock">잠금 챔버</string>
-    <string name="type.natural.water.pond">연못이</string>
+    <string name="type.natural.water.pond">연못</string>
     <string name="type.natural.water.reservoir">저수지</string>
-    <string name="type.natural.water.basin">저수지</string>
+    <string name="type.natural.water.basin">유수지</string>
     <string name="type.natural.water.river">강</string>
+    <string name="type.natural.water.intermittent">간헐적 수역</string>
     <string name="type.natural.land">땅</string>
     <string name="type.natural.meadow">초지</string>
     <string name="type.natural.orchard">과수원</string>
     <string name="type.natural.peak">산</string>
+    <string name="type.natural.hill">언덕</string>
+    <string name="type.natural.arch">바위 아치</string>
     <string name="type.natural.saddle">산 안장</string>
     <string name="type.natural.rock">암석</string>
     <string name="type.natural.scrub">관목지</string>
@@ -700,6 +712,8 @@
     <string name="type.power.substation">변전소</string>
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">전봇대</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">승강장</string>
     <string name="type.railway.disused.tunnel">폐철도 터널</string>
     <string name="type.railway.funicular">케이블카</string>
     <string name="type.railway.halt">기차역</string>
@@ -1022,6 +1036,8 @@
     <string name="type.shop.greengrocer">청과상</string>
     <string name="type.shop.grocery">\"식료품점\"</string>
     <string name="type.shop.hairdresser">이발사</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">이발소</string>
     <string name="type.shop.health_food">\"건강식품 가게\"</string>
     <string name="type.shop.hearing_aids">보청기 스토어</string>
     <string name="type.shop.herbalist">허브 가게</string>
@@ -1144,6 +1160,7 @@
     <string name="type.sport.rugby_union">럭비 유니언</string>
     <string name="type.sport.running">달리기</string>
     <string name="type.sport.softball">소프트볼</string>
+    <string name="type.sport.pilates">필라테스</string>
     <string name="type.tourism.aquarium">수족관</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
     <string name="type.tourism.alpine_hut">마운틴 롯지</string>
@@ -1189,18 +1206,23 @@
     <string name="type.tourism.zoo.petting">페팅 동물원</string>
     <string name="type.waterway.access_point">수로 액세스 포인트</string>
     <string name="type.waterway.canal">운하</string>
+    <string name="type.waterway.canal.intermittent">간헐적 운하</string>
     <string name="type.waterway.canal.tunnel">운하</string>
     <string name="type.waterway.fish_pass">물고기 사다리</string>
-    <string name="type.natural.water.ditch">배수구</string>
+    <string name="type.waterway.fish_pass.intermittent">간헐적 물고기 사다리</string>
+    <string name="type.natural.water.ditch">배수 도랑</string>
     <string name="type.waterway.ditch.tunnel">암거</string>
+    <string name="type.waterway.drain">배수로</string>
+    <string name="type.waterway.drain.intermittent">간헐적 배수로</string>
+    <string name="type.natural.water.drain">배수로</string>
     <string name="type.waterway.drain.tunnel">암거</string>
     <string name="type.waterway.lock_gate">수문</string>
     <string name="type.waterway.river">강</string>
+    <string name="type.waterway.river.intermittent">간헐적 강</string>
     <string name="type.waterway.river.tunnel">강</string>
-    <string name="type.waterway.stream">강</string>
-    <string name="type.waterway.stream.ephemeral">강</string>
-    <string name="type.waterway.stream.intermittent">강</string>
-    <string name="type.waterway.stream.tunnel">강</string>
+    <string name="type.waterway.stream">개울</string>
+    <string name="type.waterway.stream.intermittent">간헐적 개울</string>
+    <string name="type.waterway.stream.tunnel">개울</string>
     <string name="type.waterway.waterfall">폭포</string>
     <string name="type.wheelchair.limited">휠체어 접근 제한</string>
     <string name="type.wheelchair.no">휠체어 접근 금지</string>
@@ -1218,6 +1240,7 @@
     <string name="type.self_service.no">셀프 서비스 없음</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">사회 시설</string>
+    <string name="type.amenity.stage">무대</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">응급 병동 입구</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1239,6 +1262,8 @@
     <string name="type.man_made.monitoring_station.weather">날씨 모니터링 스테이션</string>
     <string name="type.amenity.student_accommodation">학생 숙소</string>
     <string name="type.craft.watchmaker">워치메이커</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">창호 제작</string>
     <string name="type.xmas_feature.market">크리스마스 마켓</string>
     <string name="type.xmas_feature.tree">크리스마스 트리</string>
     <string name="type.amenity.hookah_lounge">후카 라운지</string>

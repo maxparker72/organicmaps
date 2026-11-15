@@ -1,5 +1,6 @@
 package app.organicmaps.downloader;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,11 +11,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
 import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
 import app.organicmaps.base.BaseMwmFragment;
-import app.organicmaps.base.BaseMwmFragmentActivity;
 import app.organicmaps.sdk.downloader.CountryItem;
 import app.organicmaps.sdk.downloader.MapManager;
 import app.organicmaps.sdk.util.StringUtils;
@@ -68,11 +67,16 @@ public class CountrySuggestFragment extends BaseMwmFragment implements View.OnCl
           else if (!item.countryId.equals(mDownloadingCountry.id))
             continue;
 
-          switch (item.newStatus)
+          // The map is usable while its terrain is still downloading or has failed.
+          if (MapManager.nativeHasLatestVersion(item.countryId))
           {
-          case CountryItem.STATUS_FAILED: updateViews(); return;
-
-          case CountryItem.STATUS_DONE: exitFragment(); return;
+            exitFragment();
+            return;
+          }
+          if (item.newStatus == CountryItem.STATUS_FAILED)
+          {
+            updateViews();
+            return;
           }
 
           break;
@@ -82,16 +86,21 @@ public class CountrySuggestFragment extends BaseMwmFragment implements View.OnCl
       }
 
       @Override
-      public void onProgress(String countryId, long localSize, long remoteSize)
+      public void onProgress(String countryId, MapManager.Progress progress)
       {
+        // The map bytes only: the fragment exits when the map is ready, the terrain follows it.
+        if (progress.mwmTotal == 0)
+          return;
+
         if (!isAdded())
           return;
 
         if (mDownloadingCountry == null)
           mDownloadingCountry = CountryItem.fill(countryId);
-        else
-          mDownloadingCountry.update();
+        else if (!mDownloadingCountry.id.equals(countryId))
+          return;
 
+        mDownloadingCountry.updateProgress(progress.mwmDownloaded, progress.mwmTotal);
         updateProgress();
       }
     });
@@ -133,7 +142,7 @@ public class CountrySuggestFragment extends BaseMwmFragment implements View.OnCl
 
     mBtnDownloadMap.setText(
         StringUtils.formatUsingUsLocale("%1$s (%2$s)", getString(R.string.downloader_download_map),
-                                        StringUtils.getFileSizeString(requireContext(), mCurrentCountry.totalSize)));
+                                        StringUtils.getFileSizeString(requireContext(), mCurrentCountry.downloadSize)));
   }
 
   private void initViews(View view)
@@ -158,7 +167,10 @@ public class CountrySuggestFragment extends BaseMwmFragment implements View.OnCl
     if (!isAdded() || MapManager.nativeGetDownloadedCount() > 0)
       return;
 
-    boolean downloading = MapManager.nativeIsDownloading();
+    // A failed map is not downloading even while its terrain still drains the shared queue.
+    boolean downloading = MapManager.isDownloading()
+                       && (mDownloadingCountry == null
+                           || MapManager.nativeGetStatus(mDownloadingCountry.id) != CountryItem.STATUS_FAILED);
     UiUtils.showIf(downloading, mLlActiveDownload);
     UiUtils.showIf(!downloading, mLlSelectDownload);
 
@@ -203,12 +215,9 @@ public class CountrySuggestFragment extends BaseMwmFragment implements View.OnCl
     }
     else if (id == R.id.btn__select_map)
     {
-      final FragmentActivity fragmentActivity = requireActivity();
-      if (!(fragmentActivity instanceof BaseMwmFragmentActivity))
-        throw new IllegalStateException("Activity is not instance of BaseMwmFragmentActivity");
-      ((BaseMwmFragmentActivity) fragmentActivity).replaceFragment(DownloaderFragment.class, null, null);
+      startActivity(new Intent(requireContext(), DownloaderActivity.class));
     }
     else if (id == R.id.wpv__download_progress)
-      MapManager.nativeCancel(mDownloadingCountry.id);
+      MapManager.cancel(mDownloadingCountry.id);
   }
 }

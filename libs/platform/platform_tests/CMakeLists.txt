@@ -10,6 +10,7 @@ set(SRC
   http_client_test.cpp
   get_text_by_id_tests.cpp
   glaze_test.cpp
+  gui_thread_tests.cpp
   language_test.cpp
   local_country_file_tests.cpp
   location_test.cpp
@@ -17,6 +18,8 @@ set(SRC
   platform_test.cpp
   meta_config_tests.cpp
   products_tests.cpp
+  irish_grid_utils_tests.cpp
+  os_grid_utils_tests.cpp
   utm_mgrs_utils_tests.cpp
 )
 
@@ -24,6 +27,11 @@ set(SRC
 # (macOS uses http_client_apple.mm instead).
 if (PLATFORM_DESKTOP AND NOT PLATFORM_MAC)
   list(APPEND SRC http_client_qt_retry_test.cpp)
+  list(APPEND SRC http_client_qt_http2_test.cpp)
+endif()
+
+if (PLATFORM_LINUX)
+  list(APPEND SRC platform_linux_migration_test.cpp)
 endif()
 
 omim_add_test(${PROJECT_NAME} ${SRC} REQUIRE_QT REQUIRE_SERVER)

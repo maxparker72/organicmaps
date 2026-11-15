@@ -5,9 +5,9 @@
 #include "drape/drape_tests/testing_graphics_context.hpp"
 
 #include "drape/batcher.hpp"
+#include "drape/batcher_helpers.hpp"
 #include "drape/gl_constants.hpp"
 #include "drape/index_storage.hpp"
-#include "drape/vertex_array_buffer.hpp"
 
 #include "base/stl_helpers.hpp"
 
@@ -25,6 +25,70 @@ using testing::Invoke;
 using testing::Return;
 using namespace dp;
 using namespace std::placeholders;
+
+namespace terrain_grid_batch_tests
+{
+UNIT_TEST(TerrainGridBatch_KeepsRowWindingAcrossBufferChange)
+{
+  struct Callbacks : dp::BatchCallbacks
+  {
+    uint32_t m_vertices = 4, m_indices = 12, m_changes = 0;
+    std::vector<uint8_t> m_storage;
+    std::vector<uint32_t> m_uploaded, m_result;
+    void FlushData(ref_ptr<dp::GraphicsContext>, dp::BindingInfo const &, void const *, uint32_t count) override
+    {
+      m_uploaded.push_back(count);
+      m_vertices -= count;
+    }
+    void * GetIndexStorage(uint32_t count, uint32_t & start) override
+    {
+      start = 0;
+      m_storage.resize(count * dp::IndexStorage::SizeOfIndex());
+      m_indices -= count;
+      return m_storage.data();
+    }
+    void SubmitIndices(ref_ptr<dp::GraphicsContext>) override
+    {
+      auto const size = dp::IndexStorage::SizeOfIndex();
+      for (size_t i = 0; i < m_storage.size(); i += size)
+      {
+        uint32_t index = 0;
+        std::memcpy(&index, m_storage.data() + i, size);
+        m_result.push_back(index);
+      }
+    }
+    uint32_t GetAvailableVertexCount() const override { return m_vertices; }
+    uint32_t GetAvailableIndexCount() const override { return m_indices; }
+    void ChangeBuffer(ref_ptr<dp::GraphicsContext>) override
+    {
+      ++m_changes;
+      m_vertices = 16;
+      m_indices = 64;
+    }
+  } callbacks;
+  float points[] = {0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 2, 1, 2, 0};
+  dp::BindingInfo binding(1);
+  auto & decl = binding.GetBindingDecl(0);
+  decl.m_attributeName = "position";
+  decl.m_componentCount = 2;
+  decl.m_componentType = gl_const::GLFloatType;
+  decl.m_offset = decl.m_stride = 0;
+  dp::AttributeProvider provider(1, 7);
+  provider.InitStream(0, binding, make_ref(points));
+  dp::TriangleStripBatch batch(callbacks, false /* canDivide */);
+  batch.BatchData(nullptr, make_ref(&provider));
+  TEST_EQUAL(callbacks.m_changes, 1, ());
+  TEST_EQUAL(callbacks.m_uploaded, std::vector<uint32_t>{7}, ("The row must move intact to the fresh buffer"));
+  TEST_EQUAL(callbacks.m_result, (std::vector<uint32_t>{0, 1, 2, 1, 3, 2, 2, 3, 4, 3, 5, 4, 4, 5, 6}), ());
+  for (size_t t = 3; t < callbacks.m_result.size(); t += 3)
+  {
+    auto const a = callbacks.m_result[t], b = callbacks.m_result[t + 1], c = callbacks.m_result[t + 2];
+    float const cross = (points[2 * b] - points[2 * a]) * (points[2 * c + 1] - points[2 * a + 1]) -
+                        (points[2 * b + 1] - points[2 * a + 1]) * (points[2 * c] - points[2 * a]);
+    TEST_LESS(cross, 0.0f, (t, "Nondegenerate grid triangles must be CW"));
+  }
+}
+}  // namespace terrain_grid_batch_tests
 
 namespace
 {
@@ -352,4 +416,61 @@ UNIT_TEST(BatchListOfStript_partial)
     for (size_t i = 0; i < vaoAcceptor.m_vao.size(); ++i)
       vaoAcceptor.m_vao[i].reset();
   }
+}
+
+UNIT_TEST(BatchLineStrip_split)
+{
+  // A line strip longer than the whole buffer must split with the boundary vertex
+  // repeated (the long dynamic isolines case), not overflow the index buffer.
+  TestingGraphicsContext context;
+  uint32_t const VertexCount = 16;
+  uint32_t const ComponentCount = 3;
+  uint32_t const VertexArraySize = VertexCount * ComponentCount;
+
+  // Batcher(20 indices, 100 vertices): the first chunk takes 11 vertices / 20 indices
+  // (the full index buffer), the second continues from the repeated vertex 10.
+  uint32_t const FirstChunkVertices = 11;
+  uint32_t const SecondChunkVertices = VertexCount - FirstChunkVertices + 1;
+
+  float vertexData[VertexArraySize];
+  for (uint32_t i = 0; i < VertexArraySize; ++i)
+    vertexData[i] = static_cast<float>(i);
+
+  std::vector<uint32_t> indexDataRaw = {0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10,
+                                        // start new buffer
+                                        0, 1, 1, 2, 2, 3, 3, 4, 4, 5};
+  dp::IndexStorage indexData(std::move(indexDataRaw));
+
+  InSequence seq;
+  PartialBatcherTest test;
+  test.AddBufferNode(PartialBatcherTest::BufferNode(20 * dp::IndexStorage::SizeOfIndex(),
+                                                    FirstChunkVertices * ComponentCount * sizeof(float),
+                                                    indexData.GetRaw(), vertexData));
+  test.AddBufferNode(PartialBatcherTest::BufferNode(
+      10 * dp::IndexStorage::SizeOfIndex(), SecondChunkVertices * ComponentCount * sizeof(float), indexData.GetRaw(20),
+      vertexData + (FirstChunkVertices - 1) * ComponentCount));
+  test.CloseExpection();
+
+  auto renderState = make_unique_dp<TestExtension>();
+  auto state = RenderState(0, make_ref(renderState));
+
+  BindingInfo binding(1);
+  BindingDecl & decl = binding.GetBindingDecl(0);
+  decl.m_attributeName = "position";
+  decl.m_componentCount = ComponentCount;
+  decl.m_componentType = gl_const::GLFloatType;
+  decl.m_offset = 0;
+  decl.m_stride = 0;
+
+  AttributeProvider provider(1, VertexCount);
+  provider.InitStream(0, binding, make_ref(vertexData));
+
+  VAOAcceptor vaoAcceptor;
+  Batcher batcher(20 /* indexBufferSize */, 100 /* vertexBufferSize */);
+  batcher.StartSession(std::bind(&VAOAcceptor::FlushFullBucket, &vaoAcceptor, _1, _2));
+  batcher.InsertLineStrip(make_ref(&context), state, make_ref(&provider));
+  batcher.EndSession(make_ref(&context));
+
+  for (size_t i = 0; i < vaoAcceptor.m_vao.size(); ++i)
+    vaoAcceptor.m_vao[i].reset();
 }

@@ -7,6 +7,9 @@
 #include "routing/routing_callbacks.hpp"
 #include "routing/routing_helpers.hpp"
 #include "routing/routing_session.hpp"
+#include "routing/ruler_router.hpp"
+
+#include "platform/duration.hpp"
 
 #include "geometry/point2d.hpp"
 #include "geometry/point_with_altitude.hpp"
@@ -29,6 +32,7 @@ using chrono::seconds;
 using chrono::steady_clock;
 
 vector<m2::PointD> kTestRoute = {{0., 1.}, {0., 1.}, {0., 3.}, {0., 4.}};
+vector<m2::PointD> const kTestAltRoute = {{0., 1.}, {0., 1.}, {1., 3.}, {0., 4.}};
 vector<Segment> const kTestSegments = {{0, 0, 0, true}, {0, 0, 1, true}, {0, 0, 2, true}};
 vector<turns::TurnItem> const kTestTurnsReachOnly = {turns::TurnItem(1, turns::CarDirection::None),
                                                      turns::TurnItem(2, turns::CarDirection::None),
@@ -39,33 +43,36 @@ vector<turns::TurnItem> const kTestTurns = {turns::TurnItem(1, turns::CarDirecti
 vector<double> const kTestTimes = {5.0, 10.0, 15.0};
 auto const kRouteBuildingMaxDuration = seconds(30);
 
-void FillSubroutesInfo(Route & route, vector<turns::TurnItem> const & turns = kTestTurnsReachOnly);
+void FillSubroutesInfo(Route & route, vector<turns::TurnItem> const & turns = kTestTurnsReachOnly,
+                       vector<double> const & times = kTestTimes);
 
 // Simple router. It returns route given to him on creation.
 class DummyRouter : public IRouter
 {
 private:
   Route m_route;
-  RouterResultCode m_code;
   size_t & m_buildCount;
 
 public:
-  DummyRouter(Route & route, RouterResultCode code, size_t & buildCounter)
-    : m_route(route)
-    , m_code(code)
-    , m_buildCount(buildCounter)
-  {}
+  DummyRouter(size_t & buildCounter, vector<turns::TurnItem> const & turns = kTestTurnsReachOnly)
+    : m_buildCount(buildCounter)
+  {
+    m_route.SetGeometry(kTestRoute.begin(), kTestRoute.end());
+    if (!turns.empty())
+      FillSubroutesInfo(m_route, turns);
+  }
 
   string GetName() const override { return "dummy"; }
   void ClearState() override {}
   void SetGuides(GuidesTracks && /* guides */) override {}
 
   RouterResultCode CalculateRoute(Checkpoints const & /* checkpoints */, m2::PointD const & /* startDirection */,
-                                  bool /* adjust */, RouterDelegate const & /* delegate */, Route & route) override
+                                  bool /* adjust */, bool /* needAlternatives */, RouterDelegate const & /* delegate */,
+                                  RoutesResult & result) override
   {
     ++m_buildCount;
-    route = m_route;
-    return m_code;
+    result.MakeFrom(GetName(), Route(m_route));
+    return RouterResultCode::NoError;
   }
 
   bool FindClosestProjectionToRoad(m2::PointD const & point, m2::PointD const & direction, double radius,
@@ -73,6 +80,68 @@ public:
   {
     return false;
   }
+};
+
+// Router recording whether the session asked for alternative routes.
+class AlternativesFlagRouter : public DummyRouter
+{
+public:
+  AlternativesFlagRouter(size_t & buildCounter, vector<bool> & flags) : DummyRouter(buildCounter), m_flags(flags) {}
+
+  RouterResultCode CalculateRoute(Checkpoints const & checkpoints, m2::PointD const & startDirection, bool adjust,
+                                  bool needAlternatives, RouterDelegate const & delegate,
+                                  RoutesResult & result) override
+  {
+    m_flags.push_back(needAlternatives);
+    return DummyRouter::CalculateRoute(checkpoints, startDirection, adjust, needAlternatives, delegate, result);
+  }
+
+private:
+  vector<bool> & m_flags;
+};
+
+// Router returning two route variants and counting the "user picked the other one" notifications.
+class AltRoutesRouter : public IRouter
+{
+public:
+  explicit AltRoutesRouter(size_t & swapCount, vector<double> const & times = kTestTimes,
+                           vector<double> const & altTimes = kTestTimes)
+    : m_swapCount(swapCount)
+    , m_times(times)
+    , m_altTimes(altTimes)
+  {}
+
+  string GetName() const override { return "alt routes"; }
+  void ClearState() override {}
+  void SetGuides(GuidesTracks && /* guides */) override {}
+  void SwapAltRouteToActive() override { ++m_swapCount; }
+
+  RouterResultCode CalculateRoute(Checkpoints const & /* checkpoints */, m2::PointD const & /* startDirection */,
+                                  bool /* adjust */, bool /* needAlternatives */, RouterDelegate const & /* delegate */,
+                                  RoutesResult & result) override
+  {
+    Route active;
+    active.SetGeometry(kTestRoute.begin(), kTestRoute.end());
+    FillSubroutesInfo(active, kTestTurnsReachOnly, m_times);
+    result.MakeFrom(GetName(), std::move(active));
+
+    Route alt;
+    alt.SetGeometry(kTestAltRoute.begin(), kTestAltRoute.end());
+    FillSubroutesInfo(alt, kTestTurnsReachOnly, m_altTimes);
+    result.m_routes.emplace_back(std::move(static_cast<RouteBase &>(alt)));
+    return RouterResultCode::NoError;
+  }
+
+  bool FindClosestProjectionToRoad(m2::PointD const & point, m2::PointD const & direction, double radius,
+                                   EdgeProj & proj) override
+  {
+    return false;
+  }
+
+private:
+  size_t & m_swapCount;
+  vector<double> m_times;
+  vector<double> m_altTimes;
 };
 
 // Router which every next call of CalculateRoute() method return different return codes.
@@ -90,11 +159,14 @@ public:
   void SetGuides(GuidesTracks && /* guides */) override {}
 
   RouterResultCode CalculateRoute(Checkpoints const & /* checkpoints */, m2::PointD const & /* startDirection */,
-                                  bool /* adjust */, RouterDelegate const & /* delegate */, Route & route) override
+                                  bool /* adjust */, bool /* needAlternatives */, RouterDelegate const & /* delegate */,
+                                  RoutesResult & result) override
   {
     TEST_LESS(m_returnCodesIdx, m_returnCodes.size(), ());
-    route = Route(GetName(), m_route.begin(), m_route.end(), 0 /* route id */);
+    Route route;
+    route.SetGeometry(m_route.begin(), m_route.end());
     FillSubroutesInfo(route);
+    result.MakeFrom(GetName(), std::move(route));
     return m_returnCodes[m_returnCodesIdx++];
   }
 
@@ -190,17 +262,22 @@ private:
   RoutingSession & m_session;
 };
 
-void FillSubroutesInfo(Route & route, vector<turns::TurnItem> const & turns /* = kTestTurnsReachOnly */)
+void FillSubroutesInfo(Route & route, vector<turns::TurnItem> const & turns /* = kTestTurnsReachOnly */,
+                       vector<double> const & times /* = kTestTimes */)
 {
+  // Promoting RouteBase to Route reconstructs the followed polyline from the subroute start and
+  // segment junctions, so the segments must use this route's geometry.
+  auto const & polyPts = route.GetPoly().GetPoints();
+
   vector<geometry::PointWithAltitude> junctions;
-  for (auto const & point : kTestRoute)
+  for (auto const & point : polyPts)
     junctions.emplace_back(point, geometry::kDefaultAltitudeMeters);
 
   vector<RouteSegment> segmentInfo;
-  RouteSegmentsFrom(kTestSegments, kTestRoute, turns, {}, segmentInfo);
-  FillSegmentInfo(kTestTimes, segmentInfo);
+  RouteSegmentsFrom(kTestSegments, polyPts, turns, {}, segmentInfo);
+  FillSegmentInfo(times, segmentInfo);
   route.SetRouteSegments(std::move(segmentInfo));
-  route.SetSubroteAttrs(vector<Route::SubrouteAttrs>(
+  route.SetSubroutes(vector<Route::SubrouteAttrs>(
       {Route::SubrouteAttrs(junctions.front(), junctions.back(), 0, kTestSegments.size())}));
 }
 
@@ -241,11 +318,9 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestRouteBuilding)
   GetPlatform().RunTask(Platform::Thread::Gui, [&timedSignal, &counter, this]()
   {
     InitRoutingSession();
-    Route masterRoute("dummy", kTestRoute.begin(), kTestRoute.end(), 0 /* route id */);
 
-    unique_ptr<DummyRouter> router = make_unique<DummyRouter>(masterRoute, RouterResultCode::NoError, counter);
-    m_session->SetRouter(std::move(router), nullptr);
-    m_session->SetRoutingCallbacks([&timedSignal](Route const &, RouterResultCode)
+    m_session->SetRouter(unique_ptr<DummyRouter>(new DummyRouter(counter, {})), nullptr);
+    m_session->SetRoutingCallbacks([&timedSignal](RoutesResult const &, RouterResultCode)
     {
       LOG(LINFO, ("Ready"));
       timedSignal.Signal();
@@ -256,6 +331,62 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestRouteBuilding)
   // Manual check of the routeBuilding mutex to avoid spurious results.
   TEST(timedSignal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Route was not built."));
   TEST_EQUAL(counter, 1, ());
+}
+
+UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestTrafficRebuildRespectsRouter)
+{
+  class TrafficInsensitiveRouter final : public DummyRouter
+  {
+  public:
+    using DummyRouter::DummyRouter;
+    bool IsTrafficSensitive() const override { return false; }
+  };
+  unique_ptr<IRouter> ruler = make_unique<RulerRouter>();
+  TEST(!ruler->IsTrafficSensitive(), ());
+
+  size_t counter = 0;
+  TimedSignal built, rebuilt, switched, checked;
+  GetPlatform().RunTask(Platform::Thread::Gui, [&, this]()
+  {
+    InitRoutingSession();
+    m_session->SetRouter(make_unique<DummyRouter>(counter), nullptr);
+    m_session->SetRoutingCallbacks([&](RoutesResult const &, RouterResultCode) { built.Signal(); },
+                                   [&](RoutesResult const &, RouterResultCode) { rebuilt.Signal(); }, nullptr, nullptr);
+    m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
+  });
+  TEST(built.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Route was not built."));
+  TEST_EQUAL(counter, 1, ());
+
+  GetPlatform().RunTask(Platform::Thread::Gui, [this]()
+  {
+    m_session->OnTrafficInfoClear();
+    TEST(m_session->IsRebuildingOnly(), ());
+  });
+  TEST(rebuilt.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Traffic did not rebuild the route."));
+  TEST_EQUAL(counter, 2, ());
+
+  GetPlatform().RunTask(Platform::Thread::Gui, [&, this]()
+  {
+    m_session->SetRouter(make_unique<TrafficInsensitiveRouter>(counter), nullptr);
+    m_session->SetRoutingCallbacks([&](RoutesResult const &, RouterResultCode) { switched.Signal(); }, nullptr, nullptr,
+                                   nullptr);
+    m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
+  });
+  TEST(switched.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Switched route was not built."));
+  TEST_EQUAL(counter, 3, ());
+
+  GetPlatform().RunTask(Platform::Thread::Gui, [&, this]()
+  {
+    auto const * route = m_session->GetRoute();
+    m_session->OnTrafficInfoClear();
+    TEST(!m_session->IsBuilding(), ());
+    TEST(m_session->GetRoute() == route, ());
+    // Join the routing worker before checking the final build count.
+    m_session.reset();
+    checked.Signal();
+  });
+  TEST(checked.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Traffic check timed out."));
+  TEST_EQUAL(counter, 3, ());
 }
 
 // Test on route rebuilding when current position moving from the route. Each next position
@@ -269,14 +400,11 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestRouteRebuildingMovingA
   GetPlatform().RunTask(Platform::Thread::Gui, [&alongTimedSignal, this, &counter]()
   {
     InitRoutingSession();
-    Route masterRoute("dummy", kTestRoute.begin(), kTestRoute.end(), 0 /* route id */);
-    FillSubroutesInfo(masterRoute);
 
-    unique_ptr<DummyRouter> router = make_unique<DummyRouter>(masterRoute, RouterResultCode::NoError, counter);
-    m_session->SetRouter(std::move(router), nullptr);
+    m_session->SetRouter(make_unique<DummyRouter>(counter), nullptr);
 
     // Go along the route.
-    m_session->SetRoutingCallbacks([&alongTimedSignal](Route const &, RouterResultCode) {
+    m_session->SetRoutingCallbacks([&alongTimedSignal](RoutesResult const &, RouterResultCode) {
       alongTimedSignal.Signal();
     }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
     m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()),
@@ -308,7 +436,7 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestRouteRebuildingMovingA
       }
 
       // Rebuild route and go in opposite direction. So initiate a route rebuilding flag.
-      m_session->SetRoutingCallbacks([&oppositeTimedSignal](Route const &, RouterResultCode) {
+      m_session->SetRoutingCallbacks([&oppositeTimedSignal](RoutesResult const &, RouterResultCode) {
         oppositeTimedSignal.Signal();
       }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
       {
@@ -348,13 +476,10 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestRouteRebuildingMovingT
   GetPlatform().RunTask(Platform::Thread::Gui, [&alongTimedSignal, this, &counter]()
   {
     InitRoutingSession();
-    Route masterRoute("dummy", kTestRoute.begin(), kTestRoute.end(), 0 /* route id */);
-    FillSubroutesInfo(masterRoute);
 
-    unique_ptr<DummyRouter> router = make_unique<DummyRouter>(masterRoute, RouterResultCode::NoError, counter);
-    m_session->SetRouter(std::move(router), nullptr);
+    m_session->SetRouter(make_unique<DummyRouter>(counter), nullptr);
 
-    m_session->SetRoutingCallbacks([&alongTimedSignal](Route const &, RouterResultCode) {
+    m_session->SetRoutingCallbacks([&alongTimedSignal](RoutesResult const &, RouterResultCode) {
       alongTimedSignal.Signal();
     }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
     m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
@@ -395,13 +520,11 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestFollowRouteFlagPersist
   GetPlatform().RunTask(Platform::Thread::Gui, [&alongTimedSignal, this, &counter]()
   {
     InitRoutingSession();
-    Route masterRoute("dummy", kTestRoute.begin(), kTestRoute.end(), 0 /* route id */);
-    FillSubroutesInfo(masterRoute, kTestTurns);
-    unique_ptr<DummyRouter> router = make_unique<DummyRouter>(masterRoute, RouterResultCode::NoError, counter);
-    m_session->SetRouter(std::move(router), nullptr);
+
+    m_session->SetRouter(make_unique<DummyRouter>(counter, kTestTurns), nullptr);
 
     // Go along the route.
-    m_session->SetRoutingCallbacks([&alongTimedSignal](Route const &, RouterResultCode) {
+    m_session->SetRoutingCallbacks([&alongTimedSignal](RoutesResult const &, RouterResultCode) {
       alongTimedSignal.Signal();
     }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
     m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
@@ -430,7 +553,7 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestFollowRouteFlagPersist
     TEST_EQUAL(counter, 1, ());
 
     // Rebuild route and go in opposite direction. So initiate a route rebuilding flag.
-    m_session->SetRoutingCallbacks([&oppositeTimedSignal](Route const &, RouterResultCode) {
+    m_session->SetRoutingCallbacks([&oppositeTimedSignal](RoutesResult const &, RouterResultCode) {
       oppositeTimedSignal.Signal();
     }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
     m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
@@ -457,7 +580,7 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestFollowRouteFlagPersist
     TEST_EQUAL(code, SessionState::RouteNeedRebuild, ());
     TEST(m_session->IsFollowing(), ());
 
-    m_session->RebuildRoute(kTestRoute.front(), [&rebuildTimedSignal](Route const &, RouterResultCode)
+    m_session->RebuildRoute(kTestRoute.front(), [&rebuildTimedSignal](RoutesResult const &, RouterResultCode)
     { rebuildTimedSignal.Signal(); }, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */,
                             RouterDelegate::kNoTimeout, SessionState::RouteBuilding, false /* adjust */);
   });
@@ -477,20 +600,17 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestFollowRouteFlagPersist
 UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestFollowRoutePercentTest)
 {
   TimedSignal alongTimedSignal;
-  GetPlatform().RunTask(Platform::Thread::Gui, [&alongTimedSignal, this]()
+  size_t counter = 0;
+  GetPlatform().RunTask(Platform::Thread::Gui, [&alongTimedSignal, &counter, this]()
   {
     InitRoutingSession();
-    Route masterRoute("dummy", kTestRoute.begin(), kTestRoute.end(), 0 /* route id */);
-    FillSubroutesInfo(masterRoute);
 
-    size_t counter = 0;
-    unique_ptr<DummyRouter> router = make_unique<DummyRouter>(masterRoute, RouterResultCode::NoError, counter);
-    m_session->SetRouter(std::move(router), nullptr);
+    m_session->SetRouter(make_unique<DummyRouter>(counter), nullptr);
 
     // Get completion percent of unexisted route.
     TEST_EQUAL(m_session->GetCompletionPercent(), 0, (m_session->GetCompletionPercent()));
     // Go along the route.
-    m_session->SetRoutingCallbacks([&alongTimedSignal](Route const &, RouterResultCode) {
+    m_session->SetRoutingCallbacks([&alongTimedSignal](RoutesResult const &, RouterResultCode) {
       alongTimedSignal.Signal();
     }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
     m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
@@ -554,7 +674,7 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestRouteRebuildingError)
     TimedSignal buildTimedSignal;
     GetPlatform().RunTask(Platform::Thread::Gui, [this, &kRoute, &buildTimedSignal]()
     {
-      m_session->SetRoutingCallbacks([&buildTimedSignal](Route const &, RouterResultCode) {
+      m_session->SetRoutingCallbacks([&buildTimedSignal](RoutesResult const &, RouterResultCode) {
         buildTimedSignal.Signal();
       }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
 
@@ -578,10 +698,12 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestRouteRebuildingError)
   // Test 1. Leaving the route and returning to the route when state is |SessionState::RouteNeedRebuil|.
   TestLeavingRoute(*m_session, info);
 
-  // Continue moving along the route.
+  // Continue moving along the route. Stay short of lat=0.003 so the session stays in OnRoute —
+  // reaching that point would trigger RouteFinished (segments[2] ends there for the 4-point kRoute)
+  // and the subsequent TestLeavingRoute call would not transition out of RouteFinished.
   {
     SessionStateTest sessionStateTest({SessionState::RouteNeedRebuild, SessionState::OnRoute}, *m_session);
-    vector<double> const latitudes = {0.002, 0.0025, 0.003};
+    vector<double> const latitudes = {0.002, 0.0025, 0.0028};
     TestMovingByUpdatingLat(sessionStateTest, latitudes, info, *m_session);
   }
 
@@ -600,12 +722,156 @@ UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestRouteRebuildingError)
     TEST(signal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("State was not set."));
   }
 
-  // Continue moving along the route again.
+  // Continue moving along the route until the destination is reached. The first GPS at lat=0.003
+  // already triggers the route-finished check (segments[2] ends there for the 4-point kRoute), so
+  // the state jumps directly RouteRebuilding -> RouteFinished without an intermediate OnRoute.
   {
-    // Test on state is not changed.
-    SessionStateTest sessionStateTest({SessionState::RouteRebuilding, SessionState::OnRoute}, *m_session);
+    SessionStateTest sessionStateTest({SessionState::RouteRebuilding, SessionState::RouteFinished}, *m_session);
     vector<double> const latitudes = {0.003, 0.0035, 0.004};
     TestMovingByUpdatingLat(sessionStateTest, latitudes, info, *m_session);
   }
+}
+
+// Alternatives are drawn only outside navigation (RoutingManager::InsertRoute), so a rebuild in
+// follow mode must not pay for computing them.
+UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestAlternativesSkippedWhileFollowing)
+{
+  size_t counter = 0;
+  vector<bool> flags;
+
+  TimedSignal builtSignal;
+  GetPlatform().RunTask(Platform::Thread::Gui, [&builtSignal, &counter, &flags, this]()
+  {
+    InitRoutingSession();
+    m_session->SetRouter(make_unique<AlternativesFlagRouter>(counter, flags), nullptr);
+    m_session->SetRoutingCallbacks([&builtSignal](RoutesResult const &, RouterResultCode) {
+      builtSignal.Signal();
+    }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
+    m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
+  });
+  TEST(builtSignal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Route was not built."));
+  TEST_EQUAL(flags, vector<bool>({true}), ("The initial build computes alternatives."));
+
+  TimedSignal rebuiltSignal;
+  GetPlatform().RunTask(Platform::Thread::Gui, [&rebuiltSignal, this]()
+  {
+    TEST(m_session->EnableFollowMode(), ());
+    m_session->RebuildRoute(kTestRoute.front(), [&rebuiltSignal](RoutesResult const &, RouterResultCode)
+    { rebuiltSignal.Signal(); }, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */,
+                            RouterDelegate::kNoTimeout, SessionState::RouteRebuilding, true /* adjustToPrevRoute */);
+  });
+  TEST(rebuiltSignal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Route was not rebuilt."));
+  TEST_EQUAL(flags, vector<bool>({true, false}), ("A rebuild while navigating skips alternatives."));
+}
+
+// Picking an alternative route must reach the router: IndexRouter remembers the chosen variant
+// there and keeps its weights on the next rebuild.
+// https://github.com/organicmaps/organicmaps/issues/13205
+UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestSwapActiveAlternative)
+{
+  TimedSignal builtSignal;
+  size_t swapCount = 0;
+
+  GetPlatform().RunTask(Platform::Thread::Gui, [&builtSignal, &swapCount, this]()
+  {
+    InitRoutingSession();
+    m_session->SetRouter(make_unique<AltRoutesRouter>(swapCount), nullptr);
+    m_session->SetRoutingCallbacks([&builtSignal](RoutesResult const &, RouterResultCode) {
+      builtSignal.Signal();
+    }, nullptr /* rebuildReadyCallback */, nullptr /* needMoreMapsCallback */, nullptr /* removeRouteCallback */);
+    m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
+  });
+  TEST(builtSignal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Route was not built."));
+
+  TimedSignal swappedSignal;
+  GetPlatform().RunTask(Platform::Thread::Gui, [&swappedSignal, &swapCount, this]()
+  {
+    TEST(m_session->SwapActiveAlternative(1), ());
+    TEST_EQUAL(swapCount, 1, ());
+
+    // Picking the route which is already active changes nothing.
+    TEST(!m_session->SwapActiveAlternative(1), ());
+    TEST_EQUAL(swapCount, 1, ());
+
+    // Switching back is forwarded just the same.
+    TEST(m_session->SwapActiveAlternative(0), ());
+    TEST_EQUAL(swapCount, 2, ());
+
+    swappedSignal.Signal();
+  });
+  TEST(swappedSignal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Alternative was not swapped."));
+}
+
+UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestFollowingInfoPreservesSeconds)
+{
+  TimedSignal signal;
+  GetPlatform().RunTask(Platform::Thread::Gui, [this, &signal]()
+  {
+    InitRoutingSession();
+    struct Case
+    {
+      double m_timeSec;
+      int m_expectedSeconds;
+    };
+    Case const cases[] = {{0.0, 0},     {0.9, 0},   {20.75, 20},    {59.99, 59},      {60.0, 60},    {89.5, 89},
+                          {89.999, 89}, {90.0, 90}, {1649.5, 1649}, {1649.999, 1649}, {1650.0, 1650}};
+    for (auto const & test : cases)
+    {
+      Route route;
+      route.SetGeometry(kTestRoute.begin(), kTestRoute.end());
+      FillSubroutesInfo(route, kTestTurnsReachOnly, {test.m_timeSec / 3, test.m_timeSec * 2 / 3, test.m_timeSec});
+      m_session->AssignRouteForTesting(std::move(route), RouterResultCode::NoError);
+
+      for (bool const navigable : {true, false})
+      {
+        if (!navigable)
+          TEST(m_session->DisableFollowMode(), ());
+        TEST_EQUAL(m_session->IsNavigable(), navigable, ());
+        FollowingInfo info;
+        m_session->GetRouteFollowingInfo(info);
+        TEST(info.IsValid(), (test.m_timeSec));
+        TEST_EQUAL(info.m_time, test.m_expectedSeconds, ());
+        TEST_EQUAL(platform::Duration(info.m_time).GetRoutingString(),
+                   platform::Duration(test.m_timeSec).GetRoutingString(), (test.m_timeSec));
+        TEST(!m_session->IsFinished(), (test.m_timeSec));
+      }
+    }
+    signal.Signal();
+  });
+  TEST(signal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Following info timeout."));
+}
+
+UNIT_CLASS_TEST(AsyncGuiThreadTestWithRoutingSession, TestAlternativeEstimatesPreserveSeconds)
+{
+  TimedSignal builtSignal;
+  size_t swapCount = 0;
+  GetPlatform().RunTask(Platform::Thread::Gui, [this, &builtSignal, &swapCount]()
+  {
+    InitRoutingSession();
+    m_session->SetRouter(
+        make_unique<AltRoutesRouter>(swapCount, vector<double>{500, 1000, 1665}, vector<double>{600, 1200, 2085}),
+        nullptr);
+    m_session->SetRoutingCallbacks([&builtSignal](RoutesResult const &, RouterResultCode) { builtSignal.Signal(); },
+                                   nullptr, nullptr, nullptr);
+    m_session->BuildRoute(Checkpoints(kTestRoute.front(), kTestRoute.back()), RouterDelegate::kNoTimeout);
+  });
+  TEST(builtSignal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Route building timeout."));
+
+  TimedSignal checkedSignal;
+  GetPlatform().RunTask(Platform::Thread::Gui, [this, &checkedSignal]()
+  {
+    for (size_t const idx : {0, 1, 0})
+    {
+      m_session->SwapActiveAlternative(idx);
+      FollowingInfo info;
+      m_session->GetRouteFollowingInfo(info);
+      TEST_EQUAL(info.m_time, idx == 0 ? 1665 : 2085, ());
+      auto const expected = platform::Duration(idx == 0 ? 1680 : 2100).GetPlatformLocalizedString();
+      TEST_EQUAL(platform::Duration(info.m_time).GetRoutingString(), expected, ());
+      TEST_EQUAL(platform::Duration(m_session->GetRoute()->GetTotalTimeSec()).GetRoutingString(), expected, ());
+    }
+    checkedSignal.Signal();
+  });
+  TEST(checkedSignal.WaitUntil(steady_clock::now() + kRouteBuildingMaxDuration), ("Alternative checking timeout."));
 }
 }  // namespace routing_session_test

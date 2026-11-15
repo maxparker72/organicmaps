@@ -47,6 +47,8 @@
     <string name="auto">Αυτόματα</string>
     <!-- Settings «Map» category: «3D buildings» title -->
     <string name="pref_map_3d_buildings_title">Τρισδιάστατα κτίρια</string>
+    <!-- Settings «Route» category: «Tts unavailable» subtitle. Also used as a CarToast in Android Auto when the user taps the muted voice icon. -->
+    <string name="pref_tts_unavailable">Δεν είναι διαθέσιμη</string>
     <!-- Text in menu -->
     <string name="help">Βοήθεια</string>
     <!-- In maps downloader and country place page shows how many maps are downloaded / to download, e.g. "Maps: 3 of 10" -->
@@ -66,10 +68,13 @@
     <string name="editor_time_open">Ανοικτό</string>
     <string name="twentyfour_seven">24/7</string>
     <string name="day_off_today">Κλειστό σήμερα</string>
+    <string name="midnight">Μεσάνυχτα</string>
+    <string name="noon">Μεσημέρι</string>
     <string name="opens_in">Ανοίγει σε %s</string>
     <string name="closes_in">Κλείνει σε %s</string>
     <string name="closed">Κλειστό</string>
-    <string name="minute">λπτ</string>
+    <!-- Short label for minutes (time unit), placed after a number -->
+    <string name="minute">λεπ.</string>
     <string name="big_font">Αύξηση μεγέθους γραμματοσειράς στο χάρτη</string>
     <string name="transliteration_title">Μεταγραφή στο λατινικό αλφάβητο</string>
     <!-- this text will be shown in application notification preferences opposite checkbox which enable/disable downloader notifications. Devices on Android 8+ are affected. -->

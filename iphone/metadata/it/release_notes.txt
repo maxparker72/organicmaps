@@ -1,56 +1,33 @@
+## Calcolo del percorso
+• Miglioramento dei percorsi alternativi e dei relativi tempi di arrivo stimati
+• Aggiunti pulsanti per aggiungere o sostituire una tappa in un percorso pianificato
+• Aggiunta un’impostazione per ottimizzare l’ordine delle tappe intermedie del percorso
+• Il percorso alternativo selezionato viene ora mantenuto quando la navigazione ricalcola il percorso
+• L’ordine delle tappe del percorso viene ora ripristinato dopo il riavvio dell’app
+
 ## Mappa
+• Dati OpenStreetMap aggiornati al 28 settembre
+• Dati di Wikipedia aggiornati al 21 settembre
+• I bacini idrici sono ora visibili quando si allarga ulteriormente la visuale
+• I tunnel idrici non vengono più visualizzati sulla mappa
+• Corrette le icone delle stazioni e degli ingressi della metropolitana di Suzhou
+• Sono stati risolti rari casi in cui le etichette si spostavano fuori posizione sul livello della mappa della metropolitana
 
-- NOVITÀ! La mappa ora viene visualizzata correttamente all'antimeridiano durante il trascinamento e la rotazione
-- Dati OpenStreetMap aggiornati al 4 aprile
-- Dati Wikipedia aggiornati al 1° aprile
-- Aggiunte icone per aree ristoro e porte della città
-- Aggiunte sottocategorie dei negozi di abbigliamento: donna, uomo, bambino, matrimonio, sport, intimo e abbigliamento da ufficio
-- Corretti i colori delle linee della metropolitana di Sydney
-- Corretta la visualizzazione degli orari di apertura per i luoghi con offset di alba/tramonto
+## CarPlay
+• Aggiunte le istruzioni di manovra sugli head-up display (HUD) delle auto supportate e sulla dashboard di CarPlay
+• Corretto il funzionamento dei pulsanti e della ricerca in CarPlay
 
-## Percorsi e navigazione
+## Tracce
+• Aggiunta un'icona a forma di occhio per nascondere singole tracce
+• Correzione di bug e miglioramento della registrazione dei tracciati
+• Risolto il problema di importazione dei file KMB
 
-- NOVITÀ! Tocca un percorso ciclabile o escursionistico per selezionarlo e visualizzarne il grafico altimetrico
-- Migliorata la resa cromatica multicolore per i percorsi escursionistici e ciclabili
-- La navigazione in bicicletta ora utilizza la direzione della bussola a basse velocità
-- Risolto un errore di sistema durante la pianificazione di percorsi in prossimità di alcuni confini regionali
-- Ora è possibile avviare un percorso valido anche quando viene richiesto di scaricare mappe aggiuntive
+## Cerca
+• Risolto il problema delle ricerche quando l’area visibile della mappa attraversa il meridiano dei 180° (longitudine ±180°)
+• Ripristinata la ricerca per categoria in Spotlight
 
-## Segnalibri e tracciati
-
-- NOVITÀ! Modifica contemporaneamente tutti i colori dei segnalibri e delle tracce in una categoria
-- Modificata l'approssimazione del dislivello positivo e negativo nei grafici delle tracce per allinearla meglio ad altre app
-- Visualizzazione migliorata dei contenuti HTML con tabelle e immagini nei dettagli dei segnalibri
-- Aggiunti separatori verticali per le tracce a più segmenti nel grafico dell'altitudine
-- Risolto il problema della selezione dei punti nel grafico dell'altitudine per i punti interpolati
-- Risolto il problema della registrazione della traccia GPS che perdeva punti tra i segmenti
-- Risolto il problema dell'importazione GeoJSON
-- Risolto un crash durante l'esportazione delle tracce
-
-## Ricerca
-
-- Ricerca migliorata negli Stati Uniti, con due milioni di indirizzi aggiuntivi analizzati dai dati del censimento TIGER
-- Categorie di ricerca aggiornate: aggiunti "Bread" per le panetterie, "Shawarma" come cucina e altri miglioramenti ai sinonimi
-- Ricerca per numero civico migliorata
-- Aggiunti sinonimi per le strade negli Stati Uniti: highway, hwy, freeway, fwy
-- Risolti i risultati di ricerca quando i nomi di città e stato coincidono
-
-## Editor / OpenStreetMap
-
-- Ora è possibile aggiungere un nuovo luogo su OpenStreetMap dopo aver selezionato la propria posizione attuale sulla mappa
-- Risolto il disallineamento del mirino dell'editor quando si preme "Aggiungi luogo"
-- Aumentata l'area tattile dei pulsanti nella barra di navigazione "Aggiungi luogo"
-
-## Interfaccia utente e esperienza utente
-
-- Migliorati i gesti modali: aggancio al passaggio più vicino, chiusura durante lo scorrimento sul bordo e ripristino dello stato precedente alla riapertura
-- Risolta la gestione dell'ora legale per i fusi orari
-
-## Stabilità e localizzazione
-
-- Migliorate stabilità e prestazioni, ridotto il consumo della batteria
-- Traduzioni aggiornate
-
-## Supporto piattaforme
-
-- A causa delle modifiche apportate a TestFlight e all'App Store, questa versione supporta solo iOS 15 e versioni successive. iOS 12, 13 e 14 non sono più supportati.
+## Interfaccia utente
+• Gli orari di apertura ora mostrano «Mezzogiorno» per le 12:00 e «Mezzanotte» per le 00:00 o le 24:00
+• Sono stati corretti vari bug e migliorata l’interfaccia utente
+• Traduzioni corrette in inglese, francese e asturiano
+• Aggiunta la possibilità di selezionare una voce di navigazione installata e ascoltarne un’anteprima

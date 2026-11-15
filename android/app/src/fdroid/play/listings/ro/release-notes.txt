@@ -1,8 +1,9 @@
-• Selectarea traseelor de drumeție și ciclism pentru a vedea graficele de altitudine ale acestora
-• Afișarea corectă a hărții la antimeridian (±180° longitudine)
-• Schimbarea simultană a culorilor tuturor marcajelor și traseelor dintr-o categorie
-• Căutare mai bună pentru numerele de casă, mai multe adrese din SUA acoperite
-• Date OSM începând cu 4 aprilie
-• Mod de afișare programat în Setări
-• S-a remediat partajarea marcajelor/traseelor către alte aplicații
-…mai multe la omaps.org/news
+• OSM: 28 septembrie; Wikipedia: 21 septembrie
+• Rute alternative mai bune și estimări de sosire
+• O nouă setare optimizează ordinea opririlor
+• Noile butoane adaugă sau înlocuiesc opriri pe traseele planificate
+• Traseul alternativ ales este păstrat pe durata navigării
+• Corecții și îmbunătățiri privind înregistrarea traseelor
+• S-a remediat problema cu importul KMB
+• Corecții și îmbunătățiri ale interfeței utilizatorului
+…mai multe informații la omaps.org/news

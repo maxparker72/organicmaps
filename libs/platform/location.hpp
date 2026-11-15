@@ -3,8 +3,11 @@
 #include "geometry/latlon.hpp"
 #include "geometry/point2d.hpp"
 
+#include "base/assert.hpp"
+
 #include <cmath>
 #include <functional>
+#include <string>
 
 namespace location
 {
@@ -19,6 +22,21 @@ enum TLocationError
   EUnknown
 };
 
+inline std::string DebugPrint(TLocationError error)
+{
+  switch (error)
+  {
+  case ENoError: return "ENoError";
+  case ENotSupported: return "ENotSupported";
+  case EDenied: return "EDenied";
+  case EGPSIsOff: return "EGPSIsOff";
+  case ETimeout: return "ETimeout";
+  case EUnknown: return "EUnknown";
+  }
+  UNREACHABLE();
+}
+
+// Values are stored in GPS track backups; append new sources without renumbering.
 enum TLocationSource
 {
   EUndefined,
@@ -29,7 +47,8 @@ enum TLocationSource
   ETizen,  // Deprecated but left here for backward compatibility.
   EGeoClue2,
   EPredictor,
-  EUser
+  EUser,
+  EGeoClue
 };
 
 /// Our structure ALWAYS has valid lat, lon and horizontal accuracy.
@@ -60,14 +79,9 @@ public:
   ms::LatLon GetLatLon() const { return {m_latitude, m_longitude}; }
 };
 
-class CompassInfo
+struct CompassInfo
 {
-public:
-  // double m_timestamp;           //!< seconds from 1st Jan 1970
-  // double m_magneticHeading;     //!< positive radians from the magnetic North
-  // double m_trueHeading;         //!< positive radians from the true North
-  // double m_accuracy;            //!< offset from the magnetic to the true North in radians
-  double m_bearing;  //!< positive radians from the true North
+  double m_bearing = 0.0;  //!< positive radians from the true North
 };
 
 static inline bool IsLatValid(double lat)

@@ -73,10 +73,9 @@ class PlacePageCommonLayout: NSObject, IPlacePageLayout {
     let vc = storyboard.instantiateViewController(ofType: ActionBarViewController.self)
     let navigationManager = MWMNavigationDashboardManager.shared()
     vc.placePageData = placePageData
-    vc.isRoutePlanning = navigationManager.state != .closed
     vc.canAddStop = MWMRouter.canAddIntermediatePoint()
     vc.canReplaceStop = navigationManager.selectedRoutePoint != nil
-    vc.canRouteToAndFrom = !navigationManager.shouldAppendNewPoints && navigationManager.selectedRoutePoint == nil
+    vc.shouldAppendNewPoints = navigationManager.shouldAppendNewPoints
     vc.delegate = interactor
     return vc
   }()
@@ -129,20 +128,15 @@ class PlacePageCommonLayout: NSObject, IPlacePageLayout {
 
     placePageData.onMapNodeStatusUpdate = { [weak self] in
       guard let self = self else { return }
-      self.actionBarViewController.updateDownloadButtonState(self.placePageData.mapNodeAttributes!.nodeStatus)
       if let buttonsData = self.placePageData.osmContributionData {
         self.buttonsViewController.buttonsData = buttonsData
       }
-      switch self.placePageData.mapNodeAttributes!.nodeStatus {
-      case .onDisk, .onDiskOutOfDate, .undefined, .inQueue:
-        self.actionBarViewController.resetButtons()
-      default:
-        break
-      }
+      self.actionBarViewController.updateMapNodeStatus()
     }
     placePageData.onMapNodeProgressUpdate = { [weak self] downloadedBytes, totalBytes in
-      guard let self = self, let downloadButton = self.actionBarViewController.downloadButton else { return }
-      downloadButton.mapDownloadProgress?.progress = CGFloat(downloadedBytes) / CGFloat(totalBytes)
+      guard let self = self else { return }
+      self.actionBarViewController.downloadButton?.mapDownloadProgress?.progress =
+        CGFloat(AppConstants.maxProgress) * CGFloat(downloadedBytes) / CGFloat(totalBytes)
     }
 
     return viewControllers
@@ -199,7 +193,7 @@ extension PlacePageCommonLayout: MWMLocationObserver {
   func onLocationError(_: MWMLocationStatus) {}
 
   private func updateHeading(_ heading: CLLocationDirection) {
-    guard let location = lastLocation, heading > 0 else {
+    guard let location = lastLocation, heading >= 0 else {
       return
     }
 

@@ -15,10 +15,8 @@ namespace sound
 {
 struct Notification;
 
-/// GetTtsText is responsible for generating text message for TTS in a specified locale
-/// by notification. To get this message use operator().
-/// If the message is not available for specified locale GetTtsText tries to find it in
-/// English locale.
+/// Generates localized navigation speech from turn notifications and phrase identifiers.
+/// Falls back to English for missing locale files; a missing phrase in a loaded locale returns empty.
 class GetTtsText
 {
 public:
@@ -28,9 +26,13 @@ public:
 
   std::string GetSpeedCameraNotification() const;
 
+  std::string GetOffTrackNotification() const;
+
+  std::string GetTrackApproachNotification() const;
+
   /// \brief Sets a locale.
   /// @param locale is a string representation of locale. For example "en", "ru", "zh-Hant" and so on.
-  /// \note See sound/tts/languages.txt for the full list of available locales.
+  /// \note See data/sound-strings/ for the available locales.
   void SetLocale(std::string const & locale);
 
   /// @return current TTS locale. For example "en", "ru", "zh-Hant" and so on.
@@ -46,13 +48,14 @@ private:
 
   std::unique_ptr<platform::GetTextById> m_getCurLang;
 
-  /// \brief Removes a terminal period (or CJK or Hindi equivalent) from a string
+  /// \brief Removes a terminal period (or CJK, Hindi or Armenian equivalent) from a string
   /// @param s - String to be modified
   static void RemoveLastDot(std::string & s)
   {
     strings::EatSuffix(s, ".");
     strings::EatSuffix(s, "。");
     strings::EatSuffix(s, "।");
+    strings::EatSuffix(s, "։");
   }
 };
 /// Generates text message id about the distance of the notification. For example: In 300 meters.

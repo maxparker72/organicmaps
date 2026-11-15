@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -17,14 +18,18 @@ import androidx.lifecycle.ViewModelProvider;
 import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
 import app.organicmaps.maplayer.MapButtonsViewModel;
+import app.organicmaps.sdk.Framework;
 import app.organicmaps.sdk.Router;
+import app.organicmaps.sdk.bookmarks.data.MapObject;
 import app.organicmaps.sdk.maplayer.traffic.TrafficManager;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.routing.RoutingInfo;
 import app.organicmaps.sdk.util.StringUtils;
 import app.organicmaps.sdk.widget.roadshield.RoadShieldUtils;
 import app.organicmaps.sdk.widgets.lanes.LanesView;
-import app.organicmaps.sdk.widgets.speedlimit.SpeedLimitView;
+import app.organicmaps.sdk.widgets.speedlimit.CombinedSpeedView;
+import app.organicmaps.sdk.widgets.speedlimit.CombinedSpeedViewController;
+import app.organicmaps.sdk.widgets.speedlimit.Shape;
 import app.organicmaps.util.UiUtils;
 import app.organicmaps.util.Utils;
 import app.organicmaps.util.WindowInsetUtils;
@@ -48,14 +53,20 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
   @NonNull
   private final LanesView mLanesView;
   @NonNull
-  private final SpeedLimitView mSpeedLimit;
+  private final CombinedSpeedView mSpeedView;
+  @NonNull
+  private final CombinedSpeedViewController mSpeedController;
 
   private final MapButtonsViewModel mMapButtonsViewModel;
+  private final ViewGroup mTopFrame;
+  private final View mNextTurnContainer;
 
   private final NavMenu mNavMenu;
   View.OnClickListener mOnSettingsClickListener;
+  View.OnClickListener mOnVoiceSettingsClickListener;
 
   public NavigationController(AppCompatActivity activity, View.OnClickListener onSettingsClickListener,
+                              View.OnClickListener onVoiceSettingsClickListener,
                               NavMenu.OnMenuSizeChangedListener onMenuSizeChangedListener)
   {
     mMapButtonsViewModel = new ViewModelProvider(activity).get(MapButtonsViewModel.class);
@@ -63,37 +74,43 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
     mFrame = activity.findViewById(R.id.navigation_frame);
     mNavMenu = new NavMenu(activity, this, onMenuSizeChangedListener);
     mOnSettingsClickListener = onSettingsClickListener;
+    mOnVoiceSettingsClickListener = onVoiceSettingsClickListener;
 
     // Top frame
-    final View topFrame = mFrame.findViewById(R.id.nav_top_frame);
-    final View turnFrame = topFrame.findViewById(R.id.nav_next_turn_frame);
+    mTopFrame = mFrame.findViewById(R.id.nav_top_frame);
+    mTopFrame.addOnLayoutChangeListener(
+        (v, l, t, r, b, ol, ot, or, ob) -> mMapButtonsViewModel.setTopHeaderHeight(computeNavContentHeight()));
+    View turnFrame = mTopFrame.findViewById(R.id.nav_next_turn_frame);
     mNextTurnImage = turnFrame.findViewById(R.id.turn);
     mNextTurnDistance = turnFrame.findViewById(R.id.distance);
 
-    mNextNextTurnFrame = topFrame.findViewById(R.id.nav_next_next_turn_frame);
+    mNextNextTurnFrame = mTopFrame.findViewById(R.id.nav_next_next_turn_frame);
     mNextNextTurnImage = mNextNextTurnFrame.findViewById(R.id.turn);
 
-    mStreetFrame = topFrame.findViewById(R.id.street_frame);
+    mStreetFrame = mTopFrame.findViewById(R.id.street_frame);
     mNextStreet = mStreetFrame.findViewById(R.id.street);
 
-    mLanesView = topFrame.findViewById(R.id.lanes);
-    mSpeedLimit = topFrame.findViewById(R.id.nav_speed_limit);
+    mLanesView = mTopFrame.findViewById(R.id.lanes);
 
-    final View nextTurnContainer = topFrame.findViewById(R.id.nav_next_turn_container);
+    mSpeedView = mTopFrame.findViewById(R.id.nav_speed_limit);
+    mSpeedController = new CombinedSpeedViewController(mSpeedView);
+    updateCurrentSpeed();
+
     // Blank rectangle below the navbar that hides menu content behind it.
     final View navigationBarBackground = mFrame.findViewById(R.id.nav_bottom_sheet_nav_bar);
     final View navBottomSheet = mFrame.findViewById(R.id.nav_bottom_sheet);
+    mNextTurnContainer = mFrame.findViewById(R.id.nav_next_turn_container);
 
     ViewCompat.setOnApplyWindowInsetsListener(mStreetFrame, BaselinePaddingInsetsListener.excludeBottom());
 
-    ViewCompat.setOnApplyWindowInsetsListener(topFrame, (v, windowInsets) -> {
+    ViewCompat.setOnApplyWindowInsetsListener(mTopFrame, (v, windowInsets) -> {
       final Insets safeDrawing = windowInsets.getInsets(WindowInsetUtils.TYPE_SAFE_DRAWING);
       // Pad the start edge (LTR: left, RTL: right) so the next-turn container clears side
       // cutouts and system bars regardless of layout direction.
       final boolean isRtl = v.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
       final int startInset = isRtl ? safeDrawing.right : safeDrawing.left;
-      nextTurnContainer.setPaddingRelative(startInset, nextTurnContainer.getPaddingTop(),
-                                           nextTurnContainer.getPaddingEnd(), nextTurnContainer.getPaddingBottom());
+      mNextTurnContainer.setPaddingRelative(startInset, mNextTurnContainer.getPaddingTop(),
+                                            mNextTurnContainer.getPaddingEnd(), mNextTurnContainer.getPaddingBottom());
       return windowInsets;
     });
 
@@ -115,6 +132,25 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
         navigationBarBackground.setLayoutParams(lp);
       }
     });
+  }
+
+  // The search sheet must clear the lowest visible child, including layout offsets and overlaps.
+  private int computeNavContentHeight()
+  {
+    return UiUtils.isVisible(mFrame) ? lowestVisibleChildBottom(mTopFrame) : 0;
+  }
+
+  @VisibleForTesting
+  static int lowestVisibleChildBottom(@NonNull ViewGroup parent)
+  {
+    int bottom = 0;
+    for (int i = 0; i < parent.getChildCount(); ++i)
+    {
+      final View child = parent.getChildAt(i);
+      if (UiUtils.isVisible(child))
+        bottom = Math.max(bottom, child.getBottom());
+    }
+    return bottom;
   }
 
   private void updateVehicle(@NonNull RoutingInfo info)
@@ -140,10 +176,13 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
 
   public void update(@Nullable RoutingInfo info)
   {
+    final boolean isPedestrian = Router.get() == Router.Pedestrian;
+    UiUtils.showIf(!isPedestrian, mSpeedView);
+
     if (info == null)
       return;
 
-    if (Router.get() == Router.Pedestrian)
+    if (isPedestrian)
       updatePedestrian(info);
     else
       updateVehicle(info);
@@ -170,8 +209,14 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
   public void show(boolean show)
   {
     if (show && !UiUtils.isVisible(mFrame))
+    {
       collapseNavMenu();
+      updateSpeedLimitSignType();
+      // Seed the panel from the already-built route so it isn't empty until the first GPS fix arrives.
+      update(RoutingController.get().getCachedRoutingInfo());
+    }
     UiUtils.showIf(show, mFrame);
+    mMapButtonsViewModel.setTopHeaderHeight(computeNavContentHeight());
   }
 
   public boolean isNavMenuCollapsed()
@@ -192,6 +237,9 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
   public void refresh()
   {
     mNavMenu.refreshTts();
+    // Refresh navigation values on resume in case measurement units changed in Settings.
+    if (RoutingController.get().isNavigating())
+      update(Framework.nativeGetRouteFollowingInfo());
   }
 
   @Override
@@ -249,6 +297,12 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
   }
 
   @Override
+  public void onTtsVoiceSettingsClicked()
+  {
+    mOnVoiceSettingsClickListener.onClick(null);
+  }
+
+  @Override
   public void onStopClicked()
   {
     RoutingController.get().cancel();
@@ -256,8 +310,32 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
 
   private void updateSpeedLimit(@NonNull final RoutingInfo info)
   {
+    updateCurrentSpeed();
+    mSpeedController.setSpeedLimit(info.speedLimitMps > 0 ? StringUtils.nativeFormatSpeed(info.speedLimitMps) : null);
+    mSpeedController.setAlertForced(info.isSpeedCamLimitExceeded());
+  }
+
+  private void updateSpeedLimitSignType()
+  {
     final Location location = MwmApplication.from(mFrame.getContext()).getLocationHelper().getSavedLocation();
-    final boolean speedLimitExceeded = location != null && info.speedLimitMps < location.getSpeed();
-    mSpeedLimit.setSpeedLimit(StringUtils.nativeFormatSpeed(info.speedLimitMps), speedLimitExceeded);
+    @Framework.SpeedLimitSignType
+    int type = Framework.SpeedLimitSignType.VIENNA;
+    if (location != null)
+      type = Framework.nativeGetSpeedLimitSignType(location.getLatitude(), location.getLongitude());
+    else
+    {
+      final MapObject startPoint = RoutingController.get().getStartPoint();
+      if (startPoint != null)
+        type = Framework.nativeGetSpeedLimitSignType(startPoint.getLat(), startPoint.getLon());
+    }
+    mSpeedController.setShape(type == Framework.SpeedLimitSignType.MUTCD ? Shape.Square : Shape.Circle);
+  }
+
+  private void updateCurrentSpeed()
+  {
+    final Location location = MwmApplication.from(mFrame.getContext()).getLocationHelper().getSavedLocation();
+    mSpeedController.setUnits(StringUtils.nativeGetLocalizedSpeedUnits());
+    mSpeedController.setSpeed(
+        StringUtils.nativeFormatSpeed(location != null && location.hasSpeed() ? location.getSpeed() : 0));
   }
 }

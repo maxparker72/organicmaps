@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "Muralha";
 "type.barrier.cycle_barrier" = "Barreira de bicicletas";
 "type.waterway.ditch" = "Vala de drenagem";
+"type.waterway.ditch.intermittent" = "Vala de drenagem intermitente";
 "type.natural.water.moat" = "Fosso";
 "type.natural.water.wastewater" = "Águas residuais";
 "type.barrier.entrance" = "Entrada";
@@ -407,28 +408,28 @@
 "type.highway" = "Rodovia";
 "type.highway.bridleway" = "Caminho para cavaleiros";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Ponte";
 "type.highway.bridleway.permissive" = "Caminho para cavaleiros";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Túnel";
 "type.highway.busway" = "Via exclusiva de autocarro";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Túnel";
 "type.highway.bus_stop" = "Paragem de autocarros";
 "type.highway.construction" = "Estrada em construção";
 "type.highway.cycleway" = "Ciclovia";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Ponte";
 "type.highway.cycleway.permissive" = "Ciclovia";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Túnel";
 "type.highway.elevator" = "Elevator";
 "type.highway.footway" = "Caminho pedonal";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Passagem de peões";
 "type.highway.footway.area" = "Caminho pedonal";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Túnel";
 "type.highway.ford" = "Vau";
 "type.highway.living_street" = "Zona de coexistência";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Túnel";
 "type.highway.motorway" = "Autoestrada";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Túnel";
 "type.highway.motorway_junction" = "Saída de autoestrada";
 "type.highway.motorway_link" = "Ligação a autoestrada";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Túnel";
 "type.highway.path" = "Caminho";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Caminho";
 "type.highway.footway.bicycle" = "Caminho";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Ponte";
 "type.highway.path.horse" = "Caminho";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Túnel";
 "type.highway.pedestrian" = "Rua pedonal";
 "type.highway.pedestrian.area" = "Rua pedonal";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Túnel";
-"type.highway.platform" = "Plataforma de transporte público";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "Plataforma";
 "type.highway.primary" = "Estrada primária";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Túnel";
 "type.highway.primary_link" = "Estrada primária";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Túnel";
 "type.highway.raceway" = "Pista de corridas";
 "type.highway.residential" = "Rua residencial";
 "type.highway.residential.area" = "Rua residencial";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Túnel";
 "type.highway.rest_area" = "Área de descanso";
 "type.highway.road" = "Estrada";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Ponte";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Túnel";
 "type.highway.secondary" = "Estrada secundária";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Túnel";
 "type.highway.secondary_link" = "Estrada secundária";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Túnel";
 "type.highway.service" = "Estrada de acesso ou serviço";
 "type.highway.service.area" = "Estrada de acesso ou serviço";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Ponte";
 "type.highway.service.driveway" = "Estrada de acesso ou serviço";
 "type.highway.service.parking_aisle" = "Estrada de estacionamento";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Túnel";
 "type.highway.services" = "Área de serviço";
 "type.highway.speed_camera" = "Radar de velocidade";
 "type.highway.steps" = "Escadas";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Túnel";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "Estrada terciária";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Túnel";
 "type.highway.tertiary_link" = "Estrada terciária";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Túnel";
 "type.highway.track" = "Carreiro florestal ou agrícola";
 "type.highway.track.area" = "Carreiro florestal ou agrícola";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Ponte";
 "type.highway.track.grade1" = "Carreiro florestal ou agrícola";
 "type.highway.track.no.access" = "Carreiro florestal ou agrícola";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Túnel";
 "type.highway.traffic_signals" = "Semáforo";
 "type.highway.trunk" = "Via rápida";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Túnel";
 "type.highway.trunk_link" = "Via rápida";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Túnel";
 "type.highway.unclassified" = "Estrada sem classificação";
 "type.highway.unclassified.area" = "Estrada sem classificação";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Ponte";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Túnel";
 "type.area_highway.cycleway" = "Ciclovia";
 "type.area_highway.footway" = "Caminho pedonal";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Castelo japonês";
 "type.historic.castle.stately" = "Château";
 "type.historic.city_gate" = "Portas da cidade";
+"type.man_made.ceremonial_gate" = "Portão Cerimonial";
 "type.historic.citywalls" = "Muralha";
 "type.historic.fort" = "Forte";
 "type.historic.gallows" = "Forca";
@@ -717,7 +721,8 @@
 "type.junction.roundabout" = "Rotunda";
 "type.landuse" = "Uso do solo";
 "type.landuse.allotments" = "Horta comunitária";
-"type.landuse.basin" = "Reservatório";
+"type.landuse.basin" = "Bacia";
+"type.landuse.basin.intermittent" = "Bacia intermitente";
 "type.landuse.brownfield" = "Terreno industrial devoluto";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Pedreira";
 "type.landuse.railway" = "Área ferroviária";
 "type.landuse.recreation_ground" = "Área de lazer";
-"type.landuse.reservoir" = "Água";
 "type.landuse.residential" = "Área residencial";
 "type.landuse.retail" = "Área de retalho";
 "type.landuse.salt_pond" = "Salinas";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Rinque de patinagem";
 "type.leisure.marina" = "Marina";
 "type.leisure.nature_reserve" = "Reserva natural";
+"type.leisure.bird_hide" = "Observatório de aves";
 "type.leisure.outdoor_seating" = "Assentos ao ar livre";
 "type.leisure.firepit" = "Lugar para Fogueira";
 "type.leisure.park" = "Parque";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Píer";
 "type.man_made.pipeline" = "Gasoduto";
 "type.man_made.pipeline.overground" = "Gasoduto aéreo";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Reservatório coberto";
 "type.man_made.silo" = "Silo";
 "type.man_made.storage_tank" = "Tanque de armazenamento";
 "type.man_made.surveillance" = "Câmara de vigilância";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Torre de água";
 "type.man_made.water_well" = "Poço de água";
 "type.man_made.water_well.drinking_water_no" = "Poço de água não potável";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Estação de tratamento de água";
 "type.man_made.windmill" = "Moinho de vento";
 "type.man_made.works" = "Fábrica";
 
@@ -871,10 +882,13 @@
 "type.natural.water.reservoir" = "Reservatório";
 "type.natural.water.basin" = "Bacia";
 "type.natural.water.river" = "Rio";
+"type.natural.water.intermittent" = "Corpo de água intermitente";
 "type.natural.land" = "Terra";
 "type.natural.meadow" = "Pradaria";
 "type.natural.orchard" = "Pomar";
 "type.natural.peak" = "Pico";
+"type.natural.hill" = "Colina";
+"type.natural.arch" = "Arco de Rocha";
 "type.natural.saddle" = "Sela da Montanha";
 "type.natural.rock" = "Rochedo";
 "type.natural.scrub" = "Matagal";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "Superfície não pavimentada ruim";
 "type.psurface.unpaved_good" = "Superfície não pavimentada boa";
 "type.public_transport" = "Transporte público";
-"type.public_transport.platform" = "Plataforma de transporte público";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "Plataforma";
 "type.railway" = "Ferrovia";
 "type.railway.abandoned" = "Ferrovia abandonada";
 "type.railway.abandoned.bridge" = "Ponte de Ferrovia abandonada";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Loja de frutas e verduras";
 "type.shop.grocery" = "Mercearia";
 "type.shop.hairdresser" = "Cabeleireiro(a)";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Barbearia";
 "type.shop.hardware" = "Loja de ferragens";
 "type.shop.health_food" = "Loja de alimentos saudáveis";
 "type.shop.hearing_aids" = "Loja de aparelhos auditivos";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Râguebi";
 "type.sport.running" = "Corrida";
 "type.sport.softball" = "Softbol";
+"type.sport.pilates" = "Pilates";
 "type.tourism" = "Turismo";
 "type.tourism.aquarium" = "Aquário";
 
@@ -1514,22 +1534,25 @@
 "type.waterway" = "Curso de água";
 "type.waterway.access_point" = "Ponto de acesso à via navegável";
 "type.waterway.canal" = "Canal";
+"type.waterway.canal.intermittent" = "Canal intermitente";
 "type.waterway.canal.tunnel" = "Túnel de canal";
 "type.waterway.fish_pass" = "Escada de peixes";
+"type.waterway.fish_pass.intermittent" = "Escada de peixes intermitente";
 "type.waterway.dam" = "Barragem";
 "type.barrier.ditch" = "Vala";
 "type.natural.water.ditch" = "Vala de drenagem";
 "type.waterway.ditch.tunnel" = "Bueiro";
 "type.waterway.dock" = "Doca";
 "type.waterway.drain" = "Valeta de drenagem";
+"type.waterway.drain.intermittent" = "Valeta de drenagem intermitente";
 "type.natural.water.drain" = "Valeta de drenagem";
 "type.waterway.drain.tunnel" = "Bueiro";
 "type.waterway.lock_gate" = "Comporta de eclusa";
 "type.waterway.river" = "Rio";
+"type.waterway.river.intermittent" = "Rio intermitente";
 "type.waterway.river.tunnel" = "Rio";
 "type.waterway.stream" = "Ribeiro";
-"type.waterway.stream.ephemeral" = "Ribeiro efémero";
-"type.waterway.stream.intermittent" = "Ribeiro sasonal";
+"type.waterway.stream.intermittent" = "Ribeiro intermitente";
 "type.waterway.stream.tunnel" = "Ribeiro";
 "type.waterway.waterfall" = "Queda de água";
 "type.waterway.weir" = "Represa";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Instituição de serviços sociais";
+"type.amenity.stage" = "Palco";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Entrada do Serviço de Urgência";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Estação de monitorização meteorológica";
 "type.amenity.student_accommodation" = "Alojamento para estudantes";
 "type.craft.watchmaker" = "Relojoeiro";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Fabrico de janelas";
 "type.xmas_feature.market" = "Mercado de Natal";
 "type.xmas_feature.tree" = "Árvore de Natal";
 "type.amenity.hookah_lounge" = "Bar de narguilé";

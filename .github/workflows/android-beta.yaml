@@ -4,35 +4,41 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - .gitignore
-      - .github/**
-      - '!.github/workflows/android-beta.yaml'  # Run check on self change
-      - '**/*_tests/**'
-      - '**/CMakeLists.txt'
-      - CONTRIBUTORS
-      - LICENSE
-      - NOTICE
-      - README.md
-      - iphone/**
-      - data/strings/**
-      - docs/**
-      - generator/**
-      - packaging/**
-      - platform/*apple*
-      - platform/*_ios*
-      - platform/*_linux*
-      - platform/*_mac*
-      - platform/*qt*
-      - platform/*_win*
-      - qt*/**
-      - skin_generator/**
-      - tools/**
-      - track_generator/**
-      - xcode/**
+    # Keep common paths in sync with android-check.yaml, ios-check.yaml and ios-beta.yaml.
+    # Keep Android paths in sync with android-check.yaml, except workflow/setup-gradle.
+    paths:
+      # Common inputs
+      - .gitattributes
+      - .gitmodules
+      - '*.h'
+      - '*.hpp'
+      - 3party/**
+      - data/**
+      - libs/**
+      # Android inputs
+      - .github/workflows/android-beta.yaml
+      - android/**
+      - CMakeLists.txt
+      - cmake/**
+      - tools/unix/version.sh  # Required by Gradle version generation
+      # Common exclusions
+      - '!**/*.md'
+      - '!**/*_tests/**'
+      - '!data/borders/**'
+      - '!data/organic_maps_emoji/**'
+      - '!data/strings/**'
+      - '!data/test_data/**'
+      # Android exclusions
+      - '!android/app/src/*/play/**'
+      - '!libs/platform/*apple*'
+      - '!libs/platform/*_ios*'
+      - '!libs/platform/*_linux*'
+      - '!libs/platform/*_mac*'
+      - '!libs/platform/*qt*'
+      - '!libs/platform/*_win*'
 
 env:
-  JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64  # Java 17 is required for Android Gradle 8 plugin
+  JAVA_HOME: /usr/lib/jvm/temurin-21-jdk-amd64  # Java 21 is required by Android Gradle plugin lint
 
 jobs:
   android-google-beta:
@@ -50,14 +56,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 100 # enough to get all commits for the current day
-
-      - name: Restore Boost submodule from cache
-        uses: actions/cache@v5
-        with:
-          path: |
-            3party/boost
-            .git/modules/3party/boost
-          key: boost-submodule
 
       - name: Parallel submodules checkout
         shell: bash
@@ -77,10 +75,6 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
           SECURE_PROPERTIES: ${{ secrets.SECURE_PROPERTIES }}
           RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
-
-      - name: Configure repository
-        shell: bash
-        run: ./configure.sh
 
       - name: Compile
         shell: bash

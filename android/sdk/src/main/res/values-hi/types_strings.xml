@@ -138,6 +138,8 @@
     <string name="type.amenity.water_point">पानी की टंकी पुनः भरने का स्थान</string>
     <string name="type.amenity.water_point.drinking_water_no">पानी की टंकी पुनः भरने का स्थान</string>
     <string name="type.barrier.city_wall">शहर की दीवार</string>
+    <string name="type.waterway.ditch">जल निकासी खाई</string>
+    <string name="type.waterway.ditch.intermittent">अस्थायी जल निकासी खाई</string>
     <string name="type.barrier.wall">दीवार</string>
     <string name="type.boundary.aboriginal_lands">स्वदेशी भूमि</string>
     <string name="type.building">भवन</string>
@@ -291,7 +293,8 @@
     <string name="type.highway.path.horse">पथ</string>
     <string name="type.highway.pedestrian">पैदल यात्रीयों की सड़क</string>
     <string name="type.highway.pedestrian.area">पैदल यात्रीयों की सड़क</string>
-    <string name="type.highway.platform">रेलवे प्लेटफार्म</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">प्लेटफ़ॉर्म</string>
     <string name="type.highway.primary">प्राथमिक सड़क</string>
     <string name="type.highway.primary_link">प्राथमिक सड़क</string>
     <string name="type.highway.raceway">दौड़ का मैदान</string>
@@ -334,6 +337,7 @@
     <string name="type.historic.castle.defensive">गढ़</string>
     <string name="type.historic.castle.fortress">किले</string>
     <string name="type.historic.castle.palace">महल</string>
+    <string name="type.man_made.ceremonial_gate">समारोहिक द्वार</string>
     <string name="type.historic.citywalls">शहर की दीवार</string>
     <string name="type.historic.fort">किला</string>
     <string name="type.historic.memorial">शहीद स्मारक</string>
@@ -352,6 +356,7 @@
     <string name="type.junction.circular">गोल चक्कर</string>
     <string name="type.junction.roundabout">गोल चक्कर</string>
     <string name="type.landuse">भूमि उपयोग</string>
+    <string name="type.landuse.basin.intermittent">अस्थायी जलाशय</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">क़ब्रिस्तान</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
@@ -370,6 +375,7 @@
     <string name="type.leisure.hackerspace">हैकर्सस्पेस</string>
     <string name="type.leisure.marina">मरीना</string>
     <string name="type.leisure.nature_reserve">संरक्षित प्रकृतिक्षेत्र</string>
+    <string name="type.leisure.bird_hide">पक्षी अवलोकन आश्रय</string>
     <string name="type.leisure.park">उद्यान</string>
     <string name="type.leisure.park.no.access">उद्यान</string>
     <string name="type.leisure.park.permissive">उद्यान</string>
@@ -386,6 +392,8 @@
     <string name="type.man_made.cairn">स्तूप</string>
     <string name="type.man_made.chimney">धुआँकश</string>
     <string name="type.man_made.lighthouse">प्रकाशस्तम्भ</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">ढका हुआ जलाशय</string>
     <string name="type.man_made.tower">बुर्ज</string>
     <!-- A deep hole drilled into the earth to extract oil or gas. -->
     <string name="type.man_made.petroleum_well">तेल या गैस कुआं</string>
@@ -397,6 +405,8 @@
     <string name="type.man_made.water_tower">पानी का टावर</string>
     <string name="type.man_made.water_well">कुआँ</string>
     <string name="type.man_made.water_well.drinking_water_no">कुआँ</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">जल शोधन संयंत्र</string>
     <string name="type.man_made.windmill">पवनचक्की</string>
     <string name="type.mountain_pass">दर्रा</string>
     <string name="type.natural">प्रकृति</string>
@@ -419,10 +429,13 @@
     <string name="type.natural.water.lake">झील</string>
     <string name="type.natural.water.pond">तालाब</string>
     <string name="type.natural.water.river">नदी</string>
+    <string name="type.natural.water.intermittent">अस्थायी जल निकाय</string>
     <string name="type.natural.land">भूमि</string>
     <string name="type.natural.meadow">घास का मैदान</string>
     <string name="type.natural.orchard">फलोद्यान</string>
     <string name="type.natural.peak">शिखर</string>
+    <string name="type.natural.hill">पहाड़ी</string>
+    <string name="type.natural.arch">शिला मेहराब</string>
     <string name="type.natural.scrub">झाड़ी</string>
     <string name="type.natural.spring">पानी का चश्मा</string>
     <string name="type.natural.spring.drinking_water_no">पानी का चश्मा</string>
@@ -476,7 +489,8 @@
     <string name="type.power.substation">विद्युत उपकेंद्र</string>
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">संचरण स्तम्भ</string>
-    <string name="type.public_transport.platform">रेलवे प्लेटफार्म</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">प्लेटफ़ॉर्म</string>
     <string name="type.railway">रेल</string>
     <string name="type.railway.disused.tunnel">अप्रयुक्त रेलवे सुरंग</string>
     <string name="type.railway.funicular">रज्जुरेल</string>
@@ -551,6 +565,8 @@
     <string name="type.shop.greengrocer">फल-सब्ज़ियों की दुकान</string>
     <string name="type.shop.grocery">किराने की दुकान</string>
     <string name="type.shop.hairdresser">नाई</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">नाई की दुकान</string>
     <string name="type.shop.hardware">लौह वस्तुओं की दुकान</string>
     <string name="type.shop.health_food">स्वस्थ भोजन की दुकान</string>
     <string name="type.shop.hearing_aids">श्रवण सहायता भंडार</string>
@@ -651,6 +667,7 @@
     <string name="type.sport.rugby_union">रग्बी यूनियन</string>
     <string name="type.sport.running">दौड़ना</string>
     <string name="type.sport.softball">सॉफ्टबॉल</string>
+    <string name="type.sport.pilates">पिलाटेस</string>
     <string name="type.tourism">पर्यटन</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
     <string name="type.tourism.alpine_hut">माउंटेन लॉज</string>
@@ -682,11 +699,22 @@
     <string name="type.tourism.zoo">चिड़ियाघर</string>
     <string name="type.waterway.access_point">जलमार्ग पहुँच बिंदु</string>
     <string name="type.waterway.canal">नहर</string>
+    <string name="type.waterway.canal.intermittent">अस्थायी नहर</string>
     <string name="type.waterway.canal.tunnel">नहर</string>
+    <string name="type.waterway.fish_pass">मछली मार्ग</string>
+    <string name="type.waterway.fish_pass.intermittent">अस्थायी मछली मार्ग</string>
     <string name="type.waterway.dam">बाँध</string>
+    <string name="type.natural.water.ditch">जल निकासी खाई</string>
     <string name="type.waterway.dock">गोदी</string>
+    <string name="type.waterway.drain">नाला</string>
+    <string name="type.waterway.drain.intermittent">अस्थायी नाला</string>
+    <string name="type.natural.water.drain">नाला</string>
     <string name="type.waterway.river">नदी</string>
+    <string name="type.waterway.river.intermittent">अस्थायी नदी</string>
     <string name="type.waterway.river.tunnel">नदी</string>
+    <string name="type.waterway.stream">जलधारा</string>
+    <string name="type.waterway.stream.intermittent">अस्थायी जलधारा</string>
+    <string name="type.waterway.stream.tunnel">जलधारा</string>
     <string name="type.waterway.waterfall">जलप्रपात</string>
     <string name="type.waterway.weir">बंधिका</string>
     <string name="type.wheelchair">पहियाकुर्सी</string>
@@ -700,6 +728,7 @@
     <string name="type.self_service.no">कोई स्व-सेवा नहीं</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">सामाजिक सुविधा</string>
+    <string name="type.amenity.stage">मंच</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">आपातकालीन वार्ड प्रवेश द्वार</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -721,6 +750,8 @@
     <string name="type.man_made.monitoring_station.weather">मौसम निगरानी स्टेशन</string>
     <string name="type.amenity.student_accommodation">छात्र आवास</string>
     <string name="type.craft.watchmaker">घड़ीसाज़</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">खिड़की निर्माण</string>
     <string name="type.xmas_feature.market">क्रिसमस का बाजार</string>
     <string name="type.xmas_feature.tree">क्रिसमस ट्री</string>
     <string name="type.amenity.hookah_lounge">हुक्का लाउंज</string>

@@ -66,27 +66,11 @@ using namespace storage;
 - (void)routeAddStop:(PlacePageData *)data
 {
   MWMNavigationDashboardManager * navigationManager = [MWMNavigationDashboardManager sharedManager];
-  if (navigationManager.shouldAppendNewPoints)
-  {
-    MWMRoutePoint * newFinishPoint = [self routePoint:data withType:MWMRoutePointTypeFinish intermediateIndex:0];
-    [MWMRouter continueRouteToPointAndRebuild:newFinishPoint];
-  }
-  else if (navigationManager.selectedRoutePoint)
-  {
-    MWMRoutePoint * pointToReplace = navigationManager.selectedRoutePoint;
-    MWMRoutePoint * withPoint = [self routePoint:data
-                                        withType:pointToReplace.type
-                               intermediateIndex:pointToReplace.intermediateIndex];
-    [MWMRouter replacePointAndRebuild:pointToReplace withPoint:withPoint];
-    pointToReplace = nil;
-  }
+  MWMRoutePoint * point = [self routePoint:data withType:MWMRoutePointTypeIntermediate intermediateIndex:0];
+  if (navigationManager.isRoutePointSelectionActive)
+    [navigationManager selectRoutePoint:point];
   else
-  {
-    MWMRoutePoint * pointBeforeFinish = [self routePoint:data
-                                                withType:MWMRoutePointTypeIntermediate
-                                       intermediateIndex:0];
-    [MWMRouter addPointAndRebuild:pointBeforeFinish];
-  }
+    [MWMRouter addPointAndRebuild:point];
 
   [self.searchManager close];
   [self closePlacePage];
@@ -112,36 +96,6 @@ using namespace storage;
   [self closePlacePage];
 }
 
-- (MWMRoutePoint *)routePointWithData:(PlacePageData *)data
-                            pointType:(MWMRoutePointType)type
-                    intermediateIndex:(size_t)intermediateIndex
-{
-  if (data.isMyPosition)
-    return [[MWMRoutePoint alloc] initWithLastLocationAndType:type intermediateIndex:intermediateIndex];
-
-  NSString * title = nil;
-  if (data.previewData.title.length > 0)
-    title = data.previewData.title;
-  else if (data.previewData.secondarySubtitle.length > 0)
-    title = data.previewData.secondarySubtitle;
-  else if (data.previewData.subtitle.length > 0)
-    title = data.previewData.subtitle;
-  else if (data.bookmarkData != nil)
-    title = data.bookmarkData.externalTitle;
-  else
-    title = L(@"core_placepage_unknown_place");
-
-  NSString * subtitle = nil;
-  if (data.previewData.subtitle.length > 0 && ![title isEqualToString:data.previewData.subtitle])
-    subtitle = data.previewData.subtitle;
-
-  return [[MWMRoutePoint alloc] initWithPoint:location_helpers::ToMercator(data.locationCoordinate)
-                                        title:title
-                                     subtitle:subtitle
-                                         type:type
-                            intermediateIndex:intermediateIndex];
-}
-
 - (MWMRoutePoint *)routePoint:(PlacePageData *)data
                      withType:(MWMRoutePointType)type
             intermediateIndex:(size_t)intermediateIndex
@@ -154,16 +108,16 @@ using namespace storage;
     title = data.previewData.title;
   else if (data.previewData.secondarySubtitle.length > 0)
     title = data.previewData.secondarySubtitle;
-  else if (data.previewData.subtitle.length > 0)
-    title = data.previewData.subtitle;
+  else if (data.previewData.routeSubtitle.length > 0)
+    title = data.previewData.routeSubtitle;
   else if (data.bookmarkData != nil)
     title = data.bookmarkData.externalTitle;
   else
     title = L(@"core_placepage_unknown_place");
 
   NSString * subtitle = nil;
-  if (data.previewData.subtitle.length > 0 && ![title isEqualToString:data.previewData.subtitle])
-    subtitle = data.previewData.subtitle;
+  if (data.previewData.routeSubtitle.length > 0 && ![title isEqualToString:data.previewData.routeSubtitle])
+    subtitle = data.previewData.routeSubtitle;
 
   return [[MWMRoutePoint alloc] initWithPoint:location_helpers::ToMercator(data.locationCoordinate)
                                         title:title
@@ -203,12 +157,9 @@ using namespace storage;
     if (trackGroupId != categoryId && bmManager.HasBmCategory(trackGroupId))
       categoryId = trackGroupId;
   }
-  kml::BookmarkData bmData;
-  bmData.m_name = info.FormatNewBookmarkName();
-  bmData.m_color.m_predefinedColor = f.LastEditedBMColor();
+  auto bmData = info.MakeBookmarkData();
+  bmData.m_color = f.LastEditedBMColor();
   bmData.m_point = location_helpers::ToMercator(data.locationCoordinate);
-  if (info.IsFeature())
-    SaveFeatureTypes(info.GetTypes(), bmData);
   auto editSession = bmManager.GetEditSession();
   auto const * bookmark = editSession.CreateBookmark(std::move(bmData), categoryId);
 
@@ -220,7 +171,7 @@ using namespace storage;
 
 - (void)updateBookmark:(PlacePageData *)data
                  title:(NSString *)title
-                 color:(MWMBookmarkColor)color
+                 color:(UIColor *)color
               category:(MWMMarkGroupID)category
 {
   MWMBookmarksManager * bookmarksManager = [MWMBookmarksManager sharedManager];
@@ -314,6 +265,11 @@ using namespace storage;
 - (void)openWebsite:(PlacePageData *)data
 {
   [self.ownerViewController openUrl:data.infoData.website externally:YES];
+}
+
+- (void)openHeritageWebsite:(PlacePageData *)data
+{
+  [self.ownerViewController openUrl:data.infoData.heritageWebsite externally:YES];
 }
 
 - (void)openWebsiteMenu:(PlacePageData *)data

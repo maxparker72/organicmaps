@@ -2,6 +2,9 @@
 
 #include "map/bookmark_manager.hpp"
 
+#include "routing/router.hpp"           // routing::RouterType
+#include "routing/routing_options.hpp"  // routing::RoutingOptions
+
 #include <functional>
 #include <string>
 
@@ -50,7 +53,6 @@ public:
   void SetRoutePointFullType(RouteMarkType type, size_t intermediateIndex);
   bool IsEqualFullType(RouteMarkType type, size_t intermediateIndex) const;
 
-  void SetIsMyPosition(bool isMyPosition);
   bool IsMyPosition() const { return m_markData.m_isMyPosition; }
 
   void SetPassed(bool isPassed);
@@ -61,6 +63,7 @@ public:
 
   RouteMarkData const & GetMarkData() const { return m_markData; }
   void SetMarkData(RouteMarkData && data);
+  void SetPosition(m2::PointD const & position);
 
   drape_ptr<TitlesInfo> GetTitleDecl() const override;
 
@@ -80,11 +83,13 @@ private:
 class RoutePointsLayout
 {
 public:
-  static size_t const kMaxIntermediatePointsCount;
+  static size_t constexpr kMaxIntermediatePointsCount = 100;
+  static size_t constexpr kMaxRoutePointsCount = kMaxIntermediatePointsCount + 2;
 
   RoutePointsLayout(BookmarkManager & manager);
 
-  void AddRoutePoint(RouteMarkData && data);
+  /// Returns the created mark, or nullptr at capacity.
+  RouteMarkPoint * AddRoutePoint(RouteMarkData && data);
   RouteMarkPoint const * GetRoutePoint(RouteMarkType type, size_t intermediateIndex = 0) const;
   RouteMarkPoint * GetRoutePointForEdit(RouteMarkType type, size_t intermediateIndex = 0);
   RouteMarkPoint const * GetMyPositionPoint() const;
@@ -205,7 +210,11 @@ enum class RoadWarningMarkType : uint8_t
   Toll = 0,
   Ferry = 1,
   Dirty = 2,
-  Count = 3
+  Steps = 3,
+  // Point-like warnings (placed on a single route vertex, not a road span).
+  Gate = 4,
+  LiftGate = 5,
+  Count = 6
 };
 
 class RoadWarningMark : public UserMark
@@ -243,3 +252,66 @@ private:
 };
 
 std::string DebugPrint(RoadWarningMarkType type);
+
+// Whether a warning of |type| is shown on a route of |router|. Steps occur only on
+// pedestrian/bicycle routes, lift gates are reported for cars only, gates and ferries for all.
+bool IsWarningShownFor(RoadWarningMarkType type, routing::RouterType router);
+
+// Picks the linear warning to show for a route segment given its road types and the router type.
+// Returns RoadWarningMarkType::Count if there is nothing to warn about. Router-type filtering is
+// applied first, so Steps (pedestrian/bicycle) wins over Dirty (car) on unpaved steps instead of
+// being silently dropped.
+RoadWarningMarkType ChooseRoadWarning(routing::RoutingOptions options, routing::RouterType router);
+
+// Warnings backed by road-avoidance controls: Toll/Dirty for driving and Ferry for driving/cycling/walking.
+// The caller decides whether to signal available routing options. Steps/gate/lift_gate are not avoidable.
+bool IsAvoidableRoadWarning(RoadWarningMarkType type);
+
+/// \brief ETA balloon attached to a route variant (active or alternative). Tappable so the user can
+/// swap the active route by tapping its balloon. The pivot (m_ptOrg) sits on the route polyline.
+class RouteAltMark : public UserMark
+{
+public:
+  explicit RouteAltMark(m2::PointD const & ptOrg);
+
+  void SetEta(std::string const & etaText);
+  std::string const & GetEta() const { return m_titleDecl.m_primaryText; }
+
+  /// Marks the balloon as belonging to the currently-active route variant — uses opaque colors
+  /// instead of the dimmed alternative palette.
+  void SetIsActive(bool isActive);
+  bool IsActive() const { return m_isActive; }
+
+  /// Index into RoutesResult::m_routes that this balloon represents.
+  void SetRouteIdx(size_t idx);
+  size_t GetRouteIdx() const { return m_routeIdx; }
+
+  /// Shifts the balloon body off the pivot in pixel space and grows a tail pointing back to it.
+  /// Pivot (m_ptOrg) is untouched so taps still hit the visible balloon. Pass {0, 0} to disable.
+  void SetPixelOffset(m2::PointF const & offsetPx);
+
+  // UserMark overrides.
+  df::DepthLayer GetDepthLayer() const override { return df::DepthLayer::RoutingMarkLayer; }
+  bool SymbolIsPOI() const override { return true; }
+  bool HasTitlePriority() const override { return true; }
+  uint16_t GetPriority() const override { return static_cast<uint16_t>(Priority::TransitTransfer); }
+  df::SpecialDisplacement GetDisplacement() const override { return df::SpecialDisplacement::SpecialModeUserMark; }
+  bool IsSymbolSelectable() const override { return true; }
+  dp::Anchor GetAnchor() const override { return dp::Center; }
+  int GetMinZoom() const override;
+  int GetMinTitleZoom() const override;
+
+  drape_ptr<TitlesInfo> GetTitleDecl() const override;
+  drape_ptr<ColoredSymbolZoomInfo> GetColoredSymbols() const override;
+  drape_ptr<SymbolNameZoomInfo> GetSymbolNames() const override { return nullptr; }
+  drape_ptr<SymbolOffsets> GetSymbolOffsets() const override;
+
+private:
+  void RefreshBackground();
+
+  dp::TitleDecl m_titleDecl;
+  df::UserPointMark::ColoredSymbolZoomInfo m_textBg;
+  bool m_isActive = false;
+  size_t m_routeIdx = 0;
+  m2::PointF m_pixelOffsetPx{0, 0};
+};

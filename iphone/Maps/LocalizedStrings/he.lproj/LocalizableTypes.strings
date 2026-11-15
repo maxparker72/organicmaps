@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "חומת העיר";
 "type.barrier.cycle_barrier" = "מחסום אופניים";
 "type.waterway.ditch" = "תעלת ניקוז";
+"type.waterway.ditch.intermittent" = "תעלת ניקוז זמנית";
 "type.natural.water.moat" = "תעלת מגן";
 "type.natural.water.wastewater" = "שפכים";
 "type.barrier.entrance" = "כניסה";
@@ -407,28 +408,28 @@
 "type.highway" = "כביש";
 "type.highway.bridleway" = "שביל סוסים";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "גשר סוסים";
 "type.highway.bridleway.permissive" = "דרך מותרת לרכיבת סוסים";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "מנהרה לסוסים";
 "type.highway.busway" = "כביש יעודי לאוטובוס/מת\"צ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "מִנהָרָה";
 "type.highway.bus_stop" = "תחנת אוטובוס";
 "type.highway.construction" = "כביש בבנייה";
 "type.highway.cycleway" = "שביל אופניים";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "גשר לאופניים";
 "type.highway.cycleway.permissive" = "דרך מותרת לרכיבת אופניים";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "מנהרה לאופניים";
 "type.highway.elevator" = "מעלית";
 "type.highway.footway" = "שביל הליכה";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "מעבר הולכי רגל";
 "type.highway.footway.area" = "אזור להולכי רגל";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "גשר הולכי רגל";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "מנהרה להולכי רגל";
 "type.highway.ford" = "מקום צליחה";
 "type.highway.living_street" = "רחוב משולב";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "מִנהָרָה";
 "type.highway.motorway" = "כביש מהיר";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "מִנהָרָה";
 "type.highway.motorway_junction" = "יציאה";
 "type.highway.motorway_link" = "כביש מהיר";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "מִנהָרָה";
 "type.highway.path" = "שביל";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "שביל להולכי רגל ואופניים";
 "type.highway.footway.bicycle" = "שביל להולכי רגל ואופניים";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "גשר";
 "type.highway.path.horse" = "שביל לרכיבת סוסים";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "מִנהָרָה";
 "type.highway.pedestrian" = "מדרחוב";
 "type.highway.pedestrian.area" = "אזור הולכי רגל";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "גשר הולכי רגל";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "מנהרה להולכי רגל";
-"type.highway.platform" = "רציף תחבורה";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "רציף";
 "type.highway.primary" = "כביש ראשי";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "מִנהָרָה";
 "type.highway.primary_link" = "כביש ראשי";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "מִנהָרָה";
 "type.highway.raceway" = "מסלול מרוצים";
 "type.highway.residential" = "רחוב מגורים";
 "type.highway.residential.area" = "רחוב מגורים";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "מִנהָרָה";
 "type.highway.rest_area" = "תחנת ריענון";
 "type.highway.road" = "כביש";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "גשר";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "מִנהָרָה";
 "type.highway.secondary" = "כביש משני";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "מִנהָרָה";
 "type.highway.secondary_link" = "כביש משני";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "מִנהָרָה";
 "type.highway.service" = "כביש שירות";
 "type.highway.service.area" = "כביש שירות";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "גשר";
 "type.highway.service.driveway" = "כביש גישה";
 "type.highway.service.parking_aisle" = "מעבר במגרש חנייה";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "מִנהָרָה";
 "type.highway.services" = "מתחם שירות";
 "type.highway.speed_camera" = "מצלמת מהירות";
 "type.highway.steps" = "מדרגות";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "מִנהָרָה";
 "type.highway.ladder" = "Ladder";
 "type.highway.tertiary" = "כביש שלישוני";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "מִנהָרָה";
 "type.highway.tertiary_link" = "כביש שלישוני";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "מִנהָרָה";
 "type.highway.track" = "מסלול";
 "type.highway.track.area" = "מסלול";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "גשר";
 "type.highway.track.grade1" = "מסלול";
 "type.highway.track.no.access" = "מסלול ללא גישה";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "מִנהָרָה";
 "type.highway.traffic_signals" = "רמזור";
 "type.highway.trunk" = "כביש בין עירוני";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "מִנהָרָה";
 "type.highway.trunk_link" = "כביש בין עירוני";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "מִנהָרָה";
 "type.highway.unclassified" = "כביש לא מסומן/מזערי";
 "type.highway.unclassified.area" = "כביש לא מסומן/מזערי";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "גשר";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "מִנהָרָה";
 "type.area_highway.cycleway" = "שביל אופניים";
 "type.area_highway.footway" = "שביל הליכה";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "טירה יפנית";
 "type.historic.castle.stately" = "טירה מפוארת";
 "type.historic.city_gate" = "שער העיר";
+"type.man_made.ceremonial_gate" = "שער טקסי";
 "type.historic.citywalls" = "חומת העיר";
 "type.historic.fort" = "מִבצָר";
 "type.historic.gallows" = "גרדום";
@@ -718,6 +722,7 @@
 "type.landuse" = "שימושי קרקע";
 "type.landuse.allotments" = "חלקות חקלאיות";
 "type.landuse.basin" = "אגן מים";
+"type.landuse.basin.intermittent" = "אגן מים זמני";
 "type.landuse.brownfield" = "קרקע מזוהמת";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "מחצבה";
 "type.landuse.railway" = "שטחי רכבת";
 "type.landuse.recreation_ground" = "אזור מיועד לבילוי";
-"type.landuse.reservoir" = "מאגר";
 "type.landuse.residential" = "אזור מגורים";
 "type.landuse.retail" = "אזור קמעונאות";
 "type.landuse.salt_pond" = "בריכת מלח";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "החלקה על קרח";
 "type.leisure.marina" = "מרינה";
 "type.leisure.nature_reserve" = "שמורת טבע";
+"type.leisure.bird_hide" = "מסתור לצפייה בציפורים";
 "type.leisure.outdoor_seating" = "ישיבה בחוץ";
 "type.leisure.firepit" = "Firepit";
 "type.leisure.park" = "פארק";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "מזח";
 "type.man_made.pipeline" = "צינור";
 "type.man_made.pipeline.overground" = "צינור עילי";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "מאגר מים מקורה";
 "type.man_made.silo" = "סילו";
 "type.man_made.storage_tank" = "מיכל אחסון";
 "type.man_made.surveillance" = "מצלמת מעקב";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "מגדל מים";
 "type.man_made.water_well" = "באר מים";
 "type.man_made.water_well.drinking_water_no" = "באר מים";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "מפעל מים";
 "type.man_made.windmill" = "טחנת רוח";
 "type.man_made.works" = "עבודות תעשייה";
 
@@ -871,10 +882,13 @@
 "type.natural.water.reservoir" = "מאגר מים";
 "type.natural.water.basin" = "אגן מים";
 "type.natural.water.river" = "נהר";
+"type.natural.water.intermittent" = "גוף מים זמני";
 "type.natural.land" = "ארץ";
 "type.natural.meadow" = "אָחוּ";
 "type.natural.orchard" = "פרדס";
 "type.natural.peak" = "פסגה";
+"type.natural.hill" = "גבעה";
+"type.natural.arch" = "קשת הסלע";
 "type.natural.saddle" = "אוכף הרים";
 "type.natural.rock" = "סלע";
 "type.natural.scrub" = "עשבייה";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "לא סלול במצב גרוע";
 "type.psurface.unpaved_good" = "לא סלול במצב טוב";
 "type.public_transport" = "תחבורה ציבורית";
-"type.public_transport.platform" = "רציף תחבורה";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "רציף";
 "type.railway" = "מסילת רכבת";
 "type.railway.abandoned" = "מסילת רכבת נטושה";
 "type.railway.abandoned.bridge" = "גשר רכבת נטוש";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "ירקן";
 "type.shop.grocery" = "מכולת";
 "type.shop.hairdresser" = "מספרה";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "מספרת גברים";
 "type.shop.hardware" = "חנות לחומרי בניין";
 "type.shop.health_food" = "חנות מזון בריאות";
 "type.shop.hearing_aids" = "חנות מכשירי שמיעה";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "רוגבי 15";
 "type.sport.running" = "ריצה";
 "type.sport.softball" = "סופטבול";
+"type.sport.pilates" = "פילאטיס";
 "type.tourism" = "תיירות";
 "type.tourism.aquarium" = "אַקוַרִיוּם";
 
@@ -1514,23 +1534,26 @@
 "type.waterway" = "נתיב מים";
 "type.waterway.access_point" = "נקודת גישה לנתיב מים";
 "type.waterway.canal" = "תעלת מים";
+"type.waterway.canal.intermittent" = "תעלת מים זמנית";
 "type.waterway.canal.tunnel" = "תעלת מים תת קרקעית";
 "type.waterway.fish_pass" = "סולם דגים";
+"type.waterway.fish_pass.intermittent" = "סולם דגים זמני";
 "type.waterway.dam" = "סכר";
 "type.barrier.ditch" = "שוחה";
 "type.natural.water.ditch" = "תעלת ניקוז";
 "type.waterway.ditch.tunnel" = "מעבר מים";
 "type.waterway.dock" = "Waterway Dock";
-"type.waterway.drain" = "Drain";
-"type.natural.water.drain" = "Drain";
+"type.waterway.drain" = "מוביל ניקוז";
+"type.waterway.drain.intermittent" = "מוביל ניקוז זמני";
+"type.natural.water.drain" = "מוביל ניקוז";
 "type.waterway.drain.tunnel" = "מעבר מים";
 "type.waterway.lock_gate" = "Lock Gate";
-"type.waterway.river" = "River";
-"type.waterway.river.tunnel" = "River";
-"type.waterway.stream" = "Stream";
-"type.waterway.stream.ephemeral" = "Ephemeral Stream";
-"type.waterway.stream.intermittent" = "Intermittent Stream";
-"type.waterway.stream.tunnel" = "Stream";
+"type.waterway.river" = "נהר";
+"type.waterway.river.intermittent" = "נהר זמני";
+"type.waterway.river.tunnel" = "נהר";
+"type.waterway.stream" = "נחל";
+"type.waterway.stream.intermittent" = "נחל זמני";
+"type.waterway.stream.tunnel" = "נחל";
 "type.waterway.waterfall" = "מפל";
 "type.waterway.weir" = "Weir";
 "type.wheelchair" = "Wheelchair";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "מתקן חברתי";
+"type.amenity.stage" = "במה";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "כניסה למיון";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "תחנת ניטור מזג האוויר";
 "type.amenity.student_accommodation" = "מגורים לסטודנטים";
 "type.craft.watchmaker" = "שָׁעָן";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "ייצור חלונות";
 "type.xmas_feature.market" = "שוק חג המולד";
 "type.xmas_feature.tree" = "עץ חג המולד";
 "type.amenity.hookah_lounge" = "בר נרגילה";

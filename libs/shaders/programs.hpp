@@ -20,6 +20,11 @@ enum class Program
   TextStaticOutlinedGui,
   TextOutlinedGui,
   Area,
+  // Solid-fill patterns are background fills: keep them before programs that draw translucent geometry over them,
+  // see AreaPatterns_SolidFillsDrawBeforeTranslucentGeometry.
+  AreaStipple,
+  AreaSpeckle,
+  AreaGrid,
   AreaOutline,
   Area3d,
   Area3dOutline,
@@ -29,7 +34,14 @@ enum class Program
   PathSymbol,
   TransparentArea,
   CapJoin,
+  // The smooth (per-vertex interpolated) terrain hillshade, see df::BuildTerrainShade.
+  // Drawn after the solid fills and patterns (it writes depth at the foreground level, so
+  // a pattern drawn later at the background depths would be culled underneath it), but
+  // before the Hatching* overlays: a hatch quad writes depth everywhere too, and the shade
+  // placed after it would be culled across the whole quad (e.g. the national park hatch).
+  TerrainShade,
   HatchingArea,
+  HatchingAreaDash,
   TexturingGui,
   Ruler,
   Accuracy,
@@ -95,7 +107,12 @@ inline std::string_view DebugPrint(Program p)
   case Program::DashedLine: return "DashedLine";
   case Program::PathSymbol: return "PathSymbol";
   case Program::TransparentArea: return "TransparentArea";
+  case Program::TerrainShade: return "TerrainShade";
+  case Program::AreaStipple: return "AreaStipple";
+  case Program::AreaSpeckle: return "AreaSpeckle";
+  case Program::AreaGrid: return "AreaGrid";
   case Program::HatchingArea: return "HatchingArea";
+  case Program::HatchingAreaDash: return "HatchingAreaDash";
   case Program::TexturingGui: return "TexturingGui";
   case Program::Ruler: return "Ruler";
   case Program::Accuracy: return "Accuracy";

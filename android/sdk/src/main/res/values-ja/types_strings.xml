@@ -178,6 +178,7 @@
     <string name="type.barrier.city_wall">城壁</string>
     <string name="type.barrier.cycle_barrier">バリカー</string>
     <string name="type.waterway.ditch">排水溝</string>
+    <string name="type.waterway.ditch.intermittent">間欠的な排水溝</string>
     <string name="type.natural.water.moat">堀</string>
     <string name="type.natural.water.wastewater">廃水</string>
     <string name="type.barrier.entrance">エントランス</string>
@@ -352,48 +353,48 @@
     <!-- SECTION: Types: Roads -->
     <string name="type.highway">道路</string>
     <string name="type.highway.bridleway">馬道</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.bridleway.bridge">馬道(橋)</string>
     <string name="type.highway.bridleway.permissive">馬道</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.bridleway.tunnel">馬道(トンネル)</string>
     <string name="type.highway.busway">バス専用道路</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.busway.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.busway.tunnel">トンネル</string>
     <string name="type.highway.bus_stop">バス停</string>
     <string name="type.highway.construction">工事中の道路</string>
     <string name="type.highway.cycleway">自転車道</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.cycleway.bridge">自転車道(橋)</string>
     <string name="type.highway.cycleway.permissive">自転車道</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.cycleway.tunnel">自転車道(トンネル)</string>
     <string name="type.highway.footway">歩道</string>
     <string name="type.highway.footway.sidewalk">歩道</string>
     <string name="type.highway.footway.crossing">横断歩道</string>
     <string name="type.highway.footway.area">歩道</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.footway.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.footway.tunnel">トンネル</string>
     <string name="type.highway.ford">浅瀬</string>
     <string name="type.highway.living_street">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.living_street.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.living_street.tunnel">トンネル</string>
     <string name="type.highway.motorway">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway.tunnel">トンネル</string>
     <string name="type.highway.motorway_junction">ジャンクション</string>
     <string name="type.highway.motorway_link">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.motorway_link.tunnel">トンネル</string>
     <string name="type.highway.path">歩道</string>
     <!-- Hiking trail tagged as sac_scale=demanding_mountain_hiking (3 of 6) or trail_visibility=bad. -->
@@ -402,102 +403,103 @@
     <string name="type.highway.path.expert">非常に難しい、または区別がつかないトレイル</string>
     <string name="type.highway.path.bicycle">歩道</string>
     <string name="type.highway.footway.bicycle">歩道</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.path.bridge">橋</string>
     <string name="type.highway.path.horse">歩道</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.path.tunnel">トンネル</string>
     <string name="type.highway.pedestrian">ストリート</string>
     <string name="type.highway.pedestrian.area">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.pedestrian.tunnel">トンネル</string>
-    <string name="type.highway.platform">公共交通機関のプラットホーム</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.highway.platform">乗り場</string>
     <string name="type.highway.primary">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary.tunnel">トンネル</string>
     <string name="type.highway.primary_link">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.primary_link.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.primary_link.tunnel">トンネル</string>
     <string name="type.highway.raceway">レース場</string>
     <string name="type.highway.residential">ストリート</string>
     <string name="type.highway.residential.area">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.residential.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.residential.tunnel">トンネル</string>
     <string name="type.highway.rest_area">休憩所</string>
     <string name="type.highway.road">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.road.bridge">橋</string>
     <!-- A bridge structure outline. -->
     <string name="type.man_made.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.road.tunnel">トンネル</string>
     <string name="type.highway.secondary">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary.tunnel">トンネル</string>
     <string name="type.highway.secondary_link">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.secondary_link.tunnel">トンネル</string>
     <string name="type.highway.service">ストリート</string>
     <string name="type.highway.service.area">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.service.bridge">橋</string>
     <string name="type.highway.service.driveway">ストリート</string>
     <string name="type.highway.service.parking_aisle">ストリート</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.service.tunnel">トンネル</string>
     <string name="type.highway.services">サービスエリア</string>
     <string name="type.highway.speed_camera">自動速度違反取締装置</string>
     <string name="type.highway.steps">歩道</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.steps.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.steps.tunnel">トンネル</string>
     <string name="type.highway.tertiary">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary.tunnel">トンネル</string>
     <string name="type.highway.tertiary_link">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.tertiary_link.tunnel">トンネル</string>
     <string name="type.highway.track">ストリート</string>
     <string name="type.highway.track.area">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.track.bridge">橋</string>
     <string name="type.highway.track.grade1">ストリート</string>
     <string name="type.highway.track.no.access">ストリート</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.track.tunnel">トンネル</string>
     <string name="type.highway.traffic_signals">交通信号</string>
     <string name="type.highway.trunk">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk.tunnel">トンネル</string>
     <string name="type.highway.trunk_link">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.trunk_link.tunnel">トンネル</string>
     <string name="type.highway.unclassified">ストリート</string>
     <string name="type.highway.unclassified.area">ストリート</string>
-    <!-- These translations are used for all type.highway.*.bridge. -->
+    <!-- Default translation for type.highway.*.bridge aliases; individual types can override it. -->
     <string name="type.highway.unclassified.bridge">橋</string>
-    <!-- These translations are used for all type.highway.*.tunnel. -->
+    <!-- Default translation for type.highway.*.tunnel aliases; individual types can override it. -->
     <string name="type.highway.unclassified.tunnel">トンネル</string>
     <string name="type.area_highway.cycleway">自転車道</string>
     <string name="type.area_highway.footway">歩道</string>
@@ -535,6 +537,7 @@
     <string name="type.historic.castle.shiro">日本の城</string>
     <string name="type.historic.castle.stately">城</string>
     <string name="type.historic.city_gate">城門</string>
+    <string name="type.man_made.ceremonial_gate">セレモニアルゲート</string>
     <string name="type.historic.citywalls">城壁</string>
     <string name="type.historic.fort">歴史的な要塞</string>
     <string name="type.historic.gallows">絞首台</string>
@@ -567,7 +570,8 @@
     <string name="type.junction.roundabout">ラウンドアバウト</string>
     <string name="type.landuse">土地利用</string>
     <string name="type.landuse.allotments">市民農園</string>
-    <string name="type.landuse.basin">水地</string>
+    <string name="type.landuse.basin">調整池</string>
+    <string name="type.landuse.basin.intermittent">間欠的な調整池</string>
     <string name="type.landuse.brownfield">再開発用地</string>
     <!-- In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. -->
     <string name="type.landuse.cemetery">墓地</string>
@@ -596,7 +600,6 @@
     <string name="type.landuse.quarry">採石場</string>
     <string name="type.landuse.railway">鉄道施設</string>
     <string name="type.landuse.recreation_ground">レクリエーション</string>
-    <string name="type.landuse.reservoir">貯水池</string>
     <string name="type.landuse.residential">住宅地</string>
     <string name="type.landuse.retail">小売店エリア</string>
     <string name="type.landuse.salt_pond">塩田</string>
@@ -616,6 +619,7 @@
     <string name="type.leisure.ice_rink">アイスリンク</string>
     <string name="type.leisure.marina">マリーナ</string>
     <string name="type.leisure.nature_reserve">自然保護区</string>
+    <string name="type.leisure.bird_hide">野鳥観察舎</string>
     <string name="type.leisure.outdoor_seating">屋外席</string>
     <string name="type.leisure.park">公園</string>
     <string name="type.leisure.park.no.access">公園</string>
@@ -645,6 +649,8 @@
     <string name="type.man_made.pier">桟橋</string>
     <string name="type.man_made.pipeline">パイプライン</string>
     <string name="type.man_made.pipeline.overground">地表のパイプライン</string>
+    <!-- A covered water storage reservoir, usually for drinking water -->
+    <string name="type.man_made.reservoir_covered">配水池</string>
     <string name="type.man_made.surveillance">監視カメラ</string>
     <string name="type.man_made.tower">タワー</string>
     <!-- A huge telecommunications tower. Often a local monument or a landmark. -->
@@ -661,6 +667,8 @@
     <string name="type.man_made.water_tower">給水塔</string>
     <string name="type.man_made.water_well">井戸</string>
     <string name="type.man_made.water_well.drinking_water_no">井戸</string>
+    <!-- A facility that treats and supplies drinking water -->
+    <string name="type.man_made.water_works">浄水場</string>
     <string name="type.man_made.windmill">風車</string>
     <string name="type.man_made.works">工場</string>
     <string name="type.military">軍事</string>
@@ -692,12 +700,15 @@
     <string name="type.natural.water.lock">ロックチャンバー</string>
     <string name="type.natural.water.pond">池</string>
     <string name="type.natural.water.reservoir">貯水池</string>
-    <string name="type.natural.water.basin">水地</string>
+    <string name="type.natural.water.basin">調整池</string>
     <string name="type.natural.water.river">河川</string>
+    <string name="type.natural.water.intermittent">間欠的な水域</string>
     <string name="type.natural.land">陸地</string>
     <string name="type.natural.meadow">牧草地</string>
     <string name="type.natural.orchard">果樹園</string>
     <string name="type.natural.peak">山頂</string>
+    <string name="type.natural.hill">丘</string>
+    <string name="type.natural.arch">ロック・アーチ</string>
     <string name="type.natural.saddle">鞍部</string>
     <string name="type.natural.rock">岩</string>
     <string name="type.natural.scrub">雑木林</string>
@@ -708,7 +719,7 @@
     <string name="type.natural.vineyard">ブドウ園</string>
     <string name="type.natural.volcano">火山</string>
     <string name="type.natural.volcano.active">活火山</string>
-    <string name="type.natural.water">水地</string>
+    <string name="type.natural.water">水域</string>
     <string name="type.natural.wetland">湿地帯</string>
     <string name="type.natural.wetland.bog">泥炭地</string>
     <string name="type.natural.wetland.marsh">沼地</string>
@@ -778,7 +789,8 @@
     <!-- A tower or pylon carrying high voltage electricity cables. -->
     <string name="type.power.tower">電柱</string>
     <string name="type.public_transport">公共交通機関</string>
-    <string name="type.public_transport.platform">公共交通機関のプラットホーム</string>
+    <!-- Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. -->
+    <string name="type.public_transport.platform">乗り場</string>
     <string name="type.railway">鉄道</string>
     <string name="type.railway.abandoned">廃線</string>
     <string name="type.railway.abandoned.bridge">廃線(橋)</string>
@@ -1128,6 +1140,8 @@
     <string name="type.shop.greengrocer">八百屋</string>
     <string name="type.shop.grocery">買い物</string>
     <string name="type.shop.hairdresser">美容院/理容店</string>
+    <!-- Traditional men's haircuts and beard trimming -->
+    <string name="type.shop.hairdresser.barber">理容室</string>
     <string name="type.shop.hardware">ホームセンター</string>
     <string name="type.shop.health_food">健康食品店</string>
     <string name="type.shop.hearing_aids">補聴器店</string>
@@ -1251,6 +1265,7 @@
     <string name="type.sport.rugby_union">ラグビーユニオン</string>
     <string name="type.sport.running">ランニング</string>
     <string name="type.sport.softball">ソフトボール</string>
+    <string name="type.sport.pilates">ピラティス</string>
     <string name="type.tourism">観光</string>
     <string name="type.tourism.aquarium">水族館</string>
     <!-- Typically serviced, staff is present and food is available (compared to wilderness_hut). -->
@@ -1301,22 +1316,25 @@
     <string name="type.waterway">水域</string>
     <string name="type.waterway.access_point">水路アクセスポイント</string>
     <string name="type.waterway.canal">運河</string>
+    <string name="type.waterway.canal.intermittent">間欠的な運河</string>
     <string name="type.waterway.canal.tunnel">運河</string>
     <string name="type.waterway.fish_pass">魚道</string>
+    <string name="type.waterway.fish_pass.intermittent">間欠的な魚道</string>
     <string name="type.waterway.dam">ダム</string>
     <string name="type.barrier.ditch">排水路</string>
     <string name="type.natural.water.ditch">排水溝</string>
     <string name="type.waterway.ditch.tunnel">暗渠</string>
     <string name="type.waterway.dock">ドック</string>
-    <string name="type.waterway.drain">用水路</string>
-    <string name="type.natural.water.drain">用水路</string>
+    <string name="type.waterway.drain">排水路</string>
+    <string name="type.waterway.drain.intermittent">間欠的な排水路</string>
+    <string name="type.natural.water.drain">排水路</string>
     <string name="type.waterway.drain.tunnel">暗渠</string>
     <string name="type.waterway.lock_gate">水門</string>
     <string name="type.waterway.river">河川</string>
+    <string name="type.waterway.river.intermittent">間欠的な河川</string>
     <string name="type.waterway.river.tunnel">河川</string>
     <string name="type.waterway.stream">小川</string>
-    <string name="type.waterway.stream.ephemeral">小川</string>
-    <string name="type.waterway.stream.intermittent">小川</string>
+    <string name="type.waterway.stream.intermittent">間欠的な小川</string>
     <string name="type.waterway.stream.tunnel">小川</string>
     <string name="type.waterway.waterfall">滝</string>
     <string name="type.waterway.weir">堰</string>
@@ -1337,6 +1355,7 @@
     <string name="type.self_service.no">セルフサービスはない</string>
     <!-- https://wiki.openstreetmap.org/wiki/Key:social_facility -->
     <string name="type.amenity.social_facility">社会施設</string>
+    <string name="type.amenity.stage">舞台</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance -->
     <string name="type.emergency.emergency_ward_entrance">救急病棟入口</string>
     <!-- https://wiki.openstreetmap.org/wiki/Tag:amenity=dojo -->
@@ -1358,6 +1377,8 @@
     <string name="type.man_made.monitoring_station.weather">気象観測ステーション</string>
     <string name="type.amenity.student_accommodation">学生寮</string>
     <string name="type.craft.watchmaker">ウォッチメーカー</string>
+    <!-- A workshop that makes and installs windows -->
+    <string name="type.craft.window_construction">窓製造</string>
     <string name="type.xmas_feature.market">クリスマス・マーケット</string>
     <string name="type.xmas_feature.tree">クリスマスツリー</string>
     <string name="type.amenity.hookah_lounge">シーシャラウンジ</string>

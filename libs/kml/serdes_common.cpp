@@ -2,7 +2,14 @@
 
 #include "geometry/mercator.hpp"
 
+#include "base/assert.hpp"
+#include "base/math.hpp"
+#include "base/stl_helpers.hpp"
 #include "base/string_utils.hpp"
+
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 namespace kml
 {
@@ -32,7 +39,31 @@ std::string PointToGxString(geometry::PointWithAltitude const & pt)
   return PointToString(pt.GetPoint(), kSeparator);
 }
 
-void SaveStringWithCDATA(Writer & writer, std::string const & s)
+bool LineHasAltitude(TrackGeometry const & line)
+{
+  return base::AnyOf(line, [](geometry::PointWithAltitude const & pt)
+  {
+    auto const alt = pt.GetAltitude();
+    return alt != geometry::kInvalidAltitude && alt != geometry::kDefaultAltitudeMeters;
+  });
+}
+
+bool IsValidLatLon(double lat, double lon)
+{
+  return mercator::ValidLat(lat) && mercator::ValidLon(lon);
+}
+
+geometry::Altitude ToAltitude(double altitude)
+{
+  ASSERT(math::is_finite(altitude), (altitude));
+
+  static_assert(geometry::kInvalidAltitude == std::numeric_limits<geometry::Altitude>::min());
+  double constexpr kMinAltitude = std::numeric_limits<geometry::Altitude>::min() + 1.0;
+  double constexpr kMaxAltitude = std::numeric_limits<geometry::Altitude>::max();
+  return static_cast<geometry::Altitude>(std::clamp(std::round(altitude), kMinAltitude, kMaxAltitude));
+}
+
+void SaveStringWithCDATA(Writer & writer, std::string_view s)
 {
   if (s.empty())
     return;
@@ -51,29 +82,32 @@ void SaveStringWithCDATA(Writer & writer, std::string const & s)
 
   // Only copy and modify the string if invalid chars are actually found (rare case).
   std::string filtered;
-  std::string const * clean = &s;
+  std::string_view clean = s;
   if (std::any_of(s.begin(), s.end(), isInvalidXmlChar))
   {
     filtered = s;
     std::erase_if(filtered, isInvalidXmlChar);
     if (filtered.empty())
       return;
-    clean = &filtered;
+    clean = filtered;
   }
 
-  // According to kml/xml spec, we need to escape special symbols with CDATA.
-  if (clean->find_first_of("<&") != std::string::npos)
-    writer << "<![CDATA[" << *clean << "]]>";
+  auto pos = clean.find("]]>");
+  if (pos != std::string_view::npos || clean.find_first_of("<&") != std::string_view::npos)
+  {
+    writer << "<![CDATA[";
+    // XML forbids a CDATA terminator in character data and inside a CDATA section. Split it
+    // across adjacent sections so a user-supplied name or description stays literal text.
+    while (pos != std::string_view::npos)
+    {
+      writer << clean.substr(0, pos) << "]]]]><![CDATA[>";
+      clean.remove_prefix(pos + 3);
+      pos = clean.find("]]>");
+    }
+    writer << clean << "]]>";
+  }
   else
-    writer << *clean;
-}
-
-std::string const * GetDefaultLanguage(LocalizableString const & lstr)
-{
-  auto const find = lstr.find(kDefaultLang);
-  if (find != lstr.end())
-    return &find->second;
-  return nullptr;
+    writer << clean;
 }
 
 }  // namespace kml

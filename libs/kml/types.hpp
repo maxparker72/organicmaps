@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kml/area_data.hpp"
 #include "kml/type_utils.hpp"
 
 #include "coding/point_coding.hpp"
@@ -166,26 +167,6 @@ inline std::string DebugPrint(AccessRules accessRules)
   UNREACHABLE();
 }
 
-enum class CompilationType : uint8_t
-{
-  // Do not change the order because of binary serialization.
-  Category = 0,
-  Collection,
-  Day,
-};
-
-inline std::string DebugPrint(CompilationType compilationType)
-{
-  switch (compilationType)
-  {
-    using enum kml::CompilationType;
-  case Category: return "Category";
-  case Collection: return "Collection";
-  case Day: return "Day";
-  }
-  UNREACHABLE();
-}
-
 enum class BookmarkIcon : uint16_t
 {
   None = 0,
@@ -301,6 +282,46 @@ struct ColorData
   uint32_t m_rgba = 0;
 };
 
+// Bookmark color is carried as either a preset (m_predefinedColor, theme-aware) or an explicit
+// custom color stored in m_rgba. m_rgba == 0 is the "no custom color" sentinel; a custom color is
+// always forced opaque (dp::Color packs alpha in the low byte) so it can never collide with it.
+inline uint32_t constexpr kInvalidColorRGBA = 0;
+
+inline uint32_t ForceOpaqueRGBA(dp::Color color)
+{
+  return color.GetRGBA() | 0xFF;
+}
+
+inline bool IsCustomBookmarkColor(ColorData const & color)
+{
+  return color.m_rgba != kInvalidColorRGBA;
+}
+
+inline ColorData MakeCustomBookmarkColorData(dp::Color color)
+{
+  return {PredefinedColor::None, ForceOpaqueRGBA(color)};
+}
+
+// Enforces the bookmark color invariant:
+//   preset => {predefined != None, rgba == 0}; custom => {None, rgba forced opaque};
+//   unset {None, 0} => default preset {Red, 0}.
+// Imported {predefined, rgba != 0} data is treated as an explicit custom color.
+inline ColorData NormalizeBookmarkColorData(ColorData color)
+{
+  if (IsCustomBookmarkColor(color))
+    return MakeCustomBookmarkColorData(dp::Color(color.m_rgba));
+  if (color.m_predefinedColor == PredefinedColor::None)
+    color.m_predefinedColor = PredefinedColor::Red;
+  return color;
+}
+
+// Effective color of a bookmark: the custom color if set, else the preset's base color. Used by
+// platform bridges and color pickers; theme-independent (the render path resolves presets per theme).
+inline dp::Color GetEffectiveColor(ColorData const & color)
+{
+  return IsCustomBookmarkColor(color) ? dp::Color(color.m_rgba) : ColorFromPredefinedColor(color.m_predefinedColor);
+}
+
 class ClassifierTypes : public std::vector<uint32_t>
 {
 public:
@@ -312,8 +333,6 @@ public:
   }
 };
 
-// This structure is used in FileDataV6 because
-// its binary format is the same as in kmb version 6.
 // Make a copy of this structure in a file types_v<n>.hpp
 // in case of any changes of its binary format.
 struct BookmarkData
@@ -325,8 +344,8 @@ struct BookmarkData
                                   visitor(m_timestamp, "timestamp"), visitor(m_point, "point"),
                                   visitor(m_boundTracks, "boundTracks"), visitor(m_visible, "visible"),
                                   visitor(m_nearestToponym, "nearestToponym"), visitor(m_minZoom, "minZoom"),
-                                  visitor(m_compilations, "compilations"), visitor(m_properties, "properties"),
-                                  VISITOR_COLLECTABLE)
+                                  visitor(m_unusedCompilations, "unusedCompilations"),
+                                  visitor(m_properties, "properties"), VISITOR_COLLECTABLE)
 
   DECLARE_COLLECTABLE(LocalizableStringIndex, m_name, m_description, m_customName, m_nearestToponym, m_properties)
 
@@ -338,7 +357,7 @@ struct BookmarkData
            m_featureTypes == data.m_featureTypes && m_customName == data.m_customName &&
            m_boundTracks == data.m_boundTracks && m_visible == data.m_visible &&
            m_nearestToponym == data.m_nearestToponym && m_minZoom == data.m_minZoom &&
-           m_compilations == data.m_compilations && m_properties == data.m_properties;
+           m_properties == data.m_properties;
   }
 
   bool operator!=(BookmarkData const & data) const { return !operator==(data); }
@@ -373,8 +392,8 @@ struct BookmarkData
   std::string m_nearestToponym;
   // Minimal zoom when bookmark is visible.
   int m_minZoom = 1;
-  // List of compilationIds.
-  std::vector<CompilationId> m_compilations;
+  // Vestigial "Collections" leftover, see CategoryData::m_unusedCompilationId. Always empty.
+  std::vector<uint64_t> m_unusedCompilations;
   // Key-value properties.
   Properties m_properties;
 };
@@ -438,6 +457,26 @@ struct MultiGeometry
   size_t GetNumberOfLinesWithTimestamps() const;
 };
 
+// Intermediate route stop. KML preserves it; GPX imports named rtepts and exports waypoints,
+// and GeoJSON exports Point features.
+struct TrackStopData
+{
+  // This visitor is used for debug output only, it is not tied to any binary (KMB) layout.
+  DECLARE_VISITOR_AND_DEBUG_PRINT(TrackStopData, visitor(m_point, "point"), visitor(m_name, "name"))
+
+  bool operator==(TrackStopData const & data) const
+  {
+    return m_point.EqualDxDy(data.m_point, kMwmPointAccuracy) && m_name == data.m_name;
+  }
+
+  bool operator!=(TrackStopData const & data) const { return !operator==(data); }
+
+  // Coordinates in mercator, on or near the track line.
+  m2::PointD m_point;
+  // Stop's name in the default language (route mark titles and GPX rtept names are plain strings).
+  std::string m_name;
+};
+
 struct TrackData
 {
   DECLARE_VISITOR_AND_DEBUG_PRINT(TrackData, visitor(m_id, "id"), visitor(m_localId, "localId"),
@@ -454,7 +493,8 @@ struct TrackData
     return m_id == data.m_id && m_localId == data.m_localId && m_name == data.m_name &&
            m_description == data.m_description && m_layers == data.m_layers && IsEqual(m_timestamp, data.m_timestamp) &&
            m_geometry == data.m_geometry && m_visible == data.m_visible &&
-           m_nearestToponyms == data.m_nearestToponyms && m_properties == data.m_properties;
+           m_nearestToponyms == data.m_nearestToponyms && m_properties == data.m_properties &&
+           m_stops == data.m_stops && m_routerType == data.m_routerType;
   }
 
   bool operator!=(TrackData const & data) const { return !operator==(data); }
@@ -478,23 +518,27 @@ struct TrackData
   std::vector<std::string> m_nearestToponyms;
   // Key-value properties.
   Properties m_properties;
+
+  // Excluded from the visitor to preserve the KMB V9 layout; KML text retains both fields.
+
+  // Ordered intermediate route stops; geometry represents the endpoints.
+  std::vector<TrackStopData> m_stops;
+  // Routing profile (see routing::ToString(RouterType)), or empty when unknown.
+  std::string m_routerType;
 };
 
-// This structure is used in FileDataV6 because
-// its binary format is the same as in kmb version 6.
 // Make a copy of this structure in a file types_v<n>.hpp
 // in case of any changes of its binary format.
 struct CategoryData
 {
-  DECLARE_VISITOR_AND_DEBUG_PRINT(CategoryData, visitor(m_id, "id"), visitor(m_compilationId, "compilationId"),
-                                  visitor(m_type, "type"), visitor(m_name, "name"), visitor(m_imageUrl, "imageUrl"),
-                                  visitor(m_annotation, "annotation"), visitor(m_description, "description"),
-                                  visitor(m_visible, "visible"), visitor(m_authorName, "authorName"),
-                                  visitor(m_authorId, "authorId"), visitor(m_rating, "rating"),
-                                  visitor(m_reviewsNumber, "reviewsNumber"), visitor(m_lastModified, "lastModified"),
-                                  visitor(m_accessRules, "accessRules"), visitor(m_tags, "tags"),
-                                  visitor(m_toponyms, "toponyms"), visitor(m_languageCodes, "languageCodes"),
-                                  visitor(m_properties, "properties"), VISITOR_COLLECTABLE)
+  DECLARE_VISITOR_AND_DEBUG_PRINT(
+      CategoryData, visitor(m_id, "id"), visitor(m_unusedCompilationId, "unusedCompilationId"),
+      visitor(m_unusedCompilationType, "unusedCompilationType"), visitor(m_name, "name"),
+      visitor(m_imageUrl, "imageUrl"), visitor(m_annotation, "annotation"), visitor(m_description, "description"),
+      visitor(m_visible, "visible"), visitor(m_authorName, "authorName"), visitor(m_authorId, "authorId"),
+      visitor(m_rating, "rating"), visitor(m_reviewsNumber, "reviewsNumber"), visitor(m_lastModified, "lastModified"),
+      visitor(m_accessRules, "accessRules"), visitor(m_tags, "tags"), visitor(m_toponyms, "toponyms"),
+      visitor(m_languageCodes, "languageCodes"), visitor(m_properties, "properties"), VISITOR_COLLECTABLE)
 
   DECLARE_COLLECTABLE(LocalizableStringIndex, m_name, m_annotation, m_description, m_imageUrl, m_authorName, m_authorId,
                       m_tags, m_toponyms, m_properties)
@@ -502,10 +546,9 @@ struct CategoryData
   bool operator==(CategoryData const & data) const
   {
     double constexpr kEps = 1e-5;
-    return m_id == data.m_id && m_compilationId == data.m_compilationId && m_type == data.m_type &&
-           m_name == data.m_name && m_imageUrl == data.m_imageUrl && m_annotation == data.m_annotation &&
-           m_description == data.m_description && m_visible == data.m_visible && m_accessRules == data.m_accessRules &&
-           m_authorName == data.m_authorName && m_authorId == data.m_authorId &&
+    return m_id == data.m_id && m_name == data.m_name && m_imageUrl == data.m_imageUrl &&
+           m_annotation == data.m_annotation && m_description == data.m_description && m_visible == data.m_visible &&
+           m_accessRules == data.m_accessRules && m_authorName == data.m_authorName && m_authorId == data.m_authorId &&
            fabs(m_rating - data.m_rating) < kEps && m_reviewsNumber == data.m_reviewsNumber &&
            IsEqual(m_lastModified, data.m_lastModified) && m_tags == data.m_tags && m_toponyms == data.m_toponyms &&
            m_languageCodes == data.m_languageCodes && m_properties == data.m_properties;
@@ -515,21 +558,21 @@ struct CategoryData
 
   // Unique id (it will not be serialized in text files).
   MarkGroupId m_id = kInvalidMarkGroupId;
-  // Id unique within single kml (have to be serialized in text files).
-  CompilationId m_compilationId = kInvalidCompilationId;
-  // Unique ids of nested groups (it will not be serialized in text files).
-  GroupIdCollection m_compilationIds;
-  // Compilation's type
-  CompilationType m_type = CompilationType::Category;
+  // Vestigial leftovers of the MAPS.ME-only "Collections" feature. Organic Maps neither creates
+  // nor shows collections, but the fields keep their slots in the KMB layout (see
+  // kml::binary::Version) so that files stay compatible. They always hold the values below:
+  // whatever is read from a file is dropped by binary::DeserializerKml::DropCompilationReferences.
+  uint64_t m_unusedCompilationId = kUnusedCompilationId;
+  uint8_t m_unusedCompilationType = kUnusedCompilationType;
   // Category's name.
   LocalizableString m_name;
   // Image URL.
   std::string m_imageUrl;
-  // Category's description.
+  // Category's short annotation.
   LocalizableString m_annotation;
   // Category's description.
   LocalizableString m_description;
-  // Collection visibility.
+  // Category visibility.
   bool m_visible = true;
   // Author's name.
   std::string m_authorName;
@@ -555,31 +598,29 @@ struct CategoryData
 
 struct FileData
 {
-  DECLARE_VISITOR_AND_DEBUG_PRINT(FileData, visitor(m_serverId, "serverId"), visitor(m_categoryData, "category"),
-                                  visitor(m_bookmarksData, "bookmarks"), visitor(m_tracksData, "tracks"),
-                                  visitor(m_compilationsData, "compilations"))
+  DECLARE_VISITOR_AND_DEBUG_PRINT(FileData, visitor(m_categoryData, "category"), visitor(m_bookmarksData, "bookmarks"),
+                                  visitor(m_tracksData, "tracks"), visitor(m_areasData, "areas"))
 
   bool operator==(FileData const & data) const
   {
-    return m_serverId == data.m_serverId && m_categoryData == data.m_categoryData &&
-           m_bookmarksData == data.m_bookmarksData && m_tracksData == data.m_tracksData &&
-           m_compilationsData == data.m_compilationsData;
+    return m_categoryData == data.m_categoryData && m_bookmarksData == data.m_bookmarksData &&
+           m_tracksData == data.m_tracksData && m_areasData == data.m_areasData;
   }
 
   bool operator!=(FileData const & data) const { return !operator==(data); }
 
   // Device id (it will not be serialized in text files).
   std::string m_deviceId;
-  // Server id.
-  std::string m_serverId;
   // Category's data.
   CategoryData m_categoryData;
   // Bookmarks collection.
   std::vector<BookmarkData> m_bookmarksData;
   // Tracks collection.
   std::vector<TrackData> m_tracksData;
-  // Compilation collection.
-  std::vector<CategoryData> m_compilationsData;
+  // Polygon areas are persisted as KML; the KMB and GPX writers reject them.
+  std::vector<AreaData> m_areasData;
+
+  bool HasContent() const { return !m_bookmarksData.empty() || !m_tracksData.empty() || !m_areasData.empty(); }
 };
 
 void SetBookmarksMinZoom(FileData & fileData, double countPerTile, int maxZoom);

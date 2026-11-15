@@ -1,13 +1,22 @@
 #include "qt/place_page_dialog_user.hpp"
-#include "qt/place_page_dialog_common.hpp"
 
+#include "qt/draw_widget.hpp"
 #include "qt/qt_common/text_dialog.hpp"
+#include "qt/qt_common/translations.hpp"
 
-#include "indexer/validate_and_format_contacts.hpp"
+#include "map/bookmark.hpp"
+#include "map/bookmark_manager.hpp"
+#include "map/framework.hpp"
 #include "map/place_page_info.hpp"
 
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QDialogButtonBox>
+#include "indexer/validate_and_format_contacts.hpp"
+
+#include "kml/types.hpp"
+
+#include "drape/color.hpp"
+
+#include <QtWidgets/QColorDialog>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
@@ -17,24 +26,6 @@
 
 namespace
 {
-static int constexpr kMaxLengthOfPlacePageDescription = 500;
-
-std::string getShortDescription(std::string const & description)
-{
-  std::string_view view(description);
-
-  auto const paragraphStart = view.find("<p>");
-  auto const paragraphEnd = view.find("</p>");
-
-  if (paragraphStart == 0 && paragraphEnd != std::string::npos)
-    view = view.substr(3, paragraphEnd - 3);
-
-  if (view.length() > kMaxLengthOfPlacePageDescription)
-    return std::string(view.substr(0, kMaxLengthOfPlacePageDescription - 3)) + "...";
-
-  return std::string(view);
-}
-
 std::string_view stripSchemeFromURI(std::string_view uri)
 {
   for (std::string_view prefix : {"https://", "http://"})
@@ -54,11 +45,13 @@ public:
   }
 };
 
-PlacePageDialogUser::PlacePageDialogUser(QWidget * parent, place_page::Info const & info) : QDialog(parent)
+PlacePageDialogUser::PlacePageDialogUser(QWidget * parent, qt::DrawWidget * drawWidget, place_page::Info const & info)
+  : PlacePageDialogCommon(parent, drawWidget, info)
 {
+  using namespace place_page_dialog;
   auto const & title = info.GetTitle();
+  QVBoxLayout * contentLayout = GetContentLayout();
 
-  QVBoxLayout * layout = new QVBoxLayout();
   {
     QVBoxLayout * header = new QVBoxLayout();
 
@@ -69,7 +62,7 @@ PlacePageDialogUser::PlacePageDialogUser(QWidget * parent, place_page::Info cons
       header->addWidget(titleLabel);
     }
 
-    if (auto const subTitle = info.GetSubtitle(); !subTitle.empty())
+    if (auto const subTitle = info.GetPreviewSubtitle(); !subTitle.empty())
     {
       QLabel * subtitleLabel = new QLabel(QString::fromStdString(subTitle));
       subtitleLabel->setWordWrap(true);
@@ -83,84 +76,105 @@ PlacePageDialogUser::PlacePageDialogUser(QWidget * parent, place_page::Info cons
       header->addWidget(addressLabel);
     }
 
-    layout->addLayout(header);
+    contentLayout->addLayout(header);
   }
 
-  {
-    QHLine * line = new QHLine();
-    layout->addWidget(line);
-  }
+  contentLayout->addWidget(new QHLine());
 
   {
     QGridLayout * data = new QGridLayout();
 
     int row = 0;
 
-    auto const addEntry = [data, &row](std::string const & key, std::string const & value, bool isLink = false)
-    {
-      data->addWidget(new QLabel(QString::fromStdString(key)), row, 0);
-      QLabel * label = new QLabel(QString::fromStdString(value));
-      label->setTextInteractionFlags(Qt::TextSelectableByMouse);
-      label->setWordWrap(true);
-      if (isLink)
-      {
-        label->setOpenExternalLinks(true);
-        label->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        label->setText(QString::fromStdString("<a href=\"" + value + "\">" + value + "</a>"));
-      }
-      data->addWidget(label, row++, 1);
-      return label;
-    };
-
     if (info.IsBookmark())
-      addEntry("Bookmark", "Yes");
+    {
+      addEntry(data, row, qt::Tr("bookmark"), qt::Tr("yes"));
+
+      // Bookmark color: a swatch button that opens QColorDialog and applies an arbitrary color.
+      auto const bookmarkId = info.GetBookmarkId();
+
+      data->addWidget(new QLabel(qt::Tr("bookmark_color")), row, 0);
+      QPushButton * colorButton = new QPushButton();
+      colorButton->setAutoDefault(false);
+
+      auto const setSwatch = [colorButton](dp::Color const & c)
+      {
+        colorButton->setStyleSheet(
+            QString("background-color: rgb(%1, %2, %3);").arg(c.GetRed()).arg(c.GetGreen()).arg(c.GetBlue()));
+      };
+      if (auto const * mark = drawWidget->GetFramework().GetBookmarkManager().GetBookmark(bookmarkId))
+        setSwatch(mark->GetColorForRendering());
+
+      connect(colorButton, &QAbstractButton::clicked, this, [this, bookmarkId, setSwatch]()
+      {
+        auto & bm = GetDrawWidget()->GetFramework().GetBookmarkManager();
+        auto const * mark = bm.GetBookmark(bookmarkId);
+        if (mark == nullptr)
+          return;
+
+        auto const current = mark->GetColorForRendering();
+        QColor const picked = QColorDialog::getColor(QColor(current.GetRed(), current.GetGreen(), current.GetBlue()),
+                                                     this, qt::Tr("choose_color"));
+        if (!picked.isValid())
+          return;
+
+        dp::Color const newColor(picked.red(), picked.green(), picked.blue());
+        // Update the swatch and last-edited color first; the EditSession below notifies the engine
+        // on destruction (the last action in this handler), so nothing here can run after it.
+        setSwatch(newColor);
+        bm.SetLastEditedBmColor(kml::MakeCustomBookmarkColorData(newColor));
+
+        auto editSession = bm.GetEditSession();
+        if (auto * editable = editSession.GetBookmarkForEdit(bookmarkId))
+          editable->SetColor(newColor);
+      });
+
+      data->addWidget(colorButton, row++, 1);
+    }
 
     // Wikipedia fragment
     if (auto const & wikipedia = info.GetMetadata(feature::Metadata::EType::FMD_WIKIPEDIA); !wikipedia.empty())
     {
-      QLabel * name = new QLabel("Wikipedia");
+      QString const wikipediaLabel = qt::Tr("read_in_wikipedia");
+      QLabel * name = new QLabel(wikipediaLabel);
       name->setOpenExternalLinks(true);
       name->setTextInteractionFlags(Qt::TextBrowserInteraction);
-      name->setText(QString::fromStdString("<a href=\"" + feature::Metadata::ToWikiURL(std::string(wikipedia)) +
-                                           "\">Wikipedia</a>"));
+      name->setText(
+          QString("<a href=\"%1\">%2</a>")
+              .arg(QString::fromStdString(feature::Metadata::ToWikiURL(std::string(wikipedia))).toHtmlEscaped(),
+                   wikipediaLabel.toHtmlEscaped()));
       data->addWidget(name, row++, 0);
     }
 
     // Description
     if (auto const & description = info.GetWikiDescription(); !description.empty())
     {
-      auto descriptionShort = getShortDescription(description);
-
-      QLabel * value = new QLabel(QString::fromStdString(descriptionShort));
+      QLabel * value = new QLabel(ShortDescription(description));
       value->setWordWrap(true);
 
       data->addWidget(value, row++, 0, 1, 2);
 
-      QPushButton * wikiButton = new QPushButton("More...", value);
+      QPushButton * wikiButton = new QPushButton(qt::Tr("placepage_more_button"), value);
       wikiButton->setAutoDefault(false);
       connect(wikiButton, &QAbstractButton::clicked, this, [this, description, title]()
       {
-        auto textDialog =
-            TextDialog(this, QString::fromStdString(description), QString::fromStdString("Wikipedia: " + title));
+        auto textDialog = TextDialog(this, QString::fromStdString(description),
+                                     qt::Tr("wikipedia_place_title").arg(QString::fromStdString(title)));
         textDialog.exec();
       });
 
       data->addWidget(wikiButton, row++, 0, 1, 2, Qt::AlignLeft);
     }
 
-    /// @todo Use a combo box like the developer dialog once the place page becomes
-    /// a non-modal floating/dockable window.
-    // Route refs
-    if (auto routes = info.FormatRouteRefs(); !routes.empty())
-      addEntry("Routes", routes);
+    addRoutesRow(data, row, drawWidget, info);
 
     // Opening hours fragment
     if (auto openingHours = info.GetOpeningHours(); !openingHours.empty())
-      addEntry("Opening hours", std::string(openingHours));
+      addEntry(data, row, qt::Tr("editor_time_title"), QString::fromStdString(std::string(openingHours)));
 
     // Cuisine fragment
     if (auto cuisines = info.FormatCuisines(); !cuisines.empty())
-      addEntry("Cuisine", cuisines);
+      addEntry(data, row, qt::Tr("cuisine"), QString::fromStdString(cuisines));
 
     // Entrance fragment
     // TODO
@@ -168,7 +182,7 @@ PlacePageDialogUser::PlacePageDialogUser(QWidget * parent, place_page::Info cons
     // Phone fragment
     if (auto phoneNumber = info.GetMetadata(feature::Metadata::EType::FMD_PHONE_NUMBER); !phoneNumber.empty())
     {
-      data->addWidget(new QLabel("Phone"), row, 0);
+      data->addWidget(new QLabel(qt::Tr("phone")), row, 0);
 
       QLabel * value = new QLabel(QString::fromStdString("<a href='tel:" + std::string(phoneNumber) + "'>" +
                                                          std::string(phoneNumber) + "</a>"));
@@ -179,19 +193,26 @@ PlacePageDialogUser::PlacePageDialogUser(QWidget * parent, place_page::Info cons
 
     // Operator fragment
     if (auto operatorName = info.GetMetadata(feature::Metadata::EType::FMD_OPERATOR); !operatorName.empty())
-      addEntry("Operator", std::string(operatorName));
+      addEntry(data, row, qt::Tr("editor_operator"), QString::fromStdString(std::string(operatorName)));
 
     // Wifi fragment
     if (info.HasWifi())
-      addEntry("Wi-Fi", "Yes");
+      addEntry(data, row, qt::Tr("category_wifi"), qt::Tr("yes"));
 
     // Links fragment
     if (auto website = info.GetMetadata(feature::Metadata::EType::FMD_WEBSITE); !website.empty())
-      addEntry("Website", std::string(stripSchemeFromURI(website)), true);
+      addEntry(data, row, qt::Tr("website"), QString::fromStdString(std::string(stripSchemeFromURI(website))),
+               QString::fromStdString(std::string(website)));
+
+    if (auto heritageWebsite = info.GetMetadata(feature::Metadata::EType::FMD_HERITAGE_WEBSITE);
+        !heritageWebsite.empty())
+      addEntry(data, row, qt::Tr("heritage_website"),
+               QString::fromStdString(std::string(stripSchemeFromURI(heritageWebsite))),
+               QString::fromStdString(std::string(heritageWebsite)));
 
     if (auto email = info.GetMetadata(feature::Metadata::EType::FMD_EMAIL); !email.empty())
     {
-      data->addWidget(new QLabel("Email"), row, 0);
+      data->addWidget(new QLabel(qt::Tr("email")), row, 0);
 
       QLabel * value = new QLabel(
           QString::fromStdString("<a href='mailto:" + std::string(email) + "'>" + std::string(email) + "</a>"));
@@ -227,11 +248,14 @@ PlacePageDialogUser::PlacePageDialogUser(QWidget * parent, place_page::Info cons
     if (auto wikimedia_commons = info.GetMetadata(feature::Metadata::EType::FMD_WIKIMEDIA_COMMONS);
         !wikimedia_commons.empty())
     {
-      data->addWidget(new QLabel("Wikimedia Commons"), row, 0);
+      QString const commonsLabel = qt::Tr("wikimedia_commons");
+      data->addWidget(new QLabel(commonsLabel), row, 0);
 
-      QLabel * value = new QLabel(QString::fromStdString(
-          "<a href='" + feature::Metadata::ToWikimediaCommonsURL(std::string(wikimedia_commons)) +
-          "'>Wikimedia Commons</a>"));
+      QLabel * value = new QLabel(
+          QString("<a href=\"%1\">%2</a>")
+              .arg(QString::fromStdString(feature::Metadata::ToWikimediaCommonsURL(std::string(wikimedia_commons)))
+                       .toHtmlEscaped(),
+                   commonsLabel.toHtmlEscaped()));
       value->setOpenExternalLinks(true);
       value->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
@@ -240,40 +264,20 @@ PlacePageDialogUser::PlacePageDialogUser(QWidget * parent, place_page::Info cons
 
     // Level fragment
     if (auto level = info.GetMetadata(feature::Metadata::EType::FMD_LEVEL); !level.empty())
-      addEntry("Level", std::string(level));
+      addEntry(data, row, qt::Tr("level"), QString::fromStdString(std::string(level)));
 
     // ATM fragment
     if (info.HasAtm())
-      addEntry("ATM", "Yes");
+      addEntry(data, row, qt::Tr("category_atm"), qt::Tr("yes"));
 
     // Latlon fragment
-
-    {
-      ms::LatLon const ll = info.GetLatLon();
-      addEntry("Coordinates", strings::to_string_dac(ll.m_lat, 7) + ", " + strings::to_string_dac(ll.m_lon, 7));
-    }
+    addCoordinatesRow(data, row, info);
 
     data->setColumnStretch(0, 0);
     data->setColumnStretch(1, 1);
 
-    layout->addLayout(data);
+    contentLayout->addLayout(data);
   }
 
-  layout->addStretch();
-
-  {
-    QHLine * line = new QHLine();
-    layout->addWidget(line);
-  }
-
-  {
-    QDialogButtonBox * dbb = new QDialogButtonBox();
-    place_page_dialog::addCommonButtons(this, dbb, info.ShouldShowEditPlace());
-    layout->addWidget(dbb, Qt::AlignCenter);
-  }
-
-  setLayout(layout);
-
-  auto const ppTitle = std::string("Place Page") + (info.IsBookmark() ? " (bookmarked)" : "");
-  setWindowTitle(ppTitle.c_str());
+  contentLayout->addStretch();
 }

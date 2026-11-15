@@ -12,10 +12,6 @@ Zmadhimi, kërkimi dhe llogaritjet e rrugëve funksionojnë dukshëm shpejt.
 
 Hartat janë të pasura me detaje dhe përditësohen dy herë në muaj për të pasqyruar kushtet reale. Ndryshe nga shumë konkurrentë të njohur, ato përfshijnë etiketat e ndërtesave, stolat, shtigjet e ecjes dhe informacione të tjera të dobishme.
 
-<b>MBËSHTETUR NË OPENSTREETMAP:</b>
-
-OpenStreetMap është një hartë botërore në stil wiki, e ndërtuar dhe e mirëmbajtur nga miliona vullnetarë — vendas që njohin më së miri zonat e tyre. Ky përpjekje komunitare rezulton në harta shumë të detajuara, shpesh më të sakta se ato komerciale në rajonet më pak të matura. Organic Maps përditëson të dhënat e saj nga OpenStreetMap çdo dy javë, duke i mbajtur hartat tuaja të freskëta dhe të besueshme. Dhe nëse vëreni që diçka mungon, mund ta shtoni në OpenStreetMap dhe të ndihmoni në përmirësimin e hartës për të gjithë.
-
 <b>PRIVATËSIA E PARË:</b>
 
 Ne nuk mbledhim asnjë të dhënë ose identifikues. Kjo do të thotë që nuk ka rrezik për rrjedhje të të dhënave dhe asnjë shpërqendrim si reklamat ose njoftimet e zhurmshme — vetëm një përvojë harte e pastër dhe private.
@@ -34,9 +30,13 @@ Shijo udhëzime me zë, hap pas hapi. Krijo rrugë për ecje, shëtitje në naty
 
 Aktivizoni shtresa speciale hartash për të zbuluar shtigje të njohura ecjeje dhe çiklizmi në mbarë botën, të gjitha të marra nga OpenStreetMap. Kaloni midis shtresave për të parë shtigje me ngjyra për biçikleta dhe MTB, si dhe shtigje zyrtare ecjeje.
 
+<b>TERRENI 3D DHE THELLËSITË:</b>
+
+Shihni lartësitë e maleve, thellësitë e detit dhe izohipset e detajuara. Prekni çdo pikë në hartë për të parë lartësinë e saj.
+
 <b>TRANSPORTI PUBLIK:</b>
 
-Shikoni numrat e linjave të transportit publik në ndalesa. Oraret e transportit në kohë reale dhe udhëzimet e rrugës janë aktualisht në zhvillim.
+Planifikoni linjat e transportit publik. Oraret e drejtpërdrejta janë në zhvillim.
 
 <b>STILET E HARTËS:</b>
 
@@ -57,3 +57,14 @@ Kontribuoni në OpenStreetMap duke shtuar vende që mungojnë ose duke redaktuar
 <b>MODI I ERRËT:</b>
 
 Kaloni në një temë të errët për një pamje të rehatshme natën.
+
+Provoni aplikacionin — është 100% falas, pa reklama, i shpejtë dhe plotësisht jashtë linje.
+
+Ose mësoni mënyra të tjera për të mbështetur projektin: https://organicmaps.app/contribute/
+
+Komentet dhe vlerësimet tuaja të sinqerta në dyqan na motivojnë! Na pëlqen t'ju dëgjojmë atje.
+
+Keni pyetje? Ju lutemi vizitoni faqen organicmaps.app për detaje shtesë dhe Pyetje të Shpeshta.
+
+Instagram: @organicmaps.app
+Telegram: @OrganicMapsApp

@@ -81,13 +81,9 @@ private extension AboutController {
     func setupTitle() {
       let titleView = UILabel()
       titleView.text = Self.formattedAppVersion()
-      titleView.textColor = .white
-      titleView.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+      titleView.setFontStyle(.semibold17, color: .whitePrimary)
       titleView.isUserInteractionEnabled = true
-      titleView.numberOfLines = 1
-      titleView.allowsDefaultTighteningForTruncation = true
-      titleView.adjustsFontSizeToFitWidth = true
-      titleView.minimumScaleFactor = 0.5
+      titleView.configureSingleLineAutoScaling()
       let titleDidTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(appVersionButtonTapped))
       titleView.addGestureRecognizer(titleDidTapGestureRecognizer)
       navigationItem.titleView = titleView
@@ -112,10 +108,7 @@ private extension AboutController {
       headerTitleLabel.setFontStyle(.semibold18, color: .blackPrimary)
       headerTitleLabel.text = L("about_headline")
       headerTitleLabel.textAlignment = .center
-      headerTitleLabel.numberOfLines = 1
-      headerTitleLabel.allowsDefaultTighteningForTruncation = true
-      headerTitleLabel.adjustsFontSizeToFitWidth = true
-      headerTitleLabel.minimumScaleFactor = 0.5
+      headerTitleLabel.configureSingleLineAutoScaling()
     }
 
     func setupAdditionalInfo() {
@@ -137,7 +130,7 @@ private extension AboutController {
     func setupOSM() {
       osmView.setMapDate(Self.formattedMapsDataVersion())
       osmView.didTapHandler = { [weak self] in
-        self?.openUrl("https://www.openstreetmap.org/")
+        self?.openUrl(AppConstants.openStreetMapURL)
       }
     }
 
@@ -155,10 +148,7 @@ private extension AboutController {
     func setupSocialMediaCollection() {
       socialMediaHeaderLabel.setFontStyle(.regular16, color: .blackPrimary)
       socialMediaHeaderLabel.text = L("follow_us")
-      socialMediaHeaderLabel.numberOfLines = 1
-      socialMediaHeaderLabel.allowsDefaultTighteningForTruncation = true
-      socialMediaHeaderLabel.adjustsFontSizeToFitWidth = true
-      socialMediaHeaderLabel.minimumScaleFactor = 0.5
+      socialMediaHeaderLabel.configureSingleLineAutoScaling()
 
       socialMediaCollectionView.backgroundColor = .clear
       socialMediaCollectionView.isScrollEnabled = false
@@ -266,7 +256,7 @@ private extension AboutController {
   func buildInfoTableViewData() -> [AboutInfoTableViewCellModel] {
     let infoContent: [AboutInfo] = [.faq, .reportMapDataProblem, .reportABug, .news, .volunteer, .rateTheApp]
     return infoContent.map { [weak self] aboutInfo in
-      return AboutInfoTableViewCellModel(title: aboutInfo.title, image: aboutInfo.image, didTapHandler: {
+      AboutInfoTableViewCellModel(title: aboutInfo.title, image: aboutInfo.image, didTapHandler: {
         switch aboutInfo {
         case .faq:
           self?.navigationController?.pushViewController(FaqController(), animated: true)
@@ -286,7 +276,7 @@ private extension AboutController {
   func buildSocialMediaCollectionViewData() -> [SocialMediaCollectionViewCellModel] {
     let socialMediaContent = SocialMedia.allCases
     return socialMediaContent.map { [weak self] socialMedia in
-      return SocialMediaCollectionViewCellModel(image: socialMedia.image, didTapHandler: {
+      SocialMediaCollectionViewCellModel(image: socialMedia.image, didTapHandler: {
         switch socialMedia {
         case .telegram: fallthrough
         case .github: fallthrough

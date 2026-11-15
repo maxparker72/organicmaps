@@ -6,20 +6,22 @@ enum PresentationStepChangeAnimation {
 
 enum ModalPresentationAnimator {
   private enum Constants {
-    static let animationDuration: TimeInterval = kDefaultAnimationDuration
+    static let animationDuration: TimeInterval = AppConstants.defaultAnimationDuration
     static let springDamping: CGFloat = 0.8
     static let springVelocity: CGFloat = 0.2
     static let controlPoint1: CGPoint = .init(x: 0.25, y: 0.1)
     static let controlPoint2: CGPoint = .init(x: 0.15, y: 1.0)
   }
 
+  @discardableResult
   static func animate(with stepAnimation: PresentationStepChangeAnimation = .slide,
                       animations: @escaping (() -> Void),
-                      completion: ((Bool) -> Void)?) {
+                      completion: ((Bool) -> Void)?) -> UIViewPropertyAnimator? {
     switch stepAnimation {
     case .none:
       animations()
       completion?(true)
+      return nil
 
     case .slide:
       let timing = UICubicTimingParameters(controlPoint1: Constants.controlPoint1,
@@ -31,6 +33,7 @@ enum ModalPresentationAnimator {
         completion?(position == .end)
       }
       animator.startAnimation()
+      return animator
 
     case .slideAndBounce:
       let velocity = CGVector(dx: Constants.springVelocity, dy: Constants.springVelocity)
@@ -43,6 +46,7 @@ enum ModalPresentationAnimator {
         completion?(position == .end)
       }
       animator.startAnimation()
+      return animator
     }
   }
 }

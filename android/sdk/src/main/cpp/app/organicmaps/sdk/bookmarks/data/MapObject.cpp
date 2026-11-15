@@ -4,7 +4,7 @@
 #include "app/organicmaps/sdk/bookmarks/data/Metadata.hpp"
 #include "app/organicmaps/sdk/bookmarks/data/Track.hpp"
 #include "app/organicmaps/sdk/core/jni_helper.hpp"
-#include "app/organicmaps/sdk/routing/RoutePointInfo.hpp"
+#include "app/organicmaps/sdk/routing/RoutingJni.hpp"
 
 #include "map/elevation_info.hpp"
 #include "map/place_page_info.hpp"
@@ -37,7 +37,7 @@ jobject CreateMapObject(JNIEnv * env, place_page::Info const & info, int mapObje
     "Ljava/lang/String;"                              // subtitle
     "Ljava/lang/String;"                              // address
     "DD"                                              // lat, lon
-    "Ljava/lang/String;"                              // appId
+    "Ljava/lang/String;"                              // apiId
     "Lapp/organicmaps/sdk/routing/RoutePointInfo;"    // routePointInfo
     "I"                                               // openingMode
     "Ljava/lang/String;"                              // wikiArticle
@@ -57,7 +57,7 @@ jobject CreateMapObject(JNIEnv * env, place_page::Info const & info, int mapObje
     jni::ToJavaStringWithSupplementalCharsFix(env, info.GetSecondarySubtitle()),
     lat,
     lon,
-    jni::ToJavaString(env, parseApi ? info.GetApiUrl() : ""),
+    jni::ToJavaString(env, parseApi ? info.GetApiId() : ""),
     routingPointInfo,
     static_cast<jint>(info.GetOpeningMode()),
     jni::ToJavaString(env, info.GetWikiDescription()),
@@ -72,13 +72,15 @@ jobject CreateMapObject(JNIEnv * env, place_page::Info const & info, int mapObje
   return mapObject;
 }
 
-jobject CreateMapObject(JNIEnv * env, place_page::Info const & info)
+static jobject CreateMapObjectImpl(JNIEnv * env, place_page::Info const & info)
 {
-  jni::TScopedLocalObjectArrayRef jrawTypes(env, jni::ToJavaStringArray(env, info.GetRawTypes()));
+  using namespace jni;
 
-  jni::TScopedLocalRef routingPointInfo(env, nullptr);
+  TScopedLocalObjectArrayRef jrawTypes(env, ToJavaStringArray(env, info.GetRawTypes()));
+
+  TScopedLocalRef routingPointInfo(env, nullptr);
   if (info.IsRoutePoint())
-    routingPointInfo.reset(CreateRoutePointInfo(env, info));
+    routingPointInfo.reset(routing_jni::CreateRoutePointInfo(env, info));
 
   if (info.IsBookmark())
     return CreateBookmark(env, info, jrawTypes, routingPointInfo);
@@ -92,7 +94,9 @@ jobject CreateMapObject(JNIEnv * env, place_page::Info const & info)
                            routingPointInfo.get(), jrawTypes.get());
   }
 
-  if (info.HasApiUrl())
+  // Classify as an API point when the mark carries a return point id and/or a back URL.
+  // (A bare API mark with neither has nothing to surface and falls through to POI below.)
+  if (info.HasApiUrl() || info.HasApiId())
   {
     return CreateMapObject(env, info, kApiPoint, ll.m_lat, ll.m_lon, true /* parseMeta */, true /* parseApi */,
                            routingPointInfo.get(), jrawTypes.get());
@@ -103,4 +107,14 @@ jobject CreateMapObject(JNIEnv * env, place_page::Info const & info)
 
   return CreateMapObject(env, info, kPoi, ll.m_lat, ll.m_lon, true /* parseMeta */, false /* parseApi */,
                          routingPointInfo.get(), jrawTypes.get());
+}
+
+jobject CreateMapObject(JNIEnv * env, place_page::Info const & info)
+{
+  jobject const mapObject = CreateMapObjectImpl(env, info);
+  static jfieldID const previewSubtitleId = env->GetFieldID(g_mapObjectClazz, "mPreviewSubtitle", "Ljava/lang/String;");
+  jni::TScopedLocalRef const previewSubtitle(env,
+                                             jni::ToJavaStringWithSupplementalCharsFix(env, info.GetPreviewSubtitle()));
+  env->SetObjectField(mapObject, previewSubtitleId, previewSubtitle.get());
+  return mapObject;
 }

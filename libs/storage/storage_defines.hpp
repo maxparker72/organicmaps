@@ -1,9 +1,9 @@
 #pragma once
 
+#include "platform/downloader_defines.hpp"
 #include "platform/local_country_file.hpp"
 
-#include "base/geo_object_id.hpp"
-
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
@@ -18,21 +18,29 @@ using CountryId = std::string;
 using CountriesSet = std::set<CountryId>;
 using CountriesVec = std::vector<CountryId>;
 using LocalFilePtr = std::shared_ptr<platform::LocalCountryFile>;
-using OldMwmMapping = std::map<CountryId, CountriesSet>;
 /// Map from key affiliation words into CountryIds.
 using Affiliations = std::unordered_map<std::string, CountriesVec>;
 /// Map from country name synonyms and old names into CountryId.
 using CountryNameSynonyms = std::unordered_map<std::string, CountryId>;
-/// Map from CountryId into city GeoObject id.
-using MwmTopCityGeoIds = std::unordered_map<CountryId, base::GeoObjectId>;
-using MwmTopCountryGeoIds = std::unordered_map<CountryId, std::vector<base::GeoObjectId>>;
+
+// Map (or diff) and terrain bytes of a download batch, including its completed parts.
+struct Progress
+{
+  int64_t m_mwmDownloaded = 0;
+  int64_t m_mwmTotal = 0;
+  int64_t m_twmDownloaded = 0;
+  int64_t m_twmTotal = 0;
+
+  downloader::Progress GetCombined() const { return {m_mwmDownloaded + m_twmDownloaded, m_mwmTotal + m_twmTotal}; }
+};
+std::string DebugPrint(Progress const & progress);
 
 /// @note Android code relies that kInvalidCountryId is an empty string!
-storage::CountryId constexpr kInvalidCountryId;
+inline constexpr char kInvalidCountryId[] = "";
 
 inline bool IsCountryIdValid(CountryId const & countryId)
 {
-  return countryId != kInvalidCountryId;
+  return !countryId.empty();
 }
 
 /// Inner status which is used inside Storage class

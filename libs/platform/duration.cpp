@@ -2,6 +2,8 @@
 
 #include "base/stl_helpers.hpp"
 
+#include <algorithm>
+
 /// @todo(KK): move the formatting code from the platform namespace
 namespace platform
 {
@@ -50,13 +52,30 @@ std::string_view GetUnitsGroupingSeparator(Locale const & locale)
   return isEmptySeparator ? kNoSpace : kNonBreakingSpace;
 }
 
-bool IsUnitsOrderValid(std::initializer_list<Duration::Units> units)
+struct PlatformSeparators
 {
-  return base::IsSortedAndUnique(units);
+  std::string_view m_unitSep, m_groupingSep;
+
+  PlatformSeparators()
+  {
+    auto const locale = GetCurrentLocale();
+    m_unitSep = GetUnitSeparator(locale);
+    m_groupingSep = GetUnitsGroupingSeparator(locale);
+  }
+};
+
+PlatformSeparators const & GetPlatformSeparators()
+{
+  static PlatformSeparators const separators;
+  return separators;
 }
 }  // namespace
 
-Duration::Duration(unsigned long seconds) : m_seconds(seconds) {}
+Duration::Duration(double seconds)
+  : m_seconds(duration_cast<std::chrono::seconds>(std::chrono::duration<double>(seconds)))
+{
+  ASSERT_GREATER_OR_EQUAL(seconds, 0.0, ());
+}
 
 std::string Duration::GetLocalizedString(std::initializer_list<Units> units, Locale const & locale) const
 {
@@ -65,18 +84,7 @@ std::string Duration::GetLocalizedString(std::initializer_list<Units> units, Loc
 
 std::string Duration::GetPlatformLocalizedString() const
 {
-  struct InitSeparators
-  {
-    std::string_view m_unitSep, m_groupingSep;
-    InitSeparators()
-    {
-      auto const loc = GetCurrentLocale();
-      m_unitSep = GetUnitSeparator(loc);
-      m_groupingSep = GetUnitsGroupingSeparator(loc);
-    }
-  };
-  static InitSeparators seps;
-
+  auto const & seps = GetPlatformSeparators();
   return GetString({Units::Days, Units::Hours, Units::Minutes, Units::Seconds}, seps.m_unitSep, seps.m_groupingSep);
 }
 
@@ -84,7 +92,7 @@ std::string Duration::GetString(std::initializer_list<Units> units, std::string_
                                 std::string_view groupingSeparator) const
 {
   ASSERT(units.size(), ());
-  ASSERT(IsUnitsOrderValid(units), ());
+  ASSERT(base::IsSortedAndUnique(units), ());
 
   if (SecondsToUnits(m_seconds, Units::Minutes) == 0)
   {
@@ -110,6 +118,13 @@ std::string Duration::GetString(std::initializer_list<Units> units, std::string_
     }
   }
   return formattedTime;
+}
+
+std::string Duration::GetRoutingString() const
+{
+  seconds const rounded = std::max(minutes(1), duration_cast<minutes>(m_seconds + seconds(30)));
+  auto const & seps = GetPlatformSeparators();
+  return Duration(rounded).GetString({Units::Hours, Units::Minutes}, seps.m_unitSep, seps.m_groupingSep);
 }
 
 std::string Duration::GetUnitsString(Units unit)

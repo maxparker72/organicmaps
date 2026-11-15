@@ -38,21 +38,15 @@ class PlacePageTrackLayout: IPlacePageLayout {
     return vc
   }()
 
-  lazy var elevationMapViewController: ElevationProfileViewController? = {
-    guard trackData.trackInfo.hasElevationInfo, trackData.elevationProfileData != nil else {
-      return nil
-    }
-    return ElevationProfileBuilder.build(trackData: trackData, delegate: interactor, presentationStyle: .track)
-  }()
+  lazy var elevationMapViewController: ElevationProfileViewController? = ElevationProfileBuilder.build(trackData: trackData, delegate: interactor, presentationStyle: .track)
 
   private lazy var actionBarViewController: ActionBarViewController = {
     let vc = storyboard.instantiateViewController(ofType: ActionBarViewController.self)
     let navigationManager = MWMNavigationDashboardManager.shared()
     vc.placePageData = placePageData
-    vc.isRoutePlanning = navigationManager.state != .closed
     vc.canAddStop = MWMRouter.canAddIntermediatePoint()
     vc.canReplaceStop = navigationManager.selectedRoutePoint != nil
-    vc.canRouteToAndFrom = !navigationManager.shouldAppendNewPoints && navigationManager.selectedRoutePoint == nil
+    vc.shouldAppendNewPoints = navigationManager.shouldAppendNewPoints
     vc.delegate = interactor
     return vc
   }()
@@ -78,6 +72,15 @@ class PlacePageTrackLayout: IPlacePageLayout {
 
     if let elevationMapViewController {
       viewControllers.append(elevationMapViewController)
+    }
+
+    placePageData.onMapNodeStatusUpdate = { [weak self] in
+      self?.actionBarViewController.updateMapNodeStatus()
+    }
+    placePageData.onMapNodeProgressUpdate = { [weak self] downloadedBytes, totalBytes in
+      guard let self else { return }
+      self.actionBarViewController.downloadButton?.mapDownloadProgress?.progress =
+        CGFloat(AppConstants.maxProgress) * CGFloat(downloadedBytes) / CGFloat(totalBytes)
     }
 
     return viewControllers

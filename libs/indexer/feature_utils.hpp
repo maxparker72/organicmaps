@@ -6,6 +6,8 @@
 #include "indexer/ftraits.hpp"
 #include "indexer/yes_no_unknown.hpp"
 
+#include "base/assert.hpp"
+
 struct FeatureID;
 class StringUtf8Multilang;
 
@@ -58,6 +60,12 @@ int GetFeatureViewportScale(FeatureID const & fid, TypesHolder const & types);
 // - languages that we know are similar to |lang|;
 LangsBufferT GetSimilar(int8_t deviceLang);
 
+// Returns the first language declared for the MWM region, or kUnsupportedLanguageCode if the
+// region declares none. Used as a HarfBuzz `locl` hint for text in the region's on-the-ground
+// language: OSM-verbatim strings (addr:housenumber, road shield ref) and unqualified `name=`
+// tags, whose selected code (kDefaultCode) carries no real BCP-47 language.
+int8_t GetRegionLang(RegionData const & regionData);
+
 struct NameParamsIn
 {
   NameParamsIn(StringUtf8Multilang const & src_, RegionData const & regionData_, int8_t deviceLang_,
@@ -80,18 +88,32 @@ struct NameParamsIn
 
 struct NameParamsOut
 {
-  /// In case when primary name is empty it will be propagated from secondary and secondary will be
-  /// cleared. In case when primary name contains secondary name then secondary will be cleared.
+  /// If GetPrimary() is empty, the secondary name is promoted to primary and cleared.
+  /// A secondary name contained in GetPrimary() is cleared.
+  /// primary is empty for transliterated names; use GetPrimary() to read the effective primary name.
   std::string_view primary, secondary;
   std::string transliterated;
 
-  /// Call this fuction to get primary name when allowTranslit == true.
-  std::string_view GetPrimary() const { return (!primary.empty() ? primary : std::string_view(transliterated)); }
+  // Raw StringUtf8Multilang code actually selected for primary/secondary, used downstream to
+  // drive HarfBuzz OpenType `locl` substitutions. kEnglishCode is reported for the transliterated
+  // fallback (target script is Latin); kUnsupportedLanguageCode means no name was found at all.
+  // An unqualified `name=` is reported verbatim as kDefaultCode, which carries no real BCP-47
+  // language: resolve it to the region's language (see feature::GetRegionLang) at the usage place.
+  int8_t primaryLang = StringUtf8Multilang::kUnsupportedLanguageCode;
+  int8_t secondaryLang = StringUtf8Multilang::kUnsupportedLanguageCode;
+
+  /// Returns the borrowed primary name or the owned transliteration.
+  std::string_view GetPrimary() const
+  {
+    ASSERT(primary.empty() || transliterated.empty(), (primary, transliterated));
+    return !primary.empty() ? primary : std::string_view(transliterated);
+  }
 
   void Clear()
   {
     primary = secondary = {};
     transliterated.clear();
+    primaryLang = secondaryLang = StringUtf8Multilang::kUnsupportedLanguageCode;
   }
 };
 
@@ -129,13 +151,6 @@ void GetPreferredNames(NameParamsIn const & in, NameParamsOut & out);
 /// - default name;
 /// - country language name.
 void GetReadableName(NameParamsIn const & in, NameParamsOut & out);
-
-/// Returns language id as return result and name for search on booking in the @name parameter,
-///  the priority is the following:
-/// - default name;
-/// - country language name;
-/// - english name.
-// int8_t GetNameForSearchOnBooking(RegionData const & regionData, StringUtf8Multilang const & src, std::string & name);
 
 /// Returns preferred name when only the device language is available.
 bool GetPreferredName(StringUtf8Multilang const & src, int8_t deviceLang, std::string_view & out);
@@ -184,6 +199,7 @@ std::string FormatStars(uint8_t starsCount);
 
 /// @returns formatted elevation with ▲ symbol and units.
 std::string FormatElevation(std::string_view elevation);
+std::string FormatElevation(double elevation);
 
 /// @returns formatted capacity with car/bicycle emoji.
 std::string FormatCapacity(std::string_view capacity, TypesHolder const & types);

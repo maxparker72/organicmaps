@@ -1,9 +1,10 @@
 package app.organicmaps.settings;
 
-import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,7 @@ import app.organicmaps.editor.LanguagesFragment;
 import app.organicmaps.editor.ProfileActivity;
 import app.organicmaps.help.HelpActivity;
 import app.organicmaps.sdk.Framework;
+import app.organicmaps.sdk.Router;
 import app.organicmaps.sdk.downloader.MapManager;
 import app.organicmaps.sdk.editor.OsmOAuth;
 import app.organicmaps.sdk.editor.data.Language;
@@ -69,6 +71,7 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
     initShowDownloadedRegionsPrefsCallbacks();
     initPlayServicesPrefsCallbacks();
     initSearchPrivacyPrefsCallbacks();
+    initBookmarksBackupPrefsCallbacks();
     initScreenSleepEnabledPrefsCallbacks();
     initShowOnLockScreenPrefsCallbacks();
     initNightNavigationPrefsCallbacks();
@@ -90,7 +93,10 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
   private void updateRoutingSettingsPrefsSummary()
   {
     final Preference pref = getPreference(getString(R.string.prefs_routing));
-    pref.setSummary(RoutingOptions.hasAnyOptions() ? R.string.on : R.string.off);
+    boolean hasOptions = RoutingOptions.isRouteOptimizationEnabled();
+    for (Router router : Router.values())
+      hasOptions |= RoutingOptions.hasAnyOptions(router);
+    pref.setSummary(hasOptions ? R.string.on : R.string.off);
   }
 
   private void updateProfileSettingsPrefsSummary()
@@ -122,7 +128,12 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
     final String key = preference.getKey();
     if (key != null)
     {
-      if (key.equals(getString(R.string.pref_osm_profile)))
+      if (key.equals(getString(R.string.prefs_routing)))
+      {
+        DrivingOptionsActivity.start(requireActivity());
+        return true;
+      }
+      else if (key.equals(getString(R.string.pref_osm_profile)))
       {
         startActivity(new Intent(requireActivity(), ProfileActivity.class));
       }
@@ -130,6 +141,11 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
       {
         getSettingsActivity().stackFragment(VoiceInstructionsSettingsFragment.class,
                                             getString(R.string.pref_tts_enable_title), null);
+      }
+      else if (key.equals(getString(R.string.pref_bg_tiles_screen)))
+      {
+        getSettingsActivity().stackFragment(BgTilesSettingsFragment.class, getString(R.string.pref_bg_tiles_title),
+                                            null);
       }
       else if (key.equals(getString(R.string.pref_help)))
       {
@@ -143,6 +159,28 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
       }
     }
     return super.onPreferenceTreeClick(preference);
+  }
+
+  private void openSystemBackupSettings()
+  {
+    // There is no public intent for backup settings: the action is handled only by newer Settings,
+    // and before Android 10 ACTION_PRIVACY_SETTINGS opens the backup screen.
+    final Intent[] intents = {new Intent("com.android.settings.BACKUP_SETTINGS").setPackage("com.android.settings"),
+                              Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+                                  ? new Intent(Settings.ACTION_PRIVACY_SETTINGS)
+                                  : new Intent().setClassName("com.android.settings",
+                                                              "com.android.settings.backup.UserBackupSettingsActivity"),
+                              new Intent(Settings.ACTION_SETTINGS)};
+    for (Intent intent : intents)
+    {
+      try
+      {
+        startActivity(intent);
+        return;
+      }
+      catch (ActivityNotFoundException | SecurityException ignored)
+      {}
+    }
   }
 
   private void initLargeFontSizePrefsCallbacks()
@@ -263,7 +301,6 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
     {
       ((TwoStatePreference) pref).setChecked(Config.useGoogleServices());
       pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-        @SuppressLint("MissingPermission")
         @Override
         public boolean onPreferenceChange(@NonNull Preference preference, Object newValue)
         {
@@ -273,11 +310,7 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
           if (oldVal != newVal)
           {
             Config.setUseGoogleService(newVal);
-            if (locationHelper.isActive())
-            {
-              locationHelper.stop();
-              locationHelper.start();
-            }
+            locationHelper.reloadProvider();
           }
           return true;
         }
@@ -303,6 +336,20 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
         else
           SearchRecents.clear();
       }
+      return true;
+    });
+  }
+
+  private void initBookmarksBackupPrefsCallbacks()
+  {
+    final Preference pref = getPreference(getString(R.string.pref_bookmarks_backup));
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+    {
+      pref.setVisible(false);
+      return;
+    }
+    pref.setOnPreferenceClickListener(preference -> {
+      openSystemBackupSettings();
       return true;
     });
   }
@@ -474,7 +521,7 @@ public class SettingsPrefsFragment extends BaseXmlSettingsFragment implements La
   {
     final Preference pref = getPreference(getString(R.string.pref_storage));
     pref.setOnPreferenceClickListener(preference -> {
-      if (MapManager.nativeIsDownloading())
+      if (MapManager.isDownloading())
       {
         new MaterialAlertDialogBuilder(requireActivity(), R.style.MwmTheme_AlertDialog)
             .setTitle(R.string.downloading_is_active)

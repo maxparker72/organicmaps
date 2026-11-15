@@ -16,7 +16,7 @@
 /* Choose measurement on first launch alert - choose metric system button */
 "kilometres" = "Կիլոմետրեր";
 
-/* Choose measurement on first launch alert - choose imperial system button */
+/* Imperial measurement option: 1 mile = 1609.344 m; Swedish/Norwegian "mil" = 10 km */
 "miles" = "Մղոններ";
 
 /* Update maps later button text */
@@ -115,7 +115,7 @@
 /* Search category sight seeings and touristic attractions; any changes should be duplicated in categories.txt @category_tourism! */
 "category_tourism" = "Տեսարժան վայրեր";
 
-/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! */
+/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! Also a bookmarks list group header when sorting by type. */
 "category_entertainment" = "Ժամանց";
 
 /* Search category for ATMs; any changes should be duplicated in categories.txt @category_atm! */
@@ -148,7 +148,7 @@
 /* Search category for recycling; any changes should be duplicated in categories.txt @category_recycling! */
 "category_recycling" = "Վերամշակում";
 
-/* Search category for water; any changes should be duplicated in categories.txt @category_water! also used to sort bookmarks by type */
+/* Search category for water; any changes should be duplicated in categories.txt @category_water! Also a bookmarks list group header when sorting by type. */
 "category_water" = "Ջուր";
 
 /* Search category for RV facilities; any changes should be duplicated in categories.txt @category_rv! */
@@ -174,11 +174,23 @@
 /* Warning message when doing search around current position */
 "unknown_current_position" = "Ձեր տեղորոշումը դեռ չի որոշվել";
 
-/* Subject for emailed bookmark */
-"bookmark_share_email_subject" = "Հեյ, տես իմ նշումը Organic Maps-ում:";
+/* Text shown before a shared "my position" link, and the email subject when sharing the current location. */
+"share_my_position" = "Ես այստեղ եմ Organic Maps-ում";
 
-/* Subject for emailed position */
-"my_position_share_email_subject" = "Հեյ, տես իմ ընթացիկ դիրքը Organic Maps քարտեզի վրա:";
+/* Email subject when sharing a place. %1$@ is the place name or address. */
+"share_place_subject" = "%1$@ Organic Maps-ում";
+
+/* Email subject when sharing a place that has no name or address. */
+"share_place_subject_default" = "Վայր Organic Maps-ում";
+
+/* Shared email link text; opens the shared place in Organic Maps or in a web browser. */
+"share_open_in_om_or_browser" = "Բացել Organic Maps-ում կամ դիտարկիչում";
+
+/* Shared email link text; leads to the Organic Maps download page. */
+"share_get_om" = "Ներբեռնել Organic Maps";
+
+/* Title for the "Open in Another App" button on the PlacePage; also shared email link text: opens the shared place in another (geo:) maps app. */
+"open_in_app" = "Բացել այլ հավելվածում";
 
 /* Share by email button text, also used in editor and About. */
 "email" = "Էլ․ փոստ";
@@ -195,6 +207,7 @@
 /* Length of track in cell that describes route */
 "length" = "Երկարություն";
 "share_my_location" = "Կիսվել իմ տեղադիրքով";
+"prefs_group_network" = "Ցանց";
 "prefs_group_route" = "Նավիգացիա";
 
 /* Setting name which enables or disables zoom buttons on the map screen. */
@@ -218,6 +231,24 @@
 /* A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled */
 "pref_map_3d_buildings_disabled_summary" = "3D շենքերն անջատված են էներգախնայողության ռեժիմում";
 
+/* Settings: title of the satellite imagery (custom raster tiles) screen */
+"pref_bg_tiles_title" = "Արբանյակային պատկերներ";
+
+/* Settings «Satellite Imagery»: title of the tile server URL input field */
+"pref_bg_tiles_url_title" = "Սերվերի URL";
+
+/* Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) */
+"pref_bg_tiles_url_error" = "Մուտքագրեք {z}/{x}/{y} պարունակող վավեր URL";
+
+/* Settings «Satellite Imagery»: title of the on-disk tile cache size limit (in megabytes) */
+"pref_bg_tiles_size_title" = "Քեշի չափը (ՄԲ)";
+
+/* Settings «Satellite Imagery»: opacity of vector area objects drawn over the imagery (0% hides them) */
+"pref_bg_tiles_opacity_title" = "Մակերեսային օբյեկտների անթափանցիկություն";
+
+/* Settings «Satellite Imagery»: legal note that the user is responsible for the custom tile source they configure */
+"pref_bg_tiles_disclaimer" = "Հատուկ սալիկների աղբյուրները տրամադրում եք դուք։ Օգտագործեք միայն այն ծառայությունները, որոնց հասանելիության թույլտվություն ունեք։ Դուք պատասխանատու եք հղման, արտոնագրի պայմանների, API բանալիների, քվոտաների և օգտագործման սահմանափակումների համար։";
+
 /* Settings «Route» category: «Tts enabled» title */
 "pref_tts_enable_title" = "Ձայնային հրահանգներ";
 
@@ -233,8 +264,14 @@
 /* Settings «Navigation» category: «Voice language» footer */
 "pref_tts_download_voices_description" = "Ավելի բարձր որակի ձայն ներբեռնելու համար բացեք Կարգավորումներ հավելվածը և անցեք Մատչելիություն → VoiceOver → Խոսք → Ձայն։";
 
-/* Settings «Route» category: «Test Voice Directions» title */
-"pref_tts_test_voice_title" = "Փորձարկել ձայնային ուղղորդումը (TTS)";
+/* Header above Apple's group of novelty text-to-speech voices (Bells, Bubbles, Zarvox...), shown after the regional voice sections and Eloquence group. Use Apple's term for this group from Settings > Accessibility > VoiceOver > Speech. */
+"pref_tts_voice_group_novelty" = "Novelty";
+
+/* Accessibility label of the button that plays a sample of a text-to-speech voice. */
+"pref_tts_voice_preview_play" = "Play sample";
+
+/* Accessibility label of the button that stops the sample of a text-to-speech voice being played. */
+"pref_tts_voice_preview_stop" = "Stop sample";
 "pref_map_auto_zoom" = "Ավտոմատ խոշորացում";
 "placepage_distance" = "Հեռավորություն";
 "search_show_on_map" = "Դիտել քարտեզի վրա";
@@ -355,9 +392,6 @@
 /* blue gray color */
 "blue_gray" = "Կապտամոխրագույն";
 
-/* place preview title */
-"info" = "Տեղեկություն";
-
 /* Prints version number in About dialog */
 "version" = "Organic Maps-ի տարբերակ՝ %@";
 
@@ -369,9 +403,6 @@
 
 /* Settings "Appearance" category: "Dark" title, should be consistent with the pref_appearance_title translation. */
 "pref_appearance_dark" = "Մուգ";
-
-/* Title for "Other" section in TTS settings. */
-"pref_tts_other_section_title" = "Այլ";
 
 /* Tex label above the Donate button */
 "donate_description" = "Նվիրեք անվճար և առանց գովազդի քարտեզներ միլիոնավոր օգտատերերի:";
@@ -390,9 +421,6 @@
 
 /* Alert title */
 "email_error_title" = "Էլ. նամակի ուղարկման սխալ";
-
-/* Settings item title */
-"pref_calibration_title" = "Կողմնացույցի կարգաբերում";
 
 /* Downloaded maps category */
 "downloader_available_maps" = "Հասանելի";
@@ -491,6 +519,8 @@
 "twentyfour_seven" = "24/7";
 "day_off_today" = "Այսօր փակ է";
 "day_off" = "Փակ է";
+"midnight" = "Կեսգիշեր";
+"noon" = "Կեսօր";
 "today" = "Այսօր";
 "opens_in" = "Բացվում է %@";
 "closes_in" = "Փակվում է %@";
@@ -568,15 +598,22 @@
 
 /* abbreviation for kilometers per hour */
 "kilometers_per_hour" = "կմ/ժ";
+
+/* Short label for miles per hour (1 mile = 1609.344 m), placed after a number; e.g. mph or mi/h */
 "miles_per_hour" = "մղ/ժ";
+
+/* Short label for hours (time unit), placed after a number */
 "hour" = "ժ";
+
+/* Short label for minutes (time unit), placed after a number */
 "minute" = "ր";
+
+/* Short label for days (time unit), placed after a number */
 "day" = "օ";
+
+/* Short label for seconds (time unit), placed after a number */
 "second" = "վ";
 "placepage_more_button" = "Ավելին";
-
-/* A disable button text in the explanation dialog that opens hotel details page on Kayak website. */
-"placepage_edit_bookmark_button" = "Խմբագրել էջանիշը";
 "placepage_personal_notes_hint" = "Անձնական նշումներ (տեքստ կամ html)";
 "editor_comment_hint" = "Մեկնաբանություն…";
 "editor_reset_edits_message" = "Չեղարկե՞լ բոլոր տեղական փոփոխությունները:";
@@ -621,11 +658,13 @@
 "traffic_data_unavailable" = "Երթևեկության տվյալները հասանելի չեն";
 "enable_logging" = "Միացնել գրանցումը";
 "transliteration_title" = "Տառադարձել լատինատառի";
-"planning_route_manage_route" = "Կառավարել երթուղին";
-"button_plan" = "Պլանավորել";
 "placepage_remove_stop" = "Հեռացնել կանգառը";
+
+/* Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. */
+"route_add_destination" = "Ավելացնել նպատակակետ";
+
+/* Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. */
 "placepage_add_stop" = "Ավելացնել կանգառ";
-"saved" = "Պահպանված է";
 "error_enter_correct_name" = "Խնդրում ենք մուտքագրել ճիշտ անուն";
 "bookmark_lists" = "Ցուցակներ";
 
@@ -643,6 +682,9 @@
 "bookmarks_error_title_list_name_already_taken" = "Այս անունն արդեն զբաղված է";
 "profile" = "OpenStreetMap պրոֆիլ";
 "restore" = "Վերականգնել";
+
+/* Settings privacy group in settings screen */
+"privacy" = "Գաղտնիություն";
 "privacy_policy" = "Գաղտնիության քաղաքականություն";
 "terms_of_use" = "Օգտագործման պայմաններ";
 
@@ -651,6 +693,11 @@
 
 /* Cycling routes layer name in the Styles and Layers dialog */
 "button_layer_cycling" = "Հեծանվային";
+
+/* Map layers menu: toggle button for the satellite imagery layer */
+"button_layer_satellite" = "Արբանյակ";
+
+/* Subway map layer button; also the spoken name of the subway (metro, underground) transport type, read by screen readers before a line number on transit line badges. */
 "button_layer_subway" = "Մետրո";
 "layers_title" = "Քարտեզի ոճեր և շերտեր";
 
@@ -689,10 +736,28 @@
 /* Settings/Bookmark Text Placement */
 "bookmarks_text_placement_title" = "Էջանիշների անունները քարտեզի վրա";
 "bookmarks_text_placement_description" = "Եթե էջանիշները շատ են, քարտեզի վրա դրանց անունների ցուցադրումը կարող է դանդաղեցնել հավելվածը:";
-"show_to_the_right" = "Ցուցադրել աջից";
-"show_at_the_bottom" = "Ցուցադրել ներքևից";
+"show_to_the_right" = "Ցուցադրել աջ կողմում";
+"show_at_the_bottom" = "Ցուցադրել ներքևում";
 "enable_logging_warning_message" = "Միացրեք այս ընտրանքը ժամանակավորապես՝ Ձեր խնդրի մասին մանրամասն ախտորոշիչ գրանցամատյանները գրանցելու և մեզ ձեռքով ուղարկելու համար՝ օգտագործելով «Զեկուցել սխալի մասին» Օգնության պատուհանում։ Գրանցամատյանները կարող են ներառել տեղադիրքի տվյալներ։";
+
+/* Driving profile in routing options settings. */
+"routing_options_driving" = "Մեքենայով";
+
+/* Cycling profile in routing options settings. */
+"routing_options_cycling" = "Հեծանվով";
+
+/* Walking profile in routing options settings; also the label of a walking leg in transit route details. */
+"routing_options_walking" = "Ոտքով";
+
+/* Section heading for routing settings shared by every routing mode. */
+"routing_options_all_modes" = "Տեղաշարժման բոլոր եղանակները";
 "driving_options_title" = "Երթուղու ընտրանքներ";
+
+/* Routing setting that automatically reorders intermediate stops */
+"route_optimization" = "Երթուղու օպտիմալացում";
+
+/* Explains that route optimization automatically reorders intermediate stops */
+"route_optimization_description" = "Ավտոմատ վերադասավորում է միջանկյալ կանգառները՝ ավելի արդյունավետ երթուղի ստեղծելու համար։";
 
 /* Recommended length for CarPlay and Android Auto is around 25-27 characters */
 "avoid_tolls" = "Խուսափել վճարովի ճանապարհներից";
@@ -705,11 +770,18 @@
 "avoid_motorways" = "Խուսափել մայրուղիներից";
 "unable_to_calc_alert_title" = "Հնարավոր չէ հաշվարկել երթուղին";
 "unable_to_calc_alert_subtitle" = "Երթուղին չի գտնվել։ Սա կարող է պայմանավորված լինել երթուղու ընտրանքներով կամ OpenStreetMap-ի ոչ ամբողջական տվյալներով։ Խնդրում ենք փոխել երթուղու ընտրանքները և կրկին փորձել։";
-"define_to_avoid_btn" = "Սահմանել ճանապարհներ՝ խուսափելու համար";
-"change_driving_options_btn" = "Երթուղու ընտրանքները միացված են";
 "toll_road" = "Վճարովի ճանապարհ";
 "unpaved_road" = "Գրունտային ճանապարհ";
 "ferry_crossing" = "Լաստանավային ուղի";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_steps" = "Աստիճաններ";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_gate" = "Դարպաս";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_lift_gate" = "Ուղեփակոց";
 
 /* A generic "Yes" button in dialogs */
 "yes" = "Այո";
@@ -743,9 +815,6 @@
 /* Failed planning route message in navigation view */
 "routing_planning_error" = "Երթուղու պլանավորումը ձախողվեց";
 
-/* Arrive routing message in navigation view */
-"routing_arrive" = "Ժամանումը՝ %@";
-
 /* Text for routing::RouterResultCode::FileTooOld dialog. */
 "dialog_routing_download_and_update_maps" = "Ներբեռնել և թարմացնել բոլոր քարտեզները երթուղու երկայնքով՝ հաշվարկ կատարելու համար:";
 "editor_done_dialog_1" = "Դուք փոխեցիք աշխարհի քարտեզը: Մի պահեք դա Ձեզ, պատմեք ընկերներին և խմբագրեք միասին:";
@@ -770,7 +839,6 @@
 "please_note" = "Խնդրում ենք նկատի ունենալ";
 "migration_download_error_dialog" = "Ներբեռնման սխալ";
 "editor_add_select_category" = "Ընտրեք կատեգորիան";
-"editor_add_select_category_popular_subtitle" = "Հայտնի";
 "editor_add_select_category_all_subtitle" = "Բոլոր կատեգորիաները";
 "whatsnew_editor_message_1" = "Ավելացրեք նոր վայրեր քարտեզին և խմբագրեք առկաները անմիջապես հավելվածից:";
 "dialog_incorrect_feature_position" = "Փոխել տեղադիրքը";
@@ -792,7 +860,6 @@
 "location_services_disabled_on_device_3" = "3. Ընտրեք Տեղորոշման ծառայություններ";
 "location_services_disabled_on_device_4" = "4. Միացրեք Տեղորոշման ծառայությունները";
 "location_services_disabled_on_device_additional_message" = "Կամ շարունակեք օգտագործել Organic Maps-ն առանց տեղորոշման";
-"book_button" = "Ամրագրել";
 "placepage_call_button" = "Զանգել";
 "placepage_bookmark_name_hint" = "Էջանիշի անունը";
 "placepage_delete_bookmark_button" = "Ջնջել էջանիշը";
@@ -803,18 +870,13 @@
 /* iOS dialog for the case when recent track recording is on and the app comes back from background */
 "recent_track_background_dialog_title" = "Անջատե՞լ Ձեր անցած վերջին երթուղու ձայնագրումը:";
 "off_recent_track_background_button" = "Անջատել";
-
-/* For sharing via SMS and so on */
-"sharing_call_action_look" = "Տեսեք սա";
 "recent_track_background_dialog_message" = "Organic Maps-ը օգտագործում է Ձեր տեղադիրքը ֆոնային ռեժիմում՝ Ձեր անցած վերջին երթուղին գրանցելու համար:";
 "general_settings" = "Ընդհանուր կարգավորումներ";
 
 /* "traffic" as in road congestion */
 "traffic_update_app_message" = "Երթևեկության տվյալները ցուցադրելու համար հավելվածը պետք է թարմացվի:";
 "log_file_size" = "Գրանցամատյանի ֆայլի չափը՝ %@";
-"planning_route_remove_title" = "Քաշեք այստեղ՝ հեռացնելու համար";
 "placepage_replace_stop" = "Փոխարինել կանգառը";
-"start_from_my_position" = "Սկսել …-ից";
 
 /* For iOS message 'alert_reauth_message' should be splitted in two parts: message + link. Here's first part */
 "alert_reauth_message_ios" = "Խնդրում ենք մուտք գործել OpenStreetMap՝ Ձեր քարտեզի բոլոր փոփոխություններն ավտոմատ վերբեռնելու համար։ Իմացեք ավելին";
@@ -834,15 +896,8 @@
 "popular_place" = "Հայտնի";
 "hide_from_map" = "Թաքցնել քարտեզից";
 "tags_loading_error_subtitle" = "Պիտակների բեռնման ժամանակ սխալ տեղի ունեցավ, խնդրում ենք փորձել կրկին";
-
-/* Position of the name label on the map relative to the bookmark pin (on the right) */
-"right" = "Աջ";
-
-/* Position of the name label on the map relative to the bookmark pin (at the bottom) */
-"bottom" = "Ներքև";
 "trip_start" = "Գնացինք";
 "pick_destination" = "Նշանակման կետ";
-"follow_my_position" = "Կենտրոնացնել";
 "search_results" = "Որոնման արդյունքներ";
 "then_turn" = "Այնուհետև";
 "redirect_route_alert" = "Ցանկանո՞ւմ եք վերակառուցել երթուղին:";
@@ -888,16 +943,29 @@
 "medicine" = "Առողջապահություն";
 "search_in_the_list" = "Փնտրել ցուցակում";
 "religious_places" = "Կրոնական վայրեր";
+
+/* Button that starts multi-selection in a bookmark list. */
+"select" = "Ընտրել";
+
+/* Action that selects every bookmark and track in a bookmark list. */
+"select_all" = "Ընտրել բոլորը";
+
+/* Action that clears the multi-selection in a bookmark list. */
+"deselect_all" = "Չեղարկել ընտրությունը";
 "transit_not_found" = "Մետրոյով երթևեկությունը այս տարածաշրջանում դեռ հասանելի չէ";
 "dialog_pedestrian_route_is_long_header" = "Մետրոյի երթուղի չի գտնվել";
 "dialog_pedestrian_route_is_long_message" = "Խնդրում ենք ընտրել մետրոյի կայարանին ավելի մոտ սկզբնակետ կամ վերջնակետ";
-"button_layer_isolines" = "Հորիզոնականներ";
-"isolines_activation_error_dialog" = "Հորիզոնականների ակտիվացումը պահանջում է ներբեռնել այս տարածքի քարտեզի տվյալները";
-"isolines_location_error_dialog" = "Հորիզոնականները դեռ հասանելի չեն այս տարածքում";
+
+/* Layers menu: label of the 3D terrain layer button */
+"button_layer_terrain" = "3D ռելիեֆ";
+"isolines_location_error_dialog" = "Թարմացրեք այս տարածաշրջանը՝ հորիզոնականները տեսնելու համար";
 "elevation_profile_ascent" = "Վերելք";
 "elevation_profile_descent" = "Վայրէջք";
 "elevation_profile_min_elevation" = "Նվազգ. բարձրություն";
 "elevation_profile_max_elevation" = "Առավել. բարձրություն";
+
+/* Displayed in the elevation profile chart while track recording has fewer than two points. */
+"elevation_profile_placeholder" = "Սկսեք շարժվել՝ բարձրության պրոֆիլը տեսնելու համար";
 "isolines_toast_zooms_1_10" = "Մեծացրեք մասշտաբը՝ հորիզոնականները տեսնելու համար";
 "downloader_loading_ios" = "Ներբեռնում";
 
@@ -962,11 +1030,14 @@
 "bookmarks_export" = "Արտահանել բոլոր էջանիշները և հետագծերը";
 "drive_through" = "Դրայվ-ին";
 
+/* Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_in" = "Մեծացնել";
+
+/* Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_out" = "Փոքրացնել";
+
 /* Restaurant or other food place's menu URL field in the Editor */
 "website_menu" = "Մենյուի հղում";
-
-/* Title for the "Open in Another App" button on the PlacePage. */
-"open_in_app" = "Բացել այլ հավելվածում";
 
 /* To indicate if the place proposed self service… */
 "self_service" = "Ինքնասպասարկում";
@@ -982,11 +1053,6 @@
 
 /* Message for the toast when saving the track recording is finished but nothing to save. */
 "track_recording_toast_nothing_to_save" = "Հետագիծը դատարկ է՝ պահպանելու ոչինչ չկա";
-"edit_track" = "Խմբագրել հետագիծը";
-"elevation_profile_diff_level" = "Բարդության մակարդակ";
-"elevation_profile_diff_level_easy" = "Հեշտ";
-"elevation_profile_diff_level_moderate" = "Միջին";
-"elevation_profile_diff_level_hard" = "Բարդ";
 "downloader_updating_ios" = "Թարմացում";
 
 /* Autoupdate dialog on start */
@@ -1019,6 +1085,12 @@
 /* Text for the editing the Track's color button. */
 "change_color" = "Փոխել գույնը";
 
+/* Text for the hiding track. */
+"hide_track" = "Hide track";
+
+/* Text for the showing track. */
+"show_track" = "Show track";
+
 /* Main screen title "Map" displayed in the navigation back button's menu. */
 "map" = "Քարտեզ";
 
@@ -1037,7 +1109,7 @@
 /* Message for the "iCloud is Disabled" alert. */
 "icloud_disabled_message" = "Այս գործառույթից օգտվելու համար խնդրում ենք միացնել iCloud-ը ձեր սարքի կարգավորումներում։";
 
-/* Title for the "Enable iCloud Syncronization" alert's "Enable" action button. */
+/* Action button that enables a disabled feature, such as iCloud synchronization or location services. */
 "enable" = "Միացնել";
 
 /* Title for the "Enable iCloud Syncronization" alert's "Backup" action button. */
@@ -1099,10 +1171,10 @@
 /* abbreviation for kilometers */
 "km" = "կմ";
 
-/* abbreviation for mile(s) */
+/* Short label for miles (length unit, 1 mi = 1609.344 m), placed after a number */
 "mi" = "մղ";
 
-/* A unit of measure */
+/* Short label for feet (1 ft = 0.3048 m), after numbers; local abbreviations and uninflected unit names are allowed */
 "ft" = "ֆուտ";
 
 /* Toast text when the maps version should be updated to display the OSM hiking and cycling routes */
@@ -1134,3 +1206,30 @@
 
 /* Toast message shown when track colors are changed in category settings */
 "toast_tracks_color_changed" = "Հետագծերի գույնը փոխվեց";
+
+/* Accessibility label of the icon-only button beside the search field, shown while choosing or replacing a route point; it opens a full-screen map picker with a crosshair */
+"choose_on_map" = "Ընտրել քարտեզի վրա";
+
+/* Search field hint and full-screen map point picker title shown while choosing the starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_start_location" = "Մեկնարկ";
+
+/* Search field hint and full-screen map point picker title shown while choosing the destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_destination" = "Նպատակակետ";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_start_location" = "Փոխել մեկնարկը";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_destination" = "Փոխել նպատակակետը";
+
+/* Search field hint and full-screen map point picker title shown while replacing an already added intermediate stop of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_stop_along_route" = "Փոխել կանգառը";
+
+/* Toast shown when the user tries to add one more intermediate stop to a route that already holds the maximum allowed number */
+"routing_max_stops_reached" = "Հասել եք կանգառների առավելագույն քանակին";
+
+/* Hint under the title of the full-screen route point picker: a crosshair stays fixed in the centre of the screen while the user moves the map under it */
+"choose_point_on_map_hint" = "Շարժեք և մեծացրեք քարտեզը՝ խաչը տեղադրելու համար";
+
+/* Accessibility label for the button that reverses the complete planned route, including intermediate stops. */
+"reverse_route" = "Շրջել երթուղին";

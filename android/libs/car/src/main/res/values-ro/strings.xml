@@ -47,6 +47,8 @@
     <string name="auto">Automat</string>
     <!-- Settings «Map» category: «3D buildings» title -->
     <string name="pref_map_3d_buildings_title">Clădiri 3D</string>
+    <!-- Settings «Route» category: «Tts unavailable» subtitle. Also used as a CarToast in Android Auto when the user taps the muted voice icon. -->
+    <string name="pref_tts_unavailable">Nu există</string>
     <!-- Text in menu -->
     <string name="help">Ajutor</string>
     <!-- In maps downloader and country place page shows how many maps are downloaded / to download, e.g. "Maps: 3 of 10" -->
@@ -66,9 +68,12 @@
     <string name="editor_time_open">Deschis</string>
     <string name="twentyfour_seven">24/7</string>
     <string name="day_off_today">Închis astăzi</string>
+    <string name="midnight">Miezul nopții</string>
+    <string name="noon">Amiază</string>
     <string name="opens_in">Deschide în %s</string>
     <string name="closes_in">Închide în %s</string>
     <string name="closed">Închis</string>
+    <!-- Short label for minutes (time unit), placed after a number -->
     <string name="minute">min</string>
     <string name="big_font">Mărește dimensiunea literelor pe hartă</string>
     <string name="transliteration_title">Transcrie în alfabet latin</string>

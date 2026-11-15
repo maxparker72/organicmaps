@@ -92,6 +92,7 @@ final class TrackRecordingManagerTests: XCTestCase {
     }
     XCTAssertTrue(mockTrackRecorder.stopTrackRecordingCalled)
     XCTAssertTrue(mockTrackRecorder.saveTrackRecordingCalled)
+    XCTAssertFalse(mockTrackRecorder.discardTrackRecordingCalled)
     XCTAssertTrue(mockActivityManager.stopCalled)
     XCTAssertTrue(trackRecordingManager.recordingState == .inactive)
   }
@@ -110,7 +111,32 @@ final class TrackRecordingManagerTests: XCTestCase {
     }
     wait(for: [expectation], timeout: 1.0)
     XCTAssertFalse(mockTrackRecorder.saveTrackRecordingCalled)
+    XCTAssertTrue(mockTrackRecorder.discardTrackRecordingCalled)
     XCTAssertTrue(trackRecordingManager.recordingState == .inactive)
+  }
+
+  func test_GivenActiveRecording_WhenDiscarded_ThenClearsRecording() {
+    mockTrackRecorder.trackRecordingIsEnabled = true
+
+    trackRecordingManager.discard()
+
+    XCTAssertTrue(mockTrackRecorder.discardTrackRecordingCalled)
+    XCTAssertFalse(mockTrackRecorder.saveTrackRecordingCalled)
+    XCTAssertTrue(mockActivityManager.stopCalled)
+    XCTAssertTrue(trackRecordingManager.recordingState == .inactive)
+  }
+
+  func test_GivenElevationInfoIsUnavailable_WhenGetTrackRecordingElevationProfileData_ThenReturnsNil() {
+    mockTrackRecorder.trackRecordingElevationProfileData = nil
+
+    XCTAssertNil(trackRecordingManager.trackRecordingElevationProfileData)
+  }
+
+  func test_GivenElevationInfoIsAvailable_WhenGetTrackRecordingElevationProfileData_ThenReturnsData() {
+    let elevationProfileData = ElevationProfileData()
+    mockTrackRecorder.trackRecordingElevationProfileData = elevationProfileData
+
+    XCTAssertTrue(trackRecordingManager.trackRecordingElevationProfileData === elevationProfileData)
   }
 }
 
@@ -121,14 +147,18 @@ private final class MockTrackRecorder: TrackRecorder {
   static var trackRecordingIsEmpty = false
   static var startTrackRecordingCalled = false
   static var stopTrackRecordingCalled = false
+  static var discardTrackRecordingCalled = false
   static var saveTrackRecordingCalled = false
+  static var trackRecordingElevationProfileData: ElevationProfileData?
 
   static func reset() {
     trackRecordingIsEnabled = false
     trackRecordingIsEmpty = false
     startTrackRecordingCalled = false
     stopTrackRecordingCalled = false
+    discardTrackRecordingCalled = false
     saveTrackRecordingCalled = false
+    trackRecordingElevationProfileData = nil
   }
 
   static func isTrackRecordingEnabled() -> Bool {
@@ -149,14 +179,19 @@ private final class MockTrackRecorder: TrackRecorder {
     trackRecordingIsEnabled = false
   }
 
+  static func discardTrackRecording() {
+    discardTrackRecordingCalled = true
+    trackRecordingIsEnabled = false
+  }
+
   static func saveTrackRecording(withName _: String) {
     saveTrackRecordingCalled = true
   }
 
   static func setTrackRecordingUpdateHandler(_: ((TrackInfo) -> Void)?) {}
 
-  static func trackRecordingElevationInfo() -> ElevationProfileData {
-    ElevationProfileData()
+  static func trackRecordingElevationInfo() -> ElevationProfileData? {
+    trackRecordingElevationProfileData
   }
 }
 

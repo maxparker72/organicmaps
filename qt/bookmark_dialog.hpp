@@ -23,6 +23,7 @@ class BookmarkDialog : public QDialog
 
 public:
   BookmarkDialog(QWidget * parent, Framework & framework);
+  ~BookmarkDialog() override;
 
   void ShowModal();
 
@@ -35,7 +36,7 @@ private slots:
 
 private:
   void FillTree();
-  QTreeWidgetItem * CreateTreeItem(std::string const & title, QTreeWidgetItem * parent);
+  QTreeWidgetItem * CreateTreeItem(QString const & title, QTreeWidgetItem * parent);
   void OnAsyncLoadingStarted();
   void OnAsyncLoadingFinished();
   void OnAsyncLoadingFileSuccess(std::string const & fileName, bool isTemporaryFile);

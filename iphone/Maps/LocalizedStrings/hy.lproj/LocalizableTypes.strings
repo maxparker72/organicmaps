@@ -210,6 +210,7 @@
 "type.barrier.city_wall" = "Քաղաքի պարիսպ";
 "type.barrier.cycle_barrier" = "Հեծանվային արգելապատնեշ";
 "type.waterway.ditch" = "Ցամաքուրդային առու";
+"type.waterway.ditch.intermittent" = "Ընդհատվող ցամաքուրդային առու";
 "type.natural.water.moat" = "Խրամ";
 "type.natural.water.wastewater" = "Կեղտաջրեր";
 "type.barrier.entrance" = "Մուտք";
@@ -407,28 +408,28 @@
 "type.highway" = "Ավտոճանապարհ";
 "type.highway.bridleway" = "Ձիարշավարան";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.bridleway.bridge" = "Կամուրջ";
 "type.highway.bridleway.permissive" = "Ձիարշավարան";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.bridleway.tunnel" = "Թունել";
 "type.highway.busway" = "Ավտոբուսի ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.busway.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.busway.tunnel" = "Թունել";
 "type.highway.bus_stop" = "Կանգառ";
 "type.highway.construction" = "Կառուցվող ճանապարհ";
 "type.highway.cycleway" = "Հեծանվուղի";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.cycleway.bridge" = "Կամուրջ";
 "type.highway.cycleway.permissive" = "Հեծանվուղի";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.cycleway.tunnel" = "Թունել";
 "type.highway.elevator" = "Վերելակ";
 "type.highway.footway" = "Հետիոտնային ճանապարհ";
@@ -436,33 +437,33 @@
 "type.highway.footway.crossing" = "Հետիոտնային անցում";
 "type.highway.footway.area" = "Հետիոտնային գոտի";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.footway.bridge" = "Հետիոտնային կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.footway.tunnel" = "Հետիոտնային թունել";
 "type.highway.ford" = "Գետանցում";
 "type.highway.living_street" = "Բնակելի փողոց";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.living_street.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.living_street.tunnel" = "Թունել";
 "type.highway.motorway" = "Մայրուղի";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway.bridge" = "Մայրուղու կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway.tunnel" = "Մայրուղու թունել";
 "type.highway.motorway_junction" = "Ճանապարհի ելք";
 "type.highway.motorway_link" = "Մայրուղու միացում";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.motorway_link.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.motorway_link.tunnel" = "Թունել";
 "type.highway.path" = "Արահետ";
 
@@ -474,135 +475,137 @@
 "type.highway.path.bicycle" = "Հեծանվային և հետիոտնային արահետ";
 "type.highway.footway.bicycle" = "Հեծանվային և հետիոտնային արահետ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.path.bridge" = "Կամուրջ";
 "type.highway.path.horse" = "Ձիարշավարան";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.path.tunnel" = "Թունել";
 "type.highway.pedestrian" = "Հետիոտնային փողոց";
 "type.highway.pedestrian.area" = "Հետիոտնային գոտի";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.pedestrian.bridge" = "Հետիոտնային կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.pedestrian.tunnel" = "Հետիոտնային թունել";
-"type.highway.platform" = "Հարթակ";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.highway.platform" = "Կառամատույց";
 "type.highway.primary" = "Առաջնային ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary.tunnel" = "Թունել";
 "type.highway.primary_link" = "Առաջնային ճանապարհի միացում";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.primary_link.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.primary_link.tunnel" = "Թունել";
 "type.highway.raceway" = "Վազքուղի";
 "type.highway.residential" = "Բնակելի փողոց";
 "type.highway.residential.area" = "Բնակելի փողոց";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.residential.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.residential.tunnel" = "Թունել";
 "type.highway.rest_area" = "Հանգստի գոտի";
 "type.highway.road" = "Ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.road.bridge" = "Կամուրջ";
 
 /* A bridge structure outline. */
 "type.man_made.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.road.tunnel" = "Թունել";
 "type.highway.secondary" = "Երկրորդական ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary.tunnel" = "Թունել";
 "type.highway.secondary_link" = "Երկրորդական ճանապարհի միացում";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.secondary_link.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.secondary_link.tunnel" = "Թունել";
 "type.highway.service" = "Ծառայողական ճանապարհ";
 "type.highway.service.area" = "Ծառայողական ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.service.bridge" = "Կամուրջ";
 "type.highway.service.driveway" = "Մուտքի ճանապարհ";
 "type.highway.service.parking_aisle" = "Կայանատեղիի անցում";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.service.tunnel" = "Թունել";
 "type.highway.services" = "Սպասարկման տարածք";
 "type.highway.speed_camera" = "Արագաչափ";
 "type.highway.steps" = "Աստիճաններ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.steps.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.steps.tunnel" = "Թունել";
 "type.highway.ladder" = "Սանդուղք";
 "type.highway.tertiary" = "Երրորդական ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary.tunnel" = "Թունել";
 "type.highway.tertiary_link" = "Երրորդական ճանապարհի միացում";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.tertiary_link.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.tertiary_link.tunnel" = "Թունել";
 "type.highway.track" = "Հողային ճանապարհ";
 "type.highway.track.area" = "Հողային ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.track.bridge" = "Կամուրջ";
 "type.highway.track.grade1" = "Հողային ճանապարհ";
 "type.highway.track.no.access" = "Հողային ճանապարհ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.track.tunnel" = "Թունել";
 "type.highway.traffic_signals" = "Լուսացույց";
 "type.highway.trunk" = "Գլխավոր ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk.tunnel" = "Թունել";
 "type.highway.trunk_link" = "Գլխավոր ճանապարհի միացում";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.trunk_link.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.trunk_link.tunnel" = "Թունել";
 "type.highway.unclassified" = "Չդասակարգված ճանապարհ";
 "type.highway.unclassified.area" = "Չդասակարգված ճանապարհ";
 
-/* These translations are used for all type.highway.*.bridge. */
+/* Default translation for type.highway.*.bridge aliases; individual types can override it. */
 "type.highway.unclassified.bridge" = "Կամուրջ";
 
-/* These translations are used for all type.highway.*.tunnel. */
+/* Default translation for type.highway.*.tunnel aliases; individual types can override it. */
 "type.highway.unclassified.tunnel" = "Թունել";
 "type.area_highway.cycleway" = "Հեծանվուղի";
 "type.area_highway.footway" = "Հետիոտնային ճանապարհ";
@@ -644,6 +647,7 @@
 "type.historic.castle.shiro" = "Ճապոնական ամրոց";
 "type.historic.castle.stately" = "Շքեղ ամրոց";
 "type.historic.city_gate" = "Քաղաքի դարպաս";
+"type.man_made.ceremonial_gate" = "Արարողակարգային դարպաս";
 "type.historic.citywalls" = "Քաղաքի պարիսպ";
 "type.historic.fort" = "Ֆորտ";
 "type.historic.gallows" = "Կախաղան";
@@ -718,6 +722,7 @@
 "type.landuse" = "Հողօգտագործում";
 "type.landuse.allotments" = "Հողամասեր";
 "type.landuse.basin" = "Ավազան";
+"type.landuse.basin.intermittent" = "Ընդհատվող ավազան";
 "type.landuse.brownfield" = "Լքված տարածք";
 
 /* In most (European) countries, сemeteries are usually independent of places of worship (e.g. military cemeteries), while grave yards are usually the yard of a place of worship. */
@@ -750,7 +755,6 @@
 "type.landuse.quarry" = "Քարհանք";
 "type.landuse.railway" = "Երկաթուղային գոտի";
 "type.landuse.recreation_ground" = "Հանգստի գոտի";
-"type.landuse.reservoir" = "Ջրամբար";
 "type.landuse.residential" = "Բնակելի թաղամաս";
 "type.landuse.retail" = "Առևտրի գոտի";
 "type.landuse.salt_pond" = "Աղի լճակ";
@@ -772,6 +776,7 @@
 "type.leisure.ice_rink" = "Սահադաշտ";
 "type.leisure.marina" = "Նավակայան";
 "type.leisure.nature_reserve" = "Արգելոց";
+"type.leisure.bird_hide" = "Թռչունների դիտակետ";
 "type.leisure.outdoor_seating" = "Բացօթյա նստատեղեր";
 "type.leisure.firepit" = "Խարուկատեղ";
 "type.leisure.park" = "Զբոսայգի";
@@ -806,6 +811,9 @@
 "type.man_made.pier" = "Պիրս";
 "type.man_made.pipeline" = "Խողովակաշար";
 "type.man_made.pipeline.overground" = "Վերգետնյա խողովակաշար";
+
+/* A covered water storage reservoir, usually for drinking water */
+"type.man_made.reservoir_covered" = "Ծածկված ջրամբար";
 "type.man_made.silo" = "Սիլոսային հոր";
 "type.man_made.storage_tank" = "Պահեստային բաք";
 "type.man_made.surveillance" = "Տեսախցիկ";
@@ -828,6 +836,9 @@
 "type.man_made.water_tower" = "Ջրաշտարակ";
 "type.man_made.water_well" = "Ջրհոր";
 "type.man_made.water_well.drinking_water_no" = "Ջրհոր";
+
+/* A facility that treats and supplies drinking water */
+"type.man_made.water_works" = "Ջրամաքրման կայան";
 "type.man_made.windmill" = "Հողմաղաց";
 "type.man_made.works" = "Գործարան";
 
@@ -871,10 +882,13 @@
 "type.natural.water.reservoir" = "Ջրամբար";
 "type.natural.water.basin" = "Ավազան";
 "type.natural.water.river" = "Գետ";
+"type.natural.water.intermittent" = "Ընդհատվող ջրային մարմին";
 "type.natural.land" = "Ցամաք";
 "type.natural.meadow" = "Մարգագետին";
 "type.natural.orchard" = "Պտղատու այգի";
 "type.natural.peak" = "Գագաթ";
+"type.natural.hill" = "Բլուր";
+"type.natural.arch" = "Քարե կամար";
 "type.natural.saddle" = "Թամբարդ";
 "type.natural.rock" = "Քար";
 "type.natural.scrub" = "Թփուտ";
@@ -972,7 +986,9 @@
 "type.psurface.unpaved_bad" = "psurface-unpaved_bad";
 "type.psurface.unpaved_good" = "psurface-unpaved_good";
 "type.public_transport" = "Հասարակական տրանսպորտ";
-"type.public_transport.platform" = "Հարթակ";
+
+/* Short label for a place where passengers wait for, board or leave public transport (bus, tram, train, metro, ferry, taxi, aerialway). Also used for highway=platform; keep the label generic. A raised platform may be absent. Do not translate as a software platform or a theatre stage. */
+"type.public_transport.platform" = "Կառամատույց";
 "type.railway" = "Երկաթուղի";
 "type.railway.abandoned" = "Լքված երկաթուղի";
 "type.railway.abandoned.bridge" = "Լքված երկաթուղային կամուրջ";
@@ -996,7 +1012,7 @@
 "type.railway.narrow_gauge" = "Նեղուղի երկաթգիծ";
 "type.railway.narrow_gauge.bridge" = "Նեղուղի երկաթգծի կամուրջ";
 "type.railway.narrow_gauge.tunnel" = "Նեղուղի երկաթգծի թունել";
-"type.railway.platform" = "Երկաթուղային պլատֆորմ";
+"type.railway.platform" = "Երկաթուղային կառամատույց";
 "type.railway.preserved" = "Պահպանվող երկաթգիծ";
 "type.railway.preserved.bridge" = "Պահպանվող երկաթգծի կամուրջ";
 "type.railway.preserved.tunnel" = "Պահպանվող երկաթգծի թունել";
@@ -1333,6 +1349,9 @@
 "type.shop.greengrocer" = "Մրգի և բանջարեղենի խանութ";
 "type.shop.grocery" = "Մթերային խանութ";
 "type.shop.hairdresser" = "Վարսավիրանոց";
+
+/* Traditional men's haircuts and beard trimming */
+"type.shop.hairdresser.barber" = "Տղամարդկանց վարսավիրանոց";
 "type.shop.hardware" = "Շինանյութի խանութ";
 "type.shop.health_food" = "Առողջ սննդի խանութ";
 "type.shop.hearing_aids" = "Լսողական սարքերի խանութ";
@@ -1458,6 +1477,7 @@
 "type.sport.rugby_union" = "Ռեգբի-15";
 "type.sport.running" = "Վազք";
 "type.sport.softball" = "Սոֆթբոլ";
+"type.sport.pilates" = "Պիլատես";
 "type.tourism" = "Զբոսաշրջություն";
 "type.tourism.aquarium" = "Ակվարիում";
 
@@ -1514,21 +1534,24 @@
 "type.waterway" = "Ջրային ուղի";
 "type.waterway.access_point" = "Ջրային ճանապարհի մուտքի կետ";
 "type.waterway.canal" = "Ջրանցք";
+"type.waterway.canal.intermittent" = "Ընդհատվող ջրանցք";
 "type.waterway.canal.tunnel" = "Ջրանցքի թունել";
 "type.waterway.fish_pass" = "Ձկնանցարան";
+"type.waterway.fish_pass.intermittent" = "Ընդհատվող ձկնանցարան";
 "type.waterway.dam" = "Ամբարտակ";
 "type.barrier.ditch" = "Խանդակ";
 "type.natural.water.ditch" = "Ցամաքուրդային առու";
 "type.waterway.ditch.tunnel" = "Ջրահեռացման խողովակ";
 "type.waterway.dock" = "Նավամատույց";
 "type.waterway.drain" = "Ջրահեռացման առու";
+"type.waterway.drain.intermittent" = "Ընդհատվող ջրահեռացման առու";
 "type.natural.water.drain" = "Ջրահեռացման առու";
 "type.waterway.drain.tunnel" = "Ջրահեռացման խողովակ";
 "type.waterway.lock_gate" = "Շլյուզի դարպաս";
 "type.waterway.river" = "Գետ";
+"type.waterway.river.intermittent" = "Ընդհատվող գետ";
 "type.waterway.river.tunnel" = "Գետ";
 "type.waterway.stream" = "Առու";
-"type.waterway.stream.ephemeral" = "Ժամանակավոր առու";
 "type.waterway.stream.intermittent" = "Ընդհատվող առու";
 "type.waterway.stream.tunnel" = "Առու";
 "type.waterway.waterfall" = "Ջրվեժ";
@@ -1572,6 +1595,7 @@
 
 /* https://wiki.openstreetmap.org/wiki/Key:social_facility */
 "type.amenity.social_facility" = "Սոցիալական հաստատություն";
+"type.amenity.stage" = "Բեմ";
 
 /* https://wiki.openstreetmap.org/wiki/Tag:emergency=emergency_ward_entrance */
 "type.emergency.emergency_ward_entrance" = "Շտապօգնության բաժանմունքի մուտք";
@@ -1604,6 +1628,9 @@
 "type.man_made.monitoring_station.weather" = "Եղանակի մոնիտորինգի կայան";
 "type.amenity.student_accommodation" = "Ուսանողական հանրակացարան";
 "type.craft.watchmaker" = "Ժամագործ";
+
+/* A workshop that makes and installs windows */
+"type.craft.window_construction" = "Պատուհանների արտադրություն";
 "type.xmas_feature.market" = "Սուրբ Ծննդյան տոնավաճառ";
 "type.xmas_feature.tree" = "Տոնածառ";
 "type.amenity.hookah_lounge" = "Նարգիլե բար";

@@ -15,12 +15,11 @@ import app.organicmaps.sdk.bookmarks.data.MapObject;
 import app.organicmaps.sdk.bookmarks.data.Track;
 import app.organicmaps.util.UiUtils;
 import app.organicmaps.widget.placepage.ElevationProfileViewRenderer;
-import app.organicmaps.widget.placepage.PlacePageStateListener;
 import app.organicmaps.widget.placepage.PlacePageViewModel;
 
-public class PlacePageTrackFragment extends Fragment
-    implements PlacePageStateListener, Observer<MapObject>, BookmarkManager.OnElevationActivePointChangedListener,
-               BookmarkManager.OnElevationCurrentPositionChangedListener
+public class PlacePageTrackFragment
+    extends Fragment implements Observer<MapObject>, BookmarkManager.OnElevationActivePointChangedListener,
+                                BookmarkManager.OnElevationCurrentPositionChangedListener
 {
   private PlacePageViewModel mViewModel;
   @Nullable
@@ -88,19 +87,21 @@ public class PlacePageTrackFragment extends Fragment
   }
 
   @Override
-  public void onElevationActivePointChanged()
+  public void onElevationActivePointChanged(long trackId, double distance)
   {
-    if (mTrack == null)
+    if (mTrack == null || mTrack.getTrackId() != trackId)
       return;
-    mElevationProfileViewRenderer.onChartElevationActivePointChanged();
+    mElevationProfileViewRenderer.onChartElevationActivePointChanged(distance);
     final double[] coords = mTrack.getElevationActivePointCoordinates();
     mTrack.setLat(coords[0]);
     mTrack.setLon(coords[1]);
   }
 
   @Override
-  public void onCurrentPositionChanged()
+  public void onCurrentPositionChanged(long trackId, double distance)
   {
-    mElevationProfileViewRenderer.onChartCurrentPositionChanged();
+    if (mTrack == null || mTrack.getTrackId() != trackId)
+      return;
+    mElevationProfileViewRenderer.onChartCurrentPositionChanged(distance);
   }
 }

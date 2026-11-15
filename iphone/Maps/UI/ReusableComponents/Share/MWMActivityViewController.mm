@@ -33,17 +33,11 @@
 - (id)activityViewController:(UIActivityViewController *)activityViewController
          itemForActivityType:(NSString *)activityType
 {
-  NSItemProvider * provider = [[NSItemProvider alloc] initWithContentsOfURL:self.fileURL];
-  if (provider)
-  {
-    NSString * ext = self.fileURL.pathExtension;
-    NSString * name = self.displayName;
-    // Avoid double extension (e.g. "Track.gpx.gpx").
-    if (ext.length > 0 && ![name.pathExtension isEqualToString:ext])
-      name = [NSString stringWithFormat:@"%@.%@", name, ext];
-    provider.suggestedName = name;
-    return provider;
-  }
+  // Share the file URL directly. Its last path component is the already-sanitized, human-readable
+  // file name produced by the core (see GetFileNameForExport). Wrapping it in an NSItemProvider with
+  // a suggestedName built from the raw category/track title crashed macOS "Save to Files": ShareKit
+  // forwards that name to -[NSSavePanel setNameFieldStringValue:], which raises an uncaught exception
+  // on an empty or path-illegal name. See https://github.com/organicmaps/organicmaps/issues/12932
   return self.fileURL;
 }
 
@@ -75,11 +69,6 @@
 
 @implementation MWMActivityViewController
 
-- (instancetype)initWithActivityItem:(id<UIActivityItemSource>)activityItem
-{
-  return [self initWithActivityItems:@[activityItem]];
-}
-
 - (instancetype)initWithActivityItems:(NSArray *)activityItems
 {
   self = [super initWithActivityItems:activityItems applicationActivities:nil];
@@ -94,17 +83,13 @@
 + (instancetype)shareControllerForMyPosition:(CLLocationCoordinate2D)location
 {
   MWMShareActivityItem * item = [[MWMShareActivityItem alloc] initForMyPositionAtLocation:location];
-  MWMActivityViewController * shareVC = [[self alloc] initWithActivityItem:item];
-  shareVC.excludedActivityTypes = [shareVC.excludedActivityTypes arrayByAddingObject:UIActivityTypeAirDrop];
-  return shareVC;
+  return [[self alloc] initWithActivityItems:item.activityItems];
 }
 
-+ (instancetype)shareControllerForPlacePage:(PlacePageData *)data
++ (instancetype)shareControllerForCurrentPlacePage
 {
-  MWMShareActivityItem * item = [[MWMShareActivityItem alloc] initForPlacePage:data];
-  MWMActivityViewController * shareVC = [[self alloc] initWithActivityItem:item];
-  shareVC.excludedActivityTypes = [shareVC.excludedActivityTypes arrayByAddingObject:UIActivityTypeAirDrop];
-  return shareVC;
+  MWMShareActivityItem * item = [[MWMShareActivityItem alloc] initForCurrentPlacePage];
+  return [[self alloc] initWithActivityItems:item.activityItems];
 }
 
 + (instancetype)shareControllerForURL:(NSURL *)url

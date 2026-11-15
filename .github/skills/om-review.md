@@ -552,6 +552,12 @@ is not met.
 - Exception handling gaps
 - Integer overflow / underflow in arithmetic
 
+**Downloaded map and terrain files:**
+
+- Apply the "Error handling policy" of `CLAUDE.md`, its single statement: the files are trusted
+  after the download verification, header checks may `MYTHROW`, and the regular tile records and
+  payloads use `ASSERT`. Do not flag missing runtime checks of the latter as defects.
+
 **Regression detection:**
 
 Look for these concrete patterns in the diff (removed `-` vs added `+` lines):
@@ -638,7 +644,7 @@ Check against project requirements using `gh pr view <N> --json commits`:
 - Every commit has a `Signed-off-by:` line (DCO requirement — `docs/CONTRIBUTING.md`)
 - PR description mentions LLM tools if used (`docs/PR_GUIDE.md`)
 - Commit subjects have `[subsystem]` prefix (`docs/COMMIT_MESSAGES.md`)
-- Commit subjects <= 72 characters, imperative mood, no trailing period
+- Commit subjects <= 80 characters, imperative mood, no trailing period
 - PR is appropriately sized (flag if > 1000 lines without justification)
 - Auto-generated files (strings, styles) are in separate commits
 
@@ -1302,8 +1308,8 @@ When reviewing, consider:
 
 | Component        | Path                                                 | Focus                     |
 |------------------|------------------------------------------------------|---------------------------|
-| App Delegate     | `iphone/Maps/Classes/MapsAppDelegate.mm`             | Framework init, lifecycle |
-| Map Controller   | `iphone/Maps/Classes/MapViewController.mm`           | Gestures, rendering       |
+| App Delegate     | `iphone/Maps/Core/AppDelegate/MapsAppDelegate.mm`    | Framework init, lifecycle |
+| Map Controller   | `iphone/Maps/UI/Map/MapViewController.mm`            | Gestures, rendering       |
 | Framework Bridge | `iphone/Maps/Core/Framework/MWMFrameworkListener.mm` | Observer dispatch         |
 | Location         | `iphone/Maps/Core/Location/MWMLocationManager.mm`    | Singleton, threading      |
 | CoreApi Types    | `iphone/CoreApi/CoreApi/Common/MWMTypes.h`           | Type definitions          |

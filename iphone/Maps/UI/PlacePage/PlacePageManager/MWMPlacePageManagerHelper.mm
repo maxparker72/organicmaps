@@ -15,6 +15,7 @@
 - (void)addBusiness;
 - (void)addPlace:(CLLocationCoordinate2D)coordinate;
 - (void)openWebsite:(PlacePageData *)data;
+- (void)openHeritageWebsite:(PlacePageData *)data;
 - (void)openWebsiteMenu:(PlacePageData *)data;
 - (void)openWikipedia:(PlacePageData *)data;
 - (void)openWikimediaCommons:(PlacePageData *)data;
@@ -30,12 +31,10 @@
 - (void)openMoreUrl:(PlacePageData *)data;
 - (void)openReviewUrl:(PlacePageData *)data;
 - (void)openDescriptionUrl:(PlacePageData *)data;
-- (void)openCatalogSingleItem:(PlacePageData *)data atIndex:(NSInteger)index;
-- (void)openCatalogMoreItems:(PlacePageData *)data;
 - (void)addBookmark:(PlacePageData *)data;
 - (void)updateBookmark:(PlacePageData *)data
                  title:(NSString *)title
-                 color:(MWMBookmarkColor)color
+                 color:(UIColor *)color
               category:(MWMMarkGroupID)category;
 - (void)removeBookmark:(PlacePageData *)data;
 - (void)updateTrack:(PlacePageData *)data
@@ -45,8 +44,6 @@
 - (void)removeTrack:(PlacePageData *)data;
 - (void)editBookmark:(PlacePageData *)data;
 - (void)editTrack:(PlacePageData *)data;
-- (void)searchBookingHotels:(PlacePageData *)data;
-- (void)book:(PlacePageData *)data;
 - (void)routeFrom:(PlacePageData *)data;
 - (void)routeTo:(PlacePageData *)data;
 - (void)routeAddStop:(PlacePageData *)data;
@@ -82,6 +79,11 @@
 + (void)openWebsite:(PlacePageData *)data
 {
   [[MWMMapViewControlsManager manager].placePageManager openWebsite:data];
+}
+
++ (void)openHeritageWebsite:(PlacePageData *)data
+{
+  [[MWMMapViewControlsManager manager].placePageManager openHeritageWebsite:data];
 }
 
 + (void)openWebsiteMenu:(PlacePageData *)data
@@ -159,16 +161,6 @@
   [[MWMMapViewControlsManager manager].placePageManager openDescriptionUrl:data];
 }
 
-+ (void)openCatalogSingleItem:(PlacePageData *)data atIndex:(NSInteger)index
-{
-  [[MWMMapViewControlsManager manager].placePageManager openCatalogSingleItem:data atIndex:index];
-}
-
-+ (void)openCatalogMoreItems:(PlacePageData *)data
-{
-  [[MWMMapViewControlsManager manager].placePageManager openCatalogMoreItems:data];
-}
-
 + (void)addBookmark:(PlacePageData *)data
 {
   [[MWMMapViewControlsManager manager].placePageManager addBookmark:data];
@@ -176,7 +168,7 @@
 
 + (void)updateBookmark:(PlacePageData *)data
                  title:(NSString *)title
-                 color:(MWMBookmarkColor)color
+                 color:(UIColor *)color
               category:(MWMMarkGroupID)category
 {
   [[MWMMapViewControlsManager manager].placePageManager updateBookmark:data title:title color:color category:category];
@@ -208,16 +200,6 @@
 + (void)editTrack:(PlacePageData *)data
 {
   [[MWMMapViewControlsManager manager].placePageManager editTrack:data];
-}
-
-+ (void)searchBookingHotels:(PlacePageData *)data
-{
-  [[MWMMapViewControlsManager manager].placePageManager searchBookingHotels:data];
-}
-
-+ (void)book:(PlacePageData *)data
-{
-  [[MWMMapViewControlsManager manager].placePageManager book:data];
 }
 
 + (void)routeFrom:(PlacePageData *)data

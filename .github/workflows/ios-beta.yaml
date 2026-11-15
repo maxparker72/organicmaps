@@ -4,37 +4,44 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - .gitignore
-      - .github/**
-      - '!.github/workflows/ios-beta.yaml'  # Run check on self change
-      - '**/*_tests/**'
-      - '**/CMakeLists.txt'
-      - CONTRIBUTORS
-      - LICENSE
-      - NOTICE
-      - README.md
-      - android/**
-      - data/strings/**
-      - docs/**
-      - generator/**
-      - packaging/**
-      - platform/*_android*
-      - platform/*_linux*
-      - platform/*_mac*
-      - platform/*qt*
-      - platform/*_win*
-      - qt*/**
-      - skin_generator/**
-      - tools/**
-      - track_generator/**
+    # Keep common paths in sync with ios-check.yaml, android-check.yaml and android-beta.yaml.
+    # Keep iOS paths in sync with ios-check.yaml, except workflow/version.sh.
+    paths:
+      # Common inputs
+      - .gitattributes
+      - .gitmodules
+      - '*.h'
+      - '*.hpp'
+      - 3party/**
+      - data/**
+      - libs/**
+      # iOS inputs
+      - .github/workflows/ios-beta.yaml
+      - iphone/**
+      - tools/unix/version.sh  # Used by Fastlane to generate the version
+      - xcode/**
+      # Common exclusions
+      - '!**/*.md'
+      - '!**/*_tests/**'
+      - '!data/borders/**'
+      - '!data/organic_maps_emoji/**'
+      - '!data/strings/**'
+      - '!data/test_data/**'
+      # iOS exclusions
+      - '!**/CMakeLists.txt'
+      - '!iphone/metadata/**'
+      - '!libs/platform/*_android*'
+      - '!libs/platform/*_linux*'
+      - '!libs/platform/*_mac*'
+      - '!libs/platform/*qt*'
+      - '!libs/platform/*_win*'
 
 jobs:
   ios-beta:
     name: Apple TestFlight
-    runs-on: macos-26
+    runs-on: xcode-27
     env:
-      DEVELOPER_DIR: /Applications/Xcode_26.4.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_27.0.app/Contents/Developer
       LANG: en_US.UTF-8  # Fastlane complains that the terminal is using ASCII.
       LANGUAGE: en_US.UTF-8
       LC_ALL: en_US.UTF-8
@@ -49,18 +56,19 @@ jobs:
       - name: Show current version of Xcode
         run: xcodebuild -version
 
+      # Remove after https://github.com/actions/runner-images/issues/14548 is fixed.
+      - name: Ensure Metal Toolchain is available
+        run: |
+          if ! xcrun metal -v >/dev/null 2>&1; then
+            xcodebuild -downloadComponent MetalToolchain
+            xcrun -k
+          fi
+          xcrun metal -v
+
       - name: Checkout sources
         uses: actions/checkout@v6
         with:
           fetch-depth: 100 # enough to get all commits for the current day
-
-      - name: Restore Boost submodule from cache
-        uses: actions/cache@v5
-        with:
-          path: |
-            3party/boost
-            .git/modules/3party/boost
-          key: boost-submodule
 
       - name: Parallel submodules checkout
         run: git submodule update --depth 1 --init --recursive --jobs=$(($(sysctl -n hw.logicalcpu) * 20))
@@ -78,10 +86,6 @@ jobs:
           APPSTORE_JSON: ${{ secrets.APPSTORE_JSON }}
           CERTIFICATES_DEV_P12: ${{ secrets.CERTIFICATES_DEV_P12 }}
           CERTIFICATES_DISTR_P12: ${{ secrets.CERTIFICATES_DISTR_P12 }}
-
-      - name: Configure repository
-        shell: bash
-        run: ./configure.sh
 
       - name: Compile and upload to TestFlight
         run: |

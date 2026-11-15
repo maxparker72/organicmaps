@@ -14,7 +14,7 @@ struct EntityEditView: View {
   /// A track's color as stored, and the palette swatch shown for it. Save writes the
   /// stored color back unless the user picks another swatch, so editing a name
   /// doesn't replace an imported custom color (LIB-06).
-  @State private var storedTrackColor: NSColor?
+  @State private var storedColor: NSColor?
   @State private var loadedSwatch: BookmarkColor?
   @State private var listId: MWMMarkGroupID = 0
   @State private var lists: [BookmarkGroup] = []
@@ -136,32 +136,34 @@ struct EntityEditView: View {
       name = EntityEditor.trackName(info.trackId)
       details = EntityEditor.trackDescription(info.trackId)
       listId = EntityEditor.trackGroup(info.trackId)
-      let stored = EntityEditor.trackColor(info.trackId)
-      storedTrackColor = stored
-      color = BookmarkColor.closest(to: stored)
-      loadedSwatch = color
+      storedColor = EntityEditor.trackColor(info.trackId)
       tags = OMBookmarksHelper.tags(forTrack: info.trackId)
     } else {
       name = EntityEditor.bookmarkName(info.bookmarkId)
       details = EntityEditor.bookmarkDescription(info.bookmarkId)
-      color = EntityEditor.bookmarkColor(info.bookmarkId)
+      storedColor = EntityEditor.bookmarkColor(info.bookmarkId)
       listId = EntityEditor.bookmarkGroup(info.bookmarkId)
       tags = OMBookmarksHelper.tags(forBookmark: info.bookmarkId)
+    }
+    if let storedColor {
+      color = BookmarkColor.closest(to: storedColor)
+      loadedSwatch = color
     }
   }
 
   private func save() {
     // Commit any half-typed tag so the user doesn't lose what's in the field.
     commitNewTag()
+    // Keep the exact stored color unless the user picked another swatch.
+    let savedColor = (color == loadedSwatch ? storedColor : nil) ?? color.nsColor
     if info.isTrack {
-      let trackColor = (color == loadedSwatch ? storedTrackColor : nil) ?? color.nsColor
-      EntityEditor.saveTrack(info.trackId, group: listId, title: name, color: trackColor, description: details)
+      EntityEditor.saveTrack(info.trackId, group: listId, title: name, color: savedColor, description: details)
       OMBookmarksHelper.setTags(tags, forTrack: info.trackId)
       // Tracks render via a separate user-line cache; the implicit dirty path
       // doesn't always re-flush the existing tile, so kick the engine.
       OMBookmarksHelper.invalidateUserMarks()
     } else {
-      EntityEditor.saveBookmark(info.bookmarkId, group: listId, title: name, color: color, description: details)
+      EntityEditor.saveBookmark(info.bookmarkId, group: listId, title: name, color: savedColor, description: details)
       OMBookmarksHelper.setTags(tags, forBookmark: info.bookmarkId)
     }
     NotificationCenter.default.post(name: .omTagsChanged, object: nil)

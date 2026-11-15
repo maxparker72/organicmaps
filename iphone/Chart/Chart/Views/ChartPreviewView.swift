@@ -163,7 +163,7 @@ class ChartPreviewView: ExpandedTouchView {
   }
 
   @objc func onPan(_ sender: UIPanGestureRecognizer) {
-    if sender.state != .changed { return }
+    guard sender.state == .changed else { return }
 
     let p = sender.translation(in: viewPortView)
     let count = chartData.labels.count - 1
@@ -187,7 +187,7 @@ class ChartPreviewView: ExpandedTouchView {
   }
 
   @objc func onLeftPan(_ sender: UIPanGestureRecognizer) {
-    if sender.state != .changed { return }
+    guard sender.state == .changed else { return }
 
     let p = sender.translation(in: leftBoundView)
     let count = chartData.labels.count - 1
@@ -209,7 +209,7 @@ class ChartPreviewView: ExpandedTouchView {
   }
 
   @objc func onRightPan(_ sender: UIPanGestureRecognizer) {
-    if sender.state != .changed { return }
+    guard sender.state == .changed else { return }
 
     let p = sender.translation(in: viewPortView)
     let count = chartData.labels.count - 1
@@ -230,12 +230,14 @@ class ChartPreviewView: ExpandedTouchView {
     }
   }
 
-  func setX(min: Int, max: Int) {
+  func setX(min: Int, max: Int, notifyDelegate: Bool = true) {
     guard min < max else { return }
     minX = min
     maxX = max
     updateViewPort()
-    delegate?.chartPreviewView(self, didChangeMinX: minX, maxX: maxX)
+    if notifyDelegate {
+      delegate?.chartPreviewView(self, didChangeMinX: minX, maxX: maxX)
+    }
   }
 
   func updateViewPort() {

@@ -53,7 +53,7 @@ struct QuickLookView: View {
       switch item {
       case .bookmark(let id):
         let bm = manager.bookmark(withId: id)
-        Circle().fill(bm.bookmarkColor.swiftUIColor).frame(width: 16, height: 16)
+        Circle().fill(Color(nsColor: bm.bookmarkColor)).frame(width: 16, height: 16)
         VStack(alignment: .leading, spacing: 2) {
           Text(bm.bookmarkName).font(.headline)
           Text("Bookmark").font(.caption).foregroundStyle(.secondary)

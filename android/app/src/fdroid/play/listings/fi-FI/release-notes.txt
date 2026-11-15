@@ -1,8 +1,9 @@
-• Valitse patikointi- ja pyöräilyreitit nähdäksesi niiden korkeuskäyrät.
-• Oikea kartan kääriminen antimeridiaanin kohdalla (±180° pituusastetta).
-• Vaihda kaikkien luokkaan kuuluvien kirjanmerkkien ja reittien värejä kerralla.
-• Parempi talonumeroiden haku, enemmän Yhdysvaltain osoitteita katettu.
-• OSM-tiedot huhtikuun 4. päivästä alkaen
-• Ajastettu näyttötila asetuksissa
-• Kirjanmerkkien ja jälkien jakaminen muihin sovelluksiin korjattu
-…lisää osoitteessa omaps.org/news
+• OSM-tiedot: 28. syyskuuta; Wikipedia-tiedot: 21. syyskuuta
+• Parannetut vaihtoehtoiset reitit ja arvioidut saapumisajat
+• Uusi asetus optimoi välipysähdysten järjestyksen
+• Uudet painikkeet lisäävät tai korvaavat välipysähdyksiä suunnitellulla reitillä
+• Valittu vaihtoehtoinen reitti pysyy valittuna navigoinnin aikana
+• Jälkien tallennus korjattu ja parannettu
+• KMB-tiedostojen tuonti korjattu
+• Käyttöliittymän parannukset ja korjaukset
+…lisätietoja osoitteessa omaps.org/news

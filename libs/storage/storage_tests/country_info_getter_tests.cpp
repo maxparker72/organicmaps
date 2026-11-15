@@ -6,6 +6,7 @@
 #include "storage/country.hpp"
 #include "storage/country_decl.hpp"
 #include "storage/country_info_getter.hpp"
+#include "storage/country_info_reader_light.hpp"
 #include "storage/storage.hpp"
 #include "storage/storage_helpers.hpp"
 
@@ -82,6 +83,92 @@ Cont Flatten(vector<Cont> const & cs)
   return res;
 }
 
+UNIT_TEST(CountryDef_IsIntersectOrInside)
+{
+  using O = CountryDef::Overlap;
+  // testRect is "wrapped" (minX in (-180, 180)) but may cross the antimeridian (maxX > 180).
+  // countryRect is non-wrapped but may itself cross the antimeridian (maxX > 180 or minX < -180).
+  auto Check = [](m2::RectD const & test, m2::RectD const & country)
+  { return CountryDef::IsIntersectOrInside(test, country); };
+
+  // 1. Both canonical, no antimeridian wrap.
+  TEST_EQUAL(Check({0, 0, 10, 10}, {20, 20, 30, 30}), O::NONE, ());     // disjoint
+  TEST_EQUAL(Check({0, 0, 10, 10}, {5, 5, 15, 15}), O::INTERSECT, ());  // partial overlap
+  TEST_EQUAL(Check({0, 0, 10, 10}, {2, 2, 8, 8}), O::INSIDE, ());       // country inside test
+  TEST_EQUAL(Check({2, 2, 8, 8}, {0, 0, 10, 10}), O::INTERSECT, ());    // test inside country (not INSIDE)
+
+  // 2. Country stored unwrapped past the east antimeridian (maxX > 180), canonical test on the far
+  //    (negative) side; the -360 country shift brings them together.
+  TEST_EQUAL(Check({-175, -10, -170, -5}, {184, -12, 193, -4}), O::INTERSECT, ());
+  TEST_EQUAL(Check({-100, -10, -90, -5}, {184, -12, 193, -4}), O::NONE, ());    // no overlap even shifted
+  TEST_EQUAL(Check({-180, -20, -170, 0}, {184, -12, 186, -4}), O::INSIDE, ());  // small country inside test
+
+  // 3. Country stored unwrapped past the west antimeridian (minX < -180); the +360 country shift.
+  TEST_EQUAL(Check({170, -10, 176, -5}, {-193, -12, -184, -4}), O::INTERSECT, ());
+
+  // 4. Test rect itself crosses the antimeridian (maxX > 180) and the country is canonical near it;
+  //    the +360 country shift brings it into the test's extended frame.
+  TEST_EQUAL(Check({170, -10, 190, -5}, {-173, -12, -171, -4}), O::INTERSECT, ());  // Samoa-like
+  TEST_EQUAL(Check({170, -20, 190, 0}, {-176, -12, -174, -4}), O::INSIDE, ());      // country inside wrapped test
+  TEST_EQUAL(Check({170, -10, 190, -5}, {-100, -12, -90, -4}), O::NONE, ());        // far away
+
+  // Real-data regressions.
+  // "Marae Moana" feature piece (canonical) vs the "Tokelau" border rect (unwrapped past 180).
+  CountryDef const tokelau("Tokelau", {184.6, -10.4, 193.2, -5.4});
+  TEST(tokelau.IsRectOverlap({-168.5, -26.2, -154.8, -5.8}), ());
+  TEST(!tokelau.IsRectOverlap({-100, -10, -90, -5}), ());
+
+  // Canonical "Samoa" vs a wrapped viewport rect that crosses the antimeridian.
+  CountryDef const samoa("Samoa", {-173, -12, -171, -4});
+  TEST(samoa.IsRectOverlap({170, -10, 190, -5}), ());
+}
+
+UNIT_TEST(CountryInfoGetter_GetRegionsCountryIdByRect_Antimeridian)
+{
+  auto const getter = CreateCountryInfoGetter();
+
+  // Alaska's compact bounds cross the antimeridian. Precise rectangle lookup must check both
+  // canonical longitude parts against its country polygons.
+  auto hasAlaska = [&](m2::RectD const & r)
+  {
+    auto const cs = getter->GetRegionsCountryIdByRect(r, false /* rough */);
+    return find(cs.begin(), cs.end(), "US_Alaska") != cs.end();
+  };
+  auto rectAround = [](double lat, double lon, double half)
+  { return m2::RectD(mercator::FromLatLon(lat - half, lon - half), mercator::FromLatLon(lat + half, lon + half)); };
+
+  // Westernmost Aleutians (canonical positive lon) - inside Alaska.
+  TEST(hasAlaska(rectAround(52.7600266, 173.8999264, 0.02)), ());
+  // Bering Sea north of the Aleutians - NOT Alaska.
+  TEST(!hasAlaska(rectAround(59.1444374, 174.793276, 0.02)), ());
+
+  // Bering Strait point on the Alaska (negative lon) side, reached only by the wrapped-right part of
+  // a thin rect spanning lon [170, 192]: the [180, 192] half wraps to [-180, -168] and must match.
+  TEST(hasAlaska({mercator::FromLatLon(65.74, 170), mercator::FromLatLon(65.78, 192)}), ());
+}
+
+UNIT_TEST(CountryInfoGetter_GetRegionsCountryIdByRect_ContainedPolygons)
+{
+  auto const reader = CountryInfoReader::CreateCountryInfoReader(GetPlatform());
+  TEST(reader, ());
+  auto const & countries = reader->GetCountries();
+  for (size_t id = 0; id < countries.size(); ++id)
+  {
+    auto const regions = reader->LoadRegionsFromDisk(id);
+    if (regions.size() < 2)
+      continue;
+
+    // Enclosing one polygon need not enclose the country bounds or put the query center inside that polygon.
+    for (auto const & region : regions)
+    {
+      auto const rect = m2::Inflate(region.GetRect(), 1e-4, 1e-4);
+      auto const matches = reader->GetRegionsCountryIdByRect(rect, false /* rough */);
+      TEST(find(matches.begin(), matches.end(), countries[id].m_countryId) != matches.end(),
+           (countries[id].m_countryId, rect));
+    }
+  }
+}
+
 UNIT_TEST(CountryInfoGetter_GetByPoint_Smoke)
 {
   auto const getter = CreateCountryInfoGetter();
@@ -97,6 +184,31 @@ UNIT_TEST(CountryInfoGetter_GetByPoint_Smoke)
 
   getter->GetRegionInfo(mercator::FromLatLon(34.6509, 135.5018), info);
   TEST_EQUAL(info.m_name, "Japan, Kinki Region_Osaka_Osaka", ());
+}
+
+using LightweightCountryInfoReader = lightweight::CountryInfoReader;
+
+UNIT_CLASS_TEST(LightweightCountryInfoReader, FractionalLookup)
+{
+  auto const getter = CreateCountryInfoGetter();
+  struct TestCase
+  {
+    ms::LatLon point;
+    char const * countryId;
+  };
+  TestCase const testCases[] = {
+      {{-16.8415, -179.9747}, "Fiji"},
+      {{52.7600266, 173.8999264}, "US_Alaska"},
+      {{-16.8415, -178.0}, ""},        // Pacific Ocean east of Fiji.
+      {{59.1444374, 174.793276}, ""},  // Bering Sea north of the Aleutians.
+      {{35.51914613092363, 46.01312669564558}, "Iran_North"},
+  };
+  for (auto const & test : testCases)
+  {
+    auto const point = mercator::FromLatLon(test.point);
+    TEST_EQUAL(GetRegionCountryId(point), test.countryId, (test.point));
+    TEST_EQUAL(getter->GetRegionCountryId(point), test.countryId, (test.point));
+  }
 }
 
 UNIT_TEST(CountryInfoGetter_GetRegionsCountryIdByRect_Smoke)
@@ -123,29 +235,14 @@ UNIT_TEST(CountryInfoGetter_GetRegionsCountryIdByRect_Smoke)
 
   // Inside mwm (rough).
   auto const countries4 = getter->GetRegionsCountryIdByRect(m2::RectD(p - halfSize, p + halfSize), true /* rough */);
-  TEST_EQUAL(countries, vector<storage::CountryId>{"Russia_Bryansk Oblast"}, ());
+  TEST_EQUAL(countries4, vector<storage::CountryId>{"Russia_Bryansk Oblast"}, ());
 
   // Several countries (rough).
   auto const countries5 = getter->GetRegionsCountryIdByRect(m2::RectD(p - halfSize2, p + halfSize2), true /* rough */);
-  // US_Alaska was in the old expected list because its rect was [-180, 180] (intersected everything).
-  // With extended rects, Alaska's rect is compact and no longer intersects Belarus area.
+  // Alaska's compact extended rectangle excludes this viewport.
   auto const expected2 = vector<storage::CountryId>{"Belarus_Homiel Region", "Belarus_Maglieu Region",
                                                     "Russia_Bryansk Oblast", "Ukraine_Chernihiv Oblast"};
   TEST_EQUAL(countries5, expected2, ());
-}
-
-UNIT_TEST(CountryInfoGetter_SomeRects)
-{
-  auto const getter = CreateCountryInfoGetter();
-
-  m2::RectD rects[3];
-  getter->CalcUSALimitRect(rects);
-
-  LOG(LINFO, ("USA Continental:", rects[0]));
-  LOG(LINFO, ("Alaska:", rects[1]));
-  LOG(LINFO, ("Hawaii:", rects[2]));
-
-  LOG(LINFO, ("Canada:", getter->CalcLimitRect("Canada_")));
 }
 
 UNIT_TEST(CountryInfoGetter_HitsInRadius)
@@ -208,7 +305,19 @@ UNIT_TEST(CountryInfoGetter_GetLimitRectForLeafSingleMwm)
   TEST(AlmostEqualAbs(boundingBox, expectedBoundingBox, kRectCompareEpsilon), ());
 }
 
-// This is a test for consistency between data/countries.txt and data/packed_polygons.bin.
+UNIT_TEST(CountryInfoGetterForTesting_GetLimitRectForLeaf)
+{
+  m2::RectD const first(10, 20, 30, 40), second(50, 60, 70, 80);
+  CountryInfoGetterForTesting getter({{"First", first}});
+  TEST_EQUAL(getter.GetLimitRectForLeaf("First"), first, ());
+
+  getter.AddCountry({"Second", second});
+  TEST_EQUAL(getter.GetLimitRectForLeaf("Second"), second, ());
+  TEST_EQUAL(getter.GetLimitRectForLeaf("World"), mercator::Bounds::FullRect(), ());
+  TEST_EQUAL(getter.GetLimitRectForLeaf("Unknown"), mercator::Bounds::FullRect(), ());
+}
+
+// This is a test for consistency between data/countries.json and data/packed_polygons.bin.
 UNIT_TEST(CountryInfoGetter_Countries_And_Polygons)
 {
   auto reader = CountryInfoReader::CreateCountryInfoReader(GetPlatform());
@@ -440,7 +549,7 @@ UNIT_TEST(CountryInfoGetter_ExtendedRect_WestExtended)
   // Point inside western portion (canonical coords [-180, -160]).
   TEST_EQUAL(getter.GetRegionCountryId({-170.0, -15.0}), "WestCountry", ());
 
-  // Point inside eastern portion [166, 180] — wrapped by WrapX to [-175, ...], matches via -360 shift.
+  // Canonical longitude 175 matches the west-extended rectangle via the -360 shift.
   TEST_EQUAL(getter.GetRegionCountryId({175.0, -15.0}), "WestCountry", ());
 
   // Point outside.

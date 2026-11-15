@@ -29,6 +29,7 @@ set(SRC
   http_request.hpp
   http_uploader.hpp
   http_uploader_background.hpp
+  languages.hpp
   local_country_file.cpp
   local_country_file.hpp
   local_country_file_utils.cpp
@@ -63,6 +64,10 @@ set(SRC
   trace.hpp
   string_storage_base.cpp
   string_storage_base.hpp
+  irish_grid_utils.cpp
+  irish_grid_utils.hpp
+  os_grid_utils.cpp
+  os_grid_utils.hpp
   utm_mgrs_utils.cpp
   utm_mgrs_utils.hpp
 )
@@ -118,7 +123,7 @@ else() # neither iPhone nor Android
                   @ONLY)
 
   append(SRC
-    localization_dummy.cpp
+    localization_qt.cpp
     network_policy_dummy.cpp
     platform_qt.cpp
     "${CMAKE_CURRENT_BINARY_DIR}/platform_qt_version.cpp"
@@ -159,6 +164,7 @@ else() # neither iPhone nor Android
       http_uploader_background_dummy.cpp
       locale_std.cpp
       platform_linux.cpp
+      platform_linux_migration.hpp
       platform_unix_impl.cpp
       platform_unix_impl.hpp
       secure_storage_qt.cpp
@@ -167,6 +173,11 @@ else() # neither iPhone nor Android
 endif()
 
 omim_add_library(${PROJECT_NAME} ${SRC})
+
+if (PLATFORM_WIN)
+  string(TOUPPER "OMIM_WINDOWS_DISTRIBUTION_${OMIM_WINDOWS_DISTRIBUTION}" _channel)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE ${_channel}=1)
+endif()
 
 if (APPLE)
   target_compile_options(${PROJECT_NAME} PRIVATE -fobjc-arc -Wno-nullability-completeness)
@@ -181,9 +192,9 @@ target_link_libraries(${PROJECT_NAME}
     geometry  # mercator::YToLat
     coding
     glaze::glaze
-    $<$<BOOL:${PLATFORM_DESKTOP}>:Qt6::Core>
-    $<$<BOOL:${PLATFORM_LINUX}>:Qt6::Network>
-    $<$<BOOL:${PLATFORM_WIN}>:Qt6::Network>
+    $<$<OR:$<BOOL:${PLATFORM_DESKTOP}>,$<BOOL:${PLATFORM_SAILFISH}>>:Qt${OMIM_QT_VERSION}::Core>
+    $<$<BOOL:${PLATFORM_LINUX}>:Qt${OMIM_QT_VERSION}::Network>
+    $<$<BOOL:${PLATFORM_WIN}>:Qt${OMIM_QT_VERSION}::Network>
     $<$<BOOL:${PLATFORM_WIN}>:shlwapi>  # PathIsDirectoryEmptyA
     $<$<BOOL:${PLATFORM_MAC}>:
       -framework\ Foundation
@@ -195,7 +206,7 @@ target_link_libraries(${PROJECT_NAME}
 
 omim_add_test_subdirectory(platform_tests_support)
 omim_add_test_subdirectory(platform_tests)
-if (NOT SKIP_QT_GUI)
+if (NOT SKIP_QT_GUI OR (BUILD_TESTING AND PLATFORM_DESKTOP))
   add_subdirectory(location_service)
 endif()
 

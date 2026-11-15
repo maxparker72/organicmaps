@@ -3,16 +3,11 @@
 #import "MWMCircularProgress.h"
 #import "SwiftBridge.h"
 
-static NSString * const kUDDidHighlightRouteToButton = @"kUDDidHighlightPoint2PointButton";
-
 NSString * titleForButton(MWMActionBarButtonType type, BOOL isSelected)
 {
   switch (type)
   {
   case MWMActionBarButtonTypeDownload: return L(@"download");
-  case MWMActionBarButtonTypeBooking:
-  case MWMActionBarButtonTypeOpentable: return L(@"book_button");
-  case MWMActionBarButtonTypeBookingSearch: return L(@"booking_search");
   case MWMActionBarButtonTypeCall: return L(@"placepage_call_button");
   case MWMActionBarButtonTypeBookmark: return L(isSelected ? @"delete" : @"save");
   case MWMActionBarButtonTypeTrack: return L(@"delete");
@@ -22,6 +17,7 @@ NSString * titleForButton(MWMActionBarButtonType type, BOOL isSelected)
   case MWMActionBarButtonTypeRouteTo: return L(@"p2p_to_here");
   case MWMActionBarButtonTypeMore: return L(@"placepage_more_button");
   case MWMActionBarButtonTypeRouteAddStop: return L(@"placepage_add_stop");
+  case MWMActionBarButtonTypeRouteAddDestination: return L(@"route_add_destination");
   case MWMActionBarButtonTypeRouteReplaceStop: return L(@"placepage_replace_stop");
   case MWMActionBarButtonTypeRouteRemoveStop: return L(@"placepage_remove_stop");
   case MWMActionBarButtonTypeAvoidToll: return L(@"avoid_tolls");
@@ -30,24 +26,30 @@ NSString * titleForButton(MWMActionBarButtonType type, BOOL isSelected)
   }
 }
 
+typedef NS_ENUM(NSInteger, MWMBookmarksButtonState) {
+  MWMBookmarksButtonStateSave,
+  MWMBookmarksButtonStateDelete,
+  MWMBookmarksButtonStateRecover,
+};
+
 @interface MWMActionBarButton () <MWMCircularProgressProtocol>
 
 @property(nonatomic) MWMActionBarButtonType type;
 @property(nonatomic) MWMCircularProgress * mapDownloadProgress;
 @property(weak, nonatomic) IBOutlet MWMButton * button;
 @property(weak, nonatomic) IBOutlet UILabel * label;
-@property(weak, nonatomic) IBOutlet UIView * extraBackground;
 @property(weak, nonatomic) id<MWMActionBarButtonDelegate> delegate;
+
+- (void)setBookmarkButtonState:(MWMBookmarksButtonState)state;
 
 @end
 
 @implementation MWMActionBarButton
 
-- (void)configButton:(BOOL)isSelected enabled:(BOOL)isEnabled
+- (void)configButton:(BOOL)isSelected primary:(BOOL)isPrimary
 {
   self.label.text = titleForButton(self.type, isSelected);
-  self.extraBackground.hidden = YES;
-  self.button.coloring = MWMButtonColoringBlack;
+  self.button.coloring = isPrimary ? MWMButtonColoringBlue : MWMButtonColoringBlack;
   [self.button.imageView setContentMode:UIViewContentModeScaleAspectFit];
 
   switch (self.type)
@@ -67,36 +69,6 @@ NSString * titleForButton(MWMActionBarButtonType type, BOOL isSelected)
     [self.mapDownloadProgress setColoring:MWMButtonColoringBlue forStates:affectedStates];
     break;
   }
-  case MWMActionBarButtonTypeBooking:
-    [self.button setImage:[UIImage imageNamed:@"ic_booking_logo"] forState:UIControlStateNormal];
-    self.label.styleName = @"PPActionBarTitlePartner";
-    self.backgroundColor = [UIColor bookingBackground];
-    if (!IPAD)
-    {
-      self.extraBackground.backgroundColor = [UIColor bookingBackground];
-      self.extraBackground.hidden = NO;
-    }
-    break;
-  case MWMActionBarButtonTypeBookingSearch:
-    [self.button setImage:[UIImage imageNamed:@"ic_booking_search"] forState:UIControlStateNormal];
-    self.label.styleName = @"PPActionBarTitlePartner";
-    self.backgroundColor = [UIColor bookingBackground];
-    if (!IPAD)
-    {
-      self.extraBackground.backgroundColor = [UIColor bookingBackground];
-      self.extraBackground.hidden = NO;
-    }
-    break;
-  case MWMActionBarButtonTypeOpentable:
-    [self.button setImage:[UIImage imageNamed:@"ic_opentable"] forState:UIControlStateNormal];
-    self.label.styleName = @"PPActionBarTitlePartner";
-    self.backgroundColor = [UIColor opentableBackground];
-    if (!IPAD)
-    {
-      self.extraBackground.backgroundColor = [UIColor opentableBackground];
-      self.extraBackground.hidden = NO;
-    }
-    break;
   case MWMActionBarButtonTypeCall:
     [self.button setImage:[UIImage imageNamed:@"ic_placepage_phone_number"] forState:UIControlStateNormal];
     break;
@@ -127,8 +99,9 @@ NSString * titleForButton(MWMActionBarButtonType type, BOOL isSelected)
     break;
   case MWMActionBarButtonTypeRouteTo:
     [self.button setImage:[UIImage imageNamed:@"ic_route_to"] forState:UIControlStateNormal];
-    if ([self needsToHighlightRouteToButton])
-      self.button.coloring = MWMButtonColoringBlue;
+    break;
+  case MWMActionBarButtonTypeRouteAddDestination:
+    [self.button setImage:[UIImage imageNamed:@"ic_route_to"] forState:UIControlStateNormal];
     break;
   case MWMActionBarButtonTypeMore:
     [self.button setImage:[UIImage imageNamed:@"ic_placepage_more"] forState:UIControlStateNormal];
@@ -151,18 +124,24 @@ NSString * titleForButton(MWMActionBarButtonType type, BOOL isSelected)
     break;
   }
 
-  self.button.enabled = isEnabled;
+  // Keep the title color consistent with the icon tint.
+  switch (self.button.coloring)
+  {
+  case MWMButtonColoringBlue: self.label.styleName = @"PPActionBarTitleBlue"; break;
+  case MWMButtonColoringRed: self.label.styleName = @"PPActionBarTitleRed"; break;
+  default: self.label.styleName = @"PPActionBarTitle"; break;
+  }
 }
 
 + (MWMActionBarButton *)buttonWithDelegate:(id<MWMActionBarButtonDelegate>)delegate
                                 buttonType:(MWMActionBarButtonType)type
                                 isSelected:(BOOL)isSelected
-                                 isEnabled:(BOOL)isEnabled
+                                 isPrimary:(BOOL)isPrimary
 {
   MWMActionBarButton * button = [NSBundle.mainBundle loadNibNamed:[self className] owner:nil options:nil].firstObject;
   button.delegate = delegate;
   button.type = type;
-  [button configButton:isSelected enabled:isEnabled];
+  [button configButton:isSelected primary:isPrimary];
   return button;
 }
 
@@ -173,43 +152,21 @@ NSString * titleForButton(MWMActionBarButtonType type, BOOL isSelected)
 
 - (IBAction)tap
 {
-  if (self.type == MWMActionBarButtonTypeRouteTo)
-    [self disableRouteToButtonHighlight];
-
   [self.delegate tapOnButtonWithType:self.type];
 }
 
 - (void)setBookmarkButtonState:(MWMBookmarksButtonState)state
 {
-  [self.button setImage:[UIImage imageNamed:@"ic_bookmarks_off"] forState:UIControlStateNormal];
-  [self.button setImage:[UIImage imageNamed:@"ic_bookmarks_on"] forState:UIControlStateSelected];
+  NSString * imageName = state == MWMBookmarksButtonStateDelete ? @"ic_bookmarks_on" : @"ic_bookmarks_off";
+  [self.button setImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
   [self.button setImage:[UIImage imageNamed:@"ic_bookmarks_on"] forState:UIControlStateHighlighted];
 
   switch (state)
   {
-  case MWMBookmarksButtonStateSave:
-    self.label.text = L(@"save");
-    self.button.selected = false;
-    break;
-  case MWMBookmarksButtonStateDelete:
-    self.label.text = L(@"delete");
-    self.button.selected = true;
-    break;
-  case MWMBookmarksButtonStateRecover:
-    self.label.text = L(@"restore");
-    self.button.selected = false;
-    break;
+  case MWMBookmarksButtonStateSave: self.label.text = L(@"save"); break;
+  case MWMBookmarksButtonStateDelete: self.label.text = L(@"delete"); break;
+  case MWMBookmarksButtonStateRecover: self.label.text = L(@"restore"); break;
   }
-}
-
-- (BOOL)needsToHighlightRouteToButton
-{
-  return ![NSUserDefaults.standardUserDefaults boolForKey:kUDDidHighlightRouteToButton];
-}
-
-- (void)disableRouteToButtonHighlight
-{
-  [NSUserDefaults.standardUserDefaults setBool:true forKey:kUDDidHighlightRouteToButton];
 }
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event

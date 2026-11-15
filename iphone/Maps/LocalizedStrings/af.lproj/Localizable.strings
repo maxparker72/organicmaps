@@ -16,7 +16,7 @@
 /* Choose measurement on first launch alert - choose metric system button */
 "kilometres" = "Kilometers";
 
-/* Choose measurement on first launch alert - choose imperial system button */
+/* Imperial measurement option: 1 mile = 1609.344 m; Swedish/Norwegian "mil" = 10 km */
 "miles" = "Myle";
 
 /* Update maps later button text */
@@ -115,7 +115,7 @@
 /* Search category sight seeings and touristic attractions; any changes should be duplicated in categories.txt @category_tourism! */
 "category_tourism" = "Besienswaardighede";
 
-/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! */
+/* Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! Also a bookmarks list group header when sorting by type. */
 "category_entertainment" = "Vermaak";
 
 /* Search category for ATMs; any changes should be duplicated in categories.txt @category_atm! */
@@ -148,7 +148,7 @@
 /* Search category for recycling; any changes should be duplicated in categories.txt @category_recycling! */
 "category_recycling" = "Herwinning";
 
-/* Search category for water; any changes should be duplicated in categories.txt @category_water! also used to sort bookmarks by type */
+/* Search category for water; any changes should be duplicated in categories.txt @category_water! Also a bookmarks list group header when sorting by type. */
 "category_water" = "Water";
 
 /* Search category for RV facilities; any changes should be duplicated in categories.txt @category_rv! */
@@ -174,11 +174,23 @@
 /* Warning message when doing search around current position */
 "unknown_current_position" = "U ligging is nog nie vasgestel nie";
 
-/* Subject for emailed bookmark */
-"bookmark_share_email_subject" = "Hallo, kyk my liggingmerker in Organic Maps!";
+/* Text shown before a shared "my position" link, and the email subject when sharing the current location. */
+"share_my_position" = "Ek is hier op Organic Maps";
 
-/* Subject for emailed position */
-"my_position_share_email_subject" = "Hallo, sien my huidige ligging op die Organic Maps-toep!";
+/* Email subject when sharing a place. %1$@ is the place name or address. */
+"share_place_subject" = "%1$@ op Organic Maps";
+
+/* Email subject when sharing a place that has no name or address. */
+"share_place_subject_default" = "'n Plek op Organic Maps";
+
+/* Shared email link text; opens the shared place in Organic Maps or in a web browser. */
+"share_open_in_om_or_browser" = "Maak oop in Organic Maps of in 'n blaaier";
+
+/* Shared email link text; leads to the Organic Maps download page. */
+"share_get_om" = "Kry Organic Maps";
+
+/* Title for the "Open in Another App" button on the PlacePage; also shared email link text: opens the shared place in another (geo:) maps app. */
+"open_in_app" = "Maak oop in 'n ander toepassing";
 
 /* Share by email button text, also used in editor and About. */
 "email" = "E-pos";
@@ -195,6 +207,7 @@
 /* Length of track in cell that describes route */
 "length" = "Lengte";
 "share_my_location" = "Deel my ligging";
+"prefs_group_network" = "Netwerk";
 "prefs_group_route" = "Navigasie";
 
 /* Setting name which enables or disables zoom buttons on the map screen. */
@@ -218,6 +231,24 @@
 /* A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled */
 "pref_map_3d_buildings_disabled_summary" = "3D-geboue is gedeaktiveer in batterybesparingsmodus";
 
+/* Settings: title of the satellite imagery (custom raster tiles) screen */
+"pref_bg_tiles_title" = "Satellietbeelde";
+
+/* Settings «Satellite Imagery»: title of the tile server URL input field */
+"pref_bg_tiles_url_title" = "Bediener-URL";
+
+/* Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) */
+"pref_bg_tiles_url_error" = "Voer 'n geldige URL met {z}/{x}/{y} in";
+
+/* Settings «Satellite Imagery»: title of the on-disk tile cache size limit (in megabytes) */
+"pref_bg_tiles_size_title" = "Kasgrootte (MB)";
+
+/* Settings «Satellite Imagery»: opacity of vector area objects drawn over the imagery (0% hides them) */
+"pref_bg_tiles_opacity_title" = "Ondeursigtigheid van area-objekte";
+
+/* Settings «Satellite Imagery»: legal note that the user is responsible for the custom tile source they configure */
+"pref_bg_tiles_disclaimer" = "Pasgemaakte teëlbronne word deur jou verskaf. Gebruik slegs dienste waartoe jy toegang mag hê. Jy is verantwoordelik vir erkenning, lisensievoorwaardes, API-sleutels, kwotas en gebruiksgrense.";
+
 /* Settings «Route» category: «Tts enabled» title */
 "pref_tts_enable_title" = "Steminstruksies";
 
@@ -233,8 +264,14 @@
 /* Settings «Navigation» category: «Voice language» footer */
 "pref_tts_download_voices_description" = "Om 'n stem van hoër gehalte af te laai, maak die Instellings-toep oop en gaan na Toeganklikheid → VoiceOver → Spraak → Stem.";
 
-/* Settings «Route» category: «Test Voice Directions» title */
-"pref_tts_test_voice_title" = "Toets Stemmingsaanwysings (TTS, Teks-na-spraak)";
+/* Header above Apple's group of novelty text-to-speech voices (Bells, Bubbles, Zarvox...), shown after the regional voice sections and Eloquence group. Use Apple's term for this group from Settings > Accessibility > VoiceOver > Speech. */
+"pref_tts_voice_group_novelty" = "Novelty";
+
+/* Accessibility label of the button that plays a sample of a text-to-speech voice. */
+"pref_tts_voice_preview_play" = "Play sample";
+
+/* Accessibility label of the button that stops the sample of a text-to-speech voice being played. */
+"pref_tts_voice_preview_stop" = "Stop sample";
 "pref_map_auto_zoom" = "Outomatiese zoem";
 "placepage_distance" = "Afstand";
 "search_show_on_map" = "Bekyk op kaart";
@@ -355,9 +392,6 @@
 /* blue gray color */
 "blue_gray" = "Blougrys";
 
-/* place preview title */
-"info" = "Inligting";
-
 /* Prints version number in About dialog */
 "version" = "Organic Maps weergawe: %@";
 
@@ -369,9 +403,6 @@
 
 /* Settings "Appearance" category: "Dark" title, should be consistent with the pref_appearance_title translation. */
 "pref_appearance_dark" = "Donker";
-
-/* Title for "Other" section in TTS settings. */
-"pref_tts_other_section_title" = "Ander";
 
 /* Tex label above the Donate button */
 "donate_description" = "Skenk gratis kaarte sonder advertensies aan miljoene gebrui";
@@ -390,9 +421,6 @@
 
 /* Alert title */
 "email_error_title" = "E-posstuurfout";
-
-/* Settings item title */
-"pref_calibration_title" = "Kompaskalibrering";
 
 /* Downloaded maps category */
 "downloader_available_maps" = "Beskikbaar";
@@ -491,6 +519,8 @@
 "twentyfour_seven" = "24/7";
 "day_off_today" = "Vandag gesluit";
 "day_off" = "Gesluit";
+"midnight" = "Middernag";
+"noon" = "Middaguur";
 "today" = "Vandag";
 "opens_in" = "Open oor %@";
 "closes_in" = "Sluit oor %@";
@@ -568,15 +598,22 @@
 
 /* abbreviation for kilometers per hour */
 "kilometers_per_hour" = "km/h";
+
+/* Short label for miles per hour (1 mile = 1609.344 m), placed after a number; e.g. mph or mi/h */
 "miles_per_hour" = "mph";
+
+/* Short label for hours (time unit), placed after a number */
 "hour" = "h";
+
+/* Short label for minutes (time unit), placed after a number */
 "minute" = "min";
+
+/* Short label for days (time unit), placed after a number */
 "day" = "d";
+
+/* Short label for seconds (time unit), placed after a number */
 "second" = "s";
 "placepage_more_button" = "Meer";
-
-/* A disable button text in the explanation dialog that opens hotel details page on Kayak website. */
-"placepage_edit_bookmark_button" = "Wysig boekmerk";
 "placepage_personal_notes_hint" = "Persoonlike notas (teks of html)";
 "editor_comment_hint" = "Kommentaar…";
 "editor_reset_edits_message" = "Wys alle lokale veranderinge af?";
@@ -621,11 +658,13 @@
 "traffic_data_unavailable" = "Verkeersdata is nie beskikbaar nie";
 "enable_logging" = "Staan logboekinskrywing toe";
 "transliteration_title" = "Transliterasie in Latynse alfabet";
-"planning_route_manage_route" = "Bestuur roete";
-"button_plan" = "Beplan";
 "placepage_remove_stop" = "Verwyder stop";
-"placepage_add_stop" = "Voeg tussenstop toe";
-"saved" = "Gespaar";
+
+/* Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. */
+"route_add_destination" = "Voeg bestemming by";
+
+/* Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. */
+"placepage_add_stop" = "Voeg stop by";
 "error_enter_correct_name" = "Voer asb. ’n korrekte naam in";
 "bookmark_lists" = "Lyste";
 
@@ -643,6 +682,9 @@
 "bookmarks_error_title_list_name_already_taken" = "Die naam is reeds in gebruik";
 "profile" = "OpenStreetMap-profiel";
 "restore" = "Stel terug";
+
+/* Settings privacy group in settings screen */
+"privacy" = "Privaatheid";
 "privacy_policy" = "Privaatheidsbeleid";
 "terms_of_use" = "Gebruiksvoorwaardes";
 
@@ -651,6 +693,11 @@
 
 /* Cycling routes layer name in the Styles and Layers dialog */
 "button_layer_cycling" = "Fietsroetes";
+
+/* Map layers menu: toggle button for the satellite imagery layer */
+"button_layer_satellite" = "Satelliet";
+
+/* Subway map layer button; also the spoken name of the subway (metro, underground) transport type, read by screen readers before a line number on transit line badges. */
 "button_layer_subway" = "Moltrein";
 "layers_title" = "Kaartstyle en -lae";
 
@@ -692,7 +739,25 @@
 "show_to_the_right" = "Wys aan die regterkant";
 "show_at_the_bottom" = "Wys onderaan";
 "enable_logging_warning_message" = "Aktiveer hierdie opsie tydelik om ’n gedetailleerde diagnosestaat van u probleem op te neem en handmatig na ons te stuur d.m.v. die “Rapporteer ’n fout” in die Help-dialoog. Sulke state kan liggingsinligting bevat.";
+
+/* Driving profile in routing options settings. */
+"routing_options_driving" = "Bestuur";
+
+/* Cycling profile in routing options settings. */
+"routing_options_cycling" = "Fietsry";
+
+/* Walking profile in routing options settings; also the label of a walking leg in transit route details. */
+"routing_options_walking" = "Stap";
+
+/* Section heading for routing settings shared by every routing mode. */
+"routing_options_all_modes" = "Alle vervoermodusse";
 "driving_options_title" = "Ompadopsies";
+
+/* Routing setting that automatically reorders intermediate stops */
+"route_optimization" = "Roete-optimering";
+
+/* Explains that route optimization automatically reorders intermediate stops */
+"route_optimization_description" = "Herrangskik tussenstoppe outomaties om ’n doeltreffender roete te skep.";
 
 /* Recommended length for CarPlay and Android Auto is around 25-27 characters */
 "avoid_tolls" = "Vermy tolgelde";
@@ -705,11 +770,18 @@
 "avoid_motorways" = "Vermy snelweë";
 "unable_to_calc_alert_title" = "Kan nie ’n roete bereken nie";
 "unable_to_calc_alert_subtitle" = "’n Roete kon nie gevind word nie. Dit kan deur ’n ompadopsies of onvolledige OpenStreetMap-data veroorsaak word. Verander u omwegopsies en probeer weer.";
-"define_to_avoid_btn" = "Definieer paaie om te vermy";
-"change_driving_options_btn" = "Ompadinstellings is geaktiveer";
 "toll_road" = "Tolpaaie";
 "unpaved_road" = "Grondpaaie";
 "ferry_crossing" = "Veerbootkruisings";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_steps" = "Trap";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_gate" = "Hek";
+
+/* Route warning shown on the map for this obstacle type. */
+"road_warning_lift_gate" = "Valboom";
 
 /* A generic "Yes" button in dialogs */
 "yes" = "Ja";
@@ -743,9 +815,6 @@
 /* Failed planning route message in navigation view */
 "routing_planning_error" = "Roeteberekening het misluk";
 
-/* Arrive routing message in navigation view */
-"routing_arrive" = "Aankoms om %@";
-
 /* Text for routing::RouterResultCode::FileTooOld dialog. */
 "dialog_routing_download_and_update_maps" = "Om ’n roete te bereken moet u alle kaarte van die pad aflaai en bywerk.";
 "editor_done_dialog_1" = "U het die wêreldkaart verander! Moet dit nie vir uself hou nie; Vertel u vriende en wysig dit saam.";
@@ -770,7 +839,6 @@
 "please_note" = "Let wel";
 "migration_download_error_dialog" = "Aflaaifout";
 "editor_add_select_category" = "Kies kategorie";
-"editor_add_select_category_popular_subtitle" = "Gewild";
 "editor_add_select_category_all_subtitle" = "Kategorieë";
 "whatsnew_editor_message_1" = "Voeg nuwe plekke tot die kaart toe, en wysig bestaandes direk vanuit die toep.";
 "dialog_incorrect_feature_position" = "Verander ligging";
@@ -792,7 +860,6 @@
 "location_services_disabled_on_device_3" = "3. Kies Liggingdienste";
 "location_services_disabled_on_device_4" = "4. Skakel Liggingdienste aan";
 "location_services_disabled_on_device_additional_message" = "Of gaan voort om Organic Maps sonder ligging te gebruik";
-"book_button" = "Bespreek";
 "placepage_call_button" = "Bel";
 "placepage_bookmark_name_hint" = "Boekmerknaam";
 "placepage_delete_bookmark_button" = "Skrap boekmerk";
@@ -803,18 +870,13 @@
 /* iOS dialog for the case when recent track recording is on and the app comes back from background */
 "recent_track_background_dialog_title" = "Deaktiveer opname van u onlangs berese roete?";
 "off_recent_track_background_button" = "Deaktiveer";
-
-/* For sharing via SMS and so on */
-"sharing_call_action_look" = "Bekyk";
 "recent_track_background_dialog_message" = "Organic Maps gebruik u ligging in die agtergrond om u onlangs berese roete op te neem.";
 "general_settings" = "Algemene instellings";
 
 /* "traffic" as in road congestion */
 "traffic_update_app_message" = "Die toepassing moet bygewerk word om verkeersdata te vertoon.";
 "log_file_size" = "Loglêergrootte: %@";
-"planning_route_remove_title" = "Sleep hier om te verwyder";
 "placepage_replace_stop" = "Vervang Stop";
-"start_from_my_position" = "Begin vanaf";
 
 /* For iOS message 'alert_reauth_message' should be splitted in two parts: message + link. Here's first part */
 "alert_reauth_message_ios" = "Meld asseblief aan by OpenStreetMap om al jou kaartwysigings outomaties op te laai. Kom meer te wete";
@@ -834,15 +896,8 @@
 "popular_place" = "Gewild";
 "hide_from_map" = "Versteek van die kaart";
 "tags_loading_error_subtitle" = "’n Fout het voorgekom toe etikette gelaai word, probeer weer";
-
-/* Position of the name label on the map relative to the bookmark pin (on the right) */
-"right" = "Regs";
-
-/* Position of the name label on the map relative to the bookmark pin (at the bottom) */
-"bottom" = "Onderkant";
 "trip_start" = "Kom ons gaan";
 "pick_destination" = "Bestemming";
-"follow_my_position" = "Hersentreer";
 "search_results" = "Soekresultate";
 "then_turn" = "Dan";
 "redirect_route_alert" = "Wil u die roete herbou?";
@@ -888,16 +943,29 @@
 "medicine" = "Geneeskunde";
 "search_in_the_list" = "Soek in die lys";
 "religious_places" = "Plekke van aanbidding";
+
+/* Button that starts multi-selection in a bookmark list. */
+"select" = "Kies";
+
+/* Action that selects every bookmark and track in a bookmark list. */
+"select_all" = "Kies alles";
+
+/* Action that clears the multi-selection in a bookmark list. */
+"deselect_all" = "Ontkies alles";
 "transit_not_found" = "Moltreinnavigasie is nog nie in hierdie streek beskikbaar nie";
 "dialog_pedestrian_route_is_long_header" = "Moltreinroete nie gevind";
 "dialog_pedestrian_route_is_long_message" = "Kies asb. ’n begin- of eindpunt nader aan die moltreinstasie";
-"button_layer_isolines" = "Kontoerlyne";
-"isolines_activation_error_dialog" = "Om kontoerlyne te aktiveer moet u kaartdata vir hierdie area aflaai";
-"isolines_location_error_dialog" = "Die kontoerlyne is nog nie in hierdie area beskikbaar nie";
+
+/* Layers menu: label of the 3D terrain layer button */
+"button_layer_terrain" = "3D-terrein";
+"isolines_location_error_dialog" = "Werk hierdie area by om kontoerlyne te sien";
 "elevation_profile_ascent" = "Styging";
 "elevation_profile_descent" = "Daling";
 "elevation_profile_min_elevation" = "Min. hoogte";
 "elevation_profile_max_elevation" = "Maks. hoogte";
+
+/* Displayed in the elevation profile chart while track recording has fewer than two points. */
+"elevation_profile_placeholder" = "Begin beweeg om die hoogteprofiel te sien";
 "isolines_toast_zooms_1_10" = "Zoem in om isolyne te bekyk";
 "downloader_loading_ios" = "Laai tans af";
 
@@ -962,11 +1030,14 @@
 "bookmarks_export" = "Voer alle boekmerke en snitte uit";
 "drive_through" = "Deur-ry";
 
+/* Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_in" = "Zoem in";
+
+/* Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. */
+"zoom_out" = "Zoem uit";
+
 /* Restaurant or other food place's menu URL field in the Editor */
 "website_menu" = "Kieslys skakel";
-
-/* Title for the "Open in Another App" button on the PlacePage. */
-"open_in_app" = "Maak oop in 'n ander toepassing";
 
 /* To indicate if the place proposed self service… */
 "self_service" = "Selfdiens";
@@ -982,11 +1053,6 @@
 
 /* Message for the toast when saving the track recording is finished but nothing to save. */
 "track_recording_toast_nothing_to_save" = "Roete is leeg - niks om te red nie";
-"edit_track" = "Wysig Roete";
-"elevation_profile_diff_level" = "Moeilikheidsgraad";
-"elevation_profile_diff_level_easy" = "Maklik";
-"elevation_profile_diff_level_moderate" = "Matig";
-"elevation_profile_diff_level_hard" = "Moeilik";
 "downloader_updating_ios" = "Werk tans by";
 
 /* Autoupdate dialog on start */
@@ -1019,6 +1085,12 @@
 /* Text for the editing the Track's color button. */
 "change_color" = "Verander kleur";
 
+/* Text for the hiding track. */
+"hide_track" = "Versteek roete";
+
+/* Text for the showing track. */
+"show_track" = "Wys roete";
+
 /* Main screen title "Map" displayed in the navigation back button's menu. */
 "map" = "Kaart";
 
@@ -1037,7 +1109,7 @@
 /* Message for the "iCloud is Disabled" alert. */
 "icloud_disabled_message" = "Aktiveer asseblief iCloud in jou toestel se instellings om hierdie kenmerk te gebruik.";
 
-/* Title for the "Enable iCloud Syncronization" alert's "Enable" action button. */
+/* Action button that enables a disabled feature, such as iCloud synchronization or location services. */
 "enable" = "Aktiveer";
 
 /* Title for the "Enable iCloud Syncronization" alert's "Backup" action button. */
@@ -1099,10 +1171,10 @@
 /* abbreviation for kilometers */
 "km" = "km";
 
-/* abbreviation for mile(s) */
+/* Short label for miles (length unit, 1 mi = 1609.344 m), placed after a number */
 "mi" = "myl";
 
-/* A unit of measure */
+/* Short label for feet (1 ft = 0.3048 m), after numbers; local abbreviations and uninflected unit names are allowed */
 "ft" = "vt.";
 
 /* Toast text when the maps version should be updated to display the OSM hiking and cycling routes */
@@ -1134,3 +1206,30 @@
 
 /* Toast message shown when track colors are changed in category settings */
 "toast_tracks_color_changed" = "Spoorkleur is verander";
+
+/* Accessibility label of the icon-only button beside the search field, shown while choosing or replacing a route point; it opens a full-screen map picker with a crosshair */
+"choose_on_map" = "Kies op die kaart";
+
+/* Search field hint and full-screen map point picker title shown while choosing the starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_start_location" = "Beginpunt";
+
+/* Search field hint and full-screen map point picker title shown while choosing the destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"choose_destination" = "Bestemming";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set starting point of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_start_location" = "Verander begin";
+
+/* Search field hint and full-screen map point picker title shown while replacing the already set destination of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_destination" = "Verander bestemming";
+
+/* Search field hint and full-screen map point picker title shown while replacing an already added intermediate stop of a route. Kept short because shortcut and voice-search buttons narrow the field */
+"change_stop_along_route" = "Verander stop";
+
+/* Toast shown when the user tries to add one more intermediate stop to a route that already holds the maximum allowed number */
+"routing_max_stops_reached" = "Maksimum aantal stoppe is bereik";
+
+/* Hint under the title of the full-screen route point picker: a crosshair stays fixed in the centre of the screen while the user moves the map under it */
+"choose_point_on_map_hint" = "Skuif en zoem die kaart om die kruis te plaas";
+
+/* Accessibility label for the button that reverses the complete planned route, including intermediate stops. */
+"reverse_route" = "Keer roete om";

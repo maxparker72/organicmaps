@@ -1,56 +1,33 @@
+## Rota Oluşturma
+• Geliştirilmiş alternatif rotalar ve tahmini varış süreleri
+• Planlanmış bir rotaya durak eklemek veya değiştirmek için düğmeler eklendi
+• Ara rota duraklarının sırasını optimize etmek için bir ayar eklendi
+• Navigasyon rotayı yeniden hesapladığında, seçilen alternatif rota artık korunmaktadır
+• Uygulama yeniden başlatıldıktan sonra rota duraklarının sırası artık eski haline getiriliyor
+
 ## Harita
+• 28 Eylül itibarıyla OpenStreetMap verileri
+• 21 Eylül itibarıyla Wikipedia verileri
+• Artık haritayı daha fazla uzaklaştırdığınızda su rezervuarları görünür hale geliyor
+• Su tünelleri artık haritada gösterilmiyor
+• Suzhou Metro istasyon ve giriş simgeleri düzeltildi
+• Metro harita katmanında etiketlerin yerinden kaydığı nadir durumlar düzeltildi
 
-- YENİ! Sürükleme ve döndürme sırasında harita artık antimeridyende doğru şekilde sarılıyor
-- OpenStreetMap verileri 4 Nisan itibarıyla güncellendi
-- Wikipedia verileri 1 Nisan itibarıyla güncellendi
-- Yemek alanları ve şehir kapıları için simgeler eklendi
-- Giyim mağazası alt kategorileri eklendi: kadın, erkek, çocuk, düğün, spor, iç giyim ve ofis giyimi
-- Sidney metro hattı renkleri düzeltildi
-- Güneş doğumu/batımı farkı olan yerler için çalışma saatleri gösterimi düzeltildi
+## CarPlay
+• Desteklenen araç head-up ekranlarında (HUD'lar) ve CarPlay gösterge panelinde manevra talimatları eklendi
+• CarPlay düğmeleri ve arama özelliği düzeltildi
 
-## Rota Planlama ve Navigasyon
-
-- YENİ! Bir bisiklet veya yürüyüş rotasına dokunarak seçin ve yükseklik grafiğini görüntüleyin
-- Yürüyüş ve bisiklet rotaları için çok renkli görüntüleme iyileştirildi
-- Bisiklet navigasyonu artık düşük hızlarda pusula yönünü kullanıyor
-- Bazı bölge sınırlarının yakınında rota planlarken ortaya çıkan bir sistem hatası düzeltildi
-- Artık ek haritaları indirmeniz istendiğinde bile geçerli bir rotaya başlayabilirsiniz
-
-## Yer İşaretleri ve İzler
-
-- YENİ! Bir kategorideki tüm yer işareti ve iz renklerini tek seferde değiştirin
-- Diğer uygulamalarla daha iyi uyum sağlaması için iz grafiklerindeki yükseklik kazancı ve kaybı tahminleri ayarlandı
-- Yer işareti ayrıntılarında tablolar ve resimler içeren HTML içeriğinin görüntülenmesi iyileştirildi
-- Yükseklik grafiğinde çok segmentli izler için dikey ayırıcılar eklendi
-- Yükseklik grafiğinde enterpolasyonlu noktaların seçimi düzeltildi
-- GPS iz kaydında segmentler arasında noktaların düşmesi sorunu düzeltildi
-- GeoJSON içe aktarma sorunu düzeltildi
-- İzleri dışa aktarırken meydana gelen çökme sorunu düzeltildi
+## İzler
+• Tek tek izleri gizlemek için bir göz simgesi eklendi
+• Hatalar düzeltildi ve iz kaydı iyileştirildi
+• KMB dosyalarının içe aktarılması sorunu düzeltildi
 
 ## Arama
+• Görünür harita alanı 180° meridyenini (±180° boylam) geçtiğinde arama sorunları giderildi
+• Spotlight’ta kategori araması geri getirildi
 
-- TIGER Nüfus Sayımı verilerinden ayrıştırılan iki milyon ek adresle ABD'de daha iyi arama
-- Güncellenen arama kategorileri: fırınlar için "Bread", "Shawarma" mutfağı ve diğer eşanlamlı iyileştirmeler eklendi
-- Ev numarası adres araması iyileştirildi
-- ABD sokak eşanlamlıları eklendi: highway, hwy, freeway, fwy
-- Şehir ve eyalet adları aynı olduğunda arama sonuçları düzeltildi
-
-## Düzenleyici / OpenStreetMap
-
-- Artık harita üzerinde mevcut konumunuzu seçtikten sonra OpenStreetMap'e yeni bir yer ekleyebilirsiniz
-- "Yer Ekle" düğmesine basıldığında düzenleyicideki artı işaretinin yanlış hizalanması sorunu düzeltildi
-- "Yer Ekle" gezinme çubuğundaki düğmelerin dokunma alanı genişletildi
-
-## Kullanıcı Arayüzü ve Kullanıcı Deneyimi
-
-- Modal hareketler iyileştirildi: en yakın adıma kaydırma, kenardan kaydırmada kapatma ve yeniden açıldığında önceki durumun geri yüklenmesi
-- Saat dilimleri için yaz saati uygulaması işleme sorunu düzeltildi
-
-## Kararlılık ve Yerelleştirme
-
-- Kararlılık ve performans iyileştirildi, pil tüketimi azaltıldı
-- Çeviriler güncellendi
-
-## Platform Desteği
-
-- TestFlight ve App Store'daki değişiklikler nedeniyle, bu sürüm yalnızca iOS 15 ve sonraki sürümleri desteklemektedir. iOS 12, 13 ve 14 artık desteklenmemektedir.
+## Kullanıcı Arayüzü
+• Çalışma saatlerinde artık 12:00 için “Öğle”, 00:00 veya 24:00 için “Gece yarısı” ifadesi görüntülenmektedir
+• Çeşitli hatalar düzeltildi ve kullanıcı arayüzü iyileştirildi
+• İngilizce, Fransızca ve Asturya dillerindeki çeviriler düzeltildi
+• Yüklü bir navigasyon sesini seçme ve örnek olarak dinleme desteği eklendi

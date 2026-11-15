@@ -15,7 +15,7 @@
     <string name="downloading">Allalaadimisel…</string>
     <!-- Choose measurement on first launch alert - choose metric system button -->
     <string name="kilometres">Kilomeetrid</string>
-    <!-- Choose measurement on first launch alert - choose imperial system button -->
+    <!-- Imperial measurement option: 1 mile = 1609.344 m; Swedish/Norwegian "mil" = 10 km -->
     <string name="miles">Miilid</string>
     <!-- Update maps later button text -->
     <string name="later">Hiljem</string>
@@ -120,7 +120,7 @@
     <string name="category_hotel">Hotell</string>
     <!-- Search category sight seeings and touristic attractions; any changes should be duplicated in categories.txt @category_tourism! -->
     <string name="category_tourism">Vaatamisväärsused</string>
-    <!-- Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! -->
+    <!-- Search category for entertainment; any changes should be duplicated in categories.txt @category_entertainment! Also a bookmarks list group header when sorting by type. -->
     <string name="category_entertainment">Meelelahutus</string>
     <!-- Search category for ATMs; any changes should be duplicated in categories.txt @category_atm! -->
     <string name="category_atm">Pangaautomaat</string>
@@ -142,7 +142,7 @@
     <string name="category_police">Politsei</string>
     <!-- Search category for recycling; any changes should be duplicated in categories.txt @category_recycling! -->
     <string name="category_recycling">Jäätmekäitlus</string>
-    <!-- Search category for water; any changes should be duplicated in categories.txt @category_water! also used to sort bookmarks by type -->
+    <!-- Search category for water; any changes should be duplicated in categories.txt @category_water! Also a bookmarks list group header when sorting by type. -->
     <string name="category_water">Vesi</string>
     <!-- Search category for RV facilities; any changes should be duplicated in categories.txt @category_rv! -->
     <string name="category_rv">Haagiselamud</string>
@@ -171,16 +171,12 @@
     <string name="cant_change_this_setting">Vabandust, kaardi salvestuse seadistused on hetkel keelatud.</string>
     <!-- Alert message that downloading is in progress. -->
     <string name="downloading_is_active">Kaardi allalaadimine on hetkel käimas.</string>
-    <!-- Share my position using SMS, %1$@ contains om:// and %2$@ https://omaps.app link WITHOUT NAME. @NOTE non-ascii symbols in the link will result in max 70 characters SMS instead of 140. -->
-    <string name="my_position_share_sms">Hei, vaata minu praegust asukohta Organic Mapsi kaardil! %1$s või %2$s Võrguühenduseta kaardid puuduvad? Laadi siit: https://omaps.app/get</string>
-    <!-- Subject for emailed bookmark -->
-    <string name="bookmark_share_email_subject">Hei, vaata minu asukoha märget Organic Mapsi kaardil!</string>
-    <!-- Subject for emailed position -->
-    <string name="my_position_share_email_subject">Hei, vaata minu praegust asukohta Organic Mapsi kaardil!</string>
-    <!-- Share my position using EMail, %1$@ is om:// and %2$@ is https://omaps.app link WITHOUT NAME -->
-    <string name="my_position_share_email">Tere,\n\nOlen praegu siin: %1$s. Ava see link %2$s või see %3$s, et näha seda kohta kaardil.\n\nAitäh.</string>
     <!-- Share button text which opens menu with more buttons, like Message, EMail, Facebook etc. -->
     <string name="share">Jaga</string>
+    <!-- Email subject when sharing a place. %1$@ is the place name or address. -->
+    <string name="share_place_subject">%1$s Organic Mapsis</string>
+    <!-- Email subject when sharing a place that has no name or address. -->
+    <string name="share_place_subject_default">Koht Organic Mapsis</string>
     <!-- Share by email button text, also used in editor and About. -->
     <string name="email">E-post</string>
     <!-- Text for message when used successfully copied something -->
@@ -219,6 +215,18 @@
     <string name="pref_map_3d_buildings_title">3D-vaated</string>
     <!-- A message in Settings/Preferences explaining why is it not possible to enable 3D buildings when max power saving mode is enabled -->
     <string name="pref_map_3d_buildings_disabled_summary">3D-vaated lülitatakse energiasäästurežiimis välja</string>
+    <!-- Settings: title of the satellite imagery (custom raster tiles) screen -->
+    <string name="pref_bg_tiles_title">Satelliidipildid</string>
+    <!-- Settings «Satellite Imagery»: title of the tile server URL input field -->
+    <string name="pref_bg_tiles_url_title">Serveri URL</string>
+    <!-- Settings «Satellite Imagery»: shown under the Server URL field when its value is malformed (must start with http(s):// and contain the {z}/{x}/{y} placeholders) -->
+    <string name="pref_bg_tiles_url_error">Sisestage kehtiv URL, mis sisaldab {z}/{x}/{y}</string>
+    <!-- Settings «Satellite Imagery»: title of the on-disk tile cache size limit (in megabytes) -->
+    <string name="pref_bg_tiles_size_title">Vahemälu suurus (MB)</string>
+    <!-- Settings «Satellite Imagery»: opacity of vector area objects drawn over the imagery (0% hides them) -->
+    <string name="pref_bg_tiles_opacity_title">Pindobjektide läbipaistmatus</string>
+    <!-- Settings «Satellite Imagery»: legal note that the user is responsible for the custom tile source they configure -->
+    <string name="pref_bg_tiles_disclaimer">Kohandatud paaniallikad pakute teie. Kasutage ainult teenuseid, millele teil on lubatud juurde pääseda. Teie vastutate omistamise, litsentsitingimuste, API-võtmete, kvootide ja kasutuspiirangute eest.</string>
     <!-- Settings «Route» category: «Tts enabled» title -->
     <string name="pref_tts_enable_title">Hääljuhised</string>
     <!-- Settings «Route» category: «Tts announce street names» title -->
@@ -231,7 +239,7 @@
     <string name="pref_tts_test_voice_title">Testi hääljuhised (Kõnesüntees, TTS, Text-To-Speech)</string>
     <!-- Settings «Route» category: Pop-up message when clicking «Test Voice Directions» -->
     <string name="pref_tts_playing_test_voice">Kui sa ei kuule nüüd häält, siis kontrolli helivaljust või süsteemi kõnesünteesi seadistusi.</string>
-    <!-- Settings «Route» category: «Tts unavailable» subtitle -->
+    <!-- Settings «Route» category: «Tts unavailable» subtitle. Also used as a CarToast in Android Auto when the user taps the muted voice icon. -->
     <string name="pref_tts_unavailable">Ei ole saadaval</string>
     <string name="pref_map_auto_zoom">Automaatne suum</string>
     <string name="placepage_distance">Kaugus</string>
@@ -300,38 +308,6 @@
     <string name="enable_location_services">Palun luba asukohateenused</string>
     <string name="save">Salvesta</string>
     <string name="create">loo</string>
-    <!-- red color -->
-    <string name="red">Punane</string>
-    <!-- yellow color -->
-    <string name="yellow">Kollane</string>
-    <!-- blue color -->
-    <string name="blue">Sinine</string>
-    <!-- green color -->
-    <string name="green">Roheline</string>
-    <!-- purple color -->
-    <string name="purple">Lilla</string>
-    <!-- orange color -->
-    <string name="orange">Oranž</string>
-    <!-- brown color -->
-    <string name="brown">Pruun</string>
-    <!-- pink color -->
-    <string name="pink">Roosa</string>
-    <!-- deep purple color -->
-    <string name="deep_purple">Tumelilla</string>
-    <!-- light blue color -->
-    <string name="light_blue">Helesinine</string>
-    <!-- cyan color -->
-    <string name="cyan">Rohekassinine</string>
-    <!-- teal color -->
-    <string name="teal">Sinakasroheline</string>
-    <!-- lime color -->
-    <string name="lime">Laimiroheline</string>
-    <!-- deep orange color -->
-    <string name="deep_orange">Tumeoranž</string>
-    <!-- gray color -->
-    <string name="gray">Hall</string>
-    <!-- blue gray color -->
-    <string name="blue_gray">Sinakashall</string>
     <!-- Settings «Map» category: «Appearance» title -->
     <string name="pref_appearance_title">Välimus</string>
     <!-- Settings "Appearance" category: "Light" title, should be consistent with the pref_appearance_title translation. -->
@@ -367,6 +343,10 @@
     <!-- The message when user did not find anything in the search. -->
     <string name="search_not_found_query">Laadi alla otsitav piirkond või proovi lisada lähedalasuva linna/küla nimi.</string>
     <string name="search_history_title">Otsinguajalugu</string>
+    <!-- Tracks are recorded or imported GPS paths. -->
+    <string name="bookmarks_backup_title">Järjehoidjate ja radade varundus</string>
+    <!-- Tracks are recorded or imported GPS paths. -->
+    <string name="bookmarks_backup_description">Järjehoidjad ja rajad võivad sattuda Androidi süsteemi varukoopiatesse, kui varundamine on selles seadmes sisse lülitatud ja need ei ületa selle mahupiirangut.</string>
     <string name="search_history_text">Vaata hiljutisi otsinguid.</string>
     <string name="clear_search">Kustuta otsinguajalugu</string>
     <!-- Place Page link to Wikipedia article (if map object has it). -->
@@ -401,20 +381,15 @@
     <string name="editor_example_values">Näidisväärtused</string>
     <string name="editor_correct_mistake">Paranda viga</string>
     <string name="editor_add_select_location">Vali asukoht</string>
-    <string name="editor_report_problem_desription_1">Palun kirjelda probleemi üksikasjalikult, et OpenStreetMapi kogukond saaks selle parandada.</string>
-    <string name="editor_report_problem_desription_2">Või tee seda ise aadressil https://www.openstreetmap.org/</string>
     <string name="editor_report_problem_send_button">Saada</string>
-    <string name="editor_report_problem_title">Probleem</string>
-    <string name="editor_report_problem_no_place_title">Sellist kohta pole olemas</string>
-    <string name="editor_report_problem_under_construction_title">Suletud hoolduseks</string>
-    <string name="editor_report_problem_duplicate_place_title">Dubleeritud koht</string>
     <string name="autodownload">Laadi kaardid automaaselt alla</string>
     <!-- Place Page opening hours text -->
     <string name="daily">Iga päev</string>
     <string name="twentyfour_seven">24/7</string>
     <string name="day_off_today">Täna suletud</string>
     <string name="day_off">Suletud</string>
-    <string name="today">Täna</string>
+    <string name="midnight">Kesköö</string>
+    <string name="noon">Keskpäev</string>
     <string name="opens_in">Avatakse %s jooksul</string>
     <string name="closes_in">Suletakse %s jooksul</string>
     <string name="closed">Suletud</string>
@@ -457,7 +432,6 @@
     <string name="downloader_no_space_title">Ei ole piisavalt andmeruumi</string>
     <!-- Message shown when there is not enough space to download maps -->
     <string name="downloader_no_space_message">Palun kustuta ebavajalikud andmed</string>
-    <string name="editor_login_error_dialog">Sisselogimise viga.</string>
     <string name="editor_profile_changes">Kinnitatud muudatused</string>
     <string name="editor_focus_map_on_location">Lohista kaarti, et asetada rist koha või ettevõtte asukoha juurde.</string>
     <string name="editor_edit_place_title">Muutmine</string>
@@ -466,8 +440,6 @@
     <!-- The second part of the editor_edit_place_name_hint to explain that name should be entered in a local language, see https://wiki.openstreetmap.org/wiki/Key:name -->
     <string name="editor_default_language_hint">Nagu on kirjutatud kohalikus keeles</string>
     <string name="editor_edit_place_category_title">Kategooria</string>
-    <string name="detailed_problem_description">Probleemi üksikasjalik kirjeldus</string>
-    <string name="editor_report_problem_other_title">Erinev probleem</string>
     <string name="placepage_add_business_button">Lisa ettevõte või äri</string>
     <string name="message_invalid_feature_position">Ükski objekt ei saa siin asuda</string>
     <!-- Text in About and OSM Login screens. First %@ is replaced by a local, human readable date. -->
@@ -504,13 +476,18 @@
     <string name="current_location_unknown_error_title">Hetkeasukoht on teadmata.</string>
     <!-- abbreviation for kilometers per hour -->
     <string name="kilometers_per_hour">km/h</string>
+    <!-- Short label for miles per hour (1 mile = 1609.344 m), placed after a number; e.g. mph or mi/h -->
     <string name="miles_per_hour">mph</string>
+    <!-- Short label for hours (time unit), placed after a number -->
     <string name="hour">h</string>
+    <!-- Short label for minutes (time unit), placed after a number -->
     <string name="minute">min</string>
+    <!-- Short label for days (time unit), placed after a number -->
     <string name="day">p</string>
+    <!-- Short label for seconds (time unit), placed after a number -->
     <string name="second">sek</string>
     <string name="placepage_more_button">Veel</string>
-    <!-- A disable button text in the explanation dialog that opens hotel details page on Kayak website. -->
+    <!-- Toolbar title of the Edit Bookmark screen. -->
     <string name="placepage_edit_bookmark_button">Muuda järjehoidjat</string>
     <string name="placepage_personal_notes_hint">Isiklikud märkmed (tekst või html)</string>
     <string name="editor_comment_hint">Kommenteeri…</string>
@@ -539,7 +516,7 @@
     <string name="editor_share_to_all_dialog_message_1">Palun kontrolli, et sa ei sisestanud isiklikke andmeid.</string>
     <string name="editor_share_to_all_dialog_message_2">OpenStreetMapi haldajad kontrollivad muudatused üle ja võtavad küsimuste korral sinuga ühendust.</string>
     <string name="navigation_stop_button">Lõpeta</string>
-    <!-- Shown as toast when starting the recent track recording -->
+    <!-- Shown while a track is being recorded: the start toast, the notification title and the home screen widget status. -->
     <string name="track_recording">Rada on salvestamisel</string>
     <!-- For the first routing -->
     <string name="accept">Nõustu</string>
@@ -554,11 +531,7 @@
     <string name="mobile_data_description">Mobiilne internetiühendus on vajalik kaardi uuendamise teavituste jaoks ning muudatuste üleslaadimiseks.</string>
     <string name="mobile_data_option_never">Ära kasuta kunagi</string>
     <string name="mobile_data_option_ask">Küsi alati</string>
-    <string name="traffic_update_maps_text">Liiklusinfo kuvamiseks palun uuenda kaardid.</string>
     <string name="big_font">Suurenda teksti suurust kaardil</string>
-    <string name="traffic_update_app">Palun uuenda Organic Mapsi rakendust</string>
-    <!-- "traffic" as in "road congestion" -->
-    <string name="traffic_data_unavailable">Liiklusinfo ei ole saadaval</string>
     <string name="enable_logging">Luba logimine</string>
     <!-- Settings: "Send general feedback" button -->
     <string name="feedback_general">Üldine tagasiside</string>
@@ -567,15 +540,12 @@
     <string name="prefs_languages_information_off_link">Lisainfo saamiseks palun vaata seda juhist.</string>
     <string name="transliteration_title">Transliteratsioon ladina tähestikku</string>
     <string name="learn_more">Lisateave</string>
-    <!-- User selected the destination by pressing Route To, but the current position is unknown. User needs to select a starting point of a route using search or by tapping on the map and then pressing "Route From". -->
-    <string name="routing_add_start_point">Teekonna alguspunkti lisamiseks kasuta otsingut, vali järjehoidja või puuduta soovitud kohta kaardil</string>
-    <!-- User selected the start of a route by pressing Route From. Now the destination of a route should be selected using search or by tapping on the map and then pressing "Route To". -->
-    <string name="routing_add_finish_point">Sihtkoha lisamiseks kasuta otsingut, vali järjehoidja või puuduta soovitud kohta kaardil</string>
-    <string name="planning_route_manage_route">Halda teekonda</string>
-    <string name="button_plan">Kavanda</string>
     <string name="placepage_remove_stop">Eemalda peatus</string>
+    <!-- Keep it short: route planner button below the destination, PlacePage button, search field hint and full-screen map point picker title shown while choosing another destination. The picked place becomes the new destination, the previous one becomes a stop. -->
+    <string name="route_add_destination">Lisa sihtkoht</string>
+    <!-- Keep it short: PlacePage button, search field hint and full-screen map point picker title shown while choosing a new intermediate stop of a route. -->
     <string name="placepage_add_stop">Lisa peatus</string>
-    <string name="saved">Salvestatud</string>
+    <string name="drag_to_reorder">Järjestuse muutmine</string>
     <!-- Alert to ask user relogin to OpenStreetMap with OAuth2 flow after OAuth1 authentication is deprecated. -->
     <string name="alert_reauth_message">Oma kaastöö automaatseks üleslaadimiseks palun logi OpenStreetMappi sisse. Lisateave <a href="https://github.com/organicmaps/organicmaps/issues/6144">leidub siin</a>.</string>
     <string name="dialog_error_storage_title">Andmeruumi ligipääsu probleem</string>
@@ -611,6 +581,11 @@
         <item quantity="other">Leidsime %d faili. Näed neid peale teisendamist.</item>
     </plurals>
     <string name="restore">Taasta</string>
+    <!-- Number of imported polygon areas (zones or regions) saved in a bookmark list, not their surface size. -->
+    <plurals name="areas">
+        <item quantity="one">%d piirkond</item>
+        <item quantity="other">%d piirkonda</item>
+    </plurals>
     <plurals name="tracks">
         <item quantity="zero">%d rada</item>
         <item quantity="one">%d rada</item>
@@ -625,6 +600,9 @@
     <string name="button_layer_hiking">Matkamine</string>
     <!-- Cycling routes layer name in the Styles and Layers dialog -->
     <string name="button_layer_cycling">Jalgrattasõit</string>
+    <!-- Map layers menu: toggle button for the satellite imagery layer -->
+    <string name="button_layer_satellite">Satelliit</string>
+    <!-- Subway map layer button; also the spoken name of the subway (metro, underground) transport type, read by screen readers before a line number on transit line badges. -->
     <string name="button_layer_subway">Metroo</string>
     <string name="layers_title">Kaardi stiilid ja kihid</string>
     <string name="bookmarks_empty_list_title">See loend on tühi</string>
@@ -659,10 +637,22 @@
     <!-- Settings/Bookmark Text Placement -->
     <string name="bookmarks_text_placement_title">Kaardil leiduvate järjehoidjate nimed</string>
     <string name="bookmarks_text_placement_description">Kui kaardil on palu järjehoidjaid, siis nende nimede kuvamine aeglustab kaardi joonistamist.</string>
-    <string name="show_to_the_right">Näita paremale</string>
-    <string name="show_at_the_bottom">Näita alla</string>
+    <string name="show_to_the_right">Näita paremal</string>
+    <string name="show_at_the_bottom">Näita all</string>
     <string name="enable_logging_warning_message">Kasuta seda võimalust üksikasjaliku logi ajutiseks salvestamiseks ja meile käsitsi saatmiseks Abiteabe „Teata veast“ vaatest. Andmed võivad sisaldada sinu asukoha teavet.</string>
+    <!-- Driving profile in routing options settings. -->
+    <string name="routing_options_driving">Autoga</string>
+    <!-- Cycling profile in routing options settings. -->
+    <string name="routing_options_cycling">Jalgrattaga</string>
+    <!-- Walking profile in routing options settings; also the label of a walking leg in transit route details. -->
+    <string name="routing_options_walking">Jalgsi</string>
+    <!-- Section heading for routing settings shared by every routing mode. -->
+    <string name="routing_options_all_modes">Kõik liikumisviisid</string>
     <string name="driving_options_title">Tee juhatamise valikud</string>
+    <!-- Routing setting that automatically reorders intermediate stops -->
+    <string name="route_optimization">Marsruudi optimeerimine</string>
+    <!-- Explains that route optimization automatically reorders intermediate stops -->
+    <string name="route_optimization_description">Järjestab vahepeatused automaatselt ümber, et luua tõhusam marsruut.</string>
     <!-- Recommended length for CarPlay and Android Auto is around 25-27 characters -->
     <string name="avoid_tolls">Väldi tasulisi teid</string>
     <!-- Recommended length for CarPlay and Android Auto is around 25-27 characters -->
@@ -672,11 +662,15 @@
     <string name="avoid_motorways">Väldi kiirteed</string>
     <string name="unable_to_calc_alert_title">Teekonna koostamine ei õnnestu</string>
     <string name="unable_to_calc_alert_subtitle">Teekonda ei õnnestunud koostada. See võib olla põhjustatud sinu seatud tingimustest või OpenStreetMapi andmete puudumisest. Muuda algtingimusi ja proovi uuesti.</string>
-    <string name="define_to_avoid_btn">Määra välditavad teed</string>
-    <string name="change_driving_options_btn">Lubatud valikud teekonna koostamisel</string>
     <string name="toll_road">Tasuline tee</string>
     <string name="unpaved_road">Sillutamata tee</string>
     <string name="ferry_crossing">Praamiületus</string>
+    <!-- Route warning shown on the map for this obstacle type. -->
+    <string name="road_warning_steps">Trepp</string>
+    <!-- Route warning shown on the map for this obstacle type. -->
+    <string name="road_warning_gate">Värav</string>
+    <!-- Route warning shown on the map for this obstacle type. -->
+    <string name="road_warning_lift_gate">Tõkkepuu</string>
     <!-- A generic "Yes" button in dialogs -->
     <string name="yes">Jah</string>
     <!-- A generic "No" button in dialogs -->
@@ -718,6 +712,7 @@
     <string name="opens_at">Avatakse kell %s</string>
     <string name="closes_at">Suletakse kell %s</string>
     <string name="editor_add_select_category_all_subtitle">Kõik kategooriad</string>
+    <string name="placepage_replace_stop">Asenda peatus</string>
 
     <!-- SECTION: Bookmark types used for sorting -->
     <string name="food_places">Toit</string>
@@ -736,17 +731,21 @@
     <string name="medicine">Tervishoid</string>
     <string name="search_in_the_list">Otsi loendist</string>
     <string name="religious_places">Religiooniga seotud kohad</string>
+    <!-- Button that starts multi-selection in a bookmark list. -->
+    <string name="select">Vali</string>
+    <!-- Action that selects every bookmark and track in a bookmark list. -->
+    <string name="select_all">Vali kõik</string>
+    <!-- Action that clears the multi-selection in a bookmark list. -->
+    <string name="deselect_all">Tühista valik</string>
     <string name="select_list">Vali loend</string>
-    <string name="button_layer_isolines">Kontuurjooned</string>
-    <string name="isolines_activation_error_dialog">Topograafilise kihi aktiveerimiseks ja kasutamiseks laadi alla piirkonna kaart</string>
-    <string name="isolines_location_error_dialog">Topograafiline kiht ei ole selles piirkonnas veel saadaval</string>
+    <!-- Layers menu: label of the 3D terrain layer button -->
+    <string name="button_layer_terrain">3D-maastik</string>
+    <string name="isolines_location_error_dialog">Uuenda seda piirkonda, et näha kõrgusjooni</string>
     <string name="elevation_profile_ascent">Tõus</string>
     <string name="elevation_profile_descent">Langus</string>
     <string name="elevation_profile_min_elevation">Min. kõrgus</string>
     <string name="elevation_profile_max_elevation">Maks. kõrgus</string>
     <string name="elevation_profile_difficulty">Raskusaste</string>
-    <string name="elevation_profile_distance">Kaugus:</string>
-    <string name="elevation_profile_time">Aeg:</string>
     <string name="isolines_toast_zooms_1_10">Samakõrgusjoonte sirvimiseks suurenda kaarti</string>
     <string name="downloader_loading_ios">Allalaadimisel</string>
     <string name="download_map_title">Maailma üldkaart on allalaadimisel</string>
@@ -830,15 +829,14 @@
     <string name="pref_tts_no_system_tts">Kõnesünteesi seadistusi ei leidu, kas oled kindel, et sinu nutiseade toetab seda?</string>
     <string name="drive_through">Läbisõit</string>
     <string name="clear_the_search">Tühjenda otsing</string>
+    <!-- Accessibility text for the zoom-in button on the map and visible title for the CarPlay dashboard button. Keep it short. -->
     <string name="zoom_in">Suumi sisse</string>
-    <!-- Accessibility text for the zoom-out button on the map -->
+    <!-- Accessibility text for the zoom-out button on the map and visible title for the CarPlay dashboard button. Keep it short. -->
     <string name="zoom_out">Suumi välja</string>
     <!-- Restaurant or other food place's menu URL field in the Editor -->
     <string name="website_menu">Menüü link</string>
     <!-- Button in the Place Page which opens a restaurant or other food place's menu in a browser -->
     <string name="view_menu">Vaata menüüd</string>
-    <!-- Title for the "Open in Another App" button on the PlacePage. -->
-    <string name="open_in_app">Ava teises rakenduses</string>
     <!-- To indicate if the place proposed self service… -->
     <string name="self_service">Iseteenindus</string>
     <string name="select_option">Vali eelistus</string>
@@ -846,18 +844,16 @@
     <string name="outdoor_seating">Istekohad õues</string>
     <!-- Disclaimer summary shown when Power Saving Mode is enabled -->
     <string name="power_save_dialog_summary">Kõige täpsema tee juhatamise tagamiseks soovitame, et lülitad telefoni akuhalduse seadistused energiasäästurežiimi välja.</string>
+    <!-- Title of the one-time warning about battery optimization when starting track recording on Android. -->
+    <string name="background_recording_warning_title">Taustsalvestuse hoiatus</string>
+    <!-- One-time warning when starting track recording on Android. "Never sleeping apps" is a Samsung setting. The Settings button opens Samsung's list when available, with fallbacks to Android battery optimization settings or general settings. -->
+    <string name="background_recording_warning_message">Et raja salvestamine ei katkeks, kui ekraan on välja lülitatud, jäta Organic Maps aku optimeerimisest välja. Samsungi seadmetes lisa see loendisse „Rakendused, mida ei panda kunagi unerežiimi“.</string>
     <!-- Prompt to start recording a track. -->
     <string name="start_track_recording">Salvesta rada</string>
     <!-- Prompt for stopping a track recording. -->
     <string name="stop_track_recording">Peata raja salvestamine</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
+    <!-- Subtitle of the place page of the track being recorded, and the name and title of the home screen widget. -->
     <string name="track_recording_title">Rada salvestamine</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
-    <string name="stop_without_saving">Lõpeta ilma salvestamata</string>
-    <!-- Title for the "Stop Without Saving" action for the alert when saving a track recording. -->
-    <string name="continue_recording">Jätka salvestamist</string>
-    <!-- Title for the alert when saving a track recording. -->
-    <string name="track_recording_alert_title">Kas salvestame järjehoidjatesse ja radadesse?</string>
     <!-- Message for the toast when saving the track recording is finished but nothing to save. -->
     <string name="track_recording_toast_nothing_to_save">Rada on tühi - ei ole midagi salvestada</string>
     <!-- Error message when there are no File Manager apps installed to select a folder when importing Bookmarks and Tracks -->
@@ -865,20 +861,38 @@
     <string name="choose_color">Vali värv</string>
     <string name="edit_track">Muuda rada</string>
     <string name="uri_open_location_failed">Ei ole paigaldatud rakendust, mis oskaks asukohta avada</string>
-    <!-- preference string for using auto theme only in navigation mode -->
-    <string name="nav_auto">Automaatne tee juhatamine</string>
     <!-- Setting option to sync the app's theme with the operating system's dark/light mode -->
     <string name="follow_system">Järgi süsteemi</string>
     <!-- Title of the bottom sheet when sharing the track -->
     <string name="share_track">Jaga rada</string>
     <!-- Title for the dialog when deleting a track with the track name passed in %@ -->
     <string name="delete_track_dialog_title">Kas kustutame %s?</string>
+    <!-- Bookmark list title in multi-selection mode. %d is the number of selected bookmarks and tracks. -->
+    <plurals name="n_items_selected">
+        <item quantity="zero">%d valitud</item>
+        <item quantity="one">%d valitud</item>
+        <item quantity="other">%d valitud</item>
+    </plurals>
+    <!-- Title for the dialog when deleting several bookmarks and tracks at once. %d is their number. -->
+    <plurals name="delete_n_items_dialog_title">
+        <item quantity="zero">Kustutada %d üksust?</item>
+        <item quantity="one">Kustutada %d üksus?</item>
+        <item quantity="other">Kustutada %d üksust?</item>
+    </plurals>
+    <!-- move track or bookmark from the list button text -->
+    <string name="move">Teisalda</string>
+    <!-- Text for the editing the Track's color button. -->
+    <string name="change_color">Muuda värvi</string>
+    <!-- Text for the hiding track. -->
+    <string name="hide_track">Peida rada</string>
+    <!-- Text for the showing track. -->
+    <string name="show_track">Näita rada</string>
+
+    <!-- SECTION: Uncategorized -->
+    <!-- Short label of the user's position marker on the elevation profile chart. Where a bare pronoun would be unnatural or gendered, a location noun ("My location") is preferred. -->
+    <string name="you">Sina</string>
 
     <!-- SECTION: gps strings -->
-    <!-- Login to OSM button text -->
-    <string name="login_osm_credentials">Sisselogimine parooliga</string>
-    <!-- Login to OSM button text -->
-    <string name="login_osm_browser">Sisselogimine brauseri abil</string>
     <!-- Editor section title that shows recently used categories (types of objects) when adding a place on the map -->
     <string name="editor_add_select_category_recent_subtitle">Hiljuti kasutatud</string>
     <!-- Toast message shown when bookmark colors are changed in category settings -->
@@ -899,4 +913,43 @@
     <string name="color_picker_hex_label">sRGB Hex-värv #</string>
     <!-- Tab label for the grid color picker mode -->
     <string name="color_picker_grid">Ruudustik</string>
+    <!-- Accessibility label for the voice-search mic button in the search bar -->
+    <string name="voice_search">Häälotsing</string>
+    <!-- Accessibility label of the icon-only button beside the search field, shown while choosing or replacing a route point; it opens a full-screen map picker with a crosshair -->
+    <string name="choose_on_map">Vali kaardilt</string>
+    <!-- Search field hint and full-screen map point picker title shown while choosing the starting point of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="choose_start_location">Alguskoht</string>
+    <!-- Search field hint and full-screen map point picker title shown while choosing the destination of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="choose_destination">Sihtkoht</string>
+    <!-- Search field hint and full-screen map point picker title shown while replacing the already set starting point of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="change_start_location">Muuda alguskohta</string>
+    <!-- Search field hint and full-screen map point picker title shown while replacing the already set destination of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="change_destination">Muuda sihtkohta</string>
+    <!-- Search field hint and full-screen map point picker title shown while replacing an already added intermediate stop of a route. Kept short because shortcut and voice-search buttons narrow the field -->
+    <string name="change_stop_along_route">Muuda peatust</string>
+    <!-- Toast shown when the user tries to add one more intermediate stop to a route that already holds the maximum allowed number -->
+    <string name="routing_max_stops_reached">Peatuste maksimaalne arv on saavutatud</string>
+    <!-- Hint under the title of the full-screen route point picker: a crosshair stays fixed in the centre of the screen while the user moves the map under it -->
+    <string name="choose_point_on_map_hint">Liiguta ja suumi kaarti, et paigutada rist õigesse kohta</string>
+    <!-- Track recording notification button: stops the recording and saves the recorded track. -->
+    <string name="track_recording_stop_and_save">Lõpeta ja salvesta</string>
+    <!-- Track recording home screen widget button: opens the app to save or delete the recorded track. -->
+    <string name="track_recording_finish">Lõpeta</string>
+    <!-- Accessibility label for the button that reverses the complete planned route, including intermediate stops. -->
+    <string name="reverse_route">Pööra marsruut ümber</string>
+    <!-- Title of the transit route details screen, shown when the user taps the public transport summary tile. -->
+    <string name="transit_details_title">Reisi üksikasjad</string>
+    <!-- Heading for a user-added intermediate point (Add Stop) in the transit details breakdown (%1$d = its order in the route, starting at 1). -->
+    <string name="transit_waypoint_label">Peatus %1$d</string>
+    <!-- Number of stops ridden on a single transit line. -->
+    <plurals name="transit_stops_count">
+        <item quantity="one">%d peatus</item>
+        <item quantity="other">%d peatust</item>
+    </plurals>
+    <!-- Spoken name of the bus transport type, read by screen readers before a line number on transit line badges (route summary and details). -->
+    <string name="transit_type_bus">Buss</string>
+    <!-- Spoken name of the train transport type, read by screen readers before a line number on transit line badges (route summary and details). -->
+    <string name="transit_type_train">Rong</string>
+    <!-- Spoken name of the tram (streetcar) transport type, read by screen readers before a line number on transit line badges (route summary and details). -->
+    <string name="transit_type_tram">Tramm</string>
 </resources>

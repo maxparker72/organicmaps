@@ -169,6 +169,7 @@ world  +
             {}
         shower  -
         social_facility  -
+        stage  -
         stripclub  -
         student_accommodation  -
         studio  -
@@ -310,6 +311,7 @@ world  +
         shoemaker  -
         tailor  -
         watchmaker  -
+        window_construction  -
         winery  -
         {}
     cuisine  +
@@ -639,7 +641,9 @@ world  +
         {}
     landuse  +
         allotments  -
-        basin  -
+        basin  +
+            intermittent  -
+            {}
         brownfield  -
         cemetery  +
             christian  -
@@ -674,7 +678,6 @@ world  +
         railway  -
         recreation_ground  -
         religious  -
-        reservoir  -
         residential  -
         retail  -
         salt_pond  -
@@ -685,6 +688,7 @@ world  +
         adult_gaming_centre  -
         amusement_arcade  -
         beach_resort  -
+        bird_hide  -
         bowling_alley  -
         common  -
         dance  -
@@ -731,6 +735,7 @@ world  +
         breakwater  -
         bridge  -
         cairn  -
+        ceremonial_gate  -
         chimney  -
         communications_tower  -
         crane  -
@@ -748,6 +753,7 @@ world  +
         petroleum_well  -
         pier  -
         pipeline  -
+        reservoir_covered  -
         silo  -
         storage_tank  -
         surveillance  -
@@ -764,6 +770,7 @@ world  +
         water_well  +
             drinking_water_no  -
             {}
+        water_works  -
         windmill  -
         works  -
         {}
@@ -775,6 +782,7 @@ world  +
         {}
     mountain_pass  -
     natural  +
+        arch  -
         bare_rock  -
         bay  -
         beach  +
@@ -791,6 +799,7 @@ world  +
         glacier  -
         grassland  -
         heath  -
+        hill  -
         hot_spring  -
         land  -
         peak  -
@@ -811,6 +820,7 @@ world  +
             basin  -
             ditch  -
             drain  -
+            intermittent  -
             lake  -
             lock  -
             moat  -
@@ -845,6 +855,7 @@ world  +
         {}
     organicapp  +
         mwm_border  -
+        twm_border  -
         {}
     piste:type  +
         connection  -
@@ -1122,6 +1133,7 @@ world  +
                 sofia  -
                 spb  -
                 stockholm  -
+                suzhou  -
                 tabriz  -
                 taipei  -
                 taoyuan  -
@@ -1244,6 +1256,7 @@ world  +
             sofia  -
             spb  -
             stockholm  -
+            suzhou  -
             tabriz  -
             taipei  -
             taoyuan  -
@@ -1361,7 +1374,9 @@ world  +
         gift  -
         greengrocer  -
         grocery  -
-        hairdresser  -
+        hairdresser  +
+            barber  -
+            {}
         hardware  -
         health_food  -
         hearing_aids  -
@@ -1460,6 +1475,7 @@ world  +
         padel  -
         pelota  -
         pickleball  -
+        pilates  -
         rugby_union  -
         running  -
         scuba_diving  -
@@ -1520,25 +1536,29 @@ world  +
     waterway  +
         access_point  -
         canal  +
+            intermittent  -
             tunnel  -
             {}
         dam  -
         ditch  +
+            intermittent  -
             tunnel  -
             {}
         dock  -
         drain  +
+            intermittent  -
             tunnel  -
             {}
         fish_pass  +
+            intermittent  -
             tunnel  -
             {}
         lock_gate  -
         river  +
+            intermittent  -
             tunnel  -
             {}
         stream  +
-            ephemeral  -
             intermittent  -
             tunnel  -
             {}

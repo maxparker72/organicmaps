@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- SECTION: Other translations -->
+    <!-- Text shown before a shared "my position" link, and the email subject when sharing the current location. -->
+    <string name="share_my_position">我在 Organic Maps 上的位置</string>
+    <!-- Shared email link text; opens the shared place in Organic Maps or in a web browser. -->
+    <string name="share_open_in_om_or_browser">在 Organic Maps 或瀏覽器中開啟</string>
+    <!-- Shared email link text; leads to the Organic Maps download page. -->
+    <string name="share_get_om">取得 Organic Maps</string>
+    <!-- Title for the "Open in Another App" button on the PlacePage; also shared email link text: opens the shared place in another (geo:) maps app. -->
+    <string name="open_in_app">在另一個應用程式中開啟</string>
+
     <!-- SECTION: Uncategorized -->
     <!-- Settings/Downloader - size string, only strings different from English should be translated -->
     <string name="mb">MB</string>
@@ -26,9 +36,9 @@
     <string name="m">公尺</string>
     <!-- abbreviation for kilometers -->
     <string name="km">公里</string>
-    <!-- abbreviation for mile(s) -->
+    <!-- Short label for miles (length unit, 1 mi = 1609.344 m), placed after a number -->
     <string name="mi">英哩</string>
-    <!-- A unit of measure -->
+    <!-- Short label for feet (1 ft = 0.3048 m), after numbers; local abbreviations and uninflected unit names are allowed -->
     <string name="ft">英尺</string>
     <!-- Toast text when the maps version should be updated to display the OSM hiking and cycling routes -->
     <string name="routes_update_maps_text">要顯示路線，必須先更新地圖。</string>
@@ -38,10 +48,4 @@
     <string name="subway_data_unavailable">捷運圖層不可用</string>
     <!-- Settings/Highlight downloaded regions on the map -->
     <string name="show_downloaded_regions">紫色已下載區域</string>
-
-    <!-- SECTION: gps strings -->
-    <!-- Login to OSM button text -->
-    <string name="login_osm_credentials">使用密碼登入</string>
-    <!-- Login to OSM button text -->
-    <string name="login_osm_browser">使用瀏覽器登入</string>
 </resources>

@@ -1,16 +1,16 @@
 #include "relations_draw_info.hpp"
 
 #include "indexer/feature.hpp"
-#include "indexer/map_style_reader.hpp"
 
 #include "platform/settings.hpp"
 
 namespace df
 {
-void RelationsDrawSettings::Load()
+void RelationsDrawSettings::Load(MapStyle style)
 {
   hiking = settings::IsEnabled(kHikingEnabledKey);
   cycling = settings::IsEnabled(kCyclingEnabledKey);
+  dark = MapStyleIsDark(style);
 }
 
 bool RelationsDrawSettings::MatchHikingOrCycling(feature::RouteRelationBase::Type type) const
@@ -20,24 +20,25 @@ bool RelationsDrawSettings::MatchHikingOrCycling(feature::RouteRelationBase::Typ
           (cycling && (type == RR::Type::Bicycle || type == RR::Type::MTB)));
 }
 
-dp::Color constexpr kDefaultRouteColor{128, 0, 128};  // purple
+dp::Color constexpr kDefaultRouteColor = dp::Color::Purple();
 
 bool RelationsDrawInfo::HasHikingOrCycling(FeatureType & ft) const
 {
   for (uint32_t relID : ft.GetRelations())
-    if (m_sett.MatchHikingOrCycling(ft.ReadRelationType(relID)))
+    if (m_sett.MatchHikingOrCycling(ft.ReadRelation(relID).GetType()))
       return true;
   return false;
 }
 
 void RelationsDrawInfo::Init(FeatureType & ft)
 {
-  using RR = feature::RouteRelationBase;
+  if (m_sett.IsEmpty())
+    return;
 
   buffer_vector<std::pair<std::string, int>, 4> refs;
   for (uint32_t relID : ft.GetRelations())
   {
-    auto const rel = ft.ReadRelation<RR>(relID);
+    auto rel = ft.ReadRelation(relID);
     if (m_sett.MatchHikingOrCycling(rel.GetType()) || (m_sett.PT && rel.IsPTRoute()))
     {
       auto clr = rel.GetColor();
@@ -62,7 +63,7 @@ void RelationsDrawInfo::Init(FeatureType & ft)
 
     if (m_sett.PT)
     {
-      auto const & r = rel.GetRef();
+      auto const & r = rel.GetRel().GetRef();
       if (!r.empty())
       {
         // Get prefix integer value to sort by.
@@ -76,8 +77,8 @@ void RelationsDrawInfo::Init(FeatureType & ft)
   if (m_colors.empty())
     return;
 
-  // Adjust colors to the current theme for readability.
-  bool const isLightTheme = !MapStyleIsDark(GetStyleReader().GetCurrentStyle());
+  // Keep relation colors readable in the tile's captured theme.
+  bool const isLightTheme = !m_sett.dark;
   for (auto & [c, _] : m_colors)
   {
     dp::HSL hsl = dp::Color2HSL(c);

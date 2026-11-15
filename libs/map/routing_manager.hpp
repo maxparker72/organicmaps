@@ -22,6 +22,7 @@
 #include "base/thread_checker.hpp"
 
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
@@ -163,6 +164,16 @@ public:
   }
   void FollowRoute();
   void CloseRouting(bool removeRoutePoints);
+
+  /// \brief Activate alternative |idx| (typically triggered by tapping its ETA balloon).
+  /// Returns false if the index is out of range, already active, or its adjustment caches are
+  /// unavailable or belong to another result. Re-renders the drape to highlight the selected variant.
+  bool SwapActiveAlternative(size_t idx);
+
+  /// \brief Hit-tests |mercator| against the alternative-route polylines. If one is closer than
+  /// a tap-area threshold (kTapPixels * |mercatorPerPixel|), swaps it to active and returns true.
+  /// No-op when navigation is active (alts aren't drawn then) or there are no alternatives.
+  bool TryTapOnAlternativeRoute(m2::PointD const & mercator, double mercatorPerPixel);
   void GetRouteFollowingInfo(routing::FollowingInfo & info) const { m_routingSession.GetRouteFollowingInfo(info); }
 
   TransitRouteInfo GetTransitRouteInfo() const;
@@ -177,7 +188,7 @@ public:
   bool AreTurnNotificationsEnabled() const { return m_routingSession.AreTurnNotificationsEnabled(); }
   /// \brief Sets a locale for TTS.
   /// \param locale is a string with locale code. For example "en", "ru", "zh-Hant" and so on.
-  /// \note See sound/tts/languages.txt for the full list of available locales.
+  /// \note See data/sound-strings/ for the available locales.
   void SetTurnNotificationsLocale(std::string const & locale) { m_routingSession.SetTurnNotificationsLocale(locale); }
   /// @return current TTS locale. For example "en", "ru", "zh-Hant" and so on.
   /// In case of error returns an empty string.
@@ -185,10 +196,7 @@ public:
   /// If not, it returns an empty string.
   std::string GetTurnNotificationsLocale() const { return m_routingSession.GetTurnNotificationsLocale(); }
   // @return polyline of the route.
-  routing::FollowedPolyline const & GetRoutePolyline() const
-  {
-    return m_routingSession.GetRoute()->GetFollowedPolyline();
-  }
+  m2::PolylineD const & GetRoutePolyline() const { return m_routingSession.GetRoute()->GetPoly(); }
   // @return generated turns on the route.
   std::vector<routing::turns::TurnItem> GetTurnsOnRouteForTests() const
   {
@@ -207,8 +215,19 @@ public:
   /// will not return previous data, only newer.
   void GenerateNotifications(std::vector<std::string> & notifications, bool announceStreets);
 
-  void AddRoutePoint(RouteMarkData && markData, bool reorderIntermediatePoints = true);
-  void ContinueRouteToPoint(RouteMarkData && markData);
+  /// Appends an intermediate stop before the finish, ignoring markData.m_intermediateIndex; Start/Finish replace the
+  /// existing endpoint instead. A new stop is dropped at capacity, except when it takes over an existing My Position
+  /// mark. optimize places only the new stop at the predicted position (needs both endpoints, ignored in Ruler mode,
+  /// still applied while following). Returns false when a new point cannot be added at capacity.
+  bool AddRoutePoint(RouteMarkData && markData, bool optimize);
+  /// Replaces an existing slot without optimization. If the target is gone, adds the point normally; otherwise the
+  /// target slot's current type overrides markData.
+  void ReplaceRoutePoint(RouteMarkType type, size_t intermediateIndex, RouteMarkData && markData);
+  /// Reorders stops after the last passed mark in place, keeping endpoints, passed marks, and earlier stops fixed.
+  /// Returns whether the order changed; the caller rebuilds. No-op while following, in Ruler mode, or without
+  /// both endpoints.
+  bool OptimizeRoutePoints();
+  bool ContinueRouteToPoint(RouteMarkData && markData);
   std::vector<RouteMarkData> GetRoutePoints() const;
   size_t GetRoutePointsCount() const;
   void RemoveRoutePoint(RouteMarkType type, size_t intermediateIndex = 0);
@@ -218,6 +237,9 @@ public:
   void MoveRoutePoint(size_t currentIndex, size_t targetIndex);
   void MoveRoutePoint(RouteMarkType currentType, size_t currentIntermediateIndex, RouteMarkType targetType,
                       size_t targetIntermediateIndex);
+  /// Reverses the complete route, including intermediate points. Returns false without changing points if either
+  /// endpoint is missing.
+  bool ReverseRoutePoints();
   void HideRoutePoint(RouteMarkType type, size_t intermediateIndex = 0);
   bool CouldAddIntermediatePoint() const;
   bool IsMyPosition(RouteMarkType type, size_t intermediateIndex = 0);
@@ -226,8 +248,8 @@ public:
 
   void CheckLocationForRouting(location::GpsInfo const & info);
   void CallRouteBuilded(routing::RouterResultCode code, storage::CountriesSet const & absentCountries);
-  void OnBuildRouteReady(routing::Route const & route, routing::RouterResultCode code);
-  void OnRebuildRouteReady(routing::Route const & route, routing::RouterResultCode code);
+  void OnBuildRouteReady(routing::RoutesResult const & result, routing::RouterResultCode code);
+  void OnRebuildRouteReady(routing::RoutesResult const & result, routing::RouterResultCode code);
   void OnNeedMoreMaps(uint64_t routeId, storage::CountriesSet const & absentCountries);
   void OnRemoveRoute(routing::RouterResultCode code);
   void OnRoutePointPassed(RouteMarkType type, size_t intermediateIndex);
@@ -259,13 +281,12 @@ public:
 
   /// \returns true if there are route points saved in file and false otherwise.
   bool HasSavedRoutePoints() const;
-  /// \brief It loads road points from file and delete file after loading.
-  /// The result of the loading will be sent via SafeCallback.
-  using LoadRouteHandler = platform::SafeCallback<void(bool success)>;
-  void LoadRoutePoints(LoadRouteHandler const & handler);
-  /// \brief It saves route points to file.
+  /// Synchronously restores into an empty, inactive itinerary on the GUI thread. Returns whether points were restored.
+  /// Leaves recovery untouched while an itinerary is present or active; consumes the file after a read attempt.
+  bool LoadRoutePoints();
+  /// Saves remaining route points synchronously on the GUI thread; incomplete or finished routes discard recovery.
   void SaveRoutePoints();
-  /// \brief It deletes file with saved route points if it exists.
+  /// Deletes saved recovery synchronously on the GUI thread.
   void DeleteSavedRoutePoints();
 
   void UpdatePreviewMode();
@@ -275,9 +296,6 @@ public:
 
 private:
   void SetRouterImpl(routing::RouterType type);
-
-  /// \returns true if the route has warnings.
-  bool InsertRoute(routing::Route const & route);
 
   struct RoadInfo
   {
@@ -289,12 +307,39 @@ private:
     FeatureID m_featureId;
     double m_distance = 0.0;
   };
-  using RoadWarningsCollection = std::map<routing::RoutingOptions::Road, std::vector<RoadInfo>>;
+  using RoadWarningsCollection = std::map<RoadWarningMarkType, std::vector<RoadInfo>>;
 
-  using GetMwmIdFn = std::function<MwmSet::MwmId(routing::NumMwmId numMwmId)>;
+  MwmSet::MwmId GetMwmId(routing::NumMwmId numMwmId) const;
+
+  /// \brief Renders every route in |result| via drape subroutes. The active alternative
+  /// (result.m_activeIdx) is drawn with normal styling; the rest are dimmed. Also creates
+  /// road-warning marks for the active route.
+  /// \returns true if the active route has an avoidable warning (toll/ferry/dirty) on a car route,
+  /// i.e. one that should surface the "driving options" affordance (RouterResultCode::HasWarnings).
+  bool InsertRoute(routing::RoutesResult const & result);
+
+  // Helper: build drape subroutes for a single route. |isActive| controls styling
+  // (alternatives are dimmed). |roadWarnings| is appended for every route (active and alternatives)
+  // so warning marks of all routes are shown together.
+  void InsertSingleRoute(routing::RouteBase const & route, bool isActive, double depthOffset,
+                         std::shared_ptr<TransitRouteDisplay> const & transitRouteDisplay,
+                         RoadWarningsCollection & roadWarnings);
+
+  // Linear warnings (toll/ferry/dirty/steps): a span of the route sharing the same road type.
   void CollectRoadWarnings(std::vector<routing::RouteSegment> const & segments, m2::PointD const & startPt,
-                           double baseDistance, GetMwmIdFn const & getMwmIdFn, RoadWarningsCollection & roadWarnings);
+                           double baseDistance, RoadWarningsCollection & roadWarnings);
+  // Point warnings (gate/lift_gate): barrier nodes precomputed on the routing thread and stored in
+  // the route (see routing::RouteBase::GetWarnings); here we just map them to mark types.
+  void CollectRoadPointWarnings(routing::RouteBase const & route, RoadWarningsCollection & roadWarnings);
   void CreateRoadWarningMarks(RoadWarningsCollection && roadWarnings);
+
+  // Creates an ETA balloon (RouteAltMark) at the midpoint of each route variant in |result|.
+  // Active variant uses the route palette; alternatives use a dimmer palette.
+  void CreateRouteAltMarks(routing::RoutesResult const & result);
+
+  // Synchronously remove the alternative-route subroutes from drape and clear the alt ETA
+  // balloons when rebuilding or entering navigation. The active route is left untouched.
+  void ClearAlternativeRoutes();
 
   /// \returns false if the location could not be matched to the route and should be matched to the
   /// road graph. Otherwise returns true.
@@ -304,7 +349,9 @@ private:
 
   void SetPointsFollowingMode(bool enabled);
 
-  void ReorderIntermediatePoints();
+  /// Places |added| among the unpassed stops, keeping their relative order, or re-inserts all of them if it is null.
+  /// Returns whether any stop index changed.
+  bool ReorderIntermediatePoints(RoutePointsLayout & layout, RouteMarkPoint const * added);
 
   m2::RectD ShowPreviewSegments(std::vector<RouteMarkData> const & routePoints);
   void HidePreviewSegments();
@@ -313,6 +360,7 @@ private:
 
   void CancelRecommendation(Recommendation recommendation);
 
+  std::vector<RouteMarkData> ReadAndDeleteSavedRoutePoints() const;
   std::vector<RouteMarkData> GetRoutePointsToSave() const;
 
   void OnExtrapolatedLocationUpdate(location::GpsInfo const & info);

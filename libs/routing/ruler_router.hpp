@@ -11,9 +11,11 @@ class RulerRouter : public IRouter
   std::string GetName() const override { return {"ruler-router"}; }
   void ClearState() override {}
   void SetGuides(GuidesTracks && guides) override {}
+  bool IsTrafficSensitive() const override { return false; }
 
   RouterResultCode CalculateRoute(Checkpoints const & checkpoints, m2::PointD const & startDirection,
-                                  bool adjustToPrevRoute, RouterDelegate const & delegate, Route & route) override;
+                                  bool adjustToPrevRoute, bool needAlternatives, RouterDelegate const & delegate,
+                                  RoutesResult & result) override;
   bool FindClosestProjectionToRoad(m2::PointD const & point, m2::PointD const & direction, double radius,
                                    EdgeProj & proj) override;
 
