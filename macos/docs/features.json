@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24",
+  "updated": "2026-11-15",
   "categories": {
     "MAP": "Map and navigation",
     "DL": "Offline maps",
@@ -428,7 +428,7 @@
       "test": "untested",
       "scope": "Import keeps the file's colors and line widths. Normalization is opt-in, never automatic.",
       "accept": "Import a GPX with a 2px blue track: it stays 2px and blue.",
-      "notes": "Imports no longer rewrite track widths or colors (25a7503), and editing a track keeps its own color. Acceptance check not run yet. Re-check against upstream's custom bookmark colors on rebase."
+      "notes": "Imports no longer rewrite track widths or colors (25a7503), and editing a track or bookmark keeps its own color. Since the Nov 2026 sync the palette is display-only (D-12). Acceptance check not run yet."
     },
     {
       "fid": "LIB-07",
@@ -472,7 +472,7 @@
       "test": "untested",
       "scope": "Show or hide each item and each list on the map.",
       "accept": "Hide a track: it disappears from the map and stays hidden after relaunch.",
-      "notes": "Bookmark visibility is runtime-only (Bookmark::SetIsVisible sets m_isVisible; KML saves m_data.m_visible), so hidden bookmarks reappear on relaunch. Tracks persist. Clear Filter rewrites every KML file (R-B10)."
+      "notes": "Bookmark visibility is saved in KML since the Nov 2026 sync (Bookmark::SetVisibility, an engine patch). Not yet verified by relaunch. Show All still rewrites every KML file (R-B10)."
     },
     {
       "fid": "LIB-11",
@@ -560,7 +560,7 @@
       "test": "untested",
       "scope": "Projects group items across lists, with dates and an isolate mode.",
       "accept": "Create a project, add items from two lists, isolate it: only those items show.",
-      "notes": "Project lists appear as normal lists in the navigator and every list picker (R-S2). Isolation state is lost if you quit while isolated (R-S3). Re-importing a backup may duplicate projects (R-S19, unverified)."
+      "notes": "Project lists appear as normal lists in the navigator and every list picker (R-S2). Quitting while isolated leaves the other items hidden, and since the Nov 2026 sync that includes bookmarks as well as tracks (R-S3, T-020). Re-importing a backup may duplicate projects (R-S19, unverified)."
     },
     {
       "fid": "PRJ-03",
@@ -582,7 +582,7 @@
       "test": "untested",
       "scope": "AND/OR conditions on name, type, color, list, tag, region, distance, length.",
       "accept": "Build 'tracks longer than 10 km tagged hike' and apply it.",
-      "notes": "The default empty Name condition may hide everything on Apply (R-S9, unverified). Filter, isolation and Clear overwrite each other's visibility (R-S10)."
+      "notes": "The default empty Name condition may hide everything on Apply (R-S9, unverified). Filter, isolation and Clear overwrite each other's visibility (R-S10). Hides from an active filter are saved, so quitting with a filter applied keeps those items hidden; Show All restores them."
     },
     {
       "fid": "PRJ-05",

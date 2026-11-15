@@ -100,7 +100,10 @@ Known kinds of breakage, cheapest checks first:
 ```sh
 git commit -s    # subject: [macos] Merge upstream master (<N> commits, <date>)
                  # body: conflict choices + each Mac adaptation; end with the attribution lines
-git switch macos-experiment && git merge --ff-only sync/upstream-<date>
+# Move the branch pointer instead of switching back first: switching to the old tree
+# rewrites thousands of files and forces Xcode to rebuild them.
+git merge-base --is-ancestor macos-experiment HEAD && git branch -f macos-experiment HEAD
+git switch macos-experiment && git submodule update --init --recursive
 git push origin macos-experiment && git branch -d sync/upstream-<date>
 ```
 

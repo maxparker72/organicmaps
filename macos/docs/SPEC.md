@@ -15,7 +15,7 @@ Tasks, commits and tests refer to these IDs, for example `[macos] LIB-06: Keep i
 - **P0** needed for the first tester build, **P1** for beta, **P2** nice to have, **P3** later or never.
 - `R-B`, `R-S` and `R-E` references point to findings in REVIEW-2026-10.md.
 
-Status on 2026-10-24: 25 built, 28 partial, 11 missing, 0 planned, 3 dropped.
+Status on 2026-11-15: 25 built, 28 partial, 11 missing, 0 planned, 3 dropped.
 
 ## Map and navigation (MAP)
 
@@ -83,11 +83,11 @@ Status on 2026-10-24: 25 built, 28 partial, 11 missing, 0 planned, 3 dropped.
 | LIB-03 | Sorting and views | P1 | Built | Sort by date, name, distance, length; group by type; tree or column view. | Switch to column view and sort by length. |  |
 | LIB-04 | Type filter | P2 | Partial | One-click All / Bookmarks / Tracks filter in the navigator. | Choose Tracks: only tracks are listed. | Only grouping and filter-builder conditions exist. |
 | LIB-05 | Import | P0 | Partial | KML, KMZ, GPX, GeoJSON by menu, drag-and-drop, or folder; choose destination list, tag or project. | Drop a folder of GPX files: each lands in the chosen list with its names intact. | Import treats any list created during a batch as imported and may delete it (R-S4); a second batch's options are dropped. Multi-file drop race fixed (46db5fd). |
-| LIB-06 | Import keeps styling | P0 | Built | Import keeps the file's colors and line widths. Normalization is opt-in, never automatic. | Import a GPX with a 2px blue track: it stays 2px and blue. | Imports no longer rewrite track widths or colors (25a7503), and editing a track keeps its own color. Acceptance check not run yet. Re-check against upstream's custom bookmark colors on rebase. |
+| LIB-06 | Import keeps styling | P0 | Built | Import keeps the file's colors and line widths. Normalization is opt-in, never automatic. | Import a GPX with a 2px blue track: it stays 2px and blue. | Imports no longer rewrite track widths or colors (25a7503), and editing a track or bookmark keeps its own color. Since the Nov 2026 sync the palette is display-only (D-12). Acceptance check not run yet. |
 | LIB-07 | Export | P1 | Partial | Export a list, a selection, or a single track as KMZ, KML, GPX or GeoJSON. | Export one track as GPX and open it in another app. | List export works; single-track export has no UI. |
 | LIB-08 | Backup and restore | P1 | Partial | Back up the whole library to one KMZ; restore by import. | Back up, delete a list, import the backup: the list returns with tags. | Restore path untested. |
 | LIB-09 | Track styling | P2 | Partial | Color picker and stroke width for tracks. | Change a track's width: map updates immediately. | Color only, no width. A recolor is reverted by the next import, because SetColor leaves m_predefinedColor stale (R-B4). |
-| LIB-10 | Visibility | P1 | Partial | Show or hide each item and each list on the map. | Hide a track: it disappears from the map and stays hidden after relaunch. | Bookmark visibility is runtime-only (Bookmark::SetIsVisible sets m_isVisible; KML saves m_data.m_visible), so hidden bookmarks reappear on relaunch. Tracks persist. Clear Filter rewrites every KML file (R-B10). |
+| LIB-10 | Visibility | P1 | Partial | Show or hide each item and each list on the map. | Hide a track: it disappears from the map and stays hidden after relaunch. | Bookmark visibility is saved in KML since the Nov 2026 sync (Bookmark::SetVisibility, an engine patch). Not yet verified by relaunch. Show All still rewrites every KML file (R-B10). |
 | LIB-11 | Multi-select and bulk actions | P0 | Built | Select many; move, color, tag, add to project, show/hide, delete; same right-click menu everywhere. | Select 20 items and set their color at once. | Bulk add-to-project is O(n^2) and saves once per item (R-S6). |
 | LIB-12 | Undo | P0 | Partial | Cmd-Z undoes every library change, including deletes. | Bulk-delete 5 items, press Cmd-Z: all 5 return. | Deletes are not undoable. |
 | LIB-13 | Recently deleted | P1 | Missing | Deleted lists go to a Recently Deleted area for 30 days, as on iOS. | Delete a list, open Recently Deleted, restore it. |  |
@@ -100,9 +100,9 @@ Status on 2026-10-24: 25 built, 28 partial, 11 missing, 0 planned, 3 dropped.
 | ID | Feature | Pri | Built | Behaviour | Acceptance check | Known gaps |
 |---|---|---|---|---|---|---|
 | PRJ-01 | Tags | P1 | Partial | Finder-style tags on items, token editor with suggestions, stored in KML so they travel with the data. | Tag an item, export its list, re-import: the tag is still there. | project: tags show as ordinary tags; removing one silently drops project membership (R-S2). |
-| PRJ-02 | Projects | P1 | Partial | Projects group items across lists, with dates and an isolate mode. | Create a project, add items from two lists, isolate it: only those items show. | Project lists appear as normal lists in the navigator and every list picker (R-S2). Isolation state is lost if you quit while isolated (R-S3). Re-importing a backup may duplicate projects (R-S19, unverified). |
+| PRJ-02 | Projects | P1 | Partial | Projects group items across lists, with dates and an isolate mode. | Create a project, add items from two lists, isolate it: only those items show. | Project lists appear as normal lists in the navigator and every list picker (R-S2). Quitting while isolated leaves the other items hidden, and since the Nov 2026 sync that includes bookmarks as well as tracks (R-S3, T-020). Re-importing a backup may duplicate projects (R-S19, unverified). |
 | PRJ-03 | Project itinerary | P2 | Missing | Ordered day-by-day itinerary inside a project. | Order project items into days. | Data model exists (ItineraryEntry) but stores MarkIds, which change every launch; key entries by UUID. No UI. |
-| PRJ-04 | Filter builder | P1 | Built | AND/OR conditions on name, type, color, list, tag, region, distance, length. | Build 'tracks longer than 10 km tagged hike' and apply it. | The default empty Name condition may hide everything on Apply (R-S9, unverified). Filter, isolation and Clear overwrite each other's visibility (R-S10). |
+| PRJ-04 | Filter builder | P1 | Built | AND/OR conditions on name, type, color, list, tag, region, distance, length. | Build 'tracks longer than 10 km tagged hike' and apply it. | The default empty Name condition may hide everything on Apply (R-S9, unverified). Filter, isolation and Clear overwrite each other's visibility (R-S10). Hides from an active filter are saved, so quitting with a filter applied keeps those items hidden; Show All restores them. |
 | PRJ-05 | Saved filters | P2 | Built | Save filters, apply from the Filter menu, Select Matching for bulk actions. | Save a filter, relaunch, apply it from the menu. |  |
 | PRJ-06 | Region attribution | P2 | Built | Items know which country/region they are in, used by filters and search. | Filter by a region name: only items in it match. |  |
 
