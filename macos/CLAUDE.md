@@ -8,6 +8,9 @@ Native SwiftUI Mac app on the Organic Maps engine. Read these first:
 
 The repo-root `CLAUDE.md` covers engine conventions (C++ style, `libs/` layering, test macros).
 
+Workflows are skills in `.claude/skills/`: `macos-sync` (merge upstream), `macos-release` (build and install
+to /Applications), `macos-triage` (file issues from crashes and logs into the tracker, fix them in batches).
+
 ## Build
 
 ```sh

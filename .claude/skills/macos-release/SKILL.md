@@ -57,13 +57,14 @@ mapo must not be running while it's replaced, and two copies must never run at o
 folder). If `pgrep -f '/Applications/mapo.app'` finds it, ask the user to quit it (Cmd-Q); don't kill it.
 
 ```sh
-rm -rf /Applications/mapo.app.previous
-[ -d /Applications/mapo.app ] && mv /Applications/mapo.app /Applications/mapo.app.previous
+PREV=macos/build-release/previous      # gitignored; outside /Applications so only one mapo is registered
+mkdir -p "$PREV" && rm -rf "$PREV/mapo.app"
+[ -d /Applications/mapo.app ] && mv /Applications/mapo.app "$PREV/mapo.app"
 ditto "$APP" /Applications/mapo.app
 codesign --verify --deep --strict /Applications/mapo.app
 ```
 
-`mapo.app.previous` is the rollback: `rm -rf /Applications/mapo.app && mv /Applications/mapo.app.previous /Applications/mapo.app`.
+Rollback: `rm -rf /Applications/mapo.app && mv macos/build-release/previous/mapo.app /Applications/mapo.app`.
 
 ## 6. Smoke test
 
@@ -75,6 +76,8 @@ pgrep -lf '/Applications/mapo.app'          # still running
   | grep -E 'Renderer| E\(| C\('            # a Metal renderer line, no E( or C( lines
 ls ~/Library/Logs/DiagnosticReports | grep -i mapo   # no new crash report
 ls ~/Library/Application\ Support/com.maxparker72.mapo  # bookmarks/, settings.ini (or the user's override)
+lsof -p "$(pgrep -f /Applications/mapo.app/Contents/MacOS)" | grep -E 'World.mwm|drules'
+# every path must be inside /Applications/mapo.app/Contents/Resources: the bundle is self-contained
 ```
 
 Use `/usr/bin/log`: in zsh, plain `log` is a shell builtin. Release builds don't log debug lines such as
@@ -85,5 +88,7 @@ Leave the app running for the user.
 
 - `git push origin macos-experiment` (the version commit), and tag it: `git tag mapo-<version>-<build> && git push origin mapo-<version>-<build>`.
 - Tell the user: the version installed, what changed since the last tag (`git log --oneline <last tag>..HEAD -- macos`),
-  the smoke-test result, and the rollback command. Ask them to try the acceptance checks of anything that
+  the smoke-test result, and the rollback command. Ad-hoc signatures change with every build, so macOS may ask
+  for location permission again; if My Location stops working, re-allow mapo in System Settings → Privacy &
+  Security → Location Services. Ask them to try the acceptance checks of anything that
   changed (SPEC.md) and report problems with `/macos-triage`.
