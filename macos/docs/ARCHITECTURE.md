@@ -30,7 +30,7 @@ Rendering              libs/drape       Metal backend → MetalContextFactory (i
 - `Track::SetColor` writes only `m_rgba` on layer 0. Set both `m_predefinedColor` and `m_rgba` on every layer.
 - `Bookmark::SetIsVisible` is runtime-only. Hidden bookmarks reappear after a relaunch unless `m_data.m_visible` is also set.
 - `DeactivateMapSelection` clears the search pins unless viewport search is active, so the desktop refills them when the place page closes (`OMSearch.refillPins`).
-- After an import, `assignPaletteColorsToUncoloredBookmarks` gives bookmarks with `PredefinedColor::None` the nearest palette entry. Upstream has since added `GetCustomColor()` for custom bookmark colors. If upstream stores those as None plus RGBA, this repair would overwrite them, so re-check it during the rebase (T-030).
+- Bookmark colors are upstream's `{preset, 0}` or `{None, rgba}` (D-12). The Mac palette only names the nearest swatch; never write a `{palette, rgba}` pair. The engine fills in defaults for uncolored imports, so there is no post-import repair.
 - `GetBuildInfo().m_mercator` is the click point. Use the place's own coordinate (`info.GetMercator()`) for bookmarks, route stops and links.
 
 ## Lifecycle
@@ -73,15 +73,15 @@ Keep this table current. Each row costs time on every upstream sync (D-05).
 
 | Patch | Files | Purpose | Upstream plan |
 |---|---|---|---|
-| UIKit/AppKit shim | `iphone/CoreApi/CoreApi/Common/TargetConditionalUI.h` + 7 headers | Compile CoreApi for macOS | Offer upstream if they want a Mac target |
+| UIKit/AppKit shim | `iphone/CoreApi/CoreApi/Common/TargetConditionalUI.h` + 10 headers; `CGPointValue` guard in `MWMFrameworkHelper.mm` | Compile CoreApi for macOS. Each sync can add headers that import UIKit; the sync skill greps for them | Offer upstream if they want a Mac target |
 | Metal drawable guard | `libs/drape/metal/metal_base_context.mm` | Skip a frame when the layer has no drawable | Offer as a bug-fix PR |
-| Track visibility | `libs/map/track.hpp`, `libs/drape_frontend/*` | Hide tracks individually | Superseded upstream: adopt their `IsVisible()` on rebase |
+| Bookmark visibility | `libs/map/bookmark.hpp`, `bookmark.cpp` | Hide bookmarks individually (filters, project isolation); saved in KML via `m_data.m_visible`. Upstream removed per-bookmark visibility in Sep 2026 (bb4feae60c) | Offer upstream next to their `Track::SetVisibility` |
 | Qt-free file listing | `libs/platform/platform_qt.cpp` | Avoid linking Qt in the Mac app | Fork-only |
 | Exclude iOS texture file | `xcode/drape/drape.xcodeproj` | Don't compile `hw_texture_ios.mm` for macOS | Fork-only |
 
 ## Build and packaging
 
-- **Project.** `macos/project.yml` is the XcodeGen spec (D-04). It references 35 upstream library projects under `xcode/` and builds CoreApi as a static framework.
+- **Project.** `macos/project.yml` is the XcodeGen spec (D-04). It references 36 upstream library projects under `xcode/` and builds CoreApi as a static framework.
 - **Release builds** bundle the engine data and the Metal shader library, so the app runs offline.
 - **Known gaps:**
   - arm64-only (R-E7)

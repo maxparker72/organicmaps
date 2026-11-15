@@ -71,3 +71,18 @@ Imports keep the file's colors and line widths. Normalization is an explicit com
 Tagged builds are produced by GitHub Actions: archive, sign with Developer ID, notarize, staple, package a DMG, publish a GitHub Release. In-app updates use Sparkle later.
 
 **Why:** Testers get an app that opens without Gatekeeper warnings. **Open question:** this needs an Apple Developer Program membership ($99/year). Until then, builds are ad-hoc signed.
+
+## D-11 · Follow upstream by merging, not rebasing
+*Accepted · Nov 2026*
+
+`macos-experiment` takes upstream with a merge commit (`[macos] Merge upstream master …`) on a `sync/upstream-<date>` branch, which is fast-forwarded once the app builds and launches. `git rerere` is on, so conflict resolutions are reused. Replaces the rebase plan in T-030.
+
+**Why:** The branch is published, so rewriting it is unsafe. A merge resolves each conflict once instead of once per replayed commit, and the routine sync (`.claude/skills/macos-sync`) stays one repeatable procedure.
+
+## D-12 · Bookmark colors follow upstream; the palette is display-only
+*Accepted · Nov 2026*
+
+Upstream stores a bookmark color as a preset `{X, 0}` or a custom `{None, rgba}` and normalizes on load. The Mac app reads the effective color, shows its true color in lists, and names the nearest of the 16 palette swatches. Writes go through `SetColor(dp::Color)`, like iOS. The editor writes the exact stored color back unless the user picked a different swatch (LIB-06). The Mac palette enum lives in `macos/MapView/OMBookmarkColor.h` (Swift `BookmarkColor`).
+
+**Why:** Upstream (8aa1cd4d18) made the old `{palette, rgba}` pair invalid; keeping it would mean fighting the engine on every load. Full any-color editing is a separate feature.
+
